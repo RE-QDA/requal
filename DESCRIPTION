@@ -1,13 +1,9 @@
 Package: requal
-Title: An Amazing Shiny App
+Title: Qualitative Data Analysis with Reproducibility Support
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
-           role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
-License: What license is it under?
+Authors@R: person('Martin', 'Hájek', email = 'hajek@fsv.cuni.cz', role = c('cre', 'aut'))
+Description: PKG_DESC.
+License: MIT + file LICENSE
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.3.1),
