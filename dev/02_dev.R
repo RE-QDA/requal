@@ -16,6 +16,8 @@
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
 usethis::use_package( "quanteda" )
+usethis::use_package( "rlang" )
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/
