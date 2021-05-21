@@ -31,8 +31,8 @@ You can install the development version of `requal` from
 
 ## Running the app
 
-The shiny application for coding documents can be run by the following
-command.
+The shiny application for coding documents can be launched by the
+following command.
 
 ``` r
 requal::run_app()
