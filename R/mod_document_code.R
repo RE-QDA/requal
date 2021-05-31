@@ -46,9 +46,3 @@ mod_document_code_server <- function(id){
  
   })
 }
-    
-## To be copied in the UI
-# mod_document_code_ui("document_code_ui_1")
-    
-## To be copied in the server
-# mod_document_code_server("document_code_ui_1")
