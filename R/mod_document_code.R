@@ -18,6 +18,7 @@ mod_document_code_ui <- function(id){
     ),
     
     textOutput(ns("focal_text")),
+
     
     textOutput(ns("captured_range"))
   )
@@ -32,8 +33,15 @@ mod_document_code_server <- function(id){
     
     lorem_ipsum_input <- "Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     
+<<<<<<< HEAD
     output$focal_text <- renderText({lorem_ipsum_input})
         
+=======
+    output$lorem_ipsum_output <- renderText({lorem_ipsum_input})
+    
+  
+    
+>>>>>>> added document_code module and JS to capture selected text positions
     # observeEvent(input$tag_position, {
     # print(input$tag_position)
     # })
@@ -42,3 +50,12 @@ mod_document_code_server <- function(id){
  
   })
 }
+<<<<<<< HEAD
+=======
+    
+## To be copied in the UI
+# mod_document_code_ui("document_code_ui_1")
+    
+## To be copied in the server
+# mod_document_code_server("document_code_ui_1")
+>>>>>>> added document_code module and JS to capture selected text positions
