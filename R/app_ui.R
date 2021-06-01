@@ -10,7 +10,9 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic 
     fluidPage(
-      h1("requal")
+      h1("requal"),
+      
+      mod_document_code_ui("document_code_ui_1")
     )
   )
 }
