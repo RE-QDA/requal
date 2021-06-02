@@ -3,17 +3,71 @@
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @import shinydashboard
+#' @import shinydashboardPlus
 #' @noRd
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    # Your application UI logic 
-    fluidPage(
-      h1("requal"),
-      
-      mod_document_code_ui("document_code_ui_1")
-    )
+    # Your application UI logic
+    dashboardPage(
+      options = list(sidebarExpandOnHover = TRUE),
+      header = dashboardHeader(),
+      sidebar = dashboardSidebar(minified = TRUE, 
+                                 collapsed = TRUE,
+                                 sidebarMenu(
+                                   menuItem(
+                                     "Project",
+                                     tabName = "Project"
+                                   ),
+                                   menuItem(
+                                     "Codebook",
+                                     tabName = "Codebook"
+                                   ),
+                                   menuItem(
+                                     "Document",
+                                     tabName = "Document"
+                                   ),
+                                   menuItem(
+                                     "Analysis",
+                                     tabName = "Analysis"
+                                   ),
+                                   menuItem(
+                                     "Reporting",
+                                     tabName = "Reporting"
+                                   ),
+                                   menuItem(
+                                     "Settings",
+                                     tabName = "Settings"
+                                   ),
+                                   menuItem(
+                                     "About",
+                                     tabName = "About"
+                                   )
+                                 )),
+      body = dashboardBody(
+        
+        h1("requal"),
+        
+        mod_document_code_ui("document_code_ui_1")
+        
+        ),
+      controlbar = dashboardControlbar(
+        overlay = FALSE,
+        controlbarMenu(
+          id = "codes_menu",
+          controlbarItem(
+            title = "Codes",
+            lapply(paste0("button", 1:10), actionButton, label = "Code")
+            ),
+          controlbarItem(
+            title = "Memos"
+            )          
+        )
+        
+      )
+      )
   )
 }
 
@@ -35,7 +89,7 @@ golem_add_external_resources <- function(){
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
-      app_title = 'requal'
+      app_title = 'ReQual'
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
