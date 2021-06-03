@@ -3,8 +3,9 @@ $( document ).ready(function() {
 document.addEventListener('mouseup', function () {
     if (typeof window.getSelection != 'undefined') {
         var sel = window.getSelection();
+        if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
         var range = sel.getRangeAt(0);
-        
+
         var startOffset = range.startOffset;
         var endOffset = startOffset + range.toString().length;
       
