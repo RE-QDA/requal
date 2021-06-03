@@ -14,45 +14,8 @@ app_ui <- function(request) {
     dashboardPage(
       options = list(sidebarExpandOnHover = TRUE),
       header = dashboardHeader(),
-      sidebar = dashboardSidebar(minified = TRUE, 
-                                 collapsed = TRUE,
-                                 sidebarMenu(
-                                   menuItem(
-                                     "Project",
-                                     tabName = "Project"
-                                   ),
-                                   menuItem(
-                                     "Codebook",
-                                     tabName = "Codebook"
-                                   ),
-                                   menuItem(
-                                     "Document",
-                                     tabName = "Document"
-                                   ),
-                                   menuItem(
-                                     "Analysis",
-                                     tabName = "Analysis"
-                                   ),
-                                   menuItem(
-                                     "Reporting",
-                                     tabName = "Reporting"
-                                   ),
-                                   menuItem(
-                                     "Settings",
-                                     tabName = "Settings"
-                                   ),
-                                   menuItem(
-                                     "About",
-                                     tabName = "About"
-                                   )
-                                 )),
-      body = dashboardBody(
-        
-        h1("requal"),
-        
-        mod_document_code_ui("document_code_ui_1")
-        
-        ),
+      sidebar = mod_left_menu_ui("left_menu_ui_1"),
+      body = mod_dashboard_body_ui("dashboard_body_ui_1"),
       controlbar = dashboardControlbar(
         overlay = FALSE,
         controlbarMenu(
