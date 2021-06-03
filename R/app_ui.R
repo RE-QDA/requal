@@ -13,7 +13,7 @@ app_ui <- function(request) {
     # Your application UI logic
     dashboardPage(
       options = list(sidebarExpandOnHover = TRUE),
-      header = dashboardHeader(),
+      header = dashboardHeader(controlbarIcon = shiny::icon("file-code")),
       sidebar = dashboardSidebar(minified = TRUE, 
                                  collapsed = TRUE,
                                  sidebarMenu(
