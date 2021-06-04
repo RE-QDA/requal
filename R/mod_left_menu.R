@@ -11,7 +11,7 @@ mod_left_menu_ui <- function(id){
   ns <- NS(id)
 
     dashboardSidebar(minified = TRUE, 
-                     collapsed = TRUE,
+                     collapsed = FALSE,
                      sidebarMenu(
                        menuItem(
                          "Project",

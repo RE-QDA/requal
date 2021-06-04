@@ -12,7 +12,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     dashboardPage(title = "ReQual",
-      options = list(sidebarExpandOnHover = TRUE),
+      options = list(sidebarExpandOnHover = FALSE),
       header = dashboardHeader(controlbarIcon = shiny::icon("file-code")),
       sidebar = mod_left_menu_ui("left_menu_ui_1"),
       body = mod_dashboard_body_ui("dashboard_body_ui_1"),
