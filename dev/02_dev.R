@@ -17,11 +17,23 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "quanteda" )
 usethis::use_package( "rlang" )
+usethis::use_package( "shinydashboardPlus" )
+usethis::use_package( "shinyFiles" )
+
 
 
 ## Add modules ----
 ## Create a module infrastructure in R/
+golem::add_module( name = "left_menu" ) # Name of the module
+golem::add_module( name = "dashboard_body" ) # Name of the module
+golem::add_module( name = "project" ) # Name of the module
+golem::add_module( name = "codebook" ) # Name of the module
 golem::add_module( name = "document_code" ) # Name of the module
+golem::add_module( name = "analysis" ) # Name of the module
+golem::add_module( name = "reporting" ) # Name of the module
+golem::add_module( name = "settings" ) # Name of the module
+golem::add_module( name = "about" ) # Name of the module
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
