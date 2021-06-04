@@ -618,6 +618,13 @@
       "Repository": "CRAN",
       "Hash": "6e3b6ae7fe02b5859e4bb277f218b8ae"
     },
+    "shinyFiles": {
+      "Package": "shinyFiles",
+      "Version": "0.9.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b89af8b86b622bf54a81012e44352804"
+    },
     "shinydashboard": {
       "Package": "shinydashboard",
       "Version": "0.7.1",
