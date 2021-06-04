@@ -548,13 +548,6 @@
       "Repository": "CRAN",
       "Hash": "5c0cdb37f063c58cdab3c7e9fbb8bd2c"
     },
-    "requal": {
-      "Package": "requal",
-      "Version": "0.0.0.9000",
-      "Source": "Repository",
-      "Repository": "MRAN",
-      "Hash": "60105534912a29d69c1423f2e9c9d783"
-    },
     "rlang": {
       "Package": "rlang",
       "Version": "0.4.10",
