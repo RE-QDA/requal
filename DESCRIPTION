@@ -7,12 +7,14 @@ License: MIT + file LICENSE
 Imports: 
     attempt,
     config (>= 0.3.1),
+    DBI,
     DT,
     glue,
     golem (>= 0.3.1),
     htmltools,
     quanteda,
     rlang,
+    RSQLite,
     shiny (>= 1.6.0),
     shinydashboardPlus,
     shinyFiles
