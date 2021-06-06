@@ -36,8 +36,8 @@ mod_project_server <- function(id){
       
        output$project_action <-  renderUI({
          
-         div(id = ns("project_load_panel"),
-         
+         box(closable = TRUE,
+           
      h3("Project name"), 
      textInput(ns("project_name"), label = NULL, placeholder = "The name of your project."),
      
@@ -52,14 +52,16 @@ mod_project_server <- function(id){
      textAreaInput(ns("project_description"), label = NULL, placeholder = "Brief description of your project"),
      
      actionButton(ns("project_create"), label = "Create project", class = "btn-success"))
+         
        })
+       
      })
    
      observeEvent(input$project_load, {
        
        output$project_action <-  renderUI({
          
-   div(id = ns("project_load_panel"),
+         box(closable = TRUE,
        
        h3("Project folder")
        
