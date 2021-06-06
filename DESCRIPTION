@@ -8,6 +8,7 @@ Imports:
     attempt,
     config (>= 0.3.1),
     DBI,
+    dplyr,
     DT,
     fs,
     glue,
@@ -19,7 +20,8 @@ Imports:
     shiny (>= 1.6.0),
     shinydashboard,
     shinydashboardPlus,
-    shinyFiles
+    shinyFiles,
+    tibble
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

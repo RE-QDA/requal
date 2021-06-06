@@ -22,11 +22,19 @@ usethis::use_package( "shinyFiles" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "DBI" )
 usethis::use_package( "RSQLite" )
+usethis::use_package( "dplyr" )
+usethis::use_package( "tibble" )
+usethis::use_package( "magrittr" )
+usethis::use_package( "dbplyr" )
 
 
 
 
-## Add modules ----
+
+
+
+
+1## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "left_menu" ) # Name of the module
 golem::add_module( name = "dashboard_body" ) # Name of the module
