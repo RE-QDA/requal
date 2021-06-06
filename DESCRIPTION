@@ -8,6 +8,7 @@ Imports:
     attempt,
     config (>= 0.3.1),
     DBI,
+    dplyr,
     DT,
     glue,
     golem (>= 0.3.1),
@@ -17,7 +18,8 @@ Imports:
     RSQLite,
     shiny (>= 1.6.0),
     shinydashboardPlus,
-    shinyFiles
+    shinyFiles,
+    tibble
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
