@@ -19,6 +19,10 @@ usethis::use_package( "quanteda" )
 usethis::use_package( "rlang" )
 usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "shinyFiles" )
+usethis::use_package( "shinyjs" )
+usethis::use_package( "DBI" )
+usethis::use_package( "RSQLite" )
+
 
 
 
@@ -38,7 +42,7 @@ golem::add_module( name = "about" ) # Name of the module
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "helpers" ) 
-golem::add_utils( "helpers" )
+golem::add_utils( "project", module = "project" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

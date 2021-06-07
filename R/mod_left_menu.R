@@ -7,6 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
+#' @importFrom shinydashboard sidebarMenu menuItem
 mod_left_menu_ui <- function(id){
   ns <- NS(id)
 
