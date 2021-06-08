@@ -10,8 +10,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![R-CMD-check](https://github.com/RE-QDA/requal/workflows/R-CMD-check/badge.svg)](https://github.com/RE-QDA/requal/actions)
 <!-- badges: end -->
 
-The goal of `requal` is to provide reproducibility support for
-qualitative coding.
+The goal of `requal` is to provide reproducibility support for qualitative coding.<br>
+Supported by The Technology Agency of the Czech Republic, project n. TL05000054.
 
 ## Installation
 
