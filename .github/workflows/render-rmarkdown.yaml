@@ -20,6 +20,10 @@ jobs:
       - name: Install pandoc
         run: |
           brew install pandoc
+          
+      - name: Install libgit2
+        run: |
+           brew install libgit2
 
       - name: Cache Renv packages
         uses: actions/cache@v2
