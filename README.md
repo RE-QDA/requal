@@ -10,16 +10,18 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![R-CMD-check](https://github.com/RE-QDA/requal/workflows/R-CMD-check/badge.svg)](https://github.com/RE-QDA/requal/actions)
 <!-- badges: end -->
 
-The goal of `requal` is to provide reproducibility support for qualitative coding.<br>
-Supported by The Technology Agency of the Czech Republic, project n. TL05000054.
+The goal of `requal` is to provide reproducibility support for
+qualitative coding.  
+Supported by The Technology Agency of the Czech Republic, project
+n. TL05000054.
 
 ## Installation
 
 You can install the development version of `requal` from
 [GitHub](https://github.com/) by following these steps:
 
-1.  download the current release from [this
-    link](https://github.com/RE-QDA/requal/releases).
+1.  download the current release from
+    [Releases](https://github.com/RE-QDA/requal/releases).
 2.  install `remotes` package by running `install.packages("remotes")`
     in R console.
 3.  install `requal` package by running
@@ -29,7 +31,7 @@ You can install the development version of `requal` from
     `C:/Users/michael.skvrnak/Downloads/requal_0.0.0.9000.tar.gz` on
     Windows)
 
-## Running the app
+## Usage
 
 The shiny application for coding documents can be launched by the
 following command.
