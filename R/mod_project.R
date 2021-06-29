@@ -39,7 +39,7 @@ mod_project_server <- function(id){
     ns <- session$ns
     
     
-# create project
+# create project menu
     
      observeEvent(input$project_create_menu, {
       
@@ -66,7 +66,7 @@ mod_project_server <- function(id){
        
      })
    
-# load project 
+# load project menu
      
      observeEvent(input$project_load_menu, {
        
@@ -78,9 +78,9 @@ mod_project_server <- function(id){
        
        div(span(textOutput(ns("project_path")), class = "form-control"), class = "form-group shiny-input-container"),
 
-       shinyFiles::shinyDirButton(ns("sel_directory"), "Folder select", "Please select a project folder"),
+       shinyFiles::shinyDirButton(ns("sel_directory_load"), "Folder select", "Please select a project folder"),
        
-       selectInput(ns("project_selector"), "Select project", choices = active_project),
+       selectInput(ns("project_selector_load"), "Select project", choices = NULL),
 
        actionButton(ns("project_load"), label = "Load project", class = "btn-success")
    ) })
@@ -100,7 +100,15 @@ mod_project_server <- function(id){
                                restrictions = system.file(package = "base"), 
                                allowDirCreate = TRUE)
     
+    shinyFiles::shinyDirChoose(input, "sel_directory_load", 
+                               roots = volumes, 
+                               session = session, 
+                               restrictions = system.file(package = "base"), 
+                               allowDirCreate = TRUE)
+    
     project_directory <- reactive({ normalizePath( shinyFiles::parseDirPath(volumes, input$sel_directory))})
+    
+    project_directory_load <- reactive({ normalizePath( shinyFiles::parseDirPath(volumes, input$sel_directory_load))})
     
     output$project_path <- renderText({
       if (is.integer(input$sel_directory)) {
@@ -110,15 +118,14 @@ mod_project_server <- function(id){
       }
     })
     
-    project_name <- reactive({input$project_name})
-    project_description <- reactive({input$project_description})
-    
+
+# create project event
     
     observeEvent(input$project_create, {
       
       create_project_db(project_directory = project_directory(),
-                        project_name = project_name(),
-                        project_description = project_description())
+                        project_name = input$project_name,
+                        project_description = input$project_description)
       
       
     })
@@ -126,24 +133,29 @@ mod_project_server <- function(id){
 # active project from load
     output$project_active <- renderUI({"No active project."})
     
-    observeEvent(input$project_load, {
+    observe({
+      
+      projects_in_db <- reactive({read_project_db(project_directory_load())})
+      
+      updateSelectInput(session, "project_selector_load",
+                        choices = projects_in_db())
+      })
+    
+    observeEvent(input$sel_directory_load, {
       
       project_db <- reactive({ isolate(read_project_db(project_directory())) })
       
-      observe({
-        updateSelectInput(session, "project_selector",
-                          choices = project_db()
-        )})
+
       
-      if (length(active_project > 1)) {
-      
-      output$project_active <- renderUI({
-        
-        selectInput(ns("project_selector"), "Select project", choices = active_project)
-        
-      })
-      
-      }
+      # if (length(active_project > 1)) {
+      # 
+      # output$project_active <- renderUI({
+      #   
+      #   selectInput(ns("project_selector"), "Select project", choices = active_project)
+      #   
+      # })
+      # 
+      # }
       
     })
     

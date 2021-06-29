@@ -41,15 +41,15 @@ read_project_db <- function(project_directory) {
                           pattern = ".sqlite$",
                           full.names = TRUE)
     
-    if (length(db_file) > 1) {
+    if (length(db_file) >= 1) {
         
         db_file <- db_file[1]
         
-    } else if (length(db_file) < 1) {
+    } else {
         
        return("No active project in the folder.")
         
-    } else {
+    } 
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           db_file
@@ -61,6 +61,24 @@ read_project_db <- function(project_directory) {
         dplyr::pull(project_name)
     
     return(project_name)
-    }
+    
 }
+
+# list projects
+
+
+list_db_projects <- function(project_db) {
+    
+        
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              project_db
+        )
+        on.exit(DBI::dbDisconnect(con))
+        
+        
+        project_name <- dplyr::tbl(con, "project") %>% 
+            dplyr::pull(project_name)
+        
+        return(project_name)
+    }
 
