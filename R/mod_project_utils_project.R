@@ -47,10 +47,12 @@ read_project_db <- function(project_directory) {
         
     } else {
         
-       return("No active project in the folder.")
+        db_file <- NULL
         
     } 
     
+    if (!is.null(db_file)) {
+        
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           db_file
                          )
@@ -62,6 +64,10 @@ read_project_db <- function(project_directory) {
     
     return(project_name)
     
+    } else {
+        
+        return("No active project in the folder")
+    }
 }
 
 # list projects
