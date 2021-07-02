@@ -10,13 +10,15 @@ create_project_db <- function(project_directory,
                                   "",
                                   iconv(project_name, 
                                         to = "ASCII//TRANSLIT")
-                              ), ".sqlite")
+                              ), ".requal")
                           )))
     on.exit(DBI::dbDisconnect(con))
     
     project_df <- tibble::tibble(project_name, 
                                  project_description,
                                  project_created = as.character(Sys.time()))
+    
+    if (!DBI::dbExistsTable(con, "project")) {
     
        # https://github.com/r-dbi/RSQLite/issues/59
        DBI::dbExecute(con,
@@ -28,6 +30,8 @@ create_project_db <- function(project_directory,
 )" 
        )
        
+    }
+       
        DBI::dbWriteTable(con, "project", project_df, 
                          append = TRUE)
     
@@ -38,7 +42,7 @@ create_project_db <- function(project_directory,
 read_project_db <- function(project_directory) {
     
     db_file <- list.files(path = project_directory, 
-                          pattern = ".sqlite$",
+                          pattern = ".requal$",
                           full.names = TRUE)
     
     if (length(db_file) >= 1) {
