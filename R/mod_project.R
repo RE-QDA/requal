@@ -45,7 +45,7 @@ mod_project_server <- function(id){
       
        output$project_action <-  renderUI({
          
-         box(closable = TRUE, width = NULL,
+         box(closable = TRUE, width = NULL, title = "Create project",
            
      h3("Project name"), 
      textInput(ns("project_name"), label = NULL, placeholder = "The name of your project."),
@@ -72,7 +72,7 @@ mod_project_server <- function(id){
        
        output$project_action <-  renderUI({
          
-         box(closable = TRUE, width = NULL,
+         box(closable = TRUE, width = NULL, title = "Load project",
        
        h3("Project folder"),
        
@@ -161,13 +161,17 @@ mod_project_server <- function(id){
      observe({
        updateSelectInput(session,
                          "project_selector_load",
-                         choices = read_project_db(project_directory_load()))
+                         choices = read_project_db(project_directory_load(),
+                                                   name = NULL))
      })
      
+     
      observeEvent(input$project_load, {
+
        output$project_active <-
-         reactive({
-           isolate(read_project_db(project_directory_load()))
+         renderUI({
+           isolate(read_project_db(project_directory_load(), 
+                                   name = input$project_selector_load))
          })
        
      })
@@ -177,11 +181,13 @@ mod_project_server <- function(id){
      observeEvent(input$project_create, {
        output$project_active <-
          reactive({
-           isolate(read_project_db(project_directory()))
+           isolate(read_project_db(project_directory(),
+                                   name = input$project_name))
          })
        
      })
      
+     # display active project details
      
      
   })

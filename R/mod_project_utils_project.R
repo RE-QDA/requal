@@ -39,7 +39,7 @@ create_project_db <- function(project_directory,
    }
     
 
-read_project_db <- function(project_directory) {
+read_project_db <- function(project_directory, name) {
     
     db_file <- list.files(path = project_directory, 
                           pattern = ".requal$",
@@ -62,11 +62,23 @@ read_project_db <- function(project_directory) {
                          )
     on.exit(DBI::dbDisconnect(con))
     
-    
-    project_name <- dplyr::tbl(con, "project") %>% 
+    if (!is.null(name)) {
+        
+    active_project_name <- dplyr::tbl(con, "project") %>% 
+        dplyr::filter(project_name == name) %>% 
         dplyr::pull(project_name)
     
-    return(project_name)
+    return(active_project_name)
+    
+    } else {
+        
+        active_project_name <- dplyr::tbl(con, "project") %>% 
+            dplyr::pull(project_name)
+        
+        return(active_project_name)
+        
+    }
+    
     
     } else {
         
