@@ -45,7 +45,7 @@ mod_project_server <- function(id){
       
        output$project_action <-  renderUI({
          
-         box(closable = TRUE, width = NULL, title = "Create project",
+         box(closable = TRUE, width = NULL, title = "Create project", solidHeader = TRUE,
            
      h3("Project name"), 
      textInput(ns("project_name"), label = NULL, placeholder = "The name of your project."),
@@ -72,13 +72,13 @@ mod_project_server <- function(id){
        
        output$project_action <-  renderUI({
          
-         box(closable = TRUE, width = NULL, title = "Load project",
+         box(closable = TRUE, width = NULL, title = "Load project", solidHeader = TRUE,
        
-       h3("Project folder"),
+       h3("Project file"),
        
        div(span(textOutput(ns("project_path_load")), class = "form-control"), class = "form-group shiny-input-container"),
 
-       shinyFiles::shinyDirButton(ns("sel_directory_load"), "Folder select", "Please select a project folder"),
+       shinyFiles::shinyFilesButton(ns("sel_file_load"), "File select", "Please select a project file", multiple = FALSE),
        
        selectInput(ns("project_selector_load"), "Select project", choices = NULL),
 
@@ -104,13 +104,13 @@ mod_project_server <- function(id){
        allowDirCreate = TRUE
      )
      
-     shinyFiles::shinyDirChoose(
+     shinyFiles::shinyFileChoose(
        input,
-       "sel_directory_load",
+       "sel_file_load",
        roots = volumes,
        session = session,
        restrictions = system.file(package = "base"),
-       allowDirCreate = TRUE
+       pattern=c('\\.requal')
      )
      
      project_directory <-
@@ -118,9 +118,9 @@ mod_project_server <- function(id){
          normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
        })
      
-     project_directory_load <-
+     project_file_load <-
        reactive({
-         normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory_load))
+         normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
        })
      
      output$project_path <- renderText({
@@ -132,10 +132,10 @@ mod_project_server <- function(id){
      })
      
      output$project_path_load <- renderText({
-       if (is.integer(input$sel_directory_load)) {
-         "No project directory has been selected."
+       if (is.integer(input$sel_file_load)) {
+         "No project file has been selected."
        } else {
-         project_directory_load()
+         project_file_load()
        }
      })
      
@@ -161,7 +161,7 @@ mod_project_server <- function(id){
      observe({
        updateSelectInput(session,
                          "project_selector_load",
-                         choices = read_project_db(project_directory_load(),
+                         choices = read_project_db(project_file_load(),
                                                    name = NULL))
      })
      
@@ -170,7 +170,7 @@ mod_project_server <- function(id){
 
        output$project_active <-
          renderUI({
-           isolate(read_project_db(project_directory_load(), 
+           isolate(read_project_db(project_file_load(), 
                                    name = input$project_selector_load))
          })
        
@@ -181,8 +181,15 @@ mod_project_server <- function(id){
      observeEvent(input$project_create, {
        output$project_active <-
          reactive({
-           isolate(read_project_db(project_directory(),
-                                   name = input$project_name))
+           isolate(read_project_db(paste0(project_directory(), 
+                                            .Platform$file.sep,
+                                            paste0(gsub(
+                                                       "[^a-zA-Z]+",
+                                                       "",
+                                                       iconv(input$project_name, 
+                                                             to = "ASCII//TRANSLIT")
+                                                     ), ".requal")),
+           name = input$project_name))
          })
        
      })

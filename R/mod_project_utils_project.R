@@ -39,11 +39,9 @@ create_project_db <- function(project_directory,
    }
     
 
-read_project_db <- function(project_directory, name) {
+read_project_db <- function(project_file, name) {
     
-    db_file <- list.files(path = project_directory, 
-                          pattern = ".requal$",
-                          full.names = TRUE)
+    db_file <- project_file
     
     if (length(db_file) >= 1) {
         
