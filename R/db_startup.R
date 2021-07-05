@@ -10,26 +10,14 @@ CREATE TABLE projects
 ,    created_at TEXT
 )"
 
+# TODO: users table & user_attributes
 CREATE_LOG_SQL <- "
-CREATE TABLE logs 
+CREATE TABLE if not exists logs 
 (   user TEXT
 ,   project_id INTEGER
 ,   action TEXT
-,   payload TEXT
-,   created_at TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
-)"
-
-CREATE_LOG_SQL_POSTGRES <- "
-CREATE TABLE if not exists logs (
---    user_id INTEGER
-    user TEXT
-,   project_id INTEGER
--- ,   action_type TEXT
-,   action TEXT
 ,   payload JSON
 ,   created_at TEXT
--- ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 )"
 
@@ -42,18 +30,57 @@ CREATE TABLE if not exists documents (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 )"
 
+CREATE_CODES_SQL <- "
+CREATE TABLE if not exists codes (
+    project_id INTEGER
+,   code_id INTEGER PRIMARY KEY
+,   code_name TEXT UNIQUE
+)"
+
+CREATE_SEGMENTS_SQL <- "
+CREATE TABLE if not exists segments (
+    project_id INTEGER
+,   doc_id INTEGER
+,   code_id INTEGER
+,   segment_start INTEGER
+,   segment_end INTEGER
+,   segment_text TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+)"
+
+# TODO: memos
+# TODO: memos_documents_map, memos_codes_map, memos_segments_map
+# TODO: code_categories
+
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
+    DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 
 create_db_schema.PqConnection <- function(con){
     # TODO: Full DB structure
+    # TODO: optimize sql for Postgres (e.g. created_at fields as date type)
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
-    DBI::dbExecute(con, CREATE_LOG_SQL_POSTGRES)
+    DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
+    DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+}
+
+create_log_df <- function(project_id, action, payload){
+    tibble::tibble(
+        user = Sys.info()["user"], 
+        project_id = project_id, 
+        action = action, 
+        payload = as.character(jsonlite::toJSON(payload)), 
+        created_at = as.character(Sys.time(), usetz = TRUE)
+    )
 }
 
 log_create_project_record <- function(con, project_id, project_df){
@@ -61,24 +88,16 @@ log_create_project_record <- function(con, project_id, project_df){
 }
 
 log_create_project_record.SQLiteConnection <- function(con, project_id, project_df){
-    log_record_df <- tibble::tibble(
-        user = Sys.info()["user"], 
-        project_id = project_id, 
-        action = "Create project", 
-        payload = as.character(jsonlite::toJSON(project_df)),
-        created_at = as.character(Sys.time())
-    )
+    log_record_df <- create_log_df(project_id, 
+                                   action = "Create project", 
+                                   payload = project_df)
     DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
 }
 
 log_create_project_record.PqConnection <- function(con, project_id, project_df){
-    log_record_df <- tibble::tibble(
-        user = Sys.info()["user"], 
-        project_id = project_id, 
-        action = "Create project", 
-        payload = jsonlite::toJSON(project_df),
-        created_at = as.character(Sys.time())
-    )
+    log_record_df <- create_log_df(project_id, 
+                                   action = "Create project", 
+                                   payload = project_df)
     DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
 }
 
