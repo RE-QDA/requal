@@ -11,12 +11,21 @@ mod_project_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    actionButton(ns("project_load"), label = "Load existing project"),
-    
-    actionButton(ns("project_create"), label = "Create new project"),
-    
-    uiOutput(ns("project_action"))
-    
+    fluidRow(
+      column(width = 6,
+        
+        uiOutput(ns("project_active"))
+        
+      ),
+      column(width = 6,
+        
+        actionButton(ns("project_load_menu"), label = "Load existing project"),
+        
+        actionButton(ns("project_create_menu"), label = "Create new project"),
+        
+        uiOutput(ns("project_action"))
+      )
+    )
   )
                      
 
@@ -30,13 +39,13 @@ mod_project_server <- function(id){
     ns <- session$ns
     
     
-   
-     
-     observeEvent(input$project_create, {
+# create project menu
+    
+     observeEvent(input$project_create_menu, {
       
        output$project_action <-  renderUI({
          
-         box(closable = TRUE,
+         box(closable = TRUE, width = NULL, title = "Create project", solidHeader = TRUE,
            
      h3("Project name"), 
      textInput(ns("project_name"), label = NULL, placeholder = "The name of your project."),
@@ -57,64 +66,136 @@ mod_project_server <- function(id){
        
      })
    
-     observeEvent(input$project_load, {
+# load project menu
+     
+     observeEvent(input$project_load_menu, {
        
        output$project_action <-  renderUI({
          
-         box(closable = TRUE,
+         box(closable = TRUE, width = NULL, title = "Load project", solidHeader = TRUE,
        
-       h3("Project folder")
+       h3("Project file"),
        
-       # div(span(textOutput(ns("project_path")), class = "form-control"), class = "form-group shiny-input-container"),
-       # 
-       # shinyFiles::shinyDirButton(ns("sel_directory"), "Folder select", "Please select a project folder"),
-       # 
-       # 
-       # 
-       # actionButton(ns("project_load"), label = "Load project", class = "btn-success")
+       div(span(textOutput(ns("project_path_load")), class = "form-control"), class = "form-group shiny-input-container"),
+
+       shinyFiles::shinyFilesButton(ns("sel_file_load"), "File select", "Please select a project file", multiple = FALSE),
+       
+       selectInput(ns("project_selector_load"), "Select project", choices = NULL),
+
+       actionButton(ns("project_load"), label = "Load project", class = "btn-success")
    ) })
+       
+       
      
    })
-      
+     
+     
+     
+     # set up paths
+     
+     volumes <- c(Home = fs::path_home())
+     
+     shinyFiles::shinyDirChoose(
+       input,
+       "sel_directory",
+       roots = volumes,
+       session = session,
+       restrictions = system.file(package = "base"),
+       allowDirCreate = TRUE
+     )
+     
+     shinyFiles::shinyFileChoose(
+       input,
+       "sel_file_load",
+       roots = volumes,
+       session = session,
+       restrictions = system.file(package = "base"),
+       pattern=c('\\.requal')
+     )
+     
+     project_directory <-
+       reactive({
+         normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
+       })
+     
+     project_file_load <-
+       reactive({
+         normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
+       })
+     
+     output$project_path <- renderText({
+       if (is.integer(input$sel_directory)) {
+         "No project directory has been selected."
+       } else {
+         project_directory()
+       }
+     })
+     
+     output$project_path_load <- renderText({
+       if (is.integer(input$sel_file_load)) {
+         "No project file has been selected."
+       } else {
+         project_file_load()
+       }
+     })
+     
+     
+     # create project event
+     
+     observeEvent(input$project_create, {
+       create_project_db(
+         project_directory = project_directory(),
+         project_name = input$project_name,
+         project_description = input$project_description
+       )
+       
+       
+     })
+     
+     # set active project from load
+     output$project_active <- renderUI({
+       "No active project."
+     })
+     
+     
+     observe({
+       updateSelectInput(session,
+                         "project_selector_load",
+                         choices = read_project_db(project_file_load(),
+                                                   name = NULL))
+     })
+     
+     
+     observeEvent(input$project_load, {
 
-    volumes <- c(Home = fs::path_home())
-    # by setting `allowDirCreate = FALSE` a user will not be able to create a new directory
-    shinyFiles::shinyDirChoose(input, "sel_directory", 
-                               roots = volumes, 
-                               session = session, 
-                               restrictions = system.file(package = "base"), 
-                               allowDirCreate = TRUE)
-    
-    project_directory <- reactive({ normalizePath( shinyFiles::parseDirPath(volumes, input$sel_directory))})
-    
-    output$project_path <- renderText({
-      if (is.integer(input$sel_directory)) {
-        print("No project directory has been selected.")
-      } else {
-        project_directory()
-      }
-    })
-    
-    project_name <- reactive({input$project_name})
-    project_description <- reactive({input$project_description})
-    
-    
-    observeEvent(input$project_create, {
-      
-      create_project_db(project_directory = project_directory(),
-                        project_name = project_name())
-      
-      
-      
-      
-      # cat(c("Successful test.", 
-      #       project_name(),
-      #       project_description()), 
-      #     file = fs::path_join(c(project_directory(), "outfile.txt")),
-      #     sep = "\n")
-      
-    })
-    
-    
+       output$project_active <-
+         renderUI({
+           isolate(read_project_db(project_file_load(), 
+                                   name = input$project_selector_load))
+         })
+       
+     })
+     
+     # set active project from create
+     
+     observeEvent(input$project_create, {
+       output$project_active <-
+         reactive({
+           isolate(read_project_db(paste0(project_directory(), 
+                                            .Platform$file.sep,
+                                            paste0(gsub(
+                                                       "[^a-zA-Z]+",
+                                                       "",
+                                                       iconv(input$project_name, 
+                                                             to = "ASCII//TRANSLIT")
+                                                     ), ".requal")),
+           name = input$project_name))
+         })
+       
+     })
+     
+     # display active project details
+     
+     
   })
 }
