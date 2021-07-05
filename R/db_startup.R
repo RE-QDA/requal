@@ -1,4 +1,3 @@
-#' @export
 create_db_schema <- function(con){
     UseMethod("create_db_schema")
 }
@@ -43,7 +42,6 @@ CREATE TABLE if not exists documents (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 )"
 
-#' @export
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
@@ -51,7 +49,6 @@ create_db_schema.SQLiteConnection <- function(con){
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
 }
 
-#' @export
 create_db_schema.PqConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
@@ -59,12 +56,10 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
 }
 
-#' @export
 log_create_project_record <- function(con, project_id, project_df){
     UseMethod("log_create_project_record")
 }
 
-#' @export
 log_create_project_record.SQLiteConnection <- function(con, project_id, project_df){
     log_record_df <- tibble::tibble(
         user = Sys.info()["user"], 
@@ -76,7 +71,6 @@ log_create_project_record.SQLiteConnection <- function(con, project_id, project_
     DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
 }
 
-#' @export
 log_create_project_record.PqConnection <- function(con, project_id, project_df){
     log_record_df <- tibble::tibble(
         user = Sys.info()["user"], 
@@ -88,7 +82,6 @@ log_create_project_record.PqConnection <- function(con, project_id, project_df){
     DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
 }
 
-#' @export
 create_project_record <- function(con, project_df){
     DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
     project_id <- dplyr::tbl(con, "projects") %>% 
