@@ -19,9 +19,12 @@ create_project_db <- function(project_directory,
                                  project_created = as.character(Sys.time()))
     
     if (!DBI::dbExistsTable(con, "project")) {
+        
+        DBI::dbExecute(con, "PRAGMA foreign_keys=ON")
+        
     
        # https://github.com/r-dbi/RSQLite/issues/59
-       DBI::dbExecute(con,
+       DBI::dbExecute(con, 
                  "CREATE TABLE project
 (  project_id INTEGER PRIMARY KEY, -- Autoincrement
    project_name TEXT,
@@ -29,13 +32,23 @@ create_project_db <- function(project_directory,
    project_created TEXT
 )" 
        )
+        
+        DBI::dbExecute(con,
+                "CREATE TABLE IF NOT EXISTS documents
+       (   project INTEGER,
+           document_id INTEGER PRIMARY KEY, -- Autoincrement
+           document_text TEXT,
+           FOREIGN KEY(project) REFERENCES project(project_id)
+       )"
+       )
+
        
     }
        
        DBI::dbWriteTable(con, "project", project_df, 
                          append = TRUE)
-    
-    
+
+       
    }
     
 
@@ -80,7 +93,7 @@ read_project_db <- function(project_file, name) {
     
     } else {
         
-        return("No active project in the folder")
+        return("No active project.")
     }
 }
 
