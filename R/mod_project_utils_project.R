@@ -16,28 +16,16 @@ create_project_db <- function(project_directory,
     
     project_df <- tibble::tibble(project_name, 
                                  project_description,
-                                 project_created = as.character(Sys.time()))
+                                 created_at = as.character(Sys.time()))
     
-    if (!DBI::dbExistsTable(con, "project")) {
-    
-       # https://github.com/r-dbi/RSQLite/issues/59
-       DBI::dbExecute(con,
-                 "CREATE TABLE project
-(  project_id INTEGER PRIMARY KEY, -- Autoincrement
-   project_name TEXT,
-   project_description TEXT,
-   project_created TEXT
-)" 
-       )
-       
+    if (!DBI::dbExistsTable(con, "projects")) {
+        # https://github.com/r-dbi/RSQLite/issues/59
+        create_db_schema(con)
     }
-       
-       DBI::dbWriteTable(con, "project", project_df, 
-                         append = TRUE)
     
-    
-   }
-    
+    create_project_record(con, project_df)
+}
+
 
 read_project_db <- function(project_file, name) {
     
@@ -55,29 +43,29 @@ read_project_db <- function(project_file, name) {
     
     if (!is.null(db_file)) {
         
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          db_file
-                         )
-    on.exit(DBI::dbDisconnect(con))
-    
-    if (!is.null(name)) {
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              db_file
+        )
+        on.exit(DBI::dbDisconnect(con))
         
-    active_project_name <- dplyr::tbl(con, "project") %>% 
-        dplyr::filter(project_name == name) %>% 
-        dplyr::pull(project_name)
-    
-    return(active_project_name)
-    
-    } else {
+        if (!is.null(name)) {
+            
+            active_project_name <- dplyr::tbl(con, "projects") %>% 
+                dplyr::filter(project_name == name) %>% 
+                dplyr::pull(project_name)
+            
+            return(active_project_name)
+            
+        } else {
+            
+            active_project_name <- dplyr::tbl(con, "projects") %>% 
+                dplyr::pull(project_name)
+            
+            return(active_project_name)
+            
+        }
         
-        active_project_name <- dplyr::tbl(con, "project") %>% 
-            dplyr::pull(project_name)
         
-        return(active_project_name)
-        
-    }
-    
-    
     } else {
         
         return("No active project in the folder")
@@ -89,16 +77,16 @@ read_project_db <- function(project_file, name) {
 
 list_db_projects <- function(project_db) {
     
-        
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db
-        )
-        on.exit(DBI::dbDisconnect(con))
-        
-        
-        project_name <- dplyr::tbl(con, "project") %>% 
-            dplyr::pull(project_name)
-        
-        return(project_name)
-    }
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db
+    )
+    on.exit(DBI::dbDisconnect(con))
+    
+    
+    project_name <- dplyr::tbl(con, "projects") %>% 
+        dplyr::pull(project_name)
+    
+    return(project_name)
+}
 
