@@ -82,6 +82,9 @@ log_create_project_record.PqConnection <- function(con, project_id, project_df){
     DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
 }
 
+# Define project_name as global variable to pass R CMD Check without notes
+utils::globalVariables(c("project_name"))
+
 create_project_record <- function(con, project_df){
     DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
     project_id <- dplyr::tbl(con, "projects") %>% 
