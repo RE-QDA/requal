@@ -14,7 +14,8 @@ mod_project_ui <- function(id){
     fluidRow(
       column(width = 6,
         
-        uiOutput(ns("project_active"))
+        uiOutput(ns("project_active")),
+        uiOutput(ns("project_manager"))
         
       ),
       column(width = 6,
@@ -153,8 +154,10 @@ mod_project_server <- function(id){
      })
      
      # set active project from load
+     
+     project_active <- reactiveVal("No active project.")
      output$project_active <- renderUI({
-       "No active project."
+       project_active()
      })
      
      
@@ -167,34 +170,56 @@ mod_project_server <- function(id){
      
      
      observeEvent(input$project_load, {
-
-       output$project_active <-
-         renderUI({
-           isolate(read_project_db(project_file_load(), 
-                                   name = input$project_selector_load))
-         })
        
+       project_active( isolate(read_project_db(project_file_load(), 
+                                                 name = input$project_selector_load)) )
+
+
      })
      
      # set active project from create
      
      observeEvent(input$project_create, {
-       output$project_active <-
-         reactive({
-           isolate(read_project_db(paste0(project_directory(), 
-                                            .Platform$file.sep,
-                                            paste0(gsub(
-                                                       "[^a-zA-Z]+",
-                                                       "",
-                                                       iconv(input$project_name, 
-                                                             to = "ASCII//TRANSLIT")
-                                                     ), ".requal")),
-           name = input$project_name))
-         })
        
+         
+       project_active(isolate(read_project_db(paste0(project_directory(), 
+                                                        .Platform$file.sep,
+                                                        paste0(gsub(
+                                                          "[^a-zA-Z]+",
+                                                          "",
+                                                          iconv(input$project_name, 
+                                                                to = "ASCII//TRANSLIT")
+                                                        ), ".requal")),
+                                                 name = input$project_name))
+       )
+
      })
      
      # display active project details
+     
+
+#      
+     
+       
+    observe({
+      
+      print(project_active())
+  
+        output$project_manager <-  renderUI({ 
+           
+          if (!project_active() %in% c("No active project.",
+                                       "No active project in the folder")) {
+          mod_doc_manager_ui(ns("doc_manager_ui_1"))
+            
+          }
+          
+          })
+    })
+         
+ #     
+       
+       
+     
      
      
   })
