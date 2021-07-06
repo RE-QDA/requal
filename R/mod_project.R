@@ -168,10 +168,12 @@ mod_project_server <- function(id){
                                                    name = NULL))
      })
      
+     db_path <- reactiveVal(NULL)
      
      observeEvent(input$project_load, {
        
-       project_active( isolate(read_project_db(project_file_load(), 
+       db_path(project_file_load())
+       project_active( isolate(read_project_db(db_path(), 
                                                  name = input$project_selector_load)) )
 
 
@@ -181,24 +183,22 @@ mod_project_server <- function(id){
      
      observeEvent(input$project_create, {
        
+       db_path(paste0(project_directory(), 
+                      .Platform$file.sep,
+                      paste0(gsub(
+                        "[^a-zA-Z]+",
+                        "",
+                        iconv(input$project_name, 
+                              to = "ASCII//TRANSLIT")
+                      ), ".requal")))
          
-       project_active(isolate(read_project_db(paste0(project_directory(), 
-                                                        .Platform$file.sep,
-                                                        paste0(gsub(
-                                                          "[^a-zA-Z]+",
-                                                          "",
-                                                          iconv(input$project_name, 
-                                                                to = "ASCII//TRANSLIT")
-                                                        ), ".requal")),
+       project_active(isolate(read_project_db(db_path(),
                                                  name = input$project_name))
        )
 
      })
      
      # display active project details
-     
-
-#      
      
        
     observe({
@@ -216,8 +216,12 @@ mod_project_server <- function(id){
           })
     })
          
- #     
-       
+    observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
+      
+    mod_doc_manager_server("doc_manager_ui_1",
+                           connection = db_path(),
+                           project = project_active())    
+    })
        
      
      
