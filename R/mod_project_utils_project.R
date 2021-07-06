@@ -100,13 +100,13 @@ list_db_documents <- function(project_db, project) {
                           )
     on.exit(DBI::dbDisconnect(con))
     
-    project_id <- dplyr::tbl(con, "projects") %>% 
+    project_filter <- dplyr::tbl(con, "projects") %>% 
         dplyr::filter(project_name == project) %>% 
         dplyr::pull(project_id) %>% 
         unique()
     
     project_documents <- dplyr::tbl(con, "documents") %>% 
-        dplyr::filter(project_id == project_id) %>% 
+        dplyr::filter(project_id == project_filter) %>% 
         dplyr::pull(doc_id)
     
     return(project_documents)
