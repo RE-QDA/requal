@@ -207,8 +207,7 @@ mod_project_server <- function(id){
   
         output$project_manager <-  renderUI({ 
            
-          if (!project_active() %in% c("No active project.",
-                                       "No active project in the folder")) {
+          if (!project_active() != "No active project.") {
           mod_doc_manager_ui(ns("doc_manager_ui_1"))
             
           }
