@@ -31,14 +31,14 @@ mod_doc_manager_server <- function(id, connection, project){
     
     on.exit(DBI::dbDisconnect(con))
     
-    project_id <- dplyr::tbl(con, "project") %>% 
+    project_id <- dplyr::tbl(con, "projects") %>% 
       dplyr::filter(project_name == project) %>% 
       dplyr::pull(project_id) %>% 
       unique()
     
     text_df <- tibble::tibble(
-      project = project_id,
-      document_text = input$doc_text
+      project_id = project_id,
+      doc_text = input$doc_text
     )
     
     DBI::dbWriteTable(con, "documents", text_df, 
