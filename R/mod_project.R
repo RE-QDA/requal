@@ -207,8 +207,23 @@ mod_project_server <- function(id){
   
         output$project_manager <-  renderUI({ 
            
-          if (!project_active() != "No active project.") {
-          mod_doc_manager_ui(ns("doc_manager_ui_1"))
+          if (project_active() != "No active project.") {
+            
+            tagList(
+              
+              tabsetPanel(
+                tabPanel("Project information"
+                         
+                         ),
+                tabPanel("Manage documents",
+                         mod_doc_manager_ui(ns("doc_manager_ui_1"))
+                ),
+                tabPanel("Settings"
+                         
+                         )
+              )
+            )
+          
             
           }
           

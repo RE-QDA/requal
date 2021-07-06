@@ -11,15 +11,11 @@ mod_doc_manager_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    tabsetPanel(
-      tabPanel("Project information"),
-      tabPanel("Manage documents",
+
     textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste a new document content here"),
     actionButton(ns("doc_add"), label = "Add document")
-    ),
-    tabPanel("Settings")
+
     )
-  )
 }
     
 #' doc_manager Server Functions

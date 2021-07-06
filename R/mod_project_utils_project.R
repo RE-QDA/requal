@@ -115,3 +115,21 @@ list_db_projects <- function(project_db) {
         return(project_name)
     }
 
+# list_db_documents
+
+list_db_documents <- function(project_db) {
+    
+    if (!DBI::dbExistsTable(con, "documents")) {
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db
+    )
+    on.exit(DBI::dbDisconnect(con))
+    
+    
+    project_documents <- dplyr::tbl(con, "documents") %>% 
+        dplyr::pull(document_id)
+    
+    return(project_name)
+    }
+}
+
