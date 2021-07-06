@@ -216,7 +216,8 @@ mod_project_server <- function(id){
                          
                          ),
                 tabPanel("Manage documents",
-                         mod_doc_manager_ui(ns("doc_manager_ui_1"))
+                         mod_doc_manager_ui(ns("doc_manager_ui_1")),
+                         mod_doc_list_ui(ns("doc_list_ui_1"))
                 ),
                 tabPanel("Settings"
                          
@@ -230,6 +231,8 @@ mod_project_server <- function(id){
           })
     })
          
+    # manage documents
+    
     observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
       
     mod_doc_manager_server("doc_manager_ui_1",
@@ -237,8 +240,15 @@ mod_project_server <- function(id){
                            project = project_active())    
     })
        
+    ## list documents
      
-     
-     
+    observe({
+      if (project_active() != "No active project.") {
+        
+    mod_doc_list_server("doc_list_ui_1",
+                        connection = db_path(),
+                        project = project_active())
+      }
+    })
   })
 }
