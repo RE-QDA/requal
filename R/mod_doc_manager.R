@@ -14,7 +14,7 @@ mod_doc_manager_ui <- function(id){
     tabsetPanel(
       tabPanel("Project information"),
       tabPanel("Manage documents",
-    textAreaInput(ns("doc"), label = NULL, placeholder = "Paste a new document content here"),
+    textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste a new document content here"),
     actionButton(ns("doc_add"), label = "Add document")
     ),
     tabPanel("Settings")
@@ -25,9 +25,31 @@ mod_doc_manager_ui <- function(id){
 #' doc_manager Server Functions
 #'
 #' @noRd 
-mod_doc_manager_server <- function(id){
+mod_doc_manager_server <- function(id, connection, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    
+      
+      
+      con <- DBI::dbConnect(RSQLite::SQLite(), connection)
+      
+      on.exit(DBI::dbDisconnect(con))
+      print(project)
+      project_id <- dplyr::tbl(con, "project") %>% 
+        dplyr::filter(project_name == project) %>% 
+        dplyr::pull(project_id) %>% 
+        unique()
+
+      
+      text <- reactive(tibble::tibble(project = project_id,
+                                      document_text = input$doc_text))
+      DBI::dbWriteTable(con, "documents", text(), 
+                        append = TRUE)
+      
+    
+    
+    
  
   })
 }
