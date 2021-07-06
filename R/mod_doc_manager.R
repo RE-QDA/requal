@@ -29,28 +29,27 @@ mod_doc_manager_server <- function(id, connection, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    
-      
-      
-      con <- DBI::dbConnect(RSQLite::SQLite(), connection)
-      
-      on.exit(DBI::dbDisconnect(con))
-      print(project)
-      project_id <- dplyr::tbl(con, "project") %>% 
-        dplyr::filter(project_name == project) %>% 
-        dplyr::pull(project_id) %>% 
-        unique()
 
-      
-      text <- reactive(tibble::tibble(project = project_id,
-                                      document_text = input$doc_text))
-      DBI::dbWriteTable(con, "documents", text(), 
-                        append = TRUE)
-      
+    print(connection)
+    print(project)
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          connection)
     
+    on.exit(DBI::dbDisconnect(con))
     
+    project_id <- dplyr::tbl(con, "project") %>% 
+      dplyr::filter(project_name == project) %>% 
+      dplyr::pull(project_id) %>% 
+      unique()
     
- 
+    text_df <- tibble::tibble(
+      project = project_id,
+      document_text = input$doc_text
+    )
+    
+    DBI::dbWriteTable(con, "documents", text_df, 
+                      append = TRUE)
+    
   })
 }
     
