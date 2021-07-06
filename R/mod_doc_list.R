@@ -23,33 +23,13 @@ mod_doc_list_server <- function(id, connection, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          connection)
-    
-    on.exit(DBI::dbDisconnect(con))
-
-    if (DBI::dbExistsTable(con, "documents")) {
       
-      project_id <- dplyr::tbl(con, "project") %>% 
-        dplyr::filter(project_name == project) %>% 
-        dplyr::pull(project_id) %>% 
-        unique()
+    output$doc_list <- renderText({list_db_documents(connection, project)})
     
-      doc_list <- dplyr::tbl(con, "documents") %>% 
-        dplyr::filter(project == project_id) %>% 
-        dplyr::pull(document_id)
-      
-    output$doc_list <- renderText({doc_list})
     
-    }
 
  
   })
 }
     
-## To be copied in the UI
-# mod_doc_list_ui("doc_list_ui_1")
-    
-## To be copied in the server
-# mod_doc_list_server("doc_list_ui_1")
+

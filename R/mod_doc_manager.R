@@ -26,8 +26,6 @@ mod_doc_manager_server <- function(id, connection, project){
     ns <- session$ns
     
 
-    print(connection)
-    print(project)
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           connection)
     
@@ -48,9 +46,4 @@ mod_doc_manager_server <- function(id, connection, project){
     
   })
 }
-    
-## To be copied in the UI
-# mod_doc_manager_ui("doc_manager_ui_1")
-    
-## To be copied in the server
-# mod_doc_manager_server("doc_manager_ui_1")
+

@@ -216,7 +216,8 @@ mod_project_server <- function(id){
                 tabPanel("Manage documents",
                          fluidRow(
                            column(width = 6,
-                         mod_doc_manager_ui(ns("doc_manager_ui_1"))
+                         mod_doc_manager_ui(ns("doc_manager_ui_1")),
+                         mod_doc_delete_ui("doc_delete_ui_1")
                            ),
                           column(width = 6,
                          mod_doc_list_ui(ns("doc_list_ui_1"))
@@ -245,6 +246,9 @@ mod_project_server <- function(id){
     mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
                           project = project_active())
+    mod_doc_delete_server("doc_delete_ui_1",
+                          connection = db_path(),
+                          project = project_active())
     })
        
     ## list documents
@@ -255,6 +259,9 @@ mod_project_server <- function(id){
     mod_doc_list_server("doc_list_ui_1",
                         connection = db_path(),
                         project = project_active())
+        mod_doc_delete_server("doc_delete_ui_1",
+                              connection = db_path(),
+                              project = project_active())
       }
     })
   })

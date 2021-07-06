@@ -117,19 +117,23 @@ list_db_projects <- function(project_db) {
 
 # list_db_documents
 
-list_db_documents <- function(project_db) {
+list_db_documents <- function(project_db, project) {
     
-    if (!DBI::dbExistsTable(con, "documents")) {
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
-    )
+                          )
     on.exit(DBI::dbDisconnect(con))
     
+    project_id <- dplyr::tbl(con, "project") %>% 
+        dplyr::filter(project_name == project) %>% 
+        dplyr::pull(project_id) %>% 
+        unique()
     
     project_documents <- dplyr::tbl(con, "documents") %>% 
+        dplyr::filter(project == project_id) %>% 
         dplyr::pull(document_id)
     
-    return(project_name)
-    }
+    return(project_documents)
+    
 }
 
