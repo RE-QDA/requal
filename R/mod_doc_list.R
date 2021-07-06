@@ -23,18 +23,22 @@ mod_doc_list_server <- function(id, connection, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    
-    print(connection)
-    print(project)
+
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           connection)
     
     on.exit(DBI::dbDisconnect(con))
-    print(DBI::dbExistsTable(con, "documents"))
+
     if (DBI::dbExistsTable(con, "documents")) {
+      
+      project_id <- dplyr::tbl(con, "project") %>% 
+        dplyr::filter(project_name == project) %>% 
+        dplyr::pull(project_id) %>% 
+        unique()
     
       doc_list <- dplyr::tbl(con, "documents") %>% 
-      dplyr::pull(document_id)
+        dplyr::filter(project == project_id) %>% 
+        dplyr::pull(document_id)
       
     output$doc_list <- renderText({doc_list})
     

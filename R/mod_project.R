@@ -12,13 +12,13 @@ mod_project_ui <- function(id){
   tagList(
     
     fluidRow(
-      column(width = 6,
+      column(width = 7,
         
         uiOutput(ns("project_active")),
         uiOutput(ns("project_manager"))
         
       ),
-      column(width = 6,
+      column(width = 5,
         
         actionButton(ns("project_load_menu"), label = "Load existing project"),
         
@@ -203,8 +203,6 @@ mod_project_server <- function(id){
        
     observe({
       
-      print(project_active())
-  
         output$project_manager <-  renderUI({ 
            
           if (project_active() != "No active project.") {
@@ -216,8 +214,14 @@ mod_project_server <- function(id){
                          
                          ),
                 tabPanel("Manage documents",
-                         mod_doc_manager_ui(ns("doc_manager_ui_1")),
+                         fluidRow(
+                           column(width = 6,
+                         mod_doc_manager_ui(ns("doc_manager_ui_1"))
+                           ),
+                          column(width = 6,
                          mod_doc_list_ui(ns("doc_list_ui_1"))
+                          )
+                         )
                 ),
                 tabPanel("Settings"
                          
@@ -238,6 +242,9 @@ mod_project_server <- function(id){
     mod_doc_manager_server("doc_manager_ui_1",
                            connection = db_path(),
                            project = project_active())    
+    mod_doc_list_server("doc_list_ui_1",
+                          connection = db_path(),
+                          project = project_active())
     })
        
     ## list documents
