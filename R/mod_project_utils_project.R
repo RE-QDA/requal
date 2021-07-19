@@ -113,3 +113,24 @@ list_db_documents <- function(project_db, project) {
     
 }
 
+# delete documents from project
+
+
+delete_db_documents <- function(project_db, project, delete_doc_id) {
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db
+    )
+    on.exit(DBI::dbDisconnect(con))
+    
+    delete_doc_id <- as.integer(delete_doc_id)
+    
+    
+    DBI::dbExecute(project_db,
+    "DELETE from documents
+    where doc_id IN (?)
+    params = 1"
+    
+    )
+}
+
