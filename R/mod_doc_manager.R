@@ -41,9 +41,7 @@ mod_doc_manager_server <- function(id, connection, project){
       doc_text = input$doc_text
     )
     
-    DBI::dbWriteTable(con, "documents", text_df, 
-                      append = TRUE)
-    
+    add_documents_record(con, project_id, text_df)
   })
 }
 

@@ -73,42 +73,22 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 
-create_log_df <- function(project_id, action, payload){
-    tibble::tibble(
-        user = Sys.info()["user"], 
-        project_id = project_id, 
-        action = action, 
-        payload = as.character(jsonlite::toJSON(payload)), 
-        created_at = as.character(Sys.time(), usetz = TRUE)
-    )
-}
-
-log_create_project_record <- function(con, project_id, project_df){
-    UseMethod("log_create_project_record")
-}
-
-log_create_project_record.SQLiteConnection <- function(con, project_id, project_df){
-    log_record_df <- create_log_df(project_id, 
-                                   action = "Create project", 
-                                   payload = project_df)
-    DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
-}
-
-log_create_project_record.PqConnection <- function(con, project_id, project_df){
-    log_record_df <- create_log_df(project_id, 
-                                   action = "Create project", 
-                                   payload = project_df)
-    DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
-}
-
-# Define project_name as global variable to pass R CMD Check without notes
-utils::globalVariables(c("project_name"))
-
 create_project_record <- function(con, project_df){
-    DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
+    res <- DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
     project_id <- dplyr::tbl(con, "projects") %>% 
         dplyr::filter(project_name == !!project_df$project_name) %>%
         dplyr::pull(project_id)
-    
-    log_create_project_record(con, project_id, project_df)
+
+    if(res){
+        log_create_project_record(con, project_id, project_df)   
+    }
+}
+
+add_documents_record <- function(con, project_id, document_df){
+    res <- DBI::dbWriteTable(con, "documents", document_df, append = TRUE)
+    if(res){
+        log_add_document_record(con, project_id, document_df)    
+    }else{
+        warning("document not added")
+    }
 }

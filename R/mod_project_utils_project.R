@@ -91,6 +91,13 @@ list_db_projects <- function(project_db) {
     return(project_name)
 }
 
+get_project_id <- function(con, project){
+    dplyr::tbl(con, "projects") %>%
+        dplyr::filter(project_name == project) %>%
+        dplyr::pull(project_id) %>%
+        unique
+}
+
 # list_db_documents
 
 list_db_documents <- function(project_db, project) {
@@ -100,10 +107,7 @@ list_db_documents <- function(project_db, project) {
                           )
     on.exit(DBI::dbDisconnect(con))
     
-    project_filter <- dplyr::tbl(con, "projects") %>% 
-        dplyr::filter(project_name == project) %>% 
-        dplyr::pull(project_id) %>% 
-        unique()
+    project_filter <- get_project_id(con, project)
     
     project_documents <- dplyr::tbl(con, "documents") %>% 
         dplyr::filter(project_id == project_filter) %>% 
@@ -114,23 +118,18 @@ list_db_documents <- function(project_db, project) {
 }
 
 # delete documents from project
-
-
-delete_db_documents <- function(project_db, project, delete_doc_id) {
-    
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db
-    )
+delete_db_documents <- function(project_db, project_name, delete_doc_id) {
+    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
     on.exit(DBI::dbDisconnect(con))
     
     delete_doc_id <- as.integer(delete_doc_id)
     
+    project_id <- get_project_id(con, project_name)
     
-    DBI::dbExecute(project_db,
-    "DELETE from documents
-    where doc_id IN (?)
-    params = 1"
-    
-    )
+    DBI::dbExecute(con,
+                   "DELETE from documents
+                   WHERE doc_id IN (?)",
+                   params = list(delete_doc_id))
+    log_delete_document_record(con, project_id, delete_doc_id)
 }
 

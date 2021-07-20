@@ -25,8 +25,6 @@ mod_doc_delete_ui <- function(id) {
 mod_doc_delete_server <- function(id, connection, project) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
-
    
     output$doc_del_container <- renderUI({
       tagList(
@@ -37,20 +35,11 @@ mod_doc_delete_server <- function(id, connection, project) {
                   multiple = TRUE,
                   selected = NULL)
       )
-    
     })
    
-
-    #docs_to_delete <- reactiveVal()
     observeEvent(input$doc_remove, {
-      
-      print(input$doc_del)
-      #delete_db_documents(connection, project, delete_doc_id = input$doc_del)
-      
+      delete_db_documents(connection, project, delete_doc_id = input$doc_del)
     })
-    # 
-    # return(docs_to_delete())
-    # 
   })
 }
 
