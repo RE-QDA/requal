@@ -25,6 +25,7 @@ CREATE_DOCUMENTS_SQL <- "
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY
 ,   project_id INTEGER
+,   doc_name TEXT
 ,   doc_text TEXT
 ,   created_at TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
