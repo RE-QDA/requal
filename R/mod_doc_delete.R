@@ -39,6 +39,16 @@ mod_doc_delete_server <- function(id, connection, project) {
    
     observeEvent(input$doc_remove, {
       delete_db_documents(connection, project, delete_doc_id = input$doc_del)
+      output$doc_del_container <- renderUI({
+        tagList(
+          
+          selectInput(ns("doc_del"),
+                      label = "Select documents to remove",
+                      choices = list_db_documents(connection, project),
+                      multiple = TRUE,
+                      selected = NULL)
+        )
+      })
     })
   })
 }
