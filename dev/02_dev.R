@@ -26,6 +26,8 @@ usethis::use_package( "dplyr" )
 usethis::use_package( "tibble" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
+usethis::use_package( "purrr" )
+
 
 
 
@@ -58,6 +60,8 @@ golem::add_module( name = "about" ) # Name of the module
 ## Creates fct_* and utils_*
 golem::add_fct( "helpers" ) 
 golem::add_utils( "project", module = "project" )
+golem::add_utils( "codebook", module = "codebook" )
+
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
