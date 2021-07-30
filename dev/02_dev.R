@@ -38,7 +38,14 @@ usethis::use_package( "dbplyr" )
 ## Create a module infrastructure in R/
 golem::add_module( name = "left_menu" ) # Name of the module
 golem::add_module( name = "dashboard_body" ) # Name of the module
+
+# Project menu
 golem::add_module( name = "project" ) # Name of the module
+golem::add_module( name = "doc_manager" ) # Name of the module
+golem::add_module( name = "doc_list" ) # Name of the module
+golem::add_module( name = "doc_delete" ) # Name of the module
+
+# Codebook menu
 golem::add_module( name = "codebook" ) # Name of the module
 golem::add_module( name = "document_code" ) # Name of the module
 golem::add_module( name = "analysis" ) # Name of the module
