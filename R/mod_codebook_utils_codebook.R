@@ -14,9 +14,11 @@ list_db_codes <- function(project_db) {
     return(project_codes)
 }
 
-gen_codes_ui <- function(code_id, code_name) {
+gen_codes_ui <- function(code_id, 
+                         code_name,
+                         code_description) {
     
-    box(
+    box(code_description,
         id = code_id,
         title = code_name, 
         closable = FALSE,

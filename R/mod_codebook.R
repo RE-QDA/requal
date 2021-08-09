@@ -44,9 +44,18 @@ mod_codebook_server <- function(id, project) {
 
         project_codes <- list_db_codes(project_db = project$project_db)
 
+        if (nrow(project_codes == 0)) {
+          
+          "No codes have been created."
+          
+        } else {
+
         purrr::pmap(project_codes, gen_codes_ui)
+          
+        }
 
       } else {"No active project."}
+      
       })
     
   })

@@ -192,9 +192,11 @@ mod_project_server <- function(id) {
     
     # set active project from load
     
-    active_project <- reactiveVal("No active project.")
+    active_project <- reactiveVal(NULL)
     output$project_active <- renderUI({
-      active_project()
+      if (is.null(active_project())) {
+        "No active project."
+      }
     })
     
     
@@ -302,7 +304,7 @@ mod_project_server <- function(id) {
       }
     })
     
-    # return active project
+    # return active project details
     
     project <- reactiveValues()
     
