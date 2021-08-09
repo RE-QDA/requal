@@ -40,11 +40,13 @@ mod_codebook_server <- function(id, project) {
    
     output$codes_ui <- renderUI({
 
-      if (project$active_project != "No active project.") {
+      if (!is.null(project$active_project)) {
 
-        project_codes <- list_db_codes(project_db = project$project_db)
+        project_codes <- list_db_codes(project_db =project$project_db,
+                                                project_id = project$active_project)
+        
 
-        if (nrow(project_codes == 0)) {
+        if (nrow(project_codes) == 0) {
           
           "No codes have been created."
           

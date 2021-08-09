@@ -30,18 +30,18 @@ mod_doc_manager_server <- function(id, connection, project){
                           connection)
     
     on.exit(DBI::dbDisconnect(con))
-    
-    project_id <- dplyr::tbl(con, "projects") %>% 
-      dplyr::filter(project_name == project) %>% 
-      dplyr::pull(project_id) %>% 
-      unique()
-    
+    # 
+    # project_id <- dplyr::tbl(con, "projects") %>% 
+    #   dplyr::filter(project_id == project) %>% 
+    #   dplyr::pull(project_id) %>% 
+    #   unique()
+    # 
     text_df <- tibble::tibble(
-      project_id = project_id,
+      project_id = project,
       doc_text = input$doc_text
     )
     
-    add_documents_record(con, project_id, text_df)
+    add_documents_record(con, project, text_df)
   })
 }
 

@@ -1,4 +1,4 @@
-list_db_codes <- function(project_db) {
+list_db_codes <- function(project_db, project_id) {
     
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -6,9 +6,11 @@ list_db_codes <- function(project_db) {
     )
     on.exit(DBI::dbDisconnect(con))
     
+    project_id <- as.integer(project_id)
     
     project_codes <- dplyr::tbl(con, "codes") %>% 
-        dplyr::select(code_id, code_name) %>% 
+        dplyr::filter(project_id == project_id) %>% 
+        dplyr::select(code_id, code_name, code_description) %>% 
         dplyr::collect()
     
     return(project_codes)

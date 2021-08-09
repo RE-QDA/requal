@@ -7,6 +7,7 @@
 app_server <- function(input, output, session) {
   # Your application server logic
   
+ 
   project <- mod_project_server("project_ui_1")
 
   mod_codebook_server("codebook_ui_1", project)

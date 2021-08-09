@@ -178,17 +178,6 @@ mod_project_server <- function(id) {
     })
     
     
-    # create project event
-    
-    observeEvent(input$project_create, {
-      create_project_db(
-        project_directory = project_directory(),
-        project_name = input$project_name,
-        project_description = input$project_description
-      )
-      
-      
-    })
     
     # set active project from load
     
@@ -201,19 +190,27 @@ mod_project_server <- function(id) {
     
     
     observe({
+
+            if (length(project_file_load())>0 ) {
       updateSelectInput(session,
                         "project_selector_load",
                         choices = read_project_db(project_file_load(),
-                                                  name = NULL))
+                                                  project_id = NULL))
+      }
     })
     
     db_path <- reactiveVal(NULL)
     
     observeEvent(input$project_load, {
+      
+      req(input$project_selector_load)
+  
+      
       db_path(project_file_load())
+      
       active_project(isolate(
         read_project_db(db_path(),
-                        name = input$project_selector_load)
+                        project_id = input$project_selector_load)
       ))
       
       
@@ -222,6 +219,7 @@ mod_project_server <- function(id) {
     # set active project from create
     
     observeEvent(input$project_create, {
+      req(input$project_name, input$sel_directory)
       db_path(paste0(
         project_directory(),
         .Platform$file.sep,
@@ -233,8 +231,15 @@ mod_project_server <- function(id) {
         ), ".requal")
       ))
       
-      active_project(isolate(read_project_db(db_path(),
-                                             name = input$project_name)))
+      # create project event
+      
+        active_project(
+          create_project_db(
+            project_directory = project_directory(),
+            project_name = input$project_name,
+            project_description = input$project_description
+          ))
+        
       
     })
     
@@ -243,7 +248,7 @@ mod_project_server <- function(id) {
     
     observe({
       output$project_manager <-  renderUI({
-        if (active_project() != "No active project.") {
+        if (!is.null(active_project()) & !is.null(db_path()) ) {
           tagList(tabsetPanel(
             tabPanel("Manage documents",
                      fluidRow(
@@ -294,7 +299,7 @@ mod_project_server <- function(id) {
     
     ## list documents
     observe({
-      if (active_project() != "No active project.") {
+      if (!is.null( active_project() ) ) {
         mod_doc_list_server("doc_list_ui_1",
                             connection = db_path(),
                             project = active_project())
@@ -309,8 +314,10 @@ mod_project_server <- function(id) {
     project <- reactiveValues()
     
     observe({ 
+      if (!is.null(active_project()) & !is.null(db_path()) ) {
       project$active_project <- active_project()
       project$project_db <- db_path()
+      }
       })
     
     return(project)
