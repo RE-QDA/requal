@@ -192,9 +192,9 @@ mod_project_server <- function(id) {
     
     # set active project from load
     
-    project_active <- reactiveVal("No active project.")
+    active_project <- reactiveVal("No active project.")
     output$project_active <- renderUI({
-      project_active()
+      active_project()
     })
     
     
@@ -209,7 +209,7 @@ mod_project_server <- function(id) {
     
     observeEvent(input$project_load, {
       db_path(project_file_load())
-      project_active(isolate(
+      active_project(isolate(
         read_project_db(db_path(),
                         name = input$project_selector_load)
       ))
@@ -231,7 +231,7 @@ mod_project_server <- function(id) {
         ), ".requal")
       ))
       
-      project_active(isolate(read_project_db(db_path(),
+      active_project(isolate(read_project_db(db_path(),
                                              name = input$project_name)))
       
     })
@@ -241,7 +241,7 @@ mod_project_server <- function(id) {
     
     observe({
       output$project_manager <-  renderUI({
-        if (project_active() != "No active project.") {
+        if (active_project() != "No active project.") {
           tagList(tabsetPanel(
             tabPanel("Manage documents",
                      fluidRow(
@@ -270,36 +270,48 @@ mod_project_server <- function(id) {
 
       mod_doc_manager_server("doc_manager_ui_1",
                              connection = db_path(),
-                             project = project_active())
+                             project = active_project())
       mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
-                          project = project_active())
+                          project = active_project())
       mod_doc_delete_server("doc_delete_ui_1",
                             connection = db_path(),
-                            project = project_active())
+                            project = active_project())
     })
     
     observeEvent(input[[paste("doc_delete_ui_1", "doc_remove", sep = "-")]], {
       # input$doc_remove defined in doc_delete module
       mod_doc_delete_server("doc_delete_ui_1",
                             connection = db_path(),
-                            project = project_active())
+                            project = active_project())
       mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
-                          project = project_active())
+                          project = active_project())
       
     })
     
     ## list documents
     observe({
-      if (project_active() != "No active project.") {
+      if (active_project() != "No active project.") {
         mod_doc_list_server("doc_list_ui_1",
                             connection = db_path(),
-                            project = project_active())
+                            project = active_project())
         mod_doc_delete_server("doc_delete_ui_1",
                               connection = db_path(),
-                              project = project_active())
+                              project = active_project())
       }
     })
+    
+    # return active project
+    
+    project <- reactiveValues()
+    
+    observe({ 
+      project$active_project <- active_project()
+      project$project_db <- db_path()
+      })
+    
+    return(project)
+
   })
 }

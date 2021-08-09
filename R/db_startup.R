@@ -25,6 +25,8 @@ CREATE_DOCUMENTS_SQL <- "
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY
 ,   project_id INTEGER
+,   doc_name TEXT UNIQUE
+,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
@@ -35,6 +37,7 @@ CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY
 ,   code_name TEXT UNIQUE
+,   code_description TEXT
 )"
 
 CREATE_SEGMENTS_SQL <- "
@@ -86,6 +89,15 @@ create_project_record <- function(con, project_df){
 
 add_documents_record <- function(con, project_id, document_df){
     res <- DBI::dbWriteTable(con, "documents", document_df, append = TRUE)
+    if(res){
+        log_add_document_record(con, project_id, document_df)    
+    }else{
+        warning("document not added")
+    }
+}
+
+add_codes_record <- function(con, project_id, document_df){
+    res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
         log_add_document_record(con, project_id, document_df)    
     }else{

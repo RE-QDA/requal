@@ -1,4 +1,4 @@
-list_db_codes <- function(project_db = "/Users/radimhladik/AAaaaa_test_requal/test.requal") {
+list_db_codes <- function(project_db) {
     
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
