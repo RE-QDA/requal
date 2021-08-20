@@ -127,11 +127,12 @@ list_db_documents <- function(project_db, active_project) {
 }
 
 # delete documents from project
-delete_db_documents <- function(project_db, active_project, delete_doc_id) {
+delete_db_documents <- function(project_db, 
+                                active_project, 
+                                delete_doc_id) {
+    
     con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
     on.exit(DBI::dbDisconnect(con))
-    
-    delete_doc_id <- as.integer(delete_doc_id)
     
     DBI::dbExecute(con,
                    "DELETE from documents

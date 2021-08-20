@@ -11,22 +11,17 @@ mod_codebook_ui <- function(id) {
   ns <- NS(id)
   
   tagList(
-    "Management of codes. Including creation, deletion, merges.",
     fluidRow(column(width = 6,
                     
-                  uiOutput(ns("codes_ui"))
-                  
-                  ),
+                    uiOutput(ns(
+                      "codes_ui"
+                    ))),
              
              column(width = 6,
                     
-                    textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste a new document content here"),
-                    
-                    actionButton(ns("code_add"), label = "Add document")
-                    
-                    
-                    )
-             )
+                    uiOutput(
+                      ns("codes_manager")
+                    )))
     
   )
 }
@@ -36,30 +31,110 @@ mod_codebook_ui <- function(id) {
 #' @noRd
 mod_codebook_server <- function(id, project) {
   moduleServer(id, function(input, output, session) {
-    ns <- session$ns
-   
-    output$codes_ui <- renderUI({
-
-      if (!is.null(project$active_project)) {
-
-        project_codes <- list_db_codes(project_db =project$project_db,
-                                                project_id = project$active_project)
-        
-
-        if (nrow(project_codes) == 0) {
-          
-          "No codes have been created."
-          
-        } else {
-
-        purrr::pmap(project_codes, gen_codes_ui)
-          
-        }
-
-      } else {"No active project."}
-      
-      })
     
-  })
-}
+    ns <- session$ns
+    
+# List existing codes
+    output$codes_ui <- renderUI({
+     
+      render_codes(active_project = project$active_project, 
+                   project_db = project$project_db)
+      
+      
+    })
+#--------------------------------------------------------
+    
+# Generate codes manager UI (if there is an active project)
+    output$codes_manager <- renderUI({
+      if (isTruthy(project$active_project)) {
+        codebook_manager_UI(id,
+                            project_db = project$project_db,
+                            project_id = project$active_project)
+      }
+    })
+
+#--------------------------------------------------------
+
+# Create new code
+    
+    observeEvent(input$code_add, {
+
+      project_names <- list_db_codes(project_db = project$project_db,
+                                     project_id = project$active_project)$code_name
+      
+      if (!input$code_name %in% project_names & input$code_name != "") {
+      con <- DBI::dbConnect(RSQLite::SQLite(), project$project_db)
+      on.exit(DBI::dbDisconnect(con))
+      
+      codes_input_df <- data.frame(project_id = project$active_project,
+                                   code_name = input$code_name,
+                                   code_description = input$code_desc)
+      
+      add_codes_record(con = con, 
+                       project_id = project$active_project, 
+                       codes_df = codes_input_df)
+      
+      output$codes_ui <- renderUI({
+        
+        render_codes(active_project = project$active_project, 
+                     project_db = project$project_db)
+        
+        
+      })
+      
+      # re-render manager UI
+      
+      output$codes_manager <- renderUI({
+        if (isTruthy(project$active_project)) {
+          codebook_manager_UI(id,
+                              project_db = project$project_db,
+                              project_id = project$active_project)
+        }
+      })
+      
+      
+      } else { showModal(modalDialog(title = "Warning",
+                                     "Code names must be unique and non-empty."))
+        }
+      
+    })
+    
+#--------------------------------------------------------
+# Delete existing code
+
+    observeEvent(input$code_del_btn, {
+
+      req(input$code_to_del)
+      
+
+      # delete code
+      delete_db_codes(project_db = project$project_db,
+                      active_project = project$active_project,
+                      delete_code_id = input$code_to_del)
+      
+      # re-render manager UI
+ 
+      output$codes_manager <- renderUI({
+        if (isTruthy(project$active_project)) {
+          codebook_manager_UI(id,
+                              project_db = project$project_db,
+                              project_id = project$active_project)
+        }
+      })
+      
+      # relist remaining codes
+      output$codes_ui <- renderUI({
+
+        render_codes(active_project = project$active_project,
+                     project_db = project$project_db)
+      })
+      # 
+      
+    })
+ 
+    
+    
+ # end of server module function   
+     })
+  }
 
