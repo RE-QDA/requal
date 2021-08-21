@@ -93,7 +93,9 @@ read_project_db <- function(db_file, project_id) {
 
 
 list_db_projects <- function(project_db) {
-    
+## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
+    db_file <- NULL
+##------
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db

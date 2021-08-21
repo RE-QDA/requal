@@ -1,5 +1,6 @@
 # Create codebook manager UI
 
+#' @importFrom rlang .data
 codebook_manager_UI <- function(id, project_db, project_id) {
     ns <- NS(id)
     tagList(
@@ -85,7 +86,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                 label = "Select codes to delete",
                 choices = list_db_codes(project_db = project_db,
                                         project_id = project_id) %>% 
-                    pair_code_id(.),
+                    pair_code_id(.data),
                 selected = "",
                 multiple = TRUE
             ),
@@ -103,8 +104,15 @@ codebook_manager_UI <- function(id, project_db, project_id) {
 
 
 # Read codes from the DB
-list_db_codes <- function(project_db, project_id) {
 
+#' @importFrom rlang .env
+#' @importFrom rlang .data
+list_db_codes <- function(project_db, project_id) {
+  
+## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
+  code_id <- code_name <- code_description <- NULL
+##------
+  
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -188,6 +196,7 @@ delete_db_codes <-
 
 render_codes <- function(active_project,
                          project_db) {
+
     if (isTruthy(active_project)) {
         project_codes <- list_db_codes(project_db = project_db,
                                        project_id = active_project)

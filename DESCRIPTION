@@ -18,6 +18,7 @@ Imports:
     jsonlite,
     magrittr,
     processx,
+    purrr,
     quanteda,
     rlang,
     RSQLite,
