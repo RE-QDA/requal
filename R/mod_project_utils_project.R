@@ -34,8 +34,8 @@ create_project_db <- function(project_directory,
     active_project <- active_project_df %>% 
         dplyr::pull(project_id)
     
-    active_project <- setNames(active_project, active_project_df %>% 
-                                   dplyr::pull(project_name))
+    names(active_project) <- active_project_df %>% 
+                                   dplyr::pull(project_name)
 }
 
 
@@ -54,8 +54,8 @@ read_project_db_util <- function(db_file,
     active_project <- active_project_df %>% 
         dplyr::pull(project_id)
                                  
-    active_project <- setNames(active_project, active_project_df %>% 
-                 dplyr::pull(project_name))
+    names(active_project) <- active_project_df %>% 
+                 dplyr::pull(project_name)
 
 }
 

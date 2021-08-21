@@ -126,11 +126,12 @@ pair_code_id <- function(db_codes_df) {
      dplyr::select(dplyr::ends_with("_id")) %>% 
      dplyr::pull()
  
- names <- db_codes_df %>% 
+ named_ids <- db_codes_df %>% 
      dplyr::select(dplyr::ends_with("_name")) %>% 
      dplyr::pull()
  
-choices <- setNames(ids, names)
+choices <- ids
+names(choices) <- named_ids
 
 
 }
