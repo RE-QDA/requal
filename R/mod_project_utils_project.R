@@ -36,6 +36,8 @@ create_project_db <- function(project_directory,
     
     names(active_project) <- active_project_df %>% 
                                    dplyr::pull(project_name)
+    
+    retrun(active_project)
 }
 
 
@@ -46,8 +48,8 @@ read_project_db_util <- function(db_file,
                           db_file
     )
     on.exit(DBI::dbDisconnect(con))
-    
-    active_project_df <- dplyr::tbl(con, table) %>% 
+
+        active_project_df <- dplyr::tbl(con, table) %>% 
         dplyr::select(project_id, project_name) %>% 
         dplyr::collect()
                                  
@@ -56,6 +58,8 @@ read_project_db_util <- function(db_file,
                                  
     names(active_project) <- active_project_df %>% 
                  dplyr::pull(project_name)
+    
+    return(active_project)
 
 }
 
@@ -91,11 +95,9 @@ read_project_db <- function(db_file, project_id) {
 
 # list projects
 
-
+#' @importFrom rlang .env
 list_db_projects <- function(project_db) {
-## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
-    db_file <- NULL
-##------
+
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
@@ -103,7 +105,7 @@ list_db_projects <- function(project_db) {
     on.exit(DBI::dbDisconnect(con))
     
     
-    project_name <-  read_project_db(db_file)
+    project_name <-  read_project_db(.env$db_file)
     
     return(project_name)
 }

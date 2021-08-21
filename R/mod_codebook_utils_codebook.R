@@ -86,7 +86,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                 label = "Select codes to delete",
                 choices = list_db_codes(project_db = project_db,
                                         project_id = project_id) %>% 
-                    pair_code_id(.data),
+                    pair_code_id(),
                 selected = "",
                 multiple = TRUE
             ),
@@ -141,6 +141,7 @@ pair_code_id <- function(db_codes_df) {
 choices <- ids
 names(choices) <- named_ids
 
+return(choices)
 
 }
 
