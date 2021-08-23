@@ -37,7 +37,7 @@ create_project_db <- function(project_directory,
     names(active_project) <- active_project_df %>% 
                                    dplyr::pull(project_name)
     
-    retrun(active_project)
+    return(active_project)
 }
 
 
