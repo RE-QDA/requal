@@ -23,8 +23,9 @@ mod_doc_list_server <- function(id, connection, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-      
-    output$doc_list <- renderText({list_db_documents(connection, project)})
+
+    output$doc_list <- renderText({list_db_documents(project_db = connection, 
+                                                     active_project = project)})
     
     
 

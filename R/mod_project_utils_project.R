@@ -25,45 +25,65 @@ create_project_db <- function(project_directory,
     }
 
     create_project_record(con, project_df)
+    
+    active_project_df <- dplyr::tbl(con, "projects") %>% 
+        dplyr::select(project_id, project_name) %>% 
+        dplyr::collect() %>% 
+        dplyr::slice_max(project_id, n = 1)
+    
+    active_project <- active_project_df %>% 
+        dplyr::pull(project_id)
+    
+    names(active_project) <- active_project_df %>% 
+                                   dplyr::pull(project_name)
+    
+    return(active_project)
 }
 
 
-read_project_db <- function(project_file, name) {
+read_project_db_util <- function(db_file,
+                                 table = "projects"
+                                 ) {
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          db_file
+    )
+    on.exit(DBI::dbDisconnect(con))
+
+        active_project_df <- dplyr::tbl(con, table) %>% 
+        dplyr::select(project_id, project_name) %>% 
+        dplyr::collect()
+                                 
+    active_project <- active_project_df %>% 
+        dplyr::pull(project_id)
+                                 
+    names(active_project) <- active_project_df %>% 
+                 dplyr::pull(project_name)
     
-    db_file <- project_file
+    return(active_project)
+
+}
+
+read_project_db <- function(db_file, project_id) {
     
-    if (length(db_file) >= 1) {
-        
-        db_file <- db_file[1]
-        
-    } else {
-        
-        db_file <- NULL
-        
-    } 
     
     if (!is.null(db_file)) {
         
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              db_file
-        )
-        on.exit(DBI::dbDisconnect(con))
+   
         
-        if (!is.null(name)) {
+        if (!is.null(project_id)) { # filter by id
             
-            active_project_name <- dplyr::tbl(con, "projects") %>% 
-                dplyr::filter(project_name == name) %>% 
-                dplyr::pull(project_name)
+            project_id <- as.integer(project_id)
             
-            return(active_project_name)
+            active_project <- read_project_db_util(db_file)
+            active_project <- active_project[active_project == project_id]
             
-        } else {
+            return(active_project)
             
-            active_project_name <- dplyr::tbl(con, "projects") %>% 
-                dplyr::pull(project_name)
+        } else  { # no filter
             
-            return(active_project_name)
+            active_project <- read_project_db_util(db_file)
             
+            return(active_project)
         }
         
         
@@ -75,9 +95,9 @@ read_project_db <- function(project_file, name) {
 
 # list projects
 
-
+#' @importFrom rlang .env
 list_db_projects <- function(project_db) {
-    
+
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
@@ -85,32 +105,25 @@ list_db_projects <- function(project_db) {
     on.exit(DBI::dbDisconnect(con))
     
     
-    project_name <- dplyr::tbl(con, "projects") %>% 
-        dplyr::pull(project_name)
+    project_name <-  read_project_db(.env$db_file)
     
     return(project_name)
 }
 
-get_project_id <- function(con, project){
-    dplyr::tbl(con, "projects") %>%
-        dplyr::filter(project_name == project) %>%
-        dplyr::pull(project_id) %>%
-        unique
-}
 
 # list_db_documents
 
-list_db_documents <- function(project_db, project) {
-    
+list_db_documents <- function(project_db, active_project) {
+
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
                           )
     on.exit(DBI::dbDisconnect(con))
     
-    project_filter <- get_project_id(con, project)
+    active_project <- as.integer(active_project)
     
     project_documents <- dplyr::tbl(con, "documents") %>% 
-        dplyr::filter(project_id == project_filter) %>% 
+        dplyr::filter(project_id == active_project) %>% 
         dplyr::pull(doc_id)
     
     return(project_documents)
@@ -118,18 +131,17 @@ list_db_documents <- function(project_db, project) {
 }
 
 # delete documents from project
-delete_db_documents <- function(project_db, project_name, delete_doc_id) {
+delete_db_documents <- function(project_db, 
+                                active_project, 
+                                delete_doc_id) {
+    
     con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
     on.exit(DBI::dbDisconnect(con))
-    
-    delete_doc_id <- as.integer(delete_doc_id)
-    
-    project_id <- get_project_id(con, project_name)
     
     DBI::dbExecute(con,
                    "DELETE from documents
                    WHERE doc_id IN (?)",
                    params = list(delete_doc_id))
-    log_delete_document_record(con, project_id, delete_doc_id)
+    log_delete_document_record(con, active_project, delete_doc_id)
 }
 
