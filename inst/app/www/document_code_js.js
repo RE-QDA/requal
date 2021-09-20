@@ -20,7 +20,7 @@ function getCaretCharacterOffsetWithin(element) {
         caretOffset = preCaretTextRange.text.length;
     }
     return caretOffset;
-};
+}
 
 $( document ).ready(function() {
 
@@ -41,5 +41,20 @@ document.addEventListener('mouseup', function () {
     }
 
 }, false);
+})
+
+
+
+$( document ).ready(function() {
+  Shiny.addCustomMessageHandler('highlight', function(arg_color) {
+  
+        var selection = window.getSelection().getRangeAt(0);
+        if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
+        var selectedText = selection.extractContents();
+        var span = document.createElement("span");
+        span.style.background = arg_color;
+        span.appendChild(selectedText);
+        selection.insertNode(span);  
+  })
 });
 

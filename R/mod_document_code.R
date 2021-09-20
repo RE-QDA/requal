@@ -17,6 +17,8 @@ mod_document_code_ui <- function(id){
       )
     ),
     
+    actionButton(ns("add_code"), label = "code"),
+    
     htmlOutput(ns("focal_text")),
 
     textOutput(ns("captured_range"))
@@ -35,6 +37,13 @@ mod_document_code_server <- function(id){
                                collapse = "<br/>")
     
     output$focal_text <- renderUI(HTML({lorem_ipsum_input}))
+    
+    observeEvent(input$add_code, {
+
+      golem::invoke_js("highlight", list("yellow"))
+
+
+    })
 
     # observeEvent(input$tag_position, {
     # print(input$tag_position)
