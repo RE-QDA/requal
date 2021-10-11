@@ -24,9 +24,12 @@ mod_doc_list_server <- function(id, connection, project){
     ns <- session$ns
     
 
-    output$doc_list <- renderText({list_db_documents(project_db = connection, 
+    doc_list <- reactive({list_db_documents(project_db = connection, 
                                                      active_project = project)})
     
+    output$doc_list <- renderText(doc_list())
+      
+      return(doc_list)
     
 
  

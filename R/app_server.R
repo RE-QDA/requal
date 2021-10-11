@@ -12,7 +12,7 @@ app_server <- function(input, output, session) {
 
   mod_codebook_server("codebook_ui_1", project)
 
-  mod_document_code_server("document_code_ui_1")
+  mod_document_code_server("document_code_ui_1", project)
   
   
 }

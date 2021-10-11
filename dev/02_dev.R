@@ -63,6 +63,8 @@ golem::add_module( name = "about" ) # Name of the module
 golem::add_fct( "helpers" ) 
 golem::add_utils( "project", module = "project" )
 golem::add_utils( "codebook", module = "codebook" )
+golem::add_utils( "document_code", module = "document_code" )
+
 
 
 ## External resources
