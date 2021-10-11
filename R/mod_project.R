@@ -312,15 +312,12 @@ mod_project_server <- function(id) {
     # return active project details
     
     project <- reactiveValues()
-    doc_list <- reactiveVal("")
-    
+
     observe({ 
       if (!is.null(active_project()) & !is.null(db_path()) ) {
       project$active_project <- active_project()
       project$project_db <- db_path()
-      project$doc_list <- doc_list()
       }
-      print(doc_list())
       })
     
     return(project)
