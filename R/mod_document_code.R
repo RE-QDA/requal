@@ -39,10 +39,6 @@ mod_document_code_server <- function(id, project){
     ns <- session$ns
     
     
-    
-    lorem_ipsum_input <- paste(c("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 
-                               "Sněmovní komise k ekologické katastrofě na řece Bečvě zkritizovala postup při odběru i analýze vzorků vody a ryb bezprostředně po loňské havárii. Podle poslanců nedostatečně koordinovaly kroky vodoprávní úřad Valašského Meziříčí a Česká inspekce životního prostředí. Uvedli to v závěrečné zprávě, kterou má agentura ČTK k dispozici. Otrava přesně před rokem poničila biotop na 40 kilometrech řeky."), 
-                               collapse = "<br/>")
     doc_choices <- reactiveVal("")
     
     observeEvent(input$refresh, {
@@ -53,8 +49,11 @@ mod_document_code_server <- function(id, project){
     
     output$focal_text <- renderUI({
       
-      
-      
+      if (isTruthy(input$doc_selector)) {
+      HTML(load_doc_db(project$active_project, project$project_db, input$doc_selector))
+      } else {
+        ""
+      }
 
       
     })

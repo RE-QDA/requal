@@ -29,6 +29,25 @@ read_doc_db <- function(active_project, project_db) {
     
         } else {""}
     
+}
+
+load_doc_db <- function(active_project, project_db, doc_id) {
     
+    if (isTruthy(active_project)) {
+        
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              project_db)
+        on.exit(DBI::dbDisconnect(con))
+        
+        doc_text <- dplyr::tbl(con, "documents") %>%
+            dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
+            dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
+            dplyr::pull(doc_text)
+            
+        
+        return(doc_text)
+        
+        
+    } else {""}
     
 }
