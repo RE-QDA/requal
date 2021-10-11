@@ -42,7 +42,8 @@ load_doc_db <- function(active_project, project_db, doc_id) {
         doc_text <- dplyr::tbl(con, "documents") %>%
             dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
-            dplyr::pull(doc_text)
+            dplyr::pull(doc_text) %>% 
+            stringr::str_replace_all("\\n", "<br>")
             
         
         return(doc_text)
