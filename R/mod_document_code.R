@@ -38,6 +38,7 @@ mod_document_code_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    # Selection of documents to code
     
     doc_choices <- reactiveVal("")
     
@@ -47,27 +48,48 @@ mod_document_code_server <- function(id, project){
       updateSelectInput(session = session, "doc_selector", choices = doc_choices)
       })
     
+    # Displayed text
+    
+    text <- eventReactive(input$doc_selector, {
+    if (isTruthy(input$doc_selector)) {
+      load_doc_db(project$active_project, project$project_db, input$doc_selector)
+    } else {
+      ""
+    }
+    })
+    # Render selected text
     output$focal_text <- renderUI({
       
-      if (isTruthy(input$doc_selector)) {
-      HTML(load_doc_db(project$active_project, project$project_db, input$doc_selector))
-      } else {
-        ""
-      }
+     HTML(text())
 
       
     })
     
+    # Coding tools
     observeEvent(input$add_code, {
-
+      
+      # browser()
+      # 
       golem::invoke_js("highlight", list("yellow"))
+      
+      startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
+      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]+1
+      segment <- substr(text(), startOff, endOff)
+      
+      write_segment_db(project$active_project,
+                       project$project_db,
+                       doc_id = doc_choices(),
+                       code_id = 2,
+                       segment, 
+                       startOff, 
+                       endOff
+                       )
 
 
     })
 
-    # observeEvent(input$tag_position, {
-    # print(input$tag_position)
-    # })
+    
+    # Helper (to be commented out)
     
     output$captured_range <- renderText({input$tag_position})
  
