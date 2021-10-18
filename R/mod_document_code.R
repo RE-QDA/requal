@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList 
 mod_document_code_ui <- function(id){
   ns <- NS(id)
-  tagList(
+  fluidRow(column(width = 10,
     
     tags$head(
       tags$script(
@@ -28,6 +28,12 @@ mod_document_code_ui <- function(id){
     htmlOutput(ns("focal_text")),
 
     textOutput(ns("captured_range"))
+  ),
+  column(width = 2,
+         
+         uiOutput(ns("code_list"))
+         
+         )
   )
 }
     
@@ -42,11 +48,21 @@ mod_document_code_server <- function(id, project){
     
     doc_choices <- reactiveVal("")
     
+    code_list <- reactiveValues()
+    
+    # Refresh
+    
     observeEvent(input$refresh, {
       doc_choices <- read_doc_db(project$active_project, project$project_db)
       
       updateSelectInput(session = session, "doc_selector", choices = doc_choices)
-      })
+      
+      code_df <- list_db_codes(project$project_db, project$active_project)
+      
+      code_list$code_id <- code_df$code_id
+      code_list$code_name <- code_df$code_name
+      
+            })
     
     # Displayed text
     
@@ -66,9 +82,9 @@ mod_document_code_server <- function(id, project){
     })
     
     # Coding tools
-    observeEvent(input$add_code, {
+    observeEvent(paste("input$", $add_code, {
       
-      # browser()
+      browser()
       # 
       golem::invoke_js("highlight", list("yellow"))
       
@@ -86,6 +102,20 @@ mod_document_code_server <- function(id, project){
                        )
 
 
+    })
+    
+    output$code_list <- renderUI({
+      
+      if (!is.null(code_list$code_id)) {
+        print(code_list)
+
+        purrr::map2(paste0("code_id_", code_list$code_id), 
+                    code_list$code_name, 
+                    ~actionButton(inputId = .x,
+                                  label = .y)
+                  )
+      } else {""}
+      
     })
 
     

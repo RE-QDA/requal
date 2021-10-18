@@ -50,8 +50,12 @@ golem::add_module( name = "doc_delete" ) # Name of the module
 # Codebook menu
 golem::add_module( name = "codebook" ) # Name of the module
 
-
+# Coding workspace
 golem::add_module( name = "document_code" ) # Name of the module
+golem::add_module( name = "code_button" ) # Name of the module
+
+
+
 golem::add_module( name = "analysis" ) # Name of the module
 golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
