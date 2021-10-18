@@ -73,12 +73,12 @@ mod_document_code_server <- function(id, project){
       golem::invoke_js("highlight", list("yellow"))
       
       startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
-      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]+1
+      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
       segment <- substr(text(), startOff, endOff)
       
       write_segment_db(project$active_project,
                        project$project_db,
-                       doc_id = doc_choices(),
+                       doc_id = input$doc_selector,
                        code_id = 2,
                        segment, 
                        startOff, 
