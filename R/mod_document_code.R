@@ -76,26 +76,15 @@ mod_document_code_server <- function(id, project){
             })
     
     # Displayed text
+    text <- reactiveVal("")
     
-    text <- eventReactive(input$doc_selector, {
+    observeEvent(input$doc_selector, {
     if (isTruthy(input$doc_selector)) {
-      raw_text <- load_doc_db(project$active_project, project$project_db, input$doc_selector)
-      raw_segments <- load_segments_db(project$active_project, project$project_db, input$doc_selector) 
-      
-      df <- strsplit(raw_text, "")[[1]] %>% tibble::enframe()
-      
-      df2 <- df %>% dplyr::left_join(raw_segments %>% 
-                                       dplyr::select(code_id,segment_start), 
-                       by=c("name" = "segment_start")) %>% 
-        dplyr::left_join(raw_segments %>% dplyr::select(code_end=code_id,segment_end), by=c("name" = "segment_end")) %>% 
-        dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
-               code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
-      
-      paste0(df2$code_id, df2$value, df2$code_end, collapse = "") #%>% stringr::str_replace_all("\\n", "<br>")
-      
-    } else {
-      ""
-    }
+      display_text <- load_doc_to_display(project$active_project, 
+                                          project$project_db, 
+                                          input$doc_selector)
+      text(display_text)
+    } 
     })
     # Render selected text
     output$focal_text <- renderUI({
@@ -108,13 +97,15 @@ mod_document_code_server <- function(id, project){
     # Coding tools
     observeEvent(input[["add_code"]], {
       
-      
       # browser()
-      golem::invoke_js("highlight", list("yellow"))
+      # golem::invoke_js("highlight", list("yellow"))
       
       startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
       endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
-      segment <- substr(text(), startOff, endOff)
+      doc <- load_doc_db(project$active_project,
+                         project$project_db,
+                         doc_id = input$doc_selector)
+      segment <- substr(doc, startOff, endOff)
       
       write_segment_db(project$active_project,
                        project$project_db,
@@ -124,8 +115,12 @@ mod_document_code_server <- function(id, project){
                        startOff, 
                        endOff
                        )
-
-
+      
+      display_text <- load_doc_to_display(project$active_project, 
+                                          project$project_db, 
+                                          input$doc_selector)
+      text(display_text)
+      
     })
     
     output$code_list <- renderUI({

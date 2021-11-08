@@ -115,3 +115,20 @@ write_segment_db <- function(
     
 }
 
+load_doc_to_display <- function(active_project, project_db, doc_selector){
+    raw_text <- load_doc_db(active_project, project_db, doc_selector)
+    raw_segments <- load_segments_db(active_project, project_db, doc_selector) 
+    
+    df <- strsplit(raw_text, "")[[1]] %>% tibble::enframe()
+    
+    df2 <- df %>% dplyr::left_join(raw_segments %>% 
+                                       dplyr::select(code_id,segment_start), 
+                                   by=c("name" = "segment_start")) %>% 
+        dplyr::left_join(raw_segments %>% dplyr::select(code_end=code_id,segment_end), by=c("name" = "segment_end")) %>% 
+        dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
+                      code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
+    
+    paste0(df2$code_id, df2$value, df2$code_end, collapse = "")
+}
+
+
