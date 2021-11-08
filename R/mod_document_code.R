@@ -23,7 +23,6 @@ mod_document_code_ui <- function(id){
     
     actionButton(ns("refresh"), label = "Refresh"),
     
-    actionButton(ns("add_code"), label = "code"),
     
     htmlOutput(ns("focal_text")),
 
@@ -31,7 +30,13 @@ mod_document_code_ui <- function(id){
   ),
   column(width = 2,
          
-         uiOutput(ns("code_list"))
+         
+         selectInput(ns("code_id"), label = "Code", choices = ""),
+         
+         actionButton(ns("add_code"), label = "code")
+         
+         
+        # uiOutput(ns("code_list"))
          
          )
   )
@@ -59,6 +64,12 @@ mod_document_code_server <- function(id, project){
       
       code_df <- list_db_codes(project$project_db, project$active_project)
       
+      updateSelectInput(session = session, 
+                        "code_id", 
+                        choices = setNames(code_df$code_id, code_df$code_name)
+                        )
+      
+      
       code_list$code_id <- code_df$code_id
       code_list$code_name <- code_df$code_name
       
@@ -68,7 +79,20 @@ mod_document_code_server <- function(id, project){
     
     text <- eventReactive(input$doc_selector, {
     if (isTruthy(input$doc_selector)) {
-      load_doc_db(project$active_project, project$project_db, input$doc_selector)
+      raw_text <- load_doc_db(project$active_project, project$project_db, input$doc_selector)
+      raw_segments <- load_segments_db(project$active_project, project$project_db, input$doc_selector) 
+      
+      df <- strsplit(raw_text, "")[[1]] %>% tibble::enframe()
+      
+      df2 <- df %>% dplyr::left_join(raw_segments %>% 
+                                       dplyr::select(code_id,segment_start), 
+                       by=c("name" = "segment_start")) %>% 
+        dplyr::left_join(raw_segments %>% dplyr::select(code_end=code_id,segment_end), by=c("name" = "segment_end")) %>% 
+        dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
+               code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
+      
+      paste0(df2$code_id, df2$value, df2$code_end, collapse = "") #%>% stringr::str_replace_all("\\n", "<br>")
+      
     } else {
       ""
     }
@@ -82,10 +106,10 @@ mod_document_code_server <- function(id, project){
     })
     
     # Coding tools
-    observeEvent(paste("input$", $add_code, {
+    observeEvent(input[["add_code"]], {
       
-      browser()
-      # 
+      
+      # browser()
       golem::invoke_js("highlight", list("yellow"))
       
       startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
@@ -95,7 +119,7 @@ mod_document_code_server <- function(id, project){
       write_segment_db(project$active_project,
                        project$project_db,
                        doc_id = input$doc_selector,
-                       code_id = 2,
+                       code_id = input$code_id,
                        segment, 
                        startOff, 
                        endOff

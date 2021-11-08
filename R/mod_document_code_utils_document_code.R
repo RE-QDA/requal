@@ -31,6 +31,8 @@ read_doc_db <- function(active_project, project_db) {
     
 }
 
+# load documents to display  -------------------------------------------
+
 load_doc_db <- function(active_project, project_db, doc_id) {
     
     if (isTruthy(active_project)) {
@@ -42,8 +44,8 @@ load_doc_db <- function(active_project, project_db, doc_id) {
         doc_text <- dplyr::tbl(con, "documents") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
-            dplyr::pull(doc_text) %>% 
-            stringr::str_replace_all("\\n", "<br>")
+            dplyr::pull(doc_text)
+            
             
         
         return(doc_text)
@@ -53,7 +55,31 @@ load_doc_db <- function(active_project, project_db, doc_id) {
     
 }
 
+# load segments for document display  -------------------------------------------
 
+load_segments_db <- function(active_project, project_db, doc_id) {
+    
+    if (isTruthy(active_project)) {
+        
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              project_db)
+        on.exit(DBI::dbDisconnect(con))
+        
+        segments <- dplyr::tbl(con, "segments") %>%
+            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+            dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
+            dplyr::select(code_id,
+                          segment_start,
+                          segment_end) %>% 
+            dplyr::collect()
+        
+        
+        return(segments)
+        
+        
+    } else {""}
+    
+}
 
 # Write document segments to DB -------------------------------------------
 
