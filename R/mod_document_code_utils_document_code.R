@@ -55,6 +55,13 @@ load_doc_db <- function(active_project, project_db, doc_id) {
     
 }
 
+load_doc <- function(con, project_id, doc_id){
+    dplyr::tbl(con, "documents") %>%
+        dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
+        dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
+        dplyr::pull(doc_text)
+}
+
 # load segments for document display  -------------------------------------------
 
 load_segments_db <- function(active_project, project_db, doc_id) {
@@ -81,6 +88,31 @@ load_segments_db <- function(active_project, project_db, doc_id) {
     
 }
 
+# Check overlap between already coded segments and newly coded segment
+# using its start and end position
+check_overlap <- function(coded_segments, startOff, endOff){
+    if(!nrow(coded_segments)){
+        return(data.frame())
+    }
+    
+    overlapping_segments <- coded_segments %>%
+        dplyr::rowwise() %>%
+        dplyr::mutate(overlapping = dplyr::between(startOff, segment_start, segment_end) | 
+                          dplyr::between(endOff, segment_start, segment_end)) %>%
+        dplyr::filter(overlapping)
+    
+    if(!nrow(overlapping_segments)){
+        return(data.frame())
+    }
+    
+    overlapping_segments
+}
+
+get_segment_text <- function(con, project_id, doc_id, start, end){
+    load_doc(con, project_id, doc_id) %>%
+        substr(., start, end)
+}
+
 # Write document segments to DB -------------------------------------------
 
 write_segment_db <- function(
@@ -88,7 +120,7 @@ write_segment_db <- function(
     project_db,
     doc_id,
     code_id,
-    segment,
+    # segment,
     startOff,
     endOff
 ) {
@@ -97,15 +129,64 @@ write_segment_db <- function(
                           project_db)
     on.exit(DBI::dbDisconnect(con))
     
-    segment_df <- data.frame(project_id = active_project,
-                             doc_id = doc_id,
-                             code_id = code_id,
-                             segment_start = startOff,
-                             segment_end = endOff,
-                             segment_text = segment
-                             )
+    # Check overlap
+    # - return segments with the same document ID and code ID from the DB
+    coded_segments <- dplyr::tbl(con, "segments") %>%
+        dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+        dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
+        dplyr::filter(.data$code_id == as.integer(.env$code_id)) %>%
+        dplyr::select(project_id, doc_id, code_id,
+                      segment_start,
+                      segment_end) %>% 
+        dplyr::collect()
+    # - check overlap
+    overlap <- check_overlap(coded_segments, startOff, endOff)
     
-    res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+    if(nrow(overlap)){
+        # update existing record(s)
+        segment_df <- overlap %>%
+            dplyr::group_by(project_id, doc_id, code_id) %>%
+            dplyr::summarise(segment_start = min(startOff, segment_start), 
+                             segment_end = max(endOff, segment_end)) %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(segment_text = get_segment_text(con, 
+                                                   project_id = active_project, 
+                                                   doc_id, 
+                                                   .$segment_start, 
+                                                   .$segment_end))
+        
+            
+        # delete_segments that are to be replaced by segment_df
+        query <- glue::glue_sql("DELETE FROM segments 
+                       WHERE project_id = {active_project} 
+                       AND doc_id = {doc_id} 
+                       AND code_id = {code_id} 
+                       AND segment_start = {overlap$segment_start}
+                       AND segment_end = {overlap$segment_end}", .con = con)
+        
+        purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
+        
+        res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+        
+    }else{
+        # in case of no overlap write in DB directly
+        segment_df <- data.frame(project_id = active_project,
+                                 doc_id = doc_id,
+                                 code_id = code_id,
+                                 segment_start = startOff,
+                                 segment_end = endOff,
+                                 segment_text = get_segment_text(con, 
+                                                                 project_id = active_project, 
+                                                                 doc_id, 
+                                                                 startOff,
+                                                                 endOff)
+        )
+        
+        res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+    }
+    
+    
+    # TODO: logging
     
     # if(res){
     #     log_add_document_record(con, project_id, document_df)    

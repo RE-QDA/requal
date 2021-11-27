@@ -102,19 +102,13 @@ mod_document_code_server <- function(id, project){
       
       startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
       endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
-      doc <- load_doc_db(project$active_project,
-                         project$project_db,
-                         doc_id = input$doc_selector)
-      segment <- substr(doc, startOff, endOff)
       
       write_segment_db(project$active_project,
                        project$project_db,
                        doc_id = input$doc_selector,
                        code_id = input$code_id,
-                       segment, 
                        startOff, 
-                       endOff
-                       )
+                       endOff)
       
       display_text <- load_doc_to_display(project$active_project, 
                                           project$project_db, 
