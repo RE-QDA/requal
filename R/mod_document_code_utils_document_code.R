@@ -108,6 +108,14 @@ check_overlap <- function(coded_segments, startOff, endOff){
     overlapping_segments
 }
 
+summarise_new_segment_range <- function(overlap_df, startOff, endOff){
+    overlap_df %>%
+        dplyr::group_by(project_id, doc_id, code_id) %>%
+        dplyr::summarise(segment_start = min(startOff, segment_start), 
+                         segment_end = max(endOff, segment_end)) %>%
+        dplyr::ungroup()
+}
+
 get_segment_text <- function(con, project_id, doc_id, start, end){
     load_doc(con, project_id, doc_id) %>%
         substr(., start, end)
@@ -144,11 +152,8 @@ write_segment_db <- function(
     
     if(nrow(overlap)){
         # update existing record(s)
-        segment_df <- overlap %>%
-            dplyr::group_by(project_id, doc_id, code_id) %>%
-            dplyr::summarise(segment_start = min(startOff, segment_start), 
-                             segment_end = max(endOff, segment_end)) %>%
-            dplyr::ungroup() %>%
+        new_segment_df <- overlap %>%
+            summarise_new_segment_range %>%
             dplyr::mutate(segment_text = get_segment_text(con, 
                                                    project_id = active_project, 
                                                    doc_id, 
@@ -166,7 +171,7 @@ write_segment_db <- function(
         
         purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
         
-        res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+        res <- DBI::dbWriteTable(con, "segments", new_segment_df, append = TRUE)
         
     }else{
         # in case of no overlap write in DB directly
@@ -196,20 +201,45 @@ write_segment_db <- function(
     
 }
 
+calculate_code_overlap <- function(raw_segments){
+    raw_segments %>% 
+        dplyr::mutate(char_no = purrr::map2(segment_start, segment_end, 
+                                            function(x, y) seq(from = x, to = y, by = 1))) %>% 
+        tidyr::unnest(., char_no) %>% 
+        dplyr::group_by(char_no) %>% 
+        dplyr::summarise(code_id = paste0(code_id, collapse = "+"), count_codes = dplyr::n(), 
+                         .groups = "drop") %>% 
+        dplyr::mutate(segment_break = code_id != dplyr::lag(code_id) | 
+                          char_no != dplyr::lag(char_no) + 1) %>% 
+        dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
+        dplyr::mutate(segment_id = cumsum(segment_break)) %>% 
+        dplyr::group_by(segment_id, code_id) %>%
+        dplyr::summarise(segment_start = min(char_no), 
+                         segment_end = max(char_no), 
+                         .groups = "drop")
+}
+
 load_doc_to_display <- function(active_project, project_db, doc_selector){
     raw_text <- load_doc_db(active_project, project_db, doc_selector)
-    raw_segments <- load_segments_db(active_project, project_db, doc_selector) 
+    coded_segments <- load_segments_db(active_project, project_db, doc_selector)
     
-    df <- strsplit(raw_text, "")[[1]] %>% tibble::enframe()
-    
-    df2 <- df %>% dplyr::left_join(raw_segments %>% 
-                                       dplyr::select(code_id,segment_start), 
-                                   by=c("name" = "segment_start")) %>% 
-        dplyr::left_join(raw_segments %>% dplyr::select(code_end=code_id,segment_end), by=c("name" = "segment_end")) %>% 
-        dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
-                      code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
-    
-    paste0(df2$code_id, df2$value, df2$code_end, collapse = "")
+    if(nrow(coded_segments)){
+        highlighted_segments <- coded_segments %>%
+            calculate_code_overlap()
+        
+        df <- strsplit(raw_text, "")[[1]] %>% 
+            tibble::enframe() %>%
+            dplyr::left_join(highlighted_segments %>% dplyr::select(code_id, segment_start), 
+                             by=c("name" = "segment_start")) %>% 
+            dplyr::left_join(highlighted_segments %>% dplyr::select(code_end = code_id, segment_end), 
+                             by=c("name" = "segment_end")) %>%
+            dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
+                          code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
+        
+        paste0(df$code_id, df$value, df$code_end, collapse = "")    
+    }else{
+        raw_text
+    }
 }
 
 
