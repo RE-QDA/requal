@@ -153,7 +153,7 @@ write_segment_db <- function(
     if(nrow(overlap)){
         # update existing record(s)
         new_segment_df <- overlap %>%
-            summarise_new_segment_range %>%
+            summarise_new_segment_range(startOff, endOff) %>%
             dplyr::mutate(segment_text = get_segment_text(con, 
                                                    project_id = active_project, 
                                                    doc_id, 
