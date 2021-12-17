@@ -36,7 +36,6 @@ document.addEventListener('mouseup', function () {
       var startOffset = endOffset - range.toString().length;
     
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-      console.log(tag_position_value)
         
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }

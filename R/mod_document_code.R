@@ -90,7 +90,6 @@ mod_document_code_server <- function(id, project){
     output$focal_text <- renderUI({
       
      HTML(text())
-
       
     })
     
