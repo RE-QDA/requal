@@ -51,10 +51,10 @@ $( document ).ready(function() {
         var selection = window.getSelection().getRangeAt(0);
         if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
         var selectedText = selection.extractContents();
-        var span = document.createElement("span");
-        span.style.background = arg_color;
-        span.appendChild(selectedText);
-        selection.insertNode(span);  
+        var mark = document.createElement("mark");
+        mark.style.background = arg_color;
+        mark.appendChild(selectedText);
+        selection.insertNode(mark);  
   })
 });
 

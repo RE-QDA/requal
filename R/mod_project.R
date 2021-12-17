@@ -278,7 +278,7 @@ mod_project_server <- function(id) {
       mod_doc_manager_server("doc_manager_ui_1",
                              connection = db_path(),
                              project = active_project())
-      mod_doc_list_server("doc_list_ui_1",
+      doc_list <- mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
                           project = active_project())
       mod_doc_delete_server("doc_delete_ui_1",
@@ -291,7 +291,7 @@ mod_project_server <- function(id) {
       mod_doc_delete_server("doc_delete_ui_1",
                             connection = db_path(),
                             project = active_project())
-      mod_doc_list_server("doc_list_ui_1",
+      doc_list <- mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
                           project = active_project())
       
@@ -300,7 +300,7 @@ mod_project_server <- function(id) {
     ## list documents
     observe({
       if (!is.null( active_project() ) ) {
-        mod_doc_list_server("doc_list_ui_1",
+        doc_list <- mod_doc_list_server("doc_list_ui_1",
                             connection = db_path(),
                             project = active_project())
         mod_doc_delete_server("doc_delete_ui_1",
@@ -312,7 +312,7 @@ mod_project_server <- function(id) {
     # return active project details
     
     project <- reactiveValues()
-    
+
     observe({ 
       if (!is.null(active_project()) & !is.null(db_path()) ) {
       project$active_project <- active_project()

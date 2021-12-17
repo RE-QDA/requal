@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList 
 mod_document_code_ui <- function(id){
   ns <- NS(id)
-  tagList(
+  fluidRow(column(width = 10,
     
     tags$head(
       tags$script(
@@ -17,37 +17,121 @@ mod_document_code_ui <- function(id){
       )
     ),
     
-    actionButton(ns("add_code"), label = "code"),
+    selectInput(ns("doc_selector"), label = "Documents", 
+                choices = "",
+                selected = ""),
+    
+    actionButton(ns("refresh"), label = "Refresh"),
+    
     
     htmlOutput(ns("focal_text")),
 
     textOutput(ns("captured_range"))
+  ),
+  column(width = 2,
+         
+         
+         selectInput(ns("code_id"), label = "Code", choices = ""),
+         
+         actionButton(ns("add_code"), label = "code")
+         
+         
+        # uiOutput(ns("code_list"))
+         
+         )
   )
 }
     
 #' document_code Server Functions
 #'
 #' @noRd 
-mod_document_code_server <- function(id){
+mod_document_code_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    lorem_ipsum_input <- paste(c("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", 
-                               "Sněmovní komise k ekologické katastrofě na řece Bečvě zkritizovala postup při odběru i analýze vzorků vody a ryb bezprostředně po loňské havárii. Podle poslanců nedostatečně koordinovaly kroky vodoprávní úřad Valašského Meziříčí a Česká inspekce životního prostředí. Uvedli to v závěrečné zprávě, kterou má agentura ČTK k dispozici. Otrava přesně před rokem poničila biotop na 40 kilometrech řeky."), 
-                               collapse = "<br/>")
+    # Selection of documents to code
     
-    output$focal_text <- renderUI(HTML({lorem_ipsum_input}))
+    doc_choices <- reactiveVal("")
     
-    observeEvent(input$add_code, {
+    code_list <- reactiveValues()
+    
+    # Refresh
+    
+    observeEvent(input$refresh, {
+      doc_choices <- read_doc_db(project$active_project, project$project_db)
+      
+      updateSelectInput(session = session, "doc_selector", choices = doc_choices)
+      
+      code_df <- list_db_codes(project$project_db, project$active_project)
+      
+      updateSelectInput(session = session, 
+                        "code_id", 
+                        choices = setNames(code_df$code_id, code_df$code_name)
+                        )
+      
+      
+      code_list$code_id <- code_df$code_id
+      code_list$code_name <- code_df$code_name
+      
+            })
+    
+    # Displayed text
+    text <- reactiveVal("")
+    
+    observeEvent(input$doc_selector, {
+    if (isTruthy(input$doc_selector)) {
+      display_text <- load_doc_to_display(project$active_project, 
+                                          project$project_db, 
+                                          input$doc_selector)
+      text(display_text)
+    } 
+    })
+    # Render selected text
+    output$focal_text <- renderUI({
+      
+     HTML(text())
+      
+    })
+    
+    # Coding tools
+    observeEvent(input[["add_code"]], {
+      
+      # browser()
+      # golem::invoke_js("highlight", list("yellow"))
+      
+      startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
+      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
+      
+      write_segment_db(project$active_project,
+                       project$project_db,
+                       doc_id = input$doc_selector,
+                       code_id = input$code_id,
+                       startOff, 
+                       endOff)
+      
+      display_text <- load_doc_to_display(project$active_project, 
+                                          project$project_db, 
+                                          input$doc_selector)
+      text(display_text)
+      
+    })
+    
+    output$code_list <- renderUI({
+      
+      if (!is.null(code_list$code_id)) {
+        print(code_list)
 
-      golem::invoke_js("highlight", list("yellow"))
-
-
+        purrr::map2(paste0("code_id_", code_list$code_id), 
+                    code_list$code_name, 
+                    ~actionButton(inputId = .x,
+                                  label = .y)
+                  )
+      } else {""}
+      
     })
 
-    # observeEvent(input$tag_position, {
-    # print(input$tag_position)
-    # })
+    
+    # Helper (to be commented out)
     
     output$captured_range <- renderText({input$tag_position})
  
