@@ -19,20 +19,21 @@ Imports:
     magrittr,
     processx,
     purrr,
-    quanteda,
     rlang,
     RSQLite,
     shiny (>= 1.6.0),
     shinydashboard,
     shinydashboardPlus,
     shinyFiles,
-    tibble
+    tibble,
+    tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Suggests: 
     rmarkdown,
     knitr,
+    quanteda,
     testthat (>= 3.0.0),
     spelling
 VignetteBuilder: knitr

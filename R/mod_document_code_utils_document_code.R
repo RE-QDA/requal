@@ -1,5 +1,5 @@
 read_doc_db <- function(active_project, project_db) {
-    
+    doc_name <- NULL
     if (isTruthy(active_project)) {
         
         con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -56,6 +56,7 @@ load_doc_db <- function(active_project, project_db, doc_id) {
 }
 
 load_doc <- function(con, project_id, doc_id){
+    doc_text <- NULL
     dplyr::tbl(con, "documents") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>% 
@@ -65,7 +66,7 @@ load_doc <- function(con, project_id, doc_id){
 # load segments for document display  -------------------------------------------
 
 load_segments_db <- function(active_project, project_db, doc_id) {
-    
+    code_id <- segment_start <- segment_end <- NULL
     if (isTruthy(active_project)) {
         
         con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -91,6 +92,7 @@ load_segments_db <- function(active_project, project_db, doc_id) {
 # Check overlap between already coded segments and newly coded segment
 # using its start and end position
 check_overlap <- function(coded_segments, startOff, endOff){
+    overlapping <- segment_start <- segment_end <- NULL
     if(!nrow(coded_segments)){
         return(data.frame())
     }
@@ -109,6 +111,7 @@ check_overlap <- function(coded_segments, startOff, endOff){
 }
 
 summarise_new_segment_range <- function(overlap_df, startOff, endOff){
+    code_id <- segment_start <- segment_end <- NULL
     overlap_df %>%
         dplyr::group_by(project_id, doc_id, code_id) %>%
         dplyr::summarise(segment_start = min(startOff, segment_start), 
@@ -118,7 +121,7 @@ summarise_new_segment_range <- function(overlap_df, startOff, endOff){
 
 get_segment_text <- function(con, project_id, doc_id, start, end){
     load_doc(con, project_id, doc_id) %>%
-        substr(., start, end)
+        substr(start = start, stop = end)
 }
 
 # Write document segments to DB -------------------------------------------
@@ -128,11 +131,10 @@ write_segment_db <- function(
     project_db,
     doc_id,
     code_id,
-    # segment,
     startOff,
     endOff
 ) {
-    
+    segment_start <- segment_end <- NULL
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -157,8 +159,8 @@ write_segment_db <- function(
             dplyr::mutate(segment_text = get_segment_text(con, 
                                                    project_id = active_project, 
                                                    doc_id, 
-                                                   .$segment_start, 
-                                                   .$segment_end))
+                                                   .data$segment_start, 
+                                                   .data$segment_end))
         
             
         # delete_segments that are to be replaced by segment_df
@@ -202,10 +204,11 @@ write_segment_db <- function(
 }
 
 calculate_code_overlap <- function(raw_segments){
+    segment_start <- segment_end <- char_no <- code_id <- segment_id <- segment_break <- NULL
     raw_segments %>% 
         dplyr::mutate(char_no = purrr::map2(segment_start, segment_end, 
                                             function(x, y) seq(from = x, to = y, by = 1))) %>% 
-        tidyr::unnest(., char_no) %>% 
+        tidyr::unnest(char_no) %>% 
         dplyr::group_by(char_no) %>% 
         dplyr::summarise(code_id = paste0(code_id, collapse = "+"), count_codes = dplyr::n(), 
                          .groups = "drop") %>% 
@@ -220,6 +223,7 @@ calculate_code_overlap <- function(raw_segments){
 }
 
 load_doc_to_display <- function(active_project, project_db, doc_selector){
+    code_id <- segment_start <- segment_end <- code_end <- NULL
     raw_text <- load_doc_db(active_project, project_db, doc_selector)
     coded_segments <- load_segments_db(active_project, project_db, doc_selector)
     

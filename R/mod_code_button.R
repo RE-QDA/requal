@@ -31,7 +31,6 @@ mod_code_button_server <- function(id, project){
                      project$project_db,
                      doc_id = input$doc_selector,
                      code_id = 2,
-                     segment, 
                      startOff, 
                      endOff
     )
