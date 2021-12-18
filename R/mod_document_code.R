@@ -66,7 +66,7 @@ mod_document_code_server <- function(id, project){
       
       updateSelectInput(session = session, 
                         "code_id", 
-                        choices = setNames(code_df$code_id, code_df$code_name)
+                        choices = stats::setNames(code_df$code_id, code_df$code_name)
                         )
       
       
