@@ -21,9 +21,6 @@ mod_document_code_ui <- function(id){
                 choices = "",
                 selected = ""),
     
-    actionButton(ns("refresh"), label = "Refresh"),
-    
-    
     htmlOutput(ns("focal_text")),
 
     textOutput(ns("captured_range"))
@@ -55,14 +52,14 @@ mod_document_code_server <- function(id, project){
     
     code_list <- reactiveValues()
     
-    # Refresh
-
+    # Refresh list of documents when documents are added/removed
   
     observeEvent(project$doc_list, {
       
       if (isTruthy(project$active_project)) {
         
-      doc_choices(project$doc_list)
+      doc_choices(list_db_documents(project_db = project$project_db,
+                                    active_project = project$active_project))
 
       updateSelectInput(session = session, "doc_selector", choices = doc_choices())
 
