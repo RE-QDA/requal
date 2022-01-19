@@ -271,6 +271,10 @@ mod_project_server <- function(id) {
       })
     })
     
+    # initiate doc_list
+    
+    doc_list <- reactiveVal(NULL)
+    
     # observe documents actions
 
     observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
@@ -278,34 +282,46 @@ mod_project_server <- function(id) {
       mod_doc_manager_server("doc_manager_ui_1",
                              connection = db_path(),
                              project = active_project())
-      doc_list <- mod_doc_list_server("doc_list_ui_1",
+      mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
                           project = active_project())
       mod_doc_delete_server("doc_delete_ui_1",
                             connection = db_path(),
                             project = active_project())
+      doc_list(
+        list_db_documents(project_db = db_path(),
+                          active_project = active_project())
+      )
     })
     
     observeEvent(input[[paste("doc_delete_ui_1", "doc_remove", sep = "-")]], {
       # input$doc_remove defined in doc_delete module
-      mod_doc_delete_server("doc_delete_ui_1",
+      after_deletion <- mod_doc_delete_server("doc_delete_ui_1",
                             connection = db_path(),
                             project = active_project())
-      doc_list <- mod_doc_list_server("doc_list_ui_1",
+      mod_doc_list_server("doc_list_ui_1",
                           connection = db_path(),
                           project = active_project())
+      doc_list(
+        list_db_documents(project_db = db_path(),
+                          active_project = active_project())
+      )
       
     })
     
-    ## list documents
+    ## list documents initially
     observe({
       if (!is.null( active_project() ) ) {
-        doc_list <- mod_doc_list_server("doc_list_ui_1",
+        mod_doc_list_server("doc_list_ui_1",
                             connection = db_path(),
                             project = active_project())
         mod_doc_delete_server("doc_delete_ui_1",
                               connection = db_path(),
                               project = active_project())
+        doc_list(
+          list_db_documents(project_db = db_path(),
+                            active_project = active_project())
+        )
       }
     })
     
@@ -317,6 +333,7 @@ mod_project_server <- function(id) {
       if (!is.null(active_project()) & !is.null(db_path()) ) {
       project$active_project <- active_project()
       project$project_db <- db_path()
+      project$doc_list <- doc_list()
       }
       })
     
