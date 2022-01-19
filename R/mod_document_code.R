@@ -49,6 +49,10 @@ mod_document_code_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
+    # Monitor active project
+    
+    observe(print(project$active_project))
+    
     # Selection of documents to code
     
     doc_choices <- reactiveVal("")
@@ -57,7 +61,20 @@ mod_document_code_server <- function(id, project){
     
     # Refresh
     
+
     observeEvent(input$refresh, {
+      
+      if (!isTruthy(project$active_project)) {
+        validate(
+          showModal(
+            modalDialog(
+              title = "Warning",
+              "Select a project first.", 
+              easyClose = TRUE
+            )
+          )
+        ) } else {
+        
       doc_choices <- read_doc_db(project$active_project, project$project_db)
       
       updateSelectInput(session = session, "doc_selector", choices = doc_choices)
@@ -73,7 +90,10 @@ mod_document_code_server <- function(id, project){
       code_list$code_id <- code_df$code_id
       code_list$code_name <- code_df$code_name
       
+        }
+      
             })
+  
     
     # Displayed text
     text <- reactiveVal("")
