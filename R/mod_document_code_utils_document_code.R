@@ -238,7 +238,7 @@ load_doc_to_display <- function(active_project, project_db, doc_selector){
             dplyr::left_join(highlighted_segments %>% dplyr::select(code_end = code_id, segment_end), 
                              by=c("name" = "segment_end")) %>%
             dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
-                          code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
+                          code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '" style="padding:0">'), ""))
         
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
     }else{
