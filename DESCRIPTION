@@ -25,6 +25,7 @@ Imports:
     shinydashboard,
     shinydashboardPlus,
     shinyFiles,
+    shinyjs,
     tibble,
     tidyr
 Encoding: UTF-8

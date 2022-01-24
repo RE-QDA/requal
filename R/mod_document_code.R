@@ -17,6 +17,8 @@ mod_document_code_ui <- function(id){
       )
     ),
     
+    shinyjs::useShinyjs(),
+    
     selectInput(ns("doc_selector"), label = "Documents", 
                 choices = "",
                 selected = ""),
@@ -26,14 +28,10 @@ mod_document_code_ui <- function(id){
     textOutput(ns("captured_range"))
   ),
   column(width = 2,
-         
-         
-         selectInput(ns("code_id"), label = "Code", choices = ""),
-         
-         actionButton(ns("add_code"), label = "code")
-         
-         
-        # uiOutput(ns("code_list"))
+        
+         tags$b("Codes"),
+         br(),
+        uiOutput(ns("code_list"))
          
          )
   )
@@ -46,14 +44,18 @@ mod_document_code_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    # Selection of documents to code
+
+# Selection of documents to code ------------------------------------------
+
     
     doc_choices <- reactiveVal()
     
     code_list <- reactiveValues()
     
-    # Refresh list of documents when documents are added/removed
-  
+
+# Refresh list of documents when documents are added/removed --------
+
+    
     observeEvent(project$doc_list, {
       
       if (isTruthy(project$active_project)) {
@@ -61,25 +63,28 @@ mod_document_code_server <- function(id, project){
       doc_choices(list_db_documents(project_db = project$project_db,
                                     active_project = project$active_project))
 
-      updateSelectInput(session = session, "doc_selector", choices = doc_choices())
+      updateSelectInput(session = session, "doc_selector", choices = c("", doc_choices()))
 
-      code_df <- list_db_codes(project$project_db, project$active_project)
-
-      updateSelectInput(session = session,
-                        "code_id",
-                        choices = stats::setNames(code_df$code_id, code_df$code_name)
-                        )
-
-
-      code_list$code_id <- code_df$code_id
-      code_list$code_name <- code_df$code_name
+      # code_df <- list_db_codes(project$project_db, project$active_project)
+      # 
+      # updateSelectInput(session = session,
+      #                   "code_id",
+      #                   choices = stats::setNames(code_df$code_id, code_df$code_name)
+      #                   )
+      # 
+      # 
+      # code_list$code_id <- code_df$code_id
+      # code_list$code_name <- code_df$code_name
       
         }
     })
             
   
     
-    # Displayed text
+
+# Displayed text ----------------------------------------------------------
+
+    
     text <- reactiveVal("")
     
     observeEvent(input$doc_selector, {
@@ -97,14 +102,22 @@ mod_document_code_server <- function(id, project){
       
     })
     
-    # Coding tools
+# Coding tools ------------------------------------------------------------
+    #TODO this observer should be auto-generated for each code
+    
     observeEvent(input[["add_code"]], {
+
+
       
       # browser()
       # golem::invoke_js("highlight", list("yellow"))
       
+      req(input$tag_position)
+      
       startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
       endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
+      
+      if (endOff - startOff > 1 & endOff > startOff) {
       
       write_segment_db(project$active_project,
                        project$project_db,
@@ -115,27 +128,93 @@ mod_document_code_server <- function(id, project){
       
       display_text <- load_doc_to_display(project$active_project, 
                                           project$project_db, 
-                                          input$doc_selector)
+                                          input$tag_position)
       text(display_text)
-      
+      }
     })
+  
+
+#  Mouse coding tools -----------------------------------------------------
+
+
+    
+    shinyjs::onevent("click",
+            "focal_text",
+            
+            
+          print(load_segment_codes_db(project$active_project, 
+                                      project$project_db,
+                                      input$doc_selector))
+    
+    )
+    
+    
+
+# List out available codes ------------------------------------------------
+
+
     
     output$code_list <- renderUI({
-      
-      if (!is.null(code_list$code_id)) {
-        print(code_list)
+    
+      if (isTruthy(project$active_project)) {
+        
+#browser()
+        code_df <- list_db_codes(project$project_db, project$active_project)
 
-        purrr::map2(paste0("code_id_", code_list$code_id), 
-                    code_list$code_name, 
-                    ~actionButton(inputId = .x,
-                                  label = .y)
-                  )
-      } else {""}
+        purrr::map2(
+          
+        .x = code_df$code_id,
+         .y = code_df$code_name, 
+        ~generate_coding_tools("code_id", .x, .y)
+              )
+        
+        
+      } else {
+        
+        ""
+        
+      }
+      
+      # 
+      # updateSelectInput(session = session,
+      #                   "code_id",
+      #                   choices = stats::setNames(code_df$code_id, code_df$code_name)
+      #                   )
+      # 
+      # 
+      # code_list$code_id <- code_df$code_id
+      # code_list$code_name <- code_df$code_name
+      # purrr::map(
+      #         citations,
+      #         ~stringr::str_replace_all(.x, "<.*?>", " ")
+      #       )
+      #       
+      #       tagList(
+      #         
+      #         checkboxGroupInput(ns("publist"), 
+      #                            label ="Most recent publications in ASEP.", 
+      #                            width = "100%",
+      #                            choiceNames = displayed_citations,
+      #                            choiceValues = citations),
+      #         
+      #         actionButton(ns("add"),
+      #                      label = "Add to report",                  icon = icon("check"),                  class = "btn-success"
+      #         )
+      #       )
+      #     } else {
+      #       
+      #       paste0("No ASEP records found for author ", 
+      # 
+      # 
+      # } else {""}
       
     })
 
     
-    # Helper (to be commented out)
+
+#  # Helper (to be commented out in prod): position counter ---------------
+
+  
     
     output$captured_range <- renderText({input$tag_position})
  
