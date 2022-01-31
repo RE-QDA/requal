@@ -25,13 +25,16 @@ mod_document_code_ui <- function(id){
     
     htmlOutput(ns("focal_text")),
 
-    textOutput(ns("captured_range"))
+    textOutput(ns("captured_range")),
+    
+    verbatimTextOutput(ns("printLabel") ) 
   ),
   column(width = 2,
         
          tags$b("Codes"),
          br(),
-        uiOutput(ns("code_list"))
+        uiOutput(ns("code_list")),   
+
          
          )
   )
@@ -63,18 +66,10 @@ mod_document_code_server <- function(id, project){
       doc_choices(list_db_documents(project_db = project$project_db,
                                     active_project = project$active_project))
 
-      updateSelectInput(session = session, "doc_selector", choices = c("", doc_choices()))
-
-      # code_df <- list_db_codes(project$project_db, project$active_project)
-      # 
-      # updateSelectInput(session = session,
-      #                   "code_id",
-      #                   choices = stats::setNames(code_df$code_id, code_df$code_name)
-      #                   )
-      # 
-      # 
-      # code_list$code_id <- code_df$code_id
-      # code_list$code_name <- code_df$code_name
+      updateSelectInput(session = session, 
+                        "doc_selector",
+                        choices = c("", doc_choices())
+                        )
       
         }
     })
@@ -102,52 +97,7 @@ mod_document_code_server <- function(id, project){
       
     })
     
-# Coding tools ------------------------------------------------------------
-    #TODO this observer should be auto-generated for each code
-    
-    observeEvent(input[["add_code"]], {
 
-
-      
-      # browser()
-      # golem::invoke_js("highlight", list("yellow"))
-      
-      req(input$tag_position)
-      
-      startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
-      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
-      
-      if (endOff - startOff > 1 & endOff > startOff) {
-      
-      write_segment_db(project$active_project,
-                       project$project_db,
-                       doc_id = input$doc_selector,
-                       code_id = input$code_id,
-                       startOff, 
-                       endOff)
-      
-      display_text <- load_doc_to_display(project$active_project, 
-                                          project$project_db, 
-                                          input$tag_position)
-      text(display_text)
-      }
-    })
-  
-
-#  Mouse coding tools -----------------------------------------------------
-
-
-    
-    shinyjs::onevent("click",
-            "focal_text",
-            
-            
-          print(load_segment_codes_db(project$active_project, 
-                                      project$project_db,
-                                      input$doc_selector))
-    
-    )
-    
     
 
 # List out available codes ------------------------------------------------
@@ -158,57 +108,72 @@ mod_document_code_server <- function(id, project){
     
       if (isTruthy(project$active_project)) {
         
-#browser()
         code_df <- list_db_codes(project$project_db, project$active_project)
 
         purrr::map2(
           
         .x = code_df$code_id,
-         .y = code_df$code_name, 
-        ~generate_coding_tools("code_id", .x, .y)
+        .y = code_df$code_name, 
+        ~ generate_coding_tools(ns = ns, code_id = .x, code_name = .y)
               )
         
         
       } else {
         
         ""
-        
       }
-      
-      # 
-      # updateSelectInput(session = session,
-      #                   "code_id",
-      #                   choices = stats::setNames(code_df$code_id, code_df$code_name)
-      #                   )
-      # 
-      # 
-      # code_list$code_id <- code_df$code_id
-      # code_list$code_name <- code_df$code_name
-      # purrr::map(
-      #         citations,
-      #         ~stringr::str_replace_all(.x, "<.*?>", " ")
-      #       )
-      #       
-      #       tagList(
-      #         
-      #         checkboxGroupInput(ns("publist"), 
-      #                            label ="Most recent publications in ASEP.", 
-      #                            width = "100%",
-      #                            choiceNames = displayed_citations,
-      #                            choiceValues = citations),
-      #         
-      #         actionButton(ns("add"),
-      #                      label = "Add to report",                  icon = icon("check"),                  class = "btn-success"
-      #         )
-      #       )
-      #     } else {
-      #       
-      #       paste0("No ASEP records found for author ", 
-      # 
-      # 
-      # } else {""}
-      
+    
     })
+    
+    
+    # Coding tools ------------------------------------------------------------
+    #TODO this observer should be auto-generated for each code
+    
+
+    observeEvent(input$selected_code, {
+      
+      req(input$selected_code, input$tag_position)
+      
+      # browser()
+      # golem::invoke_js("highlight", list("yellow"))
+      
+      startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
+      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
+      
+      if (endOff - startOff > 1 & endOff > startOff) {
+        
+        write_segment_db(project$active_project,
+                         project$project_db,
+                         doc_id = input$doc_selector,
+                         code_id = input$selected_code,
+                         startOff, 
+                         endOff)
+        
+        display_text <- load_doc_to_display(project$active_project, 
+                                            project$project_db, 
+                                            input$doc_selector)
+        text(display_text)
+      }
+    })
+    
+# # Pop-up menu ------
+# works, but perhaps deal with later    
+#     observeEvent( input$tag_position, {
+#       
+#       if ((as.integer(unlist(strsplit(input$tag_position, "-"))[1])-as.integer(unlist(strsplit(input$tag_position, "-"))[2])) != 0 ) {
+#         
+#         showModal(modalDialog(
+#           title = "Somewhat important message",
+#           "This is a somewhat important message.",
+#           easyClose = TRUE,
+#           footer = NULL,
+#           fade = FALSE
+#         ))
+#         
+#       }
+#       
+#     })
+
 
     
 

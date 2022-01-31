@@ -295,22 +295,17 @@ load_segment_codes_db <- function(active_project, project_db, code_coord) {
 }
 
 
-# Generate coding toolbox -------------------------------------------------
+# Generate coding tools -------------------------------------------------
 
 
-generate_coding_tools <- function(input_id, code_id, code_name) {
+generate_coding_tools <- function(ns, code_id, code_name) {
     
-
-    tags$table(style = "border: 1px solid black; width: 100%; padding: 5%;", tags$tr(tags$td(
-            actionLink(paste0(input_id, "-", code_id),
-                               label = code_name,
-                       style = "background: none;
-                       width: 100%")
-)
-)
-            )
-          
-
+    actionButton(inputId = ns(code_id),
+               label = code_name,
+               name = code_id,
+               style = "background: none;
+                       width: 100%",
+               onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name);"))
     
     
 }
