@@ -227,7 +227,7 @@ calculate_code_overlap <- function(raw_segments){
                          .groups = "drop")
 }
 
-load_doc_to_display <- function(active_project, project_db, doc_selector){
+load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
     
     code_id <- segment_start <- segment_end <- code_end <- NULL
     
@@ -241,7 +241,7 @@ load_doc_to_display <- function(active_project, project_db, doc_selector){
         
         highlighted_segments <- coded_segments %>%
             calculate_code_overlap()
-        
+        #browser()
         df <- strsplit(raw_text, "")[[1]] %>% 
             tibble::enframe() %>%
             dplyr::left_join(highlighted_segments %>% 
@@ -253,10 +253,12 @@ load_doc_to_display <- function(active_project, project_db, doc_selector){
                              by=c("name" = "segment_end")
                              ) %>%
             dplyr::mutate(code_end = ifelse(!is.na(code_end), 
-                                            "</mark>", 
+                                            "</mark></a>", 
                                             ""),
                           code_id = ifelse(!is.na(code_id), 
-                                           paste0('<mark id="', 
+                                           
+                                           
+                                           paste0('<a href="#" name="', code_id, '" onclick="Shiny.setInputValue(\'', ns("marked_code"), '\', this.name, {priority: \'event\'});"><mark id="', 
                                                   code_id, 
                                                   '" class="code" style="padding:0; background:yellow">'), 
                                            ""))
@@ -272,23 +274,21 @@ load_doc_to_display <- function(active_project, project_db, doc_selector){
 
 # Load codes for a segment -------------------------------------------
 
-load_segment_codes_db <- function(active_project, project_db, code_coord) {
- 
-    #browser()
-    Off <- as.numeric(unlist(strsplit(code_coord, "-")))[1]+1
-    
+load_segment_codes_db <- function(active_project, project_db, marked_codes) {
+
         con <- DBI::dbConnect(RSQLite::SQLite(),
                               project_db)
         on.exit(DBI::dbDisconnect(con))
         
-        segment_codes <- dplyr::tbl(con, "segments") %>%
+        segment_codes_df <- dplyr::tbl(con, "codes") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(dplyr::between(Off, 
-                                         .data$segment_start,
-                                         .data$segment_end)
-                          ) %>% 
-            dplyr::pull(code_id)
+            dplyr::filter(code_id %in% marked_codes) %>% 
+            dplyr::collect()
+
+        #browser()
+        segment_codes <- segment_codes_df$code_id
         
+        names(segment_codes) <- segment_codes_df$code_name
         
         return(segment_codes)
         
@@ -305,7 +305,7 @@ generate_coding_tools <- function(ns, code_id, code_name) {
                name = code_id,
                style = "background: none;
                        width: 100%",
-               onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name);"))
+               onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});"))
     
     
 }

@@ -17,8 +17,6 @@ mod_document_code_ui <- function(id){
       )
     ),
     
-    shinyjs::useShinyjs(),
-    
     selectInput(ns("doc_selector"), label = "Documents", 
                 choices = "",
                 selected = ""),
@@ -27,7 +25,7 @@ mod_document_code_ui <- function(id){
 
     textOutput(ns("captured_range")),
     
-    verbatimTextOutput(ns("printLabel") ) 
+    verbatimTextOutput(ns("printLabel"))
   ),
   column(width = 2,
         
@@ -81,12 +79,12 @@ mod_document_code_server <- function(id, project){
 
     
     text <- reactiveVal("")
-    
+
     observeEvent(input$doc_selector, {
     if (isTruthy(input$doc_selector)) {
       display_text <- load_doc_to_display(project$active_project, 
                                           project$project_db, 
-                                          input$doc_selector)
+                                          input$doc_selector, ns=NS(id))
       text(display_text)
     } 
     })
@@ -102,7 +100,8 @@ mod_document_code_server <- function(id, project){
 
 # List out available codes ------------------------------------------------
 
-
+    code_df <-reactiveVal()
+    
     
     output$code_list <- renderUI({
     
@@ -127,8 +126,6 @@ mod_document_code_server <- function(id, project){
     
     
     # Coding tools ------------------------------------------------------------
-    #TODO this observer should be auto-generated for each code
-    
 
     observeEvent(input$selected_code, {
       
@@ -151,32 +148,59 @@ mod_document_code_server <- function(id, project){
         
         display_text <- load_doc_to_display(project$active_project, 
                                             project$project_db, 
-                                            input$doc_selector)
+                                            input$doc_selector,ns=NS(id))
         text(display_text)
-      }
+        
+        
+        }
     })
     
-# # Pop-up menu ------
-# works, but perhaps deal with later    
-#     observeEvent( input$tag_position, {
-#       
-#       if ((as.integer(unlist(strsplit(input$tag_position, "-"))[1])-as.integer(unlist(strsplit(input$tag_position, "-"))[2])) != 0 ) {
-#         
-#         showModal(modalDialog(
-#           title = "Somewhat important message",
-#           "This is a somewhat important message.",
-#           easyClose = TRUE,
-#           footer = NULL,
-#           fade = FALSE
-#         ))
-#         
-#       }
-#       
-#     })
-
-
     
+    
+    
+# # Pop-up menu ------
+    
+    observeEvent(input$marked_code, {
+      
+      if (grepl("\\+", input$marked_code)) {
+      marked_code_parsed <- as.integer(unlist(strsplit(input$marked_code, split = "\\+")))
+      } else {
+      marked_code_parsed <- as.integer(input$marked_code)
+      }
+      
+      print(marked_code_parsed) 
+      
+      marked_segments <- load_segment_codes_db(active_project = project$active_project,
+                                               project_db = project$project_db,
+                                               marked_codes = marked_code_parsed)
+      
+      print(marked_segments)
+      
+      showModal(
+            modalDialog(
 
+            checkboxGroupInput("codes_to_remove",
+                               label = "",
+                               choices = marked_segments,
+                               selected = TRUE),
+
+            title = "Codes in this segment",
+            "Remove selected codes from segment",
+            easyClose = TRUE,
+            footer = tagList(
+              modalButton("Cancel"),
+              actionButton("remove_codes", "Remove", class = "btn-danger")
+              ),
+            fade = TRUE
+          )
+
+
+          )
+
+      })
+    
+    
+  
 #  # Helper (to be commented out in prod): position counter ---------------
 
   
