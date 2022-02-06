@@ -241,8 +241,8 @@ load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
         
         highlighted_segments <- coded_segments %>%
             calculate_code_overlap()
-        #browser()
-        df <- strsplit(raw_text, "")[[1]] %>% 
+
+                df <- strsplit(raw_text, "")[[1]] %>% 
             tibble::enframe() %>%
             dplyr::left_join(highlighted_segments %>% 
                                  dplyr::select(code_id, segment_start), 
@@ -292,6 +292,49 @@ load_segment_codes_db <- function(active_project, project_db, marked_codes) {
         
         return(segment_codes)
         
+}
+
+# Parse tag position -----------
+
+parse_tag_pos <- function(tag_postion, which_part) {
+    
+    
+    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]+1
+    endOff <- as.integer(unlist(strsplit(tag_postion, "-")))[2]
+    
+    switch(which_part,
+           "start" = startOff,
+           "end" = endOff,
+           "both" = c(startOff, endOff)
+               )
+    
+    
+    
+}
+
+
+
+# Remove codes from a document ----------------
+
+delete_segment_codes_db <- function(project_db,
+                                    active_project, 
+                                    doc_id,
+                                    code_id,
+                                    segment_id) {
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db)
+    on.exit(DBI::dbDisconnect(con))
+    
+    # delete code from a segment
+    query <- glue::glue_sql("DELETE FROM segments 
+                       WHERE project_id = {active_project} 
+                       AND doc_id = {doc_id} 
+                       AND code_id = {code_id}", .con = con)
+    
+    purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
+    
+    
 }
 
 

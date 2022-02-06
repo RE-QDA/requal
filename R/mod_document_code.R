@@ -134,8 +134,8 @@ mod_document_code_server <- function(id, project){
       # browser()
       # golem::invoke_js("highlight", list("yellow"))
       
-      startOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[1]+1
-      endOff <- as.numeric(unlist(strsplit(input$tag_position, "-")))[2]
+      startOff <- parse_tag_pos(input$tag_position, "start")
+      endOff <- parse_tag_pos(input$tag_position, "end")
       
       if (endOff - startOff > 1 & endOff > startOff) {
         
@@ -168,38 +168,59 @@ mod_document_code_server <- function(id, project){
       marked_code_parsed <- as.integer(input$marked_code)
       }
       
-      print(marked_code_parsed) 
-      
+      #TODO make this work with segment ids
       marked_segments <- load_segment_codes_db(active_project = project$active_project,
                                                project_db = project$project_db,
                                                marked_codes = marked_code_parsed)
       
-      print(marked_segments)
+      #print(marked_segments)
       
       showModal(
             modalDialog(
 
-            checkboxGroupInput("codes_to_remove",
+            checkboxGroupInput(ns("codes_to_remove"),
                                label = "",
                                choices = marked_segments,
                                selected = TRUE),
 
             title = "Codes in this segment",
-            "Remove selected codes from segment",
+            "Remove selected codes from segment?",
             easyClose = TRUE,
             footer = tagList(
-              modalButton("Cancel"),
-              actionButton("remove_codes", "Remove", class = "btn-danger")
+              modalButton("Dismiss"),
+              actionButton(ns("remove_codes"), "Remove", class = "btn-danger")
               ),
             fade = TRUE
           )
 
 
           )
-
+      
       })
+
     
+    # Code removal ----------
     
+    observeEvent(input$remove_codes, {
+      
+#      browser()
+      
+      delete_segment_codes_db(project_db =  project$project_db,
+                              active_project = project$active_project, 
+                              doc_id = input$doc_selector,
+                              code_id = input$codes_to_remove,
+                              startOff <- parse_tag_pos(input$tag_position, "start")
+                              )
+      
+      removeModal()
+      
+      display_text <- load_doc_to_display(project$active_project, 
+                                          project$project_db, 
+                                          input$doc_selector,ns=NS(id))
+      text(display_text)
+      
+      
+    })
   
 #  # Helper (to be commented out in prod): position counter ---------------
 
