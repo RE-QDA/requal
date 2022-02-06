@@ -45,6 +45,7 @@ CREATE TABLE if not exists segments (
     project_id INTEGER
 ,   doc_id INTEGER
 ,   code_id INTEGER
+,   segment_id INTEGER PRIMARY KEY
 ,   segment_start INTEGER
 ,   segment_end INTEGER
 ,   segment_text TEXT
