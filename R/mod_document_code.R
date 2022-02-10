@@ -12,11 +12,13 @@ mod_document_code_ui <- function(id){
   fluidRow(column(width = 10,
     
     tags$head(
+      
       tags$script(
         src = "www/document_code_js.js"
       )
     ),
     
+
     selectInput(ns("doc_selector"), label = "Documents", 
                 choices = "",
                 selected = ""),
@@ -31,7 +33,12 @@ mod_document_code_ui <- function(id){
         
          tags$b("Codes"),
          br(),
-        uiOutput(ns("code_list")),   
+         actionButton(ns("remove_codes"), 
+                      "Remove code",
+                      class = "btn-danger",
+                      width = "100%"),
+         br(), br(),
+         uiOutput(ns("code_list"))
 
          
          )
@@ -158,67 +165,83 @@ mod_document_code_server <- function(id, project){
     
     
     
-# # Pop-up menu ------
-    
-    observeEvent(input$marked_code, {
-      
-      if (grepl("\\+", input$marked_code)) {
-      marked_code_parsed <- as.integer(unlist(strsplit(input$marked_code, split = "\\+")))
-      } else {
-      marked_code_parsed <- as.integer(input$marked_code)
-      }
-      
-      #TODO make this work with segment ids
-      marked_segments <- load_segment_codes_db(active_project = project$active_project,
-                                               project_db = project$project_db,
-                                               marked_codes = marked_code_parsed)
-      
-      #print(marked_segments)
-      
-      showModal(
-            modalDialog(
-
-            checkboxGroupInput(ns("codes_to_remove"),
-                               label = "",
-                               choices = marked_segments,
-                               selected = TRUE),
-
-            title = "Codes in this segment",
-            "Remove selected codes from segment?",
-            easyClose = TRUE,
-            footer = tagList(
-              modalButton("Dismiss"),
-              actionButton(ns("remove_codes"), "Remove", class = "btn-danger")
-              ),
-            fade = TRUE
-          )
-
-
-          )
-      
-      })
 
     
     # Code removal ----------
     
     observeEvent(input$remove_codes, {
       
-#      browser()
+     # browser()
+      marked_segments_df <- load_segment_codes_db(active_project = project$active_project,
+                                               project_db = project$project_db,
+                                               marked_codes = parse_tag_pos(
+                                                 input$tag_position, 
+                                                 "start")
+                                               )
+      if (nrow(marked_segments_df) == 0) {
+        NULL
+      } else if (nrow(marked_segments_df) == 1) {
+        
+        delete_segment_codes_db(project_db =  project$project_db,
+                                active_project = project$active_project, 
+                                doc_id = input$doc_selector,
+                                segment_id = marked_segments_df$segment_id)
+        
+        display_text <- load_doc_to_display(project$active_project, 
+                                            project$project_db, 
+                                            input$doc_selector,
+                                            ns=NS(id))
+        text(display_text)
+        
+      } else {
       
-      delete_segment_codes_db(project_db =  project$project_db,
-                              active_project = project$active_project, 
-                              doc_id = input$doc_selector,
-                              code_id = input$codes_to_remove,
-                              startOff <- parse_tag_pos(input$tag_position, "start")
-                              )
+      showModal(
+        modalDialog(
+          
+          checkboxGroupInput(ns("codes_to_remove"),
+                             label = "",
+                             choiceValues = marked_segments_df$segment_id,
+                             choiceNames = marked_segments_df$code_name,
+                             selected = FALSE),
+          
+          title = "Codes in this segment",
+          "Remove selected codes from segment?",
+          easyClose = TRUE,
+          footer = tagList(
+            modalButton("Dismiss"),
+            actionButton(ns("remove_codes_select"), 
+                         "Remove selected", 
+                         class = "btn-danger")
+          ),
+          fade = TRUE
+        )
+        
+        
+      )
+     
+     }
       
-      removeModal()
+    })
+    
+    observeEvent(input$remove_codes_select, {
       
-      display_text <- load_doc_to_display(project$active_project, 
-                                          project$project_db, 
-                                          input$doc_selector,ns=NS(id))
-      text(display_text)
-      
+      if (isTruthy(input$codes_to_remove)) {
+        
+        delete_segment_codes_db(project_db =  project$project_db,
+                                active_project = project$active_project, 
+                                doc_id = input$doc_selector,
+                                segment_id = input$codes_to_remove
+        )
+        removeModal()
+        
+        
+        
+        display_text <- load_doc_to_display(project$active_project, 
+                                            project$project_db, 
+                                            input$doc_selector,
+                                            ns=NS(id))
+        text(display_text)
+      }
       
     })
   

@@ -253,14 +253,14 @@ load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
                              by=c("name" = "segment_end")
                              ) %>%
             dplyr::mutate(code_end = ifelse(!is.na(code_end), 
-                                            "</mark></a>", 
+                                            "</mark>", 
                                             ""),
                           code_id = ifelse(!is.na(code_id), 
                                            
                                            
-                                           paste0('<a href="#" name="', code_id, '" onclick="Shiny.setInputValue(\'', ns("marked_code"), '\', this.name, {priority: \'event\'});"><mark id="', 
+                                           paste0('<mark id="', 
                                                   code_id, 
-                                                  '" class="code" style="padding:0; background:yellow">'), 
+                                                  '" class="code" style="padding:0; background:yellow" title="code tooltip to include">'), 
                                            ""))
         
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
@@ -280,17 +280,17 @@ load_segment_codes_db <- function(active_project, project_db, marked_codes) {
                               project_db)
         on.exit(DBI::dbDisconnect(con))
         
-        segment_codes_df <- dplyr::tbl(con, "codes") %>%
+        segment_codes_df <- dplyr::tbl(con, "segments") %>%
+            dplyr::inner_join( dplyr::tbl(con, "codes") %>% 
+                                   dplyr::select(code_id, code_name),
+                               by = "code_id"
+                               ) %>% 
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(code_id %in% marked_codes) %>% 
+            dplyr::filter(dplyr::between(marked_codes, 
+                                         .data$segment_start, 
+                                         .data$segment_end)) %>% 
+            dplyr::select(code_id, code_name, segment_id) %>% 
             dplyr::collect()
-
-        #browser()
-        segment_codes <- segment_codes_df$code_id
-        
-        names(segment_codes) <- segment_codes_df$code_name
-        
-        return(segment_codes)
         
 }
 
@@ -319,7 +319,6 @@ parse_tag_pos <- function(tag_postion, which_part) {
 delete_segment_codes_db <- function(project_db,
                                     active_project, 
                                     doc_id,
-                                    code_id,
                                     segment_id) {
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -329,8 +328,8 @@ delete_segment_codes_db <- function(project_db,
     # delete code from a segment
     query <- glue::glue_sql("DELETE FROM segments 
                        WHERE project_id = {active_project} 
-                       AND doc_id = {doc_id} 
-                       AND code_id = {code_id}", .con = con)
+                       AND doc_id = {doc_id}
+                       AND segment_id = {segment_id}", .con = con)
     
     purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
     
