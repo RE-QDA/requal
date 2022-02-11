@@ -88,7 +88,9 @@ mod_document_code_server <- function(id, project, codebook){
     if (isTruthy(input$doc_selector)) {
       display_text <- load_doc_to_display(project$active_project, 
                                           project$project_db, 
-                                          input$doc_selector, ns=NS(id))
+                                          input$doc_selector, 
+                                          code_df$active_codebook,
+                                          ns=NS(id))
       text(display_text)
     } 
     })
@@ -99,17 +101,6 @@ mod_document_code_server <- function(id, project, codebook){
       
     })
     
-
-# # Refresh list of codes when codebook changes --------
-#     
-#     code_df <- reactiveValues()
-#     
-#     observe({
-#       print(codebook$active_codebook)
-#     # code_df$code_id <- codebook$active_codebook$code_id
-#     # code_df$code_name <- codebook$active_codebook$code_name
-#     # code_df$code_description <- codebook$active_codebook$code_description
-#     })
 
 
 
@@ -166,7 +157,9 @@ mod_document_code_server <- function(id, project, codebook){
         
         display_text <- load_doc_to_display(project$active_project, 
                                             project$project_db, 
-                                            input$doc_selector,ns=NS(id))
+                                            input$doc_selector,
+                                            code_df$active_codebook,
+                                            ns=NS(id))
         text(display_text)
         
         
@@ -201,6 +194,7 @@ mod_document_code_server <- function(id, project, codebook){
         display_text <- load_doc_to_display(project$active_project, 
                                             project$project_db, 
                                             input$doc_selector,
+                                            code_df$active_codebook,
                                             ns=NS(id))
         text(display_text)
         
@@ -250,6 +244,7 @@ mod_document_code_server <- function(id, project, codebook){
         display_text <- load_doc_to_display(project$active_project, 
                                             project$project_db, 
                                             input$doc_selector,
+                                            code_df$active_codebook,
                                             ns=NS(id))
         text(display_text)
       }

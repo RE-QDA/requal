@@ -227,7 +227,11 @@ calculate_code_overlap <- function(raw_segments){
                          .groups = "drop")
 }
 
-load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
+load_doc_to_display <- function(active_project, 
+                                project_db, 
+                                doc_selector, 
+                                codebook,
+                                ns){
     
     code_id <- segment_start <- segment_end <- code_end <- NULL
     
@@ -236,12 +240,15 @@ load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
     coded_segments <- load_segments_db(active_project, 
                                        project_db, 
                                        doc_selector)
+    code_names <- codebook %>% 
+        dplyr::select(code_id, code_name) %>% 
+        dplyr::mutate(code_id = as.character(code_id))
     
     if(nrow(coded_segments)){
         
         highlighted_segments <- coded_segments %>%
             calculate_code_overlap()
-
+        
                 df <- strsplit(raw_text, "")[[1]] %>% 
             tibble::enframe() %>%
             dplyr::left_join(highlighted_segments %>% 
@@ -252,6 +259,8 @@ load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
                                  dplyr::select(code_end = code_id, segment_end), 
                              by=c("name" = "segment_end")
                              ) %>%
+            dplyr::left_join(code_names,
+                             by = c("code_id")) %>% 
             dplyr::mutate(code_end = ifelse(!is.na(code_end), 
                                             "</mark>", 
                                             ""),
@@ -260,7 +269,7 @@ load_doc_to_display <- function(active_project, project_db, doc_selector, ns){
                                            
                                            paste0('<mark id="', 
                                                   code_id, 
-                                                  '" class="code" style="padding:0; background:yellow" title="code tooltip to include">'), 
+                                                  '" class="code" style="padding:0; background:yellow" title="', code_name,'">'), 
                                            ""))
         
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
