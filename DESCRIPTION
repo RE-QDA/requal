@@ -1,6 +1,6 @@
 Package: requal
 Title: Qualitative Data Analysis with Reproducibility Support
-Version: 0.0.0.9000
+Version: 0.1.1
 Authors@R: person('Martin', 'Hájek', email = 'hajek@fsv.cuni.cz', role = c('cre', 'aut'))
 Description: PKG_DESC.
 License: MIT + file LICENSE
