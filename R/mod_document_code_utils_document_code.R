@@ -31,7 +31,7 @@ read_doc_db <- function(active_project, project_db) {
     
 }
 
-# load documents to display  -------------------------------------------
+# Load documents to display  -------------------------------------------
 
 load_doc_db <- function(active_project, project_db, doc_id) {
     
@@ -63,7 +63,7 @@ load_doc <- function(con, project_id, doc_id){
         dplyr::pull(doc_text)
 }
 
-# load segments for document display  -------------------------------------------
+# Load segments for document display  -------------------------------------------
 
 load_segments_db <- function(active_project, project_db, doc_id) {
     code_id <- segment_start <- segment_end <- NULL
@@ -204,13 +204,18 @@ write_segment_db <- function(
 }
 
 calculate_code_overlap <- function(raw_segments){
+    
     segment_start <- segment_end <- char_no <- code_id <- segment_id <- segment_break <- NULL
+    
     raw_segments %>% 
-        dplyr::mutate(char_no = purrr::map2(segment_start, segment_end, 
-                                            function(x, y) seq(from = x, to = y, by = 1))) %>% 
+        dplyr::mutate(char_no = purrr::map2(segment_start, 
+                                            segment_end, 
+                                            function(x, y) seq(from = x, to = y, by = 1))
+                      ) %>% 
         tidyr::unnest(char_no) %>% 
         dplyr::group_by(char_no) %>% 
-        dplyr::summarise(code_id = paste0(code_id, collapse = "+"), count_codes = dplyr::n(), 
+        dplyr::summarise(code_id = paste0(code_id, collapse = "+"), 
+                         count_codes = dplyr::n(), 
                          .groups = "drop") %>% 
         dplyr::mutate(segment_break = code_id != dplyr::lag(code_id) | 
                           char_no != dplyr::lag(char_no) + 1) %>% 
@@ -222,28 +227,136 @@ calculate_code_overlap <- function(raw_segments){
                          .groups = "drop")
 }
 
-load_doc_to_display <- function(active_project, project_db, doc_selector){
+load_doc_to_display <- function(active_project, 
+                                project_db, 
+                                doc_selector, 
+                                codebook,
+                                ns){
+    
     code_id <- segment_start <- segment_end <- code_end <- NULL
+    
     raw_text <- load_doc_db(active_project, project_db, doc_selector)
-    coded_segments <- load_segments_db(active_project, project_db, doc_selector)
+    
+    coded_segments <- load_segments_db(active_project, 
+                                       project_db, 
+                                       doc_selector)
+    code_names <- codebook %>% 
+        dplyr::select(code_id, code_name) %>% 
+        dplyr::mutate(code_id = as.character(code_id))
     
     if(nrow(coded_segments)){
+        
         highlighted_segments <- coded_segments %>%
             calculate_code_overlap()
         
-        df <- strsplit(raw_text, "")[[1]] %>% 
+                df <- strsplit(raw_text, "")[[1]] %>% 
             tibble::enframe() %>%
-            dplyr::left_join(highlighted_segments %>% dplyr::select(code_id, segment_start), 
-                             by=c("name" = "segment_start")) %>% 
-            dplyr::left_join(highlighted_segments %>% dplyr::select(code_end = code_id, segment_end), 
-                             by=c("name" = "segment_end")) %>%
-            dplyr::mutate(code_end = ifelse(!is.na(code_end), "</mark>", ""),
-                          code_id = ifelse(!is.na(code_id), paste0('<mark id="', code_id, '">'), ""))
+            dplyr::left_join(highlighted_segments %>% 
+                                 dplyr::select(code_id, segment_start), 
+                             by=c("name" = "segment_start")
+                             ) %>% 
+            dplyr::left_join(highlighted_segments %>% 
+                                 dplyr::select(code_end = code_id, segment_end), 
+                             by=c("name" = "segment_end")
+                             ) %>%
+            dplyr::left_join(code_names,
+                             by = c("code_id")) %>% 
+            dplyr::mutate(code_end = ifelse(!is.na(code_end), 
+                                            "</mark>", 
+                                            ""),
+                          code_id = ifelse(!is.na(code_id), 
+                                           
+                                           
+                                           paste0('<mark id="', 
+                                                  code_id, 
+                                                  '" class="code" style="padding:0; background:yellow" title="', code_name,'">'), 
+                                           ""))
         
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
+        
     }else{
+        
         raw_text
     }
 }
 
 
+# Load codes for a segment -------------------------------------------
+
+load_segment_codes_db <- function(active_project, project_db, marked_codes) {
+
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              project_db)
+        on.exit(DBI::dbDisconnect(con))
+        
+        segment_codes_df <- dplyr::tbl(con, "segments") %>%
+            dplyr::inner_join( dplyr::tbl(con, "codes") %>% 
+                                   dplyr::select(code_id, code_name),
+                               by = "code_id"
+                               ) %>% 
+            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+            dplyr::filter(dplyr::between(marked_codes, 
+                                         .data$segment_start, 
+                                         .data$segment_end)) %>% 
+            dplyr::select(code_id, code_name, segment_id) %>% 
+            dplyr::collect()
+        
+}
+
+# Parse tag position -----------
+
+parse_tag_pos <- function(tag_postion, which_part) {
+    
+    
+    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]+1
+    endOff <- as.integer(unlist(strsplit(tag_postion, "-")))[2]
+    
+    switch(which_part,
+           "start" = startOff,
+           "end" = endOff,
+           "both" = c(startOff, endOff)
+               )
+    
+    
+    
+}
+
+
+
+# Remove codes from a document ----------------
+
+delete_segment_codes_db <- function(project_db,
+                                    active_project, 
+                                    doc_id,
+                                    segment_id) {
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db)
+    on.exit(DBI::dbDisconnect(con))
+    
+    # delete code from a segment
+    query <- glue::glue_sql("DELETE FROM segments 
+                       WHERE project_id = {active_project} 
+                       AND doc_id = {doc_id}
+                       AND segment_id = {segment_id}", .con = con)
+    
+    purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
+    
+    
+}
+
+
+# Generate coding tools -------------------------------------------------
+
+
+generate_coding_tools <- function(ns, code_id, code_name) {
+    
+    actionButton(inputId = ns(code_id),
+               label = code_name,
+               name = code_id,
+               style = "background: none;
+                       width: 100%",
+               onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});"))
+    
+    
+}

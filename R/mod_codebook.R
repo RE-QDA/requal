@@ -34,7 +34,11 @@ mod_codebook_server <- function(id, project) {
     
     ns <- session$ns
     
-# List existing codes
+# codebook observer ----
+    
+    codebook_observer <- reactiveVal(0)
+    
+# List existing codes in codes boxes ----
     output$codes_ui <- renderUI({
      
       render_codes(active_project = project$active_project, 
@@ -42,9 +46,7 @@ mod_codebook_server <- function(id, project) {
       
       
     })
-#--------------------------------------------------------
-    
-# Generate codes manager UI (if there is an active project)
+#---Generate codes manager UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project$active_project)) {
         codebook_manager_UI(id,
@@ -53,16 +55,18 @@ mod_codebook_server <- function(id, project) {
       }
     })
 
-#--------------------------------------------------------
+#---Create new code------------------------------------------------------
 
-# Create new code
+
     
     observeEvent(input$code_add, {
-
-      project_names <- list_db_codes(project_db = project$project_db,
+      
+      
+      # check if code name is unique
+      code_names <- list_db_codes(project_db = project$project_db,
                                      project_id = project$active_project)$code_name
       
-      if (!input$code_name %in% project_names & input$code_name != "") {
+      if (!input$code_name %in% code_names & input$code_name != "") {
       con <- DBI::dbConnect(RSQLite::SQLite(), project$project_db)
       on.exit(DBI::dbDisconnect(con))
       
@@ -95,12 +99,18 @@ mod_codebook_server <- function(id, project) {
       
       } else { showModal(modalDialog(title = "Warning",
                                      "Code names must be unique and non-empty."))
-        }
+      }
+      
+      
+      # update codebook return value
+      codebook$active_codebook <- 
+        list_db_codes(project$project_db,
+                      project$active_project)
       
     })
     
-#--------------------------------------------------------
-# Delete existing code
+#---Delete existing code-----------------------------------------------------
+
 
     observeEvent(input$code_del_btn, {
 
@@ -128,10 +138,20 @@ mod_codebook_server <- function(id, project) {
         render_codes(active_project = project$active_project,
                      project_db = project$project_db)
       })
-      # 
+      
+      
+      # update codebook return value
+      codebook$active_codebook <- 
+        list_db_codes(project$project_db,
+                      project$active_project)
       
     })
  
+# return active codebook details ----
+
+    codebook <- reactiveValues()
+    
+       return(codebook)
     
     
  # end of server module function   

@@ -29,14 +29,7 @@ usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
 
 
-
-
-
-
-
-
-
-1## Add modules ----
+## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "left_menu" ) # Name of the module
 golem::add_module( name = "dashboard_body" ) # Name of the module
