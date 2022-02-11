@@ -100,7 +100,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
     )
 }
 
-#----------------------------------------------------------------
+#List codes--------------------------------------------------------
 
 
 # Read codes from the DB
@@ -111,7 +111,7 @@ list_db_codes <- function(project_db, project_id) {
   
 ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
   code_id <- code_name <- code_description <- NULL
-##------
+
   
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db)
@@ -124,9 +124,8 @@ list_db_codes <- function(project_db, project_id) {
     
     return(project_codes)
 }
-#----------------------------------------------------------------
 
-# Pair code names and ids
+# Pair code names and ids -----
 
 pair_code_id <- function(db_codes_df) {
     
@@ -146,9 +145,8 @@ return(choices)
 }
 
 
-#----------------------------------------------------------------
 
-# Generate boxes of codes
+# Generate boxes of codes -----
 gen_codes_ui <- function(code_id,
                          code_name,
                          code_description) {
@@ -173,9 +171,8 @@ gen_codes_ui <- function(code_id,
     )
     
 }
-#----------------------------------------------------------------
 
-# Delete codes from project
+# Delete codes from project ------
 delete_db_codes <-
     function(project_db,
              active_project,
@@ -191,9 +188,9 @@ delete_db_codes <-
         
         #log_delete_code_record(con, active_project, delete_code_id)
     }
-#----------------------------------------------------------------
 
-# render codes
+
+# Render codes -----
 
 render_codes <- function(active_project,
                          project_db) {
@@ -216,4 +213,3 @@ render_codes <- function(active_project,
     }
 }
 
-#----------------------------------------------------------------

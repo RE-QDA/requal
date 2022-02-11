@@ -48,7 +48,7 @@ mod_document_code_ui <- function(id){
 #' document_code Server Functions
 #'
 #' @noRd 
-mod_document_code_server <- function(id, project){
+mod_document_code_server <- function(id, project, codebook){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -57,8 +57,6 @@ mod_document_code_server <- function(id, project){
 
     
     doc_choices <- reactiveVal()
-    
-    code_list <- reactiveValues()
     
 
 # Refresh list of documents when documents are added/removed --------
@@ -78,9 +76,8 @@ mod_document_code_server <- function(id, project){
       
         }
     })
-            
-  
-    
+
+
 
 # Displayed text ----------------------------------------------------------
 
@@ -103,36 +100,50 @@ mod_document_code_server <- function(id, project){
     })
     
 
-    
+# # Refresh list of codes when codebook changes --------
+#     
+#     code_df <- reactiveValues()
+#     
+#     observe({
+#       print(codebook$active_codebook)
+#     # code_df$code_id <- codebook$active_codebook$code_id
+#     # code_df$code_name <- codebook$active_codebook$code_name
+#     # code_df$code_description <- codebook$active_codebook$code_description
+#     })
+
+
 
 # List out available codes ------------------------------------------------
 
-    code_df <-reactiveVal()
-    
+    code_df <- reactiveValues()
     
     output$code_list <- renderUI({
-    
+      
       if (isTruthy(project$active_project)) {
         
-        code_df <- list_db_codes(project$project_db, project$active_project)
-
-        purrr::map2(
-          
-        .x = code_df$code_id,
-        .y = code_df$code_name, 
-        ~ generate_coding_tools(ns = ns, code_id = .x, code_name = .y)
-              )
+        if (isTruthy(codebook$active_codebook)) {
+          code_df$active_codebook <- codebook$active_codebook
+        } else {
+          code_df$active_codebook <- list_db_codes(
+            project$project_db,
+            project$active_project
+          )
+        }
         
+        purrr::map2(
+          .x = code_df$active_codebook$code_id,
+          .y = code_df$active_codebook$code_name,
+          ~ generate_coding_tools(ns = ns, code_id = .x, code_name = .y)
+        )
         
       } else {
-        
         ""
       }
-    
     })
+
+
     
-    
-    # Coding tools ------------------------------------------------------------
+# Coding tools ------------------------------------------------------------
 
     observeEvent(input$selected_code, {
       
