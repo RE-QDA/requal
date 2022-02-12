@@ -274,10 +274,18 @@ load_doc_to_display <- function(active_project,
                                                   '" class="code" style="padding:0; background:yellow" title="', code_name,'">'), 
                                            "")) %>% dplyr::mutate(value = ifelse(
             
-            stringr::str_detect(value, "\\n") & 
-                stringr::str_detect(dplyr::lag(value), "\\n"), "<br><br>", value
+            stringr::str_detect(value, "[\\n\\r]") & 
+                stringr::str_detect(dplyr::lag(value), "[\\n\\r]"), "<br><br>", value
             
         )) 
+        
+                # df <- dplyr::bind_rows(
+                #     tibble::tibble(value = "<p>"), 
+                #     df,
+                #     tibble::tibble(value = "</p>")
+                #     
+                # )   
+                
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
         
     }else{
