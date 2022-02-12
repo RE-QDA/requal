@@ -11,7 +11,7 @@ CREATE TABLE projects
 )"
 
 CREATE_REQUAL_INFO_SQL <- "
-CREATE TABLE requal_version if not exists (
+CREATE TABLE if not exists requal_version (
     project_id INTEGER
 ,   version TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
@@ -92,15 +92,16 @@ create_project_record <- function(con, project_df){
     project_id <- dplyr::tbl(con, "projects") %>% 
         dplyr::filter(project_name == !!project_df$project_name) %>%
         dplyr::pull(project_id)
-    requal_version_df <- data.frame(
-        project_id = project_id, 
-        version = as.character(packageVersion("requal"))
-    )
-    res_v <- DBI::dbWriteTable(con, "requal_version", requal_version_df, append = TRUE)
-
+    
     if(res){
         log_create_project_record(con, project_id, project_df)   
     }
+    
+    requal_version_df <- data.frame(
+        project_id = project_id,
+        version = as.character(packageVersion("requal"))
+    )
+    res_v <- DBI::dbWriteTable(con, "requal_version", requal_version_df, append = TRUE)
 }
 
 add_documents_record <- function(con, project_id, document_df){
