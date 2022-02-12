@@ -227,6 +227,8 @@ calculate_code_overlap <- function(raw_segments){
                          .groups = "drop")
 }
 
+# Generate text to be displayed -----
+
 load_doc_to_display <- function(active_project, 
                                 project_db, 
                                 doc_selector, 
@@ -241,15 +243,29 @@ load_doc_to_display <- function(active_project,
                                        project_db, 
                                        doc_selector)
     code_names <- codebook %>% 
-        dplyr::select(code_id, code_name) %>% 
+        dplyr::select(code_id, code_name, code_color) %>% 
         dplyr::mutate(code_id = as.character(code_id))
     
     if(nrow(coded_segments)){
-        
+
         highlighted_segments <- coded_segments %>%
             calculate_code_overlap()
+
+        distinct_code_ids <- highlighted_segments %>% 
+            dplyr::distinct(code_id) %>% 
+            dplyr::pull(code_id)
         
-                df <- strsplit(raw_text, "")[[1]] %>% 
+        code_names_lookup <- tibble::tibble(
+            code_id = distinct_code_ids,
+            code_name = sapply(distinct_code_ids, 
+                               blend_codes, 
+                               code_names),
+            code_color = sapply(distinct_code_ids,
+                                blend_colors, 
+                                code_names)
+        )
+        
+       df <- strsplit(raw_text, "")[[1]] %>% 
             tibble::enframe() %>%
             dplyr::left_join(highlighted_segments %>% 
                                  dplyr::select(code_id, segment_start), 
@@ -259,7 +275,7 @@ load_doc_to_display <- function(active_project,
                                  dplyr::select(code_end = code_id, segment_end), 
                              by=c("name" = "segment_end")
                              ) %>%
-            dplyr::left_join(code_names,
+            dplyr::left_join(code_names_lookup,
                              by = c("code_id")) %>% 
             dplyr::mutate(code_end = ifelse(!is.na(code_end), 
                                             "</mark>", 
@@ -269,7 +285,11 @@ load_doc_to_display <- function(active_project,
                                            
                                            paste0('<mark id="', 
                                                   code_id, 
-                                                  '" class="code" style="padding:0; background:yellow" title="', code_name,'">'), 
+                                                  '" class="code" style="padding:0; background-color:',
+                                                  code_color, 
+                                                  '" title="',
+                                                  code_name,
+                                                  '">'), 
                                            ""))
         
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
@@ -358,5 +378,43 @@ generate_coding_tools <- function(ns, code_id, code_name) {
                        width: 100%",
                onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});"))
     
+    
+}
+
+# Tooltip helper for overlaying codes ---- 
+
+blend_codes <- function(string_id, code_names_df) {
+
+    ids <- unlist(strsplit(string_id, split = "\\+"))
+    
+    names <- code_names_df %>% 
+        dplyr::filter(code_id %in% ids) %>% 
+        dplyr::pull(code_name)
+    
+    paste(names, collapse = " | ")
+    
+}
+
+
+# Color helper for overlaying codes ---- 
+
+blend_colors <- function(string_id, code_names) {
+    
+    ids <- unlist(strsplit(string_id, split = "\\+"))
+    
+    colors_multiple <- code_names %>% 
+        dplyr::filter(code_id %in% ids) %>% 
+        dplyr::pull(code_color)
+    
+    color_mean <- colors_multiple %>% 
+        stringr::str_extract_all("\\d+") %>% 
+        purrr::map(as.numeric) %>% 
+        as.data.frame() %>% 
+        rowMeans() %>% 
+        round() 
+    
+    color_mean_string <- paste0(color_mean, collapse = ",") 
+    
+    paste0("rgb(", color_mean_string, ")")
     
 }

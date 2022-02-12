@@ -49,6 +49,8 @@ mod_codebook_server <- function(id, project) {
 #---Generate codes manager UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project$active_project)) {
+        
+        
         codebook_manager_UI(id,
                             project_db = project$project_db,
                             project_id = project$active_project)
@@ -72,7 +74,17 @@ mod_codebook_server <- function(id, project) {
       
       codes_input_df <- data.frame(project_id = project$active_project,
                                    code_name = input$code_name,
-                                   code_description = input$code_desc)
+                                   code_description = input$code_desc,
+                                   code_color = paste0("rgb(",
+                                                       paste(
+                                                         as.vector(
+                                                           col2rgb(
+                                                             input$color_pick
+                                                             )
+                                                           ), collapse = ", "),
+                                                       ")"
+                                                       )
+                                   )
       
       add_codes_record(con = con, 
                        project_id = project$active_project, 

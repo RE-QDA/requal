@@ -38,6 +38,7 @@ CREATE TABLE if not exists codes (
 ,   code_id INTEGER PRIMARY KEY
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
+,   code_color TEXT
 )"
 
 CREATE_SEGMENTS_SQL <- "

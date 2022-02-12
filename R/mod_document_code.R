@@ -171,7 +171,7 @@ mod_document_code_server <- function(id, project, codebook){
     
 
     
-    # Code removal ----------
+# Code removal ----------
     
     observeEvent(input$remove_codes, {
       

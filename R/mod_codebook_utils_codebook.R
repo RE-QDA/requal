@@ -21,6 +21,13 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                 placeholder = "Code description"
             ),
             
+            colourpicker::colourInput(
+              ns("color_pick"),
+              label = NULL,
+              value = "yellow",
+              closeOnClick = TRUE
+            ),
+            
             actionButton(ns("code_add"),
                          label = "Create",
                          class = "btn-success")
@@ -110,7 +117,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
 list_db_codes <- function(project_db, project_id) {
   
 ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
-  code_id <- code_name <- code_description <- NULL
+  code_id <- code_name <- code_description <- code_color <- NULL
 
   
     con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -119,7 +126,10 @@ list_db_codes <- function(project_db, project_id) {
     
     project_codes <- dplyr::tbl(con, "codes") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
-        dplyr::select(code_id, code_name, code_description) %>%
+        dplyr::select(code_id, 
+                      code_name, 
+                      code_description,
+                      code_color) %>%
         dplyr::collect()
     
     return(project_codes)
@@ -149,7 +159,8 @@ return(choices)
 # Generate boxes of codes -----
 gen_codes_ui <- function(code_id,
                          code_name,
-                         code_description) {
+                         code_description,
+                         code_color) {
     box(
         code_description,
         id = code_id,
@@ -160,8 +171,11 @@ gen_codes_ui <- function(code_id,
         collapsible = TRUE,
         collapsed = TRUE,
         boxToolSize = "md",
-        label = boxLabel(text = "code",
-                         status = "warning"),
+        label = tagAppendAttributes(
+          boxLabel(text = "code",
+                   status = "warning"),
+          style = paste0("background-color:", code_color," !important;"),
+          class = "custom_label"),
         dropdownMenu = boxDropdown(
             boxDropdownItem("Edit"),
             boxDropdownItem("Merge"),

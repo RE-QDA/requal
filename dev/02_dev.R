@@ -20,6 +20,7 @@ usethis::use_package( "rlang" )
 usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "shinyFiles" )
 usethis::use_package( "shinyjs" )
+usethis::use_package( "colourpicker" )
 usethis::use_package( "DBI" )
 usethis::use_package( "RSQLite" )
 usethis::use_package( "dplyr" )
@@ -27,6 +28,7 @@ usethis::use_package( "tibble" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
+
 
 
 ## Add modules ----
