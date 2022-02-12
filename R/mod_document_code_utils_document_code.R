@@ -31,7 +31,7 @@ read_doc_db <- function(active_project, project_db) {
     
 }
 
-# Load documents to display  -------------------------------------------
+# Load documents to display -----------------------------
 
 load_doc_db <- function(active_project, project_db, doc_id) {
     
@@ -227,6 +227,8 @@ calculate_code_overlap <- function(raw_segments){
                          .groups = "drop")
 }
 
+# Load document to display at workbench with added HTML ----
+
 load_doc_to_display <- function(active_project, 
                                 project_db, 
                                 doc_selector, 
@@ -270,8 +272,12 @@ load_doc_to_display <- function(active_project,
                                            paste0('<mark id="', 
                                                   code_id, 
                                                   '" class="code" style="padding:0; background:yellow" title="', code_name,'">'), 
-                                           ""))
-        
+                                           "")) %>% dplyr::mutate(value = ifelse(
+            
+            stringr::str_detect(value, "\\n") & 
+                stringr::str_detect(dplyr::lag(value), "\\n"), "<br><br>", value
+            
+        )) 
         paste0(df$code_id, df$value, df$code_end, collapse = "")    
         
     }else{
