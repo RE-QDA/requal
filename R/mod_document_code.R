@@ -32,7 +32,6 @@ mod_document_code_ui <- function(id){
                     ",
         ".code-button:hover {
                       overflow: visible;
-                      color: darkgray;
                       }
                       "))),
     
