@@ -10,20 +10,32 @@
 mod_codebook_ui <- function(id) {
   ns <- NS(id)
   
-  tagList(
-    fluidRow(column(width = 6,
-                    
-                    uiOutput(ns(
-                      "codes_ui"
-                    ))),
+
+
+    fluidRow(
+      
+      tags$head(
+        
+        tags$style(HTML(
+          paste0("#",ns("codes_ui")), "{
+                    border: none;
+                    height:90vh;
+                    overflow-y:scroll
+                  }
+                  "))
+      ),
+      
+      column(width = 6,
+             uiOutput(ns(
+               "codes_ui"
+               ))),
              
-             column(width = 6,
-                    
-                    uiOutput(
-                      ns("codes_manager")
-                    )))
+      column(width = 6,
+             uiOutput(
+               ns("codes_manager")
+               )))
     
-  )
+  
 }
 
 #' codebook Server Functions

@@ -9,14 +9,30 @@
 #' @importFrom shiny NS tagList 
 mod_document_code_ui <- function(id){
   ns <- NS(id)
-  fluidRow(column(width = 10,
+  fluidRow(
     
     tags$head(
       
       tags$script(
         src = "www/document_code_js.js"
-      )
+      ),
+      
+      tags$style(HTML(
+        paste0("#",ns("code_list")), ", ",
+        paste0("#",ns("focal_text")), "{
+                    border: none;
+                    height:80vh;
+                    overflow-y:scroll
+                  }
+                  "))
     ),
+    
+    
+    column(width = 10,
+    
+
+    
+
     
 
     selectInput(ns("doc_selector"), label = "Documents", 
@@ -39,6 +55,7 @@ mod_document_code_ui <- function(id){
                       width = "100%"),
          br(), br(),
          uiOutput(ns("code_list"))
+         
 
          
          )
