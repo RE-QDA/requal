@@ -11,7 +11,11 @@ mod_about_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    "Supported by TACR"
+    p("Development has been supported by", 
+      a(href = "https://www.tacr.cz/en/technology-agency-of-the-czech-republic", 
+        "The Technology Agency of the Czech Republic"), 
+      "project n. TL05000054."
+      )
  
   )
 }
