@@ -400,6 +400,7 @@ generate_coding_tools <- function(ns, code_id, code_name) {
     actionButton(inputId = ns(code_id),
                label = code_name,
                name = code_id,
+               class = "code-button",
                style = "background: none;
                        width: 100%",
                onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});"))

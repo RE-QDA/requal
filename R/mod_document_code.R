@@ -22,10 +22,19 @@ mod_document_code_ui <- function(id){
         paste0("#",ns("focal_text")), "{
                     border: none;
                     height:80vh;
-                    overflow-y:scroll
-                  }
-                  "))
-    ),
+                    overflow-y:scroll;
+                    }
+                    ",
+        ".code-button {
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      }
+                    ",
+        ".code-button:hover {
+                      overflow: visible;
+                      color: darkgray;
+                      }
+                      "))),
     
     
     column(width = 10,
