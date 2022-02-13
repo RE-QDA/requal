@@ -4,11 +4,19 @@ create_db_schema <- function(con){
 
 CREATE_PROJECT_SQL <- "
 CREATE TABLE projects 
-(    project_id INTEGER PRIMARY KEY
+(    project_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,    project_name TEXT
 ,    project_description TEXT
-,    created_at TEXT
+,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 )"
+
+CREATE_REQUAL_INFO_SQL <- "
+CREATE TABLE if not exists requal_version (
+    project_id INTEGER
+,   version TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+);
+"
 
 # TODO: users table & user_attributes
 CREATE_LOG_SQL <- "
@@ -17,25 +25,25 @@ CREATE TABLE if not exists logs
 ,   project_id INTEGER
 ,   action TEXT
 ,   payload JSON
-,   created_at TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 )"
 
 CREATE_DOCUMENTS_SQL <- "
 CREATE TABLE if not exists documents (
-    doc_id INTEGER PRIMARY KEY
+    doc_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   project_id INTEGER
 ,   doc_name TEXT UNIQUE
 ,   doc_description TEXT
 ,   doc_text TEXT
-,   created_at TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 )"
 
 CREATE_CODES_SQL <- "
 CREATE TABLE if not exists codes (
     project_id INTEGER
-,   code_id INTEGER PRIMARY KEY
+,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
@@ -46,7 +54,7 @@ CREATE TABLE if not exists segments (
     project_id INTEGER
 ,   doc_id INTEGER
 ,   code_id INTEGER
-,   segment_id INTEGER PRIMARY KEY
+,   segment_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   segment_start INTEGER
 ,   segment_end INTEGER
 ,   segment_text TEXT
@@ -62,6 +70,7 @@ CREATE TABLE if not exists segments (
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
+    DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
@@ -72,6 +81,7 @@ create_db_schema.PqConnection <- function(con){
     # TODO: Full DB structure
     # TODO: optimize sql for Postgres (e.g. created_at fields as date type)
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
+    DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
@@ -83,10 +93,16 @@ create_project_record <- function(con, project_df){
     project_id <- dplyr::tbl(con, "projects") %>% 
         dplyr::filter(project_name == !!project_df$project_name) %>%
         dplyr::pull(project_id)
-
+    
     if(res){
         log_create_project_record(con, project_id, project_df)   
     }
+    
+    requal_version_df <- data.frame(
+        project_id = project_id,
+        version = as.character(packageVersion("requal"))
+    )
+    res_v <- DBI::dbWriteTable(con, "requal_version", requal_version_df, append = TRUE)
 }
 
 add_documents_record <- function(con, project_id, document_df){
