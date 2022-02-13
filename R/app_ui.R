@@ -14,21 +14,7 @@ app_ui <- function(request) {
       options = list(sidebarExpandOnHover = FALSE),
       header = dashboardHeader(controlbarIcon = shiny::icon("file-code")),
       sidebar = mod_left_menu_ui("left_menu_ui_1"),
-      body = mod_dashboard_body_ui("dashboard_body_ui_1"),
-      controlbar = dashboardControlbar(
-        overlay = FALSE,
-        controlbarMenu(
-          id = "codes_menu",
-          controlbarItem(
-            title = "Codes",
-            lapply(paste0("button", 1:10), actionButton, label = "Code")
-            ),
-          controlbarItem(
-            title = "Memos"
-            )          
-        )
-        
-      )
+      body = mod_dashboard_body_ui("dashboard_body_ui_1")
       )
   )
 }
