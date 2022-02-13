@@ -61,7 +61,7 @@ load_doc <- function(con, project_id, doc_id){
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
         dplyr::pull(doc_text) %>%
-        gsub("\\n", "", .)
+        gsub("[\\n\\r]", "", .)
 }
 
 # Load segments for document display  -------------------------------------------
@@ -272,12 +272,12 @@ load_doc_to_display <- function(active_project,
             tibble::enframe() 
 
             df_breaks <- df_source %>%
-                dplyr::filter(stringr::str_detect(value, "\\n")) %>%
+                dplyr::filter(stringr::str_detect(value, "[\\n\\r]")) %>%
                 dplyr::mutate(value = "<br>") %>%
                 dplyr::rename(id = name)
 
             df_temp <- df_source %>%
-                dplyr::filter(!stringr::str_detect(value, "\\n")) %>%
+                dplyr::filter(!stringr::str_detect(value, "[\\n\\r]")) %>%
                 dplyr::mutate(id = name,
                               name = seq(1, length(name))) %>%
                 dplyr::left_join(highlighted_segments %>%
@@ -318,7 +318,7 @@ df <- dplyr::bind_rows(df_temp, df_breaks) %>%
         df_non_coded <- strsplit(raw_text, "")[[1]] %>%
             tibble::enframe() %>%
             dplyr::mutate(value = stringr::str_replace(value,
-                                               "\\n",
+                                               "[\\n\\r]",
                                                "<br>"))
 
         paste0(df_non_coded$value, collapse = "")
@@ -329,7 +329,10 @@ df <- dplyr::bind_rows(df_temp, df_breaks) %>%
 
 # Load codes for a segment -------------------------------------------
 
-load_segment_codes_db <- function(active_project, project_db, marked_codes) {
+load_segment_codes_db <- function(active_project, 
+                                  project_db,
+                                  active_doc,
+                                  marked_codes) {
 
         con <- DBI::dbConnect(RSQLite::SQLite(),
                               project_db)
@@ -337,10 +340,13 @@ load_segment_codes_db <- function(active_project, project_db, marked_codes) {
 
         segment_codes_df <- dplyr::tbl(con, "segments") %>%
             dplyr::inner_join( dplyr::tbl(con, "codes") %>%
-                                   dplyr::select(code_id, code_name),
+                                   dplyr::select(code_id, 
+                                                 code_name
+                                                 ),
                                by = "code_id"
                                ) %>%
-            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+            dplyr::filter(.data$project_id == as.integer(active_project) &
+                          .data$doc_id == as.integer(active_doc)) %>%
             dplyr::filter(dplyr::between(marked_codes,
                                          .data$segment_start,
                                          .data$segment_end)) %>%

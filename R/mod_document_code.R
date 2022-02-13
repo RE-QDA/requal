@@ -205,58 +205,58 @@ mod_document_code_server <- function(id, project, codebook){
 # Code removal ----------
     
     observeEvent(input$remove_codes, {
-      
-     # browser()
-      marked_segments_df <- load_segment_codes_db(active_project = project$active_project,
-                                               project_db = project$project_db,
-                                               marked_codes = parse_tag_pos(
-                                                 input$tag_position, 
-                                                 "start")
-                                               )
+
+      # browser()
+      marked_segments_df <- load_segment_codes_db(
+        active_project = project$active_project,
+        project_db = project$project_db,
+        active_doc = input$doc_selector,
+        marked_codes = parse_tag_pos(
+          input$tag_position,
+          "start"
+        )
+      )
       if (nrow(marked_segments_df) == 0) {
         NULL
       } else if (nrow(marked_segments_df) == 1) {
-        
-        delete_segment_codes_db(project_db =  project$project_db,
-                                active_project = project$active_project, 
-                                doc_id = input$doc_selector,
-                                segment_id = marked_segments_df$segment_id)
-        
-        display_text <- load_doc_to_display(project$active_project, 
-                                            project$project_db, 
-                                            input$doc_selector,
-                                            code_df$active_codebook,
-                                            ns=NS(id))
-        text(display_text)
-        
-      } else {
-      
-      showModal(
-        modalDialog(
-          
-          checkboxGroupInput(ns("codes_to_remove"),
-                             label = "",
-                             choiceValues = marked_segments_df$segment_id,
-                             choiceNames = marked_segments_df$code_name,
-                             selected = FALSE),
-          
-          title = "Codes in this segment",
-          "Remove selected codes from segment?",
-          easyClose = TRUE,
-          footer = tagList(
-            modalButton("Dismiss"),
-            actionButton(ns("remove_codes_select"), 
-                         "Remove selected", 
-                         class = "btn-danger")
-          ),
-          fade = TRUE
+        delete_segment_codes_db(
+          project_db = project$project_db,
+          active_project = project$active_project,
+          doc_id = input$doc_selector,
+          segment_id = marked_segments_df$segment_id
         )
-        
-        
-      )
-     
-     }
-      
+
+        display_text <- load_doc_to_display(project$active_project,
+          project$project_db,
+          input$doc_selector,
+          code_df$active_codebook,
+          ns = NS(id)
+        )
+        text(display_text)
+      } else {
+        showModal(
+          modalDialog(
+
+            checkboxGroupInput(ns("codes_to_remove"),
+              label = "",
+              choiceValues = marked_segments_df$segment_id,
+              choiceNames = marked_segments_df$code_name,
+              selected = FALSE
+            ),
+            title = "Codes in this segment",
+            "Remove selected codes from segment?",
+            easyClose = TRUE,
+            footer = tagList(
+              modalButton("Dismiss"),
+              actionButton(ns("remove_codes_select"),
+                "Remove selected",
+                class = "btn-danger"
+              )
+            ),
+            fade = TRUE
+          )
+        )
+      }
     })
     
     observeEvent(input$remove_codes_select, {
