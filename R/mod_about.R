@@ -11,9 +11,18 @@ mod_about_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    p("Development has been supported by", 
+    h2(
+      tags$a(href="https://github.com/RE-QDA/requal",
+    tags$img(src="www/requal_logo.png", width = "5%"), target = "_blank"),
+    "ReQual CAQDAS"
+    ), 
+    
+    p(),
+    
+    p("The development of this tool has been supported by", 
       a(href = "https://www.tacr.cz/en/technology-agency-of-the-czech-republic", 
-        "The Technology Agency of the Czech Republic"), 
+        "The Technology Agency of the Czech Republic",
+        target = "_blank"), 
       "project n. TL05000054."
       )
  

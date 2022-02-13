@@ -16,31 +16,37 @@ mod_left_menu_ui <- function(id){
                      sidebarMenu(
                        menuItem(
                          "Project",
-                         tabName = "Project"
+                         tabName = "Project",
+                         icon = icon("book")
                        ),
                        menuItem(
                          "Codebook",
-                         tabName = "Codebook"
+                         tabName = "Codebook",
+                         icon = icon("code")
                        ),
                        menuItem(
-                         "Document",
-                         tabName = "Document"
+                         "Workdesk",
+                         tabName = "Document",
+                         icon = icon("marker")
                        ),
                        menuItem(
                          "Analysis",
-                         tabName = "Analysis"
+                         tabName = "Analysis",
+                         icon = icon("microscope")
                        ),
                        menuItem(
-                         "Reporting",
-                         tabName = "Reporting"
+                         "Report",
+                         tabName = "Reporting",
+                         icon = icon("chart-bar")
                        ),
-                       menuItem(
-                         "Settings",
-                         tabName = "Settings"
-                       ),
+                       # menuItem(
+                       #   "Settings",
+                       #   tabName = "Settings"
+                       # ),
                        menuItem(
                          "About",
-                         tabName = "About"
+                         tabName = "About",
+                         icon = icon("info")
                        )
                      ))
  

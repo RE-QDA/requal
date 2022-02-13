@@ -12,7 +12,9 @@ app_ui <- function(request) {
     # Your application UI logic
     dashboardPage(title = "ReQual",
       options = list(sidebarExpandOnHover = FALSE),
-      header = dashboardHeader(controlbarIcon = shiny::icon("file-code")),
+      header = dashboardHeader(title = tags$span(style = 'text-align:left;',
+        tags$img(src="www/requal_logo.png", 
+                 height="80%"), "ReQual")),
       sidebar = mod_left_menu_ui("left_menu_ui_1"),
       body = mod_dashboard_body_ui("dashboard_body_ui_1")
       )
