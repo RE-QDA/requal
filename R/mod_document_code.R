@@ -147,10 +147,16 @@ mod_document_code_server <- function(id, project, codebook){
           )
         }
         
-        purrr::map2(
-          .x = code_df$active_codebook$code_id,
-          .y = code_df$active_codebook$code_name,
-          ~ generate_coding_tools(ns = ns, code_id = .x, code_name = .y)
+        purrr::pmap(
+          list(
+          code_df$active_codebook$code_id,
+          code_df$active_codebook$code_name,
+          code_df$active_codebook$code_color
+          ),
+          ~ generate_coding_tools(ns = ns, 
+                                  code_id = ..1, 
+                                  code_name = ..2,
+                                  code_color = ..3)
         )
         
       } else {

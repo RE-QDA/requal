@@ -395,14 +395,15 @@ delete_segment_codes_db <- function(project_db,
 # Generate coding tools -------------------------------------------------
 
 
-generate_coding_tools <- function(ns, code_id, code_name) {
+generate_coding_tools <- function(ns, code_id, code_name, code_color) {
 
     actionButton(inputId = ns(code_id),
                label = code_name,
                name = code_id,
                class = "code-button",
-               style = "background: none;
-                       width: 100%",
+               style = paste0("background: none;
+                       width: 100%;
+                       border-left: 5px solid ", code_color, ";"),
                onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});"))
 
 
