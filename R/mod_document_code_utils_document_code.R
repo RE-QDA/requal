@@ -268,11 +268,8 @@ load_doc_to_display <- function(active_project,
                                 code_names)
         )
 
-       df <- strsplit(raw_text, "")[[1]] %>%
-            tibble::enframe() %>%
-            dplyr::left_join(highlighted_segments %>%
-            df_source <- strsplit(raw_text, "")[[1]] %>%
-            tibble::enframe()
+        df_source <- strsplit(raw_text, "")[[1]] %>% 
+            tibble::enframe() 
 
             df_breaks <- df_source %>%
                 dplyr::filter(stringr::str_detect(value, "\\n")) %>%
