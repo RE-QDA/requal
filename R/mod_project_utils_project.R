@@ -119,7 +119,7 @@ list_db_documents <- function(project_db, active_project) {
                           project_db
                           )
     on.exit(DBI::dbDisconnect(con))
-    
+
     active_project <- as.integer(active_project)
     
     project_documents <- dplyr::tbl(con, "documents") %>% 

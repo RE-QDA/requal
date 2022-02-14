@@ -78,6 +78,7 @@ mod_document_code_server <- function(id, project, codebook){
     ns <- session$ns
     
 
+
 # Selection of documents to code ------------------------------------------
 
     
@@ -88,7 +89,6 @@ mod_document_code_server <- function(id, project, codebook){
 
     
     observeEvent(project$doc_list, {
-      
       if (isTruthy(project$active_project)) {
         
       doc_choices(list_db_documents(project_db = project$project_db,

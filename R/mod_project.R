@@ -16,6 +16,8 @@ mod_project_ui <- function(id) {
            uiOutput(ns(
              "project_manager"
            ))),
+    textOutput(ns("doc_list")),
+    
     column(
       width = 5,
       
@@ -94,7 +96,10 @@ mod_project_server <- function(id) {
     db_path <- reactiveVal(NULL)
     
     
-    
+    output$doc_list <- renderText({
+      req(active_project())
+      list_db_documents(project_db = db_path(), 
+                                                     active_project = active_project())})
     
     # set up paths
     
