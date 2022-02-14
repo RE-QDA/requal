@@ -120,14 +120,13 @@ mod_launchpad_creator_server <- function(id){
       
       project$active_project <- active_project()
       project$project_db <- db_path()
-      project$doc_list <- NULL
-      
+
     })
     
     # return active project details ----
     
     
-    return(project)
+    return(reactive(reactiveValuesToList(project)))
     
     
   })

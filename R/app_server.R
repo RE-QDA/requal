@@ -7,30 +7,31 @@
 app_server <- function(input, output, session) {
   # Your application server logic
   
-  project_observer <- reactiveValues()
+  project_observer <- reactiveVal()
   
-  project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
-    observeEvent(project_loader$active_project, {
-    project_observer$project <- project_loader
+ project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
+    observeEvent(project_loader(), {
+    project_observer(project_loader())
+
   })
-  
+
   project_creator <- mod_launchpad_creator_server("launchpad_creator_ui_1")
-    observeEvent(project_creator$active_project, {
-      project_observer$project <- project_creator
+    observeEvent(project_creator(), {
+      project_observer(project_creator())
     })
 
-  observeEvent(project_observer$project$active_project, {
+  observeEvent(project_observer()$active_project, {
   updateControlbar("control_bar")
   })
-  
+
   #mod_project_server("project_ui_1")
 
-  codebook <- mod_codebook_server("codebook_ui_1", project_observer$project)
+  codebook <- mod_codebook_server("codebook_ui_1", project_observer)
 
-  mod_document_code_server("document_code_ui_1", 
-                           project_observer$project,
+  mod_document_code_server("document_code_ui_1",
+                           project_observer,
                            codebook)
-  
+
   
   
 }

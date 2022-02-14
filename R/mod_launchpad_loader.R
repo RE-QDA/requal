@@ -118,22 +118,17 @@ mod_launchpad_loader_server <- function(id){
                         project_id = input$project_selector_load)
       ))
       
-      doc_list(list_db_documents(project_db = db_path(), 
-                        active_project = input$project_selector_load))
+
       
       project$active_project <- active_project()
       project$project_db <- db_path()
 
-      project$doc_list <- doc_list()
-
-      
     })
     
-    
+
     # return active project details
      
-    
-    return(project)
+    return(reactive(reactiveValuesToList(project)))
     
  
   })
