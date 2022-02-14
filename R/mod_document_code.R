@@ -205,7 +205,8 @@ mod_document_code_server <- function(id, project, codebook){
 # Code removal ----------
     
     observeEvent(input$remove_codes, {
-
+      
+      req(project$active_project)
       # browser()
       marked_segments_df <- load_segment_codes_db(
         active_project = project$active_project,
