@@ -125,8 +125,7 @@ mod_launchpad_loader_server <- function(id){
       project$project_db <- db_path()
 
       project$doc_list <- doc_list()
-      observe(print(      project$doc_list
-      ))
+
       
     })
     

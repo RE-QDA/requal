@@ -121,7 +121,8 @@ set_controlbar <- function() {
             shinydashboardPlus::controlbarItem(
                 id = "creator",
                 title = "Create",
-                icon = icon("plus")
+                icon = icon("plus"),
+                mod_launchpad_creator_ui("launchpad_creator_ui_1")
             )
         )
     )

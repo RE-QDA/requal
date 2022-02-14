@@ -8,12 +8,14 @@ app_server <- function(input, output, session) {
   # Your application server logic
   
   project <- mod_launchpad_loader_server("launchpad_loader_ui_1")
+  
+  mod_launchpad_creator_server("launchpad_creator_ui_1")
 
   observeEvent(project$active_project, {
   updateControlbar("control_bar")
   })
   
-  mod_project_server("project_ui_1")
+  #mod_project_server("project_ui_1")
 
   codebook <- mod_codebook_server("codebook_ui_1", project)
 
