@@ -24,14 +24,17 @@ app_server <- function(input, output, session) {
   updateControlbar("control_bar")
   })
 
-  #mod_project_server("project_ui_1")
-
+  # documents  ----
+  
+  documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer)
+  
+  # codebook  ----
+  
   codebook <- mod_codebook_server("codebook_ui_1", project_observer)
-
-  mod_document_code_server("document_code_ui_1",
-                           project_observer,
-                           codebook)
-
+  
+  # workdesk ----
+  
+  #mod_document_code_server("document_code_ui_1", project_observer, codebook, documents)
   
   
 }
