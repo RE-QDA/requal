@@ -14,31 +14,12 @@ app_ui <- function(request) {
       options = list(sidebarExpandOnHover = FALSE),
       header = dashboardHeader(title = tags$span(
         tags$img(src="www/requal_logo.png", 
-                 height="70%"), "ReQual"),
+                 height="70%", style = "margin-right: 20px"), "ReQual"),
         controlbarIcon = icon("power-off", id = "launchpad_icon")
         ),
-      sidebar = mod_left_menu_ui("left_menu_ui_1"),
-      body = mod_dashboard_body_ui("dashboard_body_ui_1"),
-      controlbar = dashboardControlbar(
-        id = "control_bar",
-        overlay = TRUE,
-        collapsed = FALSE,
-        width = 400,
-        controlbarMenu(
-          id = "launchpad",
-          controlbarItem(
-            id = "loader",
-            title = "Load",
-            icon = icon("spinner"),
-            "UI placeholder"
-          ),
-          controlbarItem(
-            id = "creator",
-            title = "Create",
-            icon = icon("plus")
-          )
-        )
-      )
+      sidebar = set_left_menu(),
+      body = set_dashboard_body(),
+      controlbar = set_controlbar()
       )
   )
 }
@@ -62,9 +43,10 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'ReQual'
-    )
+    ),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
+    
   )
 }
 

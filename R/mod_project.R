@@ -86,46 +86,13 @@ mod_project_server <- function(id) {
       
     })
     
-    # load project menu
+
+      
+      
+      
+    active_project <- reactiveVal(NULL)
+    db_path <- reactiveVal(NULL)
     
-    observeEvent(input$project_load_menu, {
-      output$project_action <-  renderUI({
-        box(
-          closable = TRUE,
-          width = NULL,
-          title = "Load project",
-          solidHeader = TRUE,
-          
-          h3("Project file"),
-          
-          div(span(textOutput(
-            ns("project_path_load")
-          ), class = "form-control"), class = "form-group shiny-input-container"),
-          
-          shinyFiles::shinyFilesButton(
-            ns("sel_file_load"),
-            "File select",
-            "Please select a project file",
-            multiple = FALSE
-          ),
-          
-          selectInput(
-            ns("project_selector_load"),
-            "Select project",
-            choices = NULL
-          ),
-          
-          actionButton(
-            ns("project_load"),
-            label = "Load project",
-            class = "btn-success"
-          )
-        )
-      })
-      
-      
-      
-    })
     
     
     
@@ -142,25 +109,14 @@ mod_project_server <- function(id) {
       allowDirCreate = TRUE
     )
     
-    shinyFiles::shinyFileChoose(
-      input,
-      "sel_file_load",
-      roots = volumes,
-      session = session,
-      restrictions = system.file(package = "base"),
-      pattern = c('\\.requal')
-    )
+    
     
     project_directory <-
       reactive({
         normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
       })
     
-    project_file_load <-
-      reactive({
-        normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
-      })
-    
+
     output$project_path <- renderText({
       if (is.integer(input$sel_directory)) {
         "No project directory has been selected."
@@ -169,52 +125,10 @@ mod_project_server <- function(id) {
       }
     })
     
-    output$project_path_load <- renderText({
-      if (is.integer(input$sel_file_load)) {
-        "No project file has been selected."
-      } else {
-        project_file_load()
-      }
-    })
-    
-    
-    
-    # set active project from load
-    
-    active_project <- reactiveVal(NULL)
-    output$project_active <- renderUI({
-      if (is.null(active_project())) {
-        "No active project."
-      }
-    })
-    
-    
-    observe({
 
-            if (length(project_file_load())>0 ) {
-      updateSelectInput(session,
-                        "project_selector_load",
-                        choices = read_project_db(project_file_load(),
-                                                  project_id = NULL))
-      }
-    })
     
-    db_path <- reactiveVal(NULL)
     
-    observeEvent(input$project_load, {
-      
-      req(input$project_selector_load)
-  
-      
-      db_path(project_file_load())
-      
-      active_project(isolate(
-        read_project_db(db_path(),
-                        project_id = input$project_selector_load)
-      ))
-      
-      
-    })
+
     
     # set active project from create
     
@@ -321,19 +235,6 @@ mod_project_server <- function(id) {
       }
     })
     
-    # return active project details
-    
-    project <- reactiveValues()
-
-    observe({ 
-      if (!is.null(active_project()) & !is.null(db_path()) ) {
-      project$active_project <- active_project()
-      project$project_db <- db_path()
-      project$doc_list <- doc_list()
-      }
-      })
-    
-    return(project)
-
+  
   })
 }

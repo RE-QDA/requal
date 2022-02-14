@@ -33,7 +33,7 @@ usethis::use_package( "purrr" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "left_menu" ) # Name of the module
+golem::add_module( name = "launchpad_loader" ) # Name of the module
 golem::add_module( name = "dashboard_body" ) # Name of the module
 
 # Project menu
