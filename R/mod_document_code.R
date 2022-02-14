@@ -73,7 +73,7 @@ mod_document_code_ui <- function(id){
 #' document_code Server Functions
 #'
 #' @noRd 
-mod_document_code_server <- function(id, project, codebook){
+mod_document_code_server <- function(id, project, codebook, documents){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
