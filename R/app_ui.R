@@ -15,22 +15,30 @@ app_ui <- function(request) {
       header = dashboardHeader(title = tags$span(
         tags$img(src="www/requal_logo.png", 
                  height="70%"), "ReQual"),
-        leftUi = tagList(shinydashboardPlus::dropdownBlock(id = "mydropdown",
-                                          title = "",
-                                          icon = icon("power-off"),
-                                          badgeStatus = NULL,
-                                          actionButton("loader",
-                                                       "Load project",
-                                                       style = "width: 80%"),
-                                          br(),br(),
-                                          actionButton("creator",
-                                                       "Create project",
-                                                       style = "width: 80%")
-                                          )
-                         )
+        controlbarIcon = icon("power-off", id = "launchpad_icon")
         ),
       sidebar = mod_left_menu_ui("left_menu_ui_1"),
-      body = mod_dashboard_body_ui("dashboard_body_ui_1")
+      body = mod_dashboard_body_ui("dashboard_body_ui_1"),
+      controlbar = dashboardControlbar(
+        id = "control_bar",
+        overlay = TRUE,
+        collapsed = FALSE,
+        width = 400,
+        controlbarMenu(
+          id = "launchpad",
+          controlbarItem(
+            id = "loader",
+            title = "Load",
+            icon = icon("spinner"),
+            "UI placeholder"
+          ),
+          controlbarItem(
+            id = "creator",
+            title = "Create",
+            icon = icon("plus")
+          )
+        )
+      )
       )
   )
 }

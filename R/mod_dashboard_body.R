@@ -12,11 +12,24 @@ mod_dashboard_body_ui <- function(id){
   ns <- NS(id)
   
   dashboardBody(
+
+    # css for controlo bar
+    
     tags$head(tags$style(HTML('
-  .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-  width:300px;
+#launchpad_icon{
+  color: white;
+  animation-name: launchpad-animation;
+  animation-duration: 2s;
+  animation-iteration-count: 3;
+}
+
+@keyframes launchpad-animation {
+  from {color: white;}
+  to {color: red;}
+}
   }
   '))),
+  
     tabItems(
       
     tabItem("Project",
