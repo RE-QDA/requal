@@ -43,7 +43,7 @@ mod_document_code_ui <- function(id){
 
     
 
-    selectInput(ns("doc_selector"), label = "Documents", 
+    selectInput(ns("doc_selector"), label = "Select a document to code", 
                 choices = "",
                 selected = ""),
     

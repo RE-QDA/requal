@@ -11,7 +11,7 @@ mod_reporting_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    "Stats to be used in reports."
+    "This feature is not implemented yet."
  
   )
 }

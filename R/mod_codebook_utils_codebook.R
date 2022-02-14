@@ -32,56 +32,56 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                          label = "Create",
                          class = "btn-success")
         ),
-        box(
-            title = "Edit codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
-            width = NULL,
-            
-            selectInput(
-                ns("code_to_edit"),
-                label = "Select code to edit",
-                choices = c("", "placeholder1", "placeholder2"),
-                selected = "",
-                multiple = FALSE
-            ),
-            
-            uiOutput(ns("code_editor")),
-            
-            actionButton(ns("code_edit"),
-                         label = "Edit",
-                         class = "btn-warning")
-            
-        ),
-        
-        box(
-            title = "Merge codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
-            width = NULL,
-            
-            selectInput(
-                ns("code_merge_from"),
-                label = "Select codes to merge",
-                choices = c("placeholder1", "placeholder2"),
-                selected = "",
-                multiple = TRUE
-            ),
-            
-            selectInput(
-                ns("code_merge_to"),
-                label = "Select codes to merge",
-                choices = c("placeholder1", "placeholder2"),
-                selected = "",
-                multiple = TRUE
-            ),
-            
-            actionButton(ns("code_merge"),
-                         label = "Merge",
-                         class = "btn-warning")
-            
-        ),
-        
+        # box(
+        #     title = "Edit codes",
+        #     collapsible = TRUE,
+        #     collapsed = TRUE,
+        #     width = NULL,
+        #     
+        #     selectInput(
+        #         ns("code_to_edit"),
+        #         label = "Select code to edit",
+        #         choices = c("", "placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = FALSE
+        #     ),
+        #     
+        #     uiOutput(ns("code_editor")),
+        #     
+        #     actionButton(ns("code_edit"),
+        #                  label = "Edit",
+        #                  class = "btn-warning")
+        #     
+        # ),
+        # 
+        # box(
+        #     title = "Merge codes",
+        #     collapsible = TRUE,
+        #     collapsed = TRUE,
+        #     width = NULL,
+        #     
+        #     selectInput(
+        #         ns("code_merge_from"),
+        #         label = "Select codes to merge",
+        #         choices = c("placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = TRUE
+        #     ),
+        #     
+        #     selectInput(
+        #         ns("code_merge_to"),
+        #         label = "Select codes to merge",
+        #         choices = c("placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = TRUE
+        #     ),
+        #     
+        #     actionButton(ns("code_merge"),
+        #                  label = "Merge",
+        #                  class = "btn-warning")
+        #     
+        # ),
+        # 
         box(
             title = "Delete codes",
             collapsible = TRUE,

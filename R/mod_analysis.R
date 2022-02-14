@@ -11,7 +11,7 @@ mod_analysis_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    "Viewing coded segments."
+    "This feature is not implemented yet."
  
   )
 }
