@@ -12,9 +12,23 @@ app_ui <- function(request) {
     # Your application UI logic
     dashboardPage(title = "ReQual",
       options = list(sidebarExpandOnHover = FALSE),
-      header = dashboardHeader(title = tags$span(style = 'text-align:left;',
+      header = dashboardHeader(title = tags$span(
         tags$img(src="www/requal_logo.png", 
-                 height="80%"), "ReQual")),
+                 height="70%"), "ReQual"),
+        leftUi = tagList(shinydashboardPlus::dropdownBlock(id = "mydropdown",
+                                          title = "",
+                                          icon = icon("power-off"),
+                                          badgeStatus = NULL,
+                                          actionButton("loader",
+                                                       "Load project",
+                                                       style = "width: 80%"),
+                                          br(),br(),
+                                          actionButton("creator",
+                                                       "Create project",
+                                                       style = "width: 80%")
+                                          )
+                         )
+        ),
       sidebar = mod_left_menu_ui("left_menu_ui_1"),
       body = mod_dashboard_body_ui("dashboard_body_ui_1")
       )

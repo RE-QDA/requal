@@ -12,7 +12,11 @@ mod_dashboard_body_ui <- function(id){
   ns <- NS(id)
   
   dashboardBody(
-    
+    tags$head(tags$style(HTML('
+  .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+  width:300px;
+  }
+  '))),
     tabItems(
       
     tabItem("Project",
