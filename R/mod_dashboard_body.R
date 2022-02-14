@@ -17,6 +17,7 @@ mod_dashboard_body_ui <- function(id){
     
     tags$head(tags$style(HTML('
 #launchpad_icon{
+  margin-right: 20px;
   color: white;
   animation-name: launchpad-animation;
   animation-duration: 2s;
