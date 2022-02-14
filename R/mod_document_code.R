@@ -87,8 +87,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
 
 # Refresh list of documents when documents are added/removed --------
 
-    
-    observeEvent(documents$doc_list, {
+    observe({
       if (isTruthy(project()$active_project)) {
 
       doc_choices(list_db_documents(project_db = project()$project_db,
@@ -108,9 +107,18 @@ mod_document_code_server <- function(id, project, codebook, documents){
 
     
     text <- reactiveVal("")
+    
+    # reset text on project change
+    
+    observeEvent(project()$active_project, {
+      
+      text("")
+      
+    })
 
     observeEvent(input$doc_selector, {
     if (isTruthy(input$doc_selector)) {
+
       display_text <- load_doc_to_display(project()$active_project, 
                                           project()$project_db, 
                                           input$doc_selector, 
@@ -134,10 +142,10 @@ mod_document_code_server <- function(id, project, codebook, documents){
     code_df <- reactiveValues()
     
     output$code_list <- renderUI({
-      
+
       if (isTruthy(project()$active_project)) {
         
-        if (isTruthy(codebook$active_codebook)) {
+        if (isTruthy(codebook()$active_codebook)) {
           code_df$active_codebook <- codebook$active_codebook
         } else {
           code_df$active_codebook <- list_db_codes(
@@ -170,9 +178,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
     observeEvent(input$selected_code, {
       
       req(input$selected_code, input$tag_position)
-      
-      # browser()
-      # golem::invoke_js("highlight", list("yellow"))
+
       
       startOff <- parse_tag_pos(input$tag_position, "start")
       endOff <- parse_tag_pos(input$tag_position, "end")
