@@ -17,8 +17,9 @@ mod_doc_manager_ui <- function(id){
             
              uiOutput(ns("project_active")),
              
+tags$div(      tableOutput(ns("doc_list_table")) ) %>% 
+  tagAppendAttributes(class = "scrollable90")
 
-      tableOutput(ns("doc_list_table"))
       
     ),
       

@@ -17,23 +17,7 @@ mod_document_code_ui <- function(id){
         src = "www/document_code_js.js"
       ),
       
-      tags$style(HTML(
-        paste0("#",ns("code_list")), ", ",
-        paste0("#",ns("focal_text")), "{
-                    border: none;
-                    height:80vh;
-                    overflow-y:scroll;
-                    }
-                    ",
-        ".code-button {
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                      }
-                    ",
-        ".code-button:hover {
-                      overflow: visible;
-                      }
-                      "))),
+      ),
     
     
     column(width = 10,
@@ -47,7 +31,7 @@ mod_document_code_ui <- function(id){
                 choices = "",
                 selected = ""),
     
-    htmlOutput(ns("focal_text")),
+    htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
 
     textOutput(ns("captured_range")),
     

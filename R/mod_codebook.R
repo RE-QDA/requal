@@ -14,21 +14,11 @@ mod_codebook_ui <- function(id) {
 
     fluidRow(
       
-      tags$head(
-        
-        tags$style(HTML(
-          paste0("#",ns("codes_ui")), "{
-                    border: none;
-                    height:90vh;
-                    overflow-y:scroll
-                  }
-                  "))
-      ),
-      
+
       column(width = 6,
              uiOutput(ns(
                "codes_ui"
-               ))),
+               ))) %>% tagAppendAttributes(class = "scrollable90"),
              
       column(width = 6,
              uiOutput(

@@ -17,7 +17,7 @@ mod_launchpad_loader_ui <- function(id){
       
       div(span(textOutput(
         ns("project_path_load")
-      ), class = "form-control"), class = "form-group shiny-input-container"),
+      ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
       
       shinyFiles::shinyFilesButton(
         ns("sel_file_load"),
