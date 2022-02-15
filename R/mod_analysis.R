@@ -135,7 +135,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
     })
     
     output$segments <- renderUI({
-      if (nrow(segments_df()) > 1) {
+      if (nrow(req(segments_df())) > 1) {
       segments_taglist()
         
       } else {
@@ -145,7 +145,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
     
     output$download <- renderUI({
       
-if (nrow(segments_df() > 1)) {
+if (nrow(req(segments_df())) > 1) {
   mod_download_handler_ui("download_handler_ui_1")
 } else {""}
       
@@ -154,7 +154,7 @@ if (nrow(segments_df() > 1)) {
 
 return(reactive({
   
-  if (nrow(segments_df() > 1)) {
+  if (nrow(req(segments_df())) > 1) {
     segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
   } else {as.data.frame(NULL)}
   

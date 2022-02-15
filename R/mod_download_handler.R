@@ -30,7 +30,7 @@ mod_download_handler_server <- function(id, df_out){
         paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv")
       },
       content = function(file) {
-        write.csv(df_out(), file)
+        write.csv(req(df_out()), file)
       }
     )
  
