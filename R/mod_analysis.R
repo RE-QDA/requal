@@ -10,13 +10,20 @@
 mod_analysis_ui <- function(id){
   ns <- NS(id)
   tagList(
-    
-    selectizeInput(ns("code_filter"),
+    fluidRow(column(width = 8,
+                    htmlOutput(ns("segments"))
+                    
+    ),
+    column(width = 4,
+    selectInput(ns("code_filter"),
                    label = "Filter by code",
-                   choices = ""),
+                   choices = "",
+                   multiple = TRUE,
+                selectize = FALSE,
+                width = "100%",
+                size = 30),
                    
-    htmlOutput(ns("segments"))
- 
+    ))
   )
 }
     
@@ -27,11 +34,24 @@ mod_analysis_server <- function(id, project_observer, codebook, documents){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
-    observe({ 
-      print(project_observer())
-      print(codebook())
-      print(documents())
+    observeEvent(codebook(), { 
+      updateSelectInput(session = session,
+                        "code_filter",
+                        choices = setNames(codebook()$code_id,
+                                           codebook()$code_name),
+                        selected = codebook()$code_id
+                           )
+      
+      
       })
+    
+    observeEvent(codebook(), { 
+    output$segments <- renderText({
+      
+      "dsdfsd"
+      
+    })
+    })
     
   })
 }
