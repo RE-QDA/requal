@@ -3,10 +3,9 @@
 load_segments_analysis <- function(project_db, 
                                   active_project, 
                                   selected_codes) {
-    
-    selected_codes <- segment_start <- segment_end <- NULL
+   
     if (isTruthy(selected_codes)) {
-        browser()
+        
         
         con <- DBI::dbConnect(RSQLite::SQLite(),
                               project_db)
@@ -14,7 +13,7 @@ load_segments_analysis <- function(project_db,
         
         segments <- dplyr::tbl(con, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(.data$doc_id %in% as.integer(.env$selected_codes)) %>%
+            dplyr::filter(code_id  %in% !! as.integer(selected_codes)) %>%
             dplyr::select(code_id,
                           doc_id,
                           segment_id,

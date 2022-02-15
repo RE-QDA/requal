@@ -47,13 +47,17 @@ mod_analysis_server <- function(id, project, codebook, documents){
 
 
 
-    segments_intialize <- eventReactive(project()$active_project, {
+    segments_intialize <- eventReactive(input$code_filter, {
       
       print(project()$active_project)
       print(codebook())
       print(documents())
-      # print(input$code_filter)
-  
+      print(input$code_filter)
+      segments_df <- load_segments_analysis(project()$project_db,
+                             project()$active_project,
+                             input$code_filter)
+      
+      segments_df$segment_text
     })
     
     output$segments <- renderText({
