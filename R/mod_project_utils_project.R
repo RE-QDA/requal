@@ -150,7 +150,11 @@ list_db_document_table <- function(project_db, active_project) {
     
     documents_table <- dplyr::tbl(con, "documents") %>%
         dplyr::filter(.data$project_id == .env$active_project) %>%
-        dplyr::collect() 
+        dplyr::collect() %>% 
+        dplyr::select("ID" = doc_id,
+                      "Name" = doc_name,
+                      "Description" = doc_description,
+                      "Date added" = created_at)
 
 
     
@@ -158,4 +162,21 @@ list_db_document_table <- function(project_db, active_project) {
     
 }
 
-
+make_doc_table <- function(connection, active_project, doc_list)
+renderTable({
+    
+    req(active_project)
+    
+    if (isTruthy(doc_list))
+    {
+        
+        list_db_document_table(project_db = connection,
+                               active_project = active_project)
+        
+        
+    } else {
+        
+        "This project does not contain any documents yet."
+        
+    }
+})

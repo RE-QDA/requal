@@ -12,7 +12,8 @@ mod_doc_manager_ui <- function(id){
 
     fluidRow(
       column(width = 6,
-             "dd",
+             br(),
+             textOutput(ns("project_name")),
             
              uiOutput(ns("project_active")),
              
@@ -71,34 +72,34 @@ mod_doc_manager_server <- function(id, project){
     ## list documents initially ----
     observeEvent(project()$active_project, {
       
+      output$project_name <- renderText({
+        paste("Active project:", names(project()$active_project))
+      })
+      
       doc_startup <- list_db_documents(project_db = project()$project_db,
                                  active_project = project()$active_project)
       doc_list(doc_startup)
+      
+      output$doc_list_table <- make_doc_table(
+        project()$project_db,
+        project()$active_project,
+        doc_list()
+      )
+      
+      updateSelectInput(session = session,
+                        "doc_delete_list", 
+                        choices = doc_list())
+      
     })
     
 
     ## render existing documents ----
 
-output$doc_list_table <- renderTable({
-
-    req(project()$active_project)
-
-    if (isTruthy(doc_list()))
-    {
-    
-      list_db_document_table(project_db = project()$project_db,
-                             active_project = project()$active_project) %>% 
-        dplyr::select("ID" = doc_id,
-                      "Name" = doc_name,
-                      "Description" = doc_description,
-                      "Date added" = created_at)
-      
-    } else {
-      
-      "This project does not contain any documents yet."
-      
-    }
-  })
+output$doc_list_table <- make_doc_table(
+  project()$project_db,
+  project()$active_project,
+  doc_list()
+)
 
 
 
@@ -121,9 +122,18 @@ observeEvent(input$doc_add, {
                      doc_description = input$doc_description
   )
   
+  output$doc_list_table <- make_doc_table(
+    project()$project_db,
+    project()$active_project,
+    doc_list()
+    )
   
     doc_list(list_db_documents(project_db = project()$project_db,
                                active_project = project()$active_project))
+    
+    updateSelectInput(session = session,
+                      "doc_delete_list", 
+                      choices = doc_list())
 
 })
 
@@ -131,15 +141,30 @@ observeEvent(input$doc_add, {
     observeEvent(input$doc_remove, {
       
  
+      delete_db_documents(project()$project_db, 
+                                      project()$active_project, 
+                                      input$doc_delete_list)
       
       # update reactive value containing project documents
       doc_list(list_db_documents(project_db = project()$project_db,
                                  active_project = project()$active_project))
       
+      output$doc_list_table <- make_doc_table(
+        project()$project_db,
+        project()$active_project,
+        doc_list()
+      )
+      
+      updateSelectInput(session = session,
+                        "doc_delete_list",
+                        choices = doc_list())
+      
     })
     
 
+    
 
+    
     return(reactive(doc_list()))
     
   })

@@ -6,6 +6,7 @@ delete_db_documents <- function(project_db,
     con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
     on.exit(DBI::dbDisconnect(con))
     
+    
     DBI::dbExecute(con,
                    "DELETE from documents
                    WHERE doc_id IN (?)",
