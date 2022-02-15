@@ -108,6 +108,7 @@ segments_observer <- reactiveVal(0)
                                           code_df$active_codebook,
                                           ns=NS(id))
       text(display_text)
+      segments_observer(segments_observer()+1)
     } 
     })
     # Render selected text
@@ -117,7 +118,6 @@ segments_observer <- reactiveVal(0)
       
     })
     
-
 
 
 # List out available codes ------------------------------------------------
