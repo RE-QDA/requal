@@ -13,7 +13,7 @@ mod_doc_manager_ui <- function(id){
     fluidRow(
       column(width = 6,
              br(),
-             textOutput(ns("project_name")),
+             htmlOutput(ns("project_name")),
             
              uiOutput(ns("project_active")),
              
@@ -97,7 +97,7 @@ mod_doc_manager_server <- function(id, project){
     observeEvent(project()$active_project, {
       
       output$project_name <- renderText({
-        paste("Active project:", names(project()$active_project))
+        paste(tags$b("Active project:"), names(project()$active_project))
       })
       
       doc_startup <- list_db_documents(project_db = project()$project_db,
