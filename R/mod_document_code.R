@@ -87,11 +87,10 @@ mod_document_code_server <- function(id, project, codebook, documents){
 
 # Refresh list of documents when documents are added/removed --------
 
-    observe({ print(documents())
+    observe({ 
       if (isTruthy(project()$active_project)) {
 
-      doc_choices(list_db_documents(project_db = project()$project_db,
-                                    active_project = project()$active_project))
+      doc_choices(documents())
 
       updateSelectInput(session = session,
                         "doc_selector",
