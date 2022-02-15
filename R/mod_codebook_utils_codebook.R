@@ -23,8 +23,9 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             
             colourpicker::colourInput(
               ns("color_pick"),
-              label = NULL,
+              label = "Highlight",
               value = "yellow",
+              showColour = "background",
               closeOnClick = TRUE
             ),
             
@@ -176,11 +177,11 @@ gen_codes_ui <- function(code_id,
                    status = "warning"),
           style = paste0("background-color:", code_color," !important;"),
           class = "custom_label"),
-        dropdownMenu = boxDropdown(
-            boxDropdownItem("Edit"),
-            boxDropdownItem("Merge"),
-            boxDropdownItem("Delete")
-        ),
+        # dropdownMenu = boxDropdown(
+        #     boxDropdownItem("Edit"),
+        #     boxDropdownItem("Merge"),
+        #     boxDropdownItem("Delete")
+        #),
         ""
     )
     
