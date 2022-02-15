@@ -2,7 +2,8 @@
 
 load_segments_analysis <- function(project_db, 
                                   active_project, 
-                                  selected_codes) {
+                                  selected_codes,
+                                  selected_docs) {
    
     if (isTruthy(selected_codes)) {
         
@@ -14,6 +15,7 @@ load_segments_analysis <- function(project_db,
         segments <- dplyr::tbl(con, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(code_id  %in% !! as.integer(selected_codes)) %>%
+            dplyr::filter(doc_id  %in% !! as.integer(selected_docs)) %>%
             dplyr::select(code_id,
                           doc_id,
                           segment_id,

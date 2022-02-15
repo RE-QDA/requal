@@ -15,15 +15,27 @@ mod_analysis_ui <- function(id){
                     
     ),
     column(width = 4,
+           
     selectInput(ns("code_filter"),
                    label = "Filter by code",
                    choices = "",
                    multiple = TRUE,
                 selectize = FALSE,
                 width = "100%",
-                size = 30),
-                   
-    ))
+                size = 15),
+    
+    selectInput(ns("document_filter"),
+                label = "Filter by document",
+                choices = "",
+                multiple = TRUE,
+                selectize = FALSE,
+                width = "100%",
+                size = 15)
+    
+    )
+    
+    
+    )
   )
 }
     
@@ -48,18 +60,33 @@ mod_analysis_server <- function(id, project, codebook, documents){
       }
       
       })
-
-
-
-    segments_intialize <- eventReactive(input$code_filter, {
+    
+    observeEvent(documents(), { 
       
-      req(input$code_filter)
+      if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
+        
+        updateSelectInput(session = session,
+                          "document_filter",
+                          choices = documents(),
+                          selected = documents()
+        )
+        
+      }
+      
+    })
+
+
+
+    segments_intialize <- eventReactive(c(input$code_filter, input$document_filter), {
+      
+      req(input$code_filter, input$document_filter)
       
       if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
 
         segments_df <- load_segments_analysis(project()$project_db,
                              project()$active_project,
-                             input$code_filter) %>% 
+                             input$code_filter,
+                             input$document_filter) %>% 
         dplyr::left_join(codebook(),
                          by = "code_id") %>% 
         dplyr::left_join(tibble::enframe(documents(),
