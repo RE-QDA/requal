@@ -38,6 +38,30 @@ mod_doc_manager_ui <- function(id){
                
             ),
              
+            box(title = "File upload",
+                collapsible = TRUE,
+                collapsed = TRUE,
+                width = NULL,
+                
+                textInput(ns("doc_upload_name"), label = "Document name", placeholder = "Short name"),
+                textAreaInput(ns("doc_upload_description"), label = "Document description", placeholder = "Description"),
+                
+      # upload UI ----
+      div(span(textOutput(
+        ns("doc_upload_path")
+      ), class = "form-control"), class = "form-group shiny-input-container"),
+      
+                shinyFiles::shinyFilesButton(
+                  ns("doc_upload"),
+                  "Select file",
+                  "Select file",
+                  multiple = FALSE),
+      
+      actionButton(ns("doc_upload_add"), 
+                   "Upload",
+                   class = "btn-success")
+            
+            ),
             box(title = "Delete documents",
                 collapsible = TRUE,
                 collapsed = TRUE,
@@ -163,7 +187,77 @@ observeEvent(input$doc_add, {
     
 
     
+    # document upload
+    
+    # file system prep ----
+    
+    volumes <- c(Home = fs::path_home())
+    
+    
+    shinyFiles::shinyFileChoose(
+      input,
+      "doc_upload",
+      roots = volumes,
+      session = session,
+      restrictions = system.file(package = "base"),
+      pattern = c('\\.txt')
+    )
 
+    
+    
+    doc_file_load <-
+      reactive({
+        normalizePath(shinyFiles::parseFilePaths(volumes, input$doc_upload)$datapath)
+      })
+    
+    output$doc_upload_path <- renderText({
+      if (is.integer(input$doc_upload)) {
+        "No document file has been selected."
+      } else {
+        doc_file_load()
+      }
+    })
+    
+    # document upload ----
+
+    observeEvent(input$doc_upload_add, {
+
+      if (!is.integer(input$doc_upload)) {
+      doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
+
+      if (!isTruthy(input$doc_upload_name)) {
+        doc_name_parsed <- sub(".*/", "", doc_file_load())
+      } else {
+        doc_name_parsed <- input$doc_upload_name
+      }
+      
+      
+      add_input_document(connection = project()$project_db,
+                         project = project()$active_project,
+                         doc_name = doc_name_parsed,
+                         doc_text = doc_upload_text,
+                         doc_description = input$doc_upload_description
+      )
+      
+      output$doc_list_table <- make_doc_table(
+        project()$project_db,
+        project()$active_project,
+        doc_list()
+      )
+      
+      doc_list(list_db_documents(project_db = project()$project_db,
+                                 active_project = project()$active_project))
+      
+      updateSelectInput(session = session,
+                        "doc_delete_list", 
+                        choices = doc_list())
+      
+      } else {NULL}
+      
+      
+      
+    })
+    
     
     return(reactive(doc_list()))
     
