@@ -26,7 +26,7 @@ app_server <- function(input, output, session) {
 
   # documents  ----
   
-  documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer)
+  documents <- mod_project_server("mod_project_ui_1", project_observer)
   
   # codebook  ----
   

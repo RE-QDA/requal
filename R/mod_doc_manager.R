@@ -9,25 +9,35 @@
 #' @importFrom shiny NS tagList 
 mod_doc_manager_ui <- function(id){
   ns <- NS(id)
-  tagList(
-    
-    fluidRow(
-      column(width = 7,
-             
-             uiOutput(ns("project_active")),
-             ),
-      textOutput(ns("doc_list")),
-      
-      column(
-        width = 5,
 
-        uiOutput(ns(
-          "project_manager"
-        ))
-      )
-    )
+    fluidRow(
+      column(width = 6,
+             "dd",
+            
+             uiOutput(ns("project_active")),
+             
+
+      textOutput(ns("doc_list_text"))
+      
+    ),
+      
+      column(width = 6,
+
+        selectInput(ns("doc_delele_list"),
+                    label = "Remove selected documents from project",
+                    choices = "",
+                    multiple = TRUE,
+                    selected = NULL),
+        
+        actionButton(ns("remove_doc"), 
+                     "Remove",
+                     class = "btn-danger")
+      
+        
+      
+    ))
     
-  )
+  
 }
 
 #' doc_manager Server Functions
@@ -36,98 +46,78 @@ mod_doc_manager_ui <- function(id){
 mod_doc_manager_server <- function(id, project){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
+    
     doc_list <- reactiveVal()
 
+    ## list documents initially ----
+    observeEvent(project()$active_project, {
+      
+      doc_startup <- list_db_documents(project_db = project()$project_db,
+                                 active_project = project()$active_project)
+      doc_list(doc_startup)
+    })
+    
 
+    ## render existing documents ----
 
-output$doc_list <- renderText({
+output$doc_list_text <- renderText({
 
     req(project()$active_project)
 
-    list_db_documents(project_db = project()$project_db,
-                    active_project = project()$active_project)
-  })
-
-
-
-
-# display active project details
-
-
-
-  output$project_manager <-  renderUI({
-    if (!is.null(project()$active_project) & !is.null(project()$project_db) ) {
-      tagList(tabsetPanel(
-        tabPanel("Manage documents",
-                 fluidRow(
-                   column(
-                     width = 6,
-                     mod_doc_delete_ui(ns("doc_delete_ui_1"))
-                   ),
-                   column(width = 6,
-                         
-                          )
-                 )),
-        tabPanel("Project information"),
-        tabPanel("Settings")
-      ))
-
-
+    if (isTruthy(doc_list()))
+    {
+    
+      doc_list()
+    } else {
+      
+      "This project does not contain any documents yet."
+      
     }
   })
 
 
 
 
+
+
  # observe documents actions
 
-observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
-
-  # this module processes document input
-  mod_doc_manager_server("doc_manager_ui_1",
-                         connection = project()$project_db,
-                         project = project()$active_project)
-  # this module displays active documents
-  mod_doc_list_server("doc_list_ui_1",
-                      connection = project()$project_db,
-                      project = project()$active_project)
-  # the delete module is called to update delete UI by adding new document
-  mod_doc_delete_server("doc_delete_ui_1",
-                        connection = project()$project_db,
-                        project = project()$active_project)
-  # update reactive value containing project documents
-  documents$doc_list<- documents$doc_list+1
-
-})
-
-observeEvent(input[[paste("doc_delete_ui_1", "doc_remove", sep = "-")]], {
-  # input$doc_remove defined in doc_delete module
-  after_deletion <- mod_doc_delete_server("doc_delete_ui_1",
-                                          connection = project()$project_db,
-                                          project = project()$active_project)
-  mod_doc_list_server("doc_list_ui_1",
-                      connection = project()$project_db,
-                      project = project()$active_project)
-  # update reactive value containing project documents
-  documents$doc_list<- documents$doc_list+1
-
-})
+# observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
 # 
-# ## list documents initially
-# observe({
-#   if (!is.null( project()$active_project ) ) {
-#     mod_doc_list_server("doc_list_ui_1",
+#   # this module processes document input
+#   mod_doc_manager_server("doc_manager_ui_1",
+#                          connection = project()$project_db,
+#                          project = project()$active_project)
+#   # this module displays active documents
+#   mod_doc_list_server("doc_list_ui_1",
+#                       connection = project()$project_db,
+#                       project = project()$active_project)
+#   # the delete module is called to update delete UI by adding new document
+#   mod_doc_delete_server("doc_delete_ui_1",
 #                         connection = project()$project_db,
-#                             project = project()$active_project)
-#         mod_doc_delete_server("doc_delete_ui_1",
-#                               connection = project()$project_db,
-#                               project = project()$active_project)
-#       }
-#     })
+#                         project = project()$active_project)
+#   # update reactive value containing project documents
+#   doc_list(doc_list+1)
 # 
-#     documents$doc_list <- list_db_documents(project_db = project()$project_db,
-#                                active_project = project()$active_project)
+# })
 # 
+    
+    observeEvent(input$remove_doc, {
+      
+      req(input$doc_delete_list)
+      
+      delete_db_documents(connection,
+                          project,
+                          delete_doc_id = input$doc_delete_list)
+      
+      # update reactive value containing project documents
+      doc_list(list_db_documents(project_db = project()$project_db,
+                                 active_project = project()$active_project))
+      
+    })
+    
+
+
     return(reactive(doc_list()))
     
   })

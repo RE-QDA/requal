@@ -87,7 +87,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
 
 # Refresh list of documents when documents are added/removed --------
 
-    observe({
+    observe({ print(documents())
       if (isTruthy(project()$active_project)) {
 
       doc_choices(list_db_documents(project_db = project()$project_db,

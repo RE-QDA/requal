@@ -37,7 +37,7 @@ set_dashboard_body <- function() {
 shinydashboard::tabItems(
     
     shinydashboard::tabItem("Project",
-            mod_doc_manager_ui("doc_manager_ui_1")),
+            mod_project_ui("mod_project_ui_1")),
     shinydashboard::tabItem("Codebook",
             mod_codebook_ui("codebook_ui_1")),
     shinydashboard::tabItem("Document",
