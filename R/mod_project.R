@@ -28,8 +28,7 @@ mod_project_server <- function(id, project) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    documents <- reactiveVal()
-    
+
  
       output$project_manager <-  renderUI({
         if (!is.null(project()$active_project) & !is.null(project()$project_db) ) {
@@ -54,11 +53,9 @@ mod_project_server <- function(id, project) {
       
     documents_from_manager <- mod_doc_manager_server("doc_manager_ui_1", project)
     
-    observeEvent(documents_from_manager(), {
-    documents(documents_from_manager())
-      })
+
     
-  return(reactive(documents()))
+  return(reactive(documents_from_manager()))
   
   })
 }

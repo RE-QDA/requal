@@ -30,7 +30,7 @@ mod_analysis_ui <- function(id){
 #' analysis Server Functions
 #'
 #' @noRd 
-mod_analysis_server <- function(id, project_observer, codebook, documents){
+mod_analysis_server <- function(id, project, codebook, documents){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
@@ -44,13 +44,20 @@ mod_analysis_server <- function(id, project_observer, codebook, documents){
       
       
       })
-    
-    observeEvent(codebook(), { 
-    output$segments <- renderText({
+
+
+
+    segments_intialize <- eventReactive(project()$active_project, {
       
-      "dsdfsd"
-      
+      print(project()$active_project)
+      print(codebook())
+      print(documents())
+      # print(input$code_filter)
+  
     })
+    
+    output$segments <- renderText({
+      segments_intialize()
     })
     
   })
