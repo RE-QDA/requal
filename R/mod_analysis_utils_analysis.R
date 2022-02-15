@@ -30,3 +30,24 @@ load_segments_analysis <- function(project_db,
     } else {""}
     
 }
+
+
+
+format_cutouts <- function(segment_text, segment_document, segment_code, segment_color) {
+
+
+  tags$div(
+
+    segment_text %>% 
+    tags$blockquote(class = "quote", style =  paste0("border-left: 5px solid ", segment_color, "; margin-bottom: 0px !important;")),
+    
+tags$div(
+    segment_document %>% 
+      tags$div(class = "segment_badge"),
+    
+    segment_code %>% 
+      tags$div(class = "segment_badge", style = paste0("background-color: ", segment_color, " !important;")),
+    
+    style = "text-align: right; margin: 0 0 10px;")
+)
+}

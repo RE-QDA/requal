@@ -34,3 +34,25 @@
 .code-button:hover {
     overflow: visible;
 }
+
+.quote{
+font-size: medium;
+font-style: italic;
+line-height: 1;
+background-color: #E8E8E8;
+}
+
+.segment_badge{
+display: inline-block;
+padding: .2em .6em .3em;
+font-size: 10;
+font-weight: 700;
+line-height: 1;
+color: black;
+text-align: center;
+white-space: nowrap;
+vertical-align: baseline;
+border-radius: .25em;
+background-color: white;
+}
+
