@@ -29,7 +29,7 @@ load_segments_analysis <- function(project_db,
         return(segments)
         
         
-    } else {""}
+    } else {as.data.frame(NULL)}
     
 }
 

@@ -36,7 +36,8 @@ mod_analysis_ui <- function(id){
     
     ),
     
-    mod_download_handler_ui("download_handler_ui_1")
+    uiOutput(ns("download"))
+    
     
     
     )
@@ -53,7 +54,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
 
     observeEvent(codebook(), { 
       
-      if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
+     
         
       updateSelectInput(session = session,
                         "code_filter",
@@ -62,13 +63,13 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
                         selected = codebook()$code_id
                            )
       
-      }
+      
       
       })
     
     observeEvent(documents(), { 
       
-      if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
+     
         
         updateSelectInput(session = session,
                           "document_filter",
@@ -76,37 +77,48 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
                           selected = documents()
         )
         
-      }
+      
       
     })
 
 
-
-    segments_df <- eventReactive(c(input$code_filter, input$document_filter, segments()), {
+    segments_df <- reactiveVal()
+    
+   observeEvent({input$code_filter
+      input$document_filter
+      segments()
+      codebook()
+      documents()
+      project()$active_project}, {
       
-      req(input$code_filter, input$document_filter)
-      
-      if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
 
-         load_segments_analysis(project()$project_db,
+      
+
+        temp_df <- load_segments_analysis(project()$project_db,
                              project()$active_project,
                              input$code_filter,
-                             input$document_filter) %>% 
+                             input$document_filter) 
+        
+        if (nrow(temp_df) > 0) {
+          segments_df(
+            temp_df %>% 
         dplyr::left_join(codebook(),
                          by = "code_id") %>% 
         dplyr::left_join(tibble::enframe(documents(),
                                          name = "doc_name",
                                          value = "doc_id"),
-                         by = "doc_id")       } else {
+                         by = "doc_id")
+        ) } else {
                            
-                           ""
-                         }
+          segments_df(as.data.frame(NULL))
+          
+                         } 
       })
    
-      observe(print(segments_df()))
+      
     segments_taglist <- eventReactive(segments_df(), { 
       
-      if (isTruthy(segments_df())) {
+      if (nrow(segments_df()) > 1) {
      purrr::pmap(list(segments_df()$segment_text, 
                            segments_df()$doc_name, 
                            segments_df()$code_name, 
@@ -123,12 +135,31 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
     })
     
     output$segments <- renderUI({
+      if (nrow(segments_df()) > 1) {
       segments_taglist()
+        
+      } else {
+        "No coded segments detected."
+      }
     })
     
+    output$download <- renderUI({
+      
+if (nrow(segments_df() > 1)) {
+  mod_download_handler_ui("download_handler_ui_1")
+} else {""}
+      
+    })
     
 
-return(reactive(segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)))
+return(reactive({
+  
+  if (nrow(segments_df() > 1)) {
+    segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
+  } else {as.data.frame(NULL)}
+  
+  
+  }))
     
   })
 }
