@@ -23,15 +23,21 @@ mod_doc_manager_ui <- function(id){
       
       column(width = 6,
              
-            box(
+            box(title = "Document input",
+                collapsible = TRUE,
+                width = NULL,
                
-               
-               textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste a new document content here"),
-               actionButton(ns("doc_add"), label = "Add document")
+               textInput(ns("doc_name"), label = "Document name", placeholder = "Short name"),
+               textAreaInput(ns("doc_description"), label = "Document description", placeholder = "Description"),
+               textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste the new document content here"),
+               actionButton(ns("doc_add"), label = "Add document", class = "btn-success")
                
             ),
              
-            box(
+            box(title = "Delete documents",
+                collapsible = TRUE,
+                collapsed = TRUE,
+                width = NULL,
 
         selectInput(ns("doc_delete_list"),
                     label = "Remove selected documents from project",
@@ -90,10 +96,13 @@ output$doc_list_text <- renderText({
 
 
 
- # observe documents actions
+ # observe documents actions ----
+    
+    # document input ----
+    
 
-# observeEvent(input[[paste("doc_manager_ui_1", "doc_add", sep = "-")]], {
-# 
+observeEvent(input$doc_add, {
+#
 #   # this module processes document input
 #   mod_doc_manager_server("doc_manager_ui_1",
 #                          connection = project()$project_db,
@@ -106,12 +115,13 @@ output$doc_list_text <- renderText({
 #   mod_doc_delete_server("doc_delete_ui_1",
 #                         connection = project()$project_db,
 #                         project = project()$active_project)
-#   # update reactive value containing project documents
-#   doc_list(doc_list+1)
-# 
-# })
-# 
-    
+    # update reactive value containing project documents
+    doc_list(list_db_documents(project_db = project()$project_db,
+                               active_project = project()$active_project))
+
+})
+
+    # document removal ----
     observeEvent(input$doc_remove, {
       
       req(input$doc_delete_list)
