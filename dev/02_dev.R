@@ -61,6 +61,8 @@ golem::add_fct( "helpers" )
 golem::add_utils( "project", module = "project" )
 golem::add_utils( "codebook", module = "codebook" )
 golem::add_utils( "document_code", module = "document_code" )
+golem::add_utils( "doc_manager", module = "doc_manager" )
+
 
 
 

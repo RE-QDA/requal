@@ -22,18 +22,28 @@ mod_doc_manager_ui <- function(id){
     ),
       
       column(width = 6,
+             
+            box(
+               
+               
+               textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste a new document content here"),
+               actionButton(ns("doc_add"), label = "Add document")
+               
+            ),
+             
+            box(
 
-        selectInput(ns("doc_delele_list"),
+        selectInput(ns("doc_delete_list"),
                     label = "Remove selected documents from project",
                     choices = "",
                     multiple = TRUE,
                     selected = NULL),
         
-        actionButton(ns("remove_doc"), 
+        actionButton(ns("doc_remove"), 
                      "Remove",
                      class = "btn-danger")
       
-        
+            )
       
     ))
     
@@ -102,7 +112,7 @@ output$doc_list_text <- renderText({
 # })
 # 
     
-    observeEvent(input$remove_doc, {
+    observeEvent(input$doc_remove, {
       
       req(input$doc_delete_list)
       
