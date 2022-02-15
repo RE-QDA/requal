@@ -11,7 +11,9 @@ mod_analysis_ui <- function(id){
   ns <- NS(id)
   tagList(
     fluidRow(column(width = 8,
-                    uiOutput(ns("segments"))
+                    
+                    uiOutput(ns("segments")) %>% 
+                      tagAppendAttributes(class = "scrollable90")
                     
     ),
     column(width = 4,
@@ -42,9 +44,11 @@ mod_analysis_ui <- function(id){
 #' analysis Server Functions
 #'
 #' @noRd 
-mod_analysis_server <- function(id, project, codebook, documents){
+mod_analysis_server <- function(id, project, codebook, documents, segments) {
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    observe({print(segments())})
  
     observeEvent(codebook(), { 
       
@@ -77,7 +81,7 @@ mod_analysis_server <- function(id, project, codebook, documents){
 
 
 
-    segments_intialize <- eventReactive(c(input$code_filter, input$document_filter), {
+    segments_intialize <- eventReactive(c(input$code_filter, input$document_filter, segments()), {
       
       req(input$code_filter, input$document_filter)
       

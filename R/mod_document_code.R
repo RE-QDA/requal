@@ -61,7 +61,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-
+segments_observer <- reactiveVal(0)
 
 # Selection of documents to code ------------------------------------------
 
@@ -181,7 +181,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
                                             code_df$active_codebook,
                                             ns=NS(id))
         text(display_text)
-        
+        segments_observer(segments_observer()+1)
         
         }
     })
@@ -223,6 +223,8 @@ mod_document_code_server <- function(id, project, codebook, documents){
           ns = NS(id)
         )
         text(display_text)
+        segments_observer(segments_observer()+1)
+        
       } else {
         showModal(
           modalDialog(
@@ -268,6 +270,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
                                             code_df$active_codebook,
                                             ns=NS(id))
         text(display_text)
+        segments_observer(segments_observer()+1)
       }
       
     })
@@ -277,6 +280,8 @@ mod_document_code_server <- function(id, project, codebook, documents){
   
     
     output$captured_range <- renderText({input$tag_position})
+
+    return(reactive(segments_observer()))
  
   })
 }

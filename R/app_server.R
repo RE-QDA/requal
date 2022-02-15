@@ -34,11 +34,11 @@ app_server <- function(input, output, session) {
   
   # workdesk ----
  
-  mod_document_code_server("document_code_ui_1", project_observer, codebook, documents)
+  segments_observer <- mod_document_code_server("document_code_ui_1", project_observer, codebook, documents)
   
   # analysis
   
-  mod_analysis_server("analysis_ui_1", project_observer, codebook, documents)
+  mod_analysis_server("analysis_ui_1", project_observer, codebook, documents, segments_observer)
 
   
 }
