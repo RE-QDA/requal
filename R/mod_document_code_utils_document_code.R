@@ -57,11 +57,12 @@ load_doc_db <- function(active_project, project_db, doc_id) {
 
 load_doc <- function(con, project_id, doc_id){
     doc_text <- NULL
+    browser()
     dplyr::tbl(con, "documents") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
         dplyr::pull(doc_text) %>%
-        gsub("[\\n\\r]", "", .)
+        gsub("[\n\r]", "", .)
 }
 
 # Load segments for document display  -------------------------------------------
