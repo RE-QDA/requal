@@ -48,8 +48,10 @@ golem::add_module( name = "codebook" ) # Name of the module
 golem::add_module( name = "document_code" ) # Name of the module
 
 
-
+# Analysis
 golem::add_module( name = "analysis" ) # Name of the module
+golem::add_module( name = "download_handler" ) # Name of the module
+
 golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
 golem::add_module( name = "about" ) # Name of the module

@@ -34,7 +34,9 @@ mod_analysis_ui <- function(id){
                 width = "100%",
                 size = 15)
     
-    )
+    ),
+    
+    mod_download_handler_ui("download_handler_ui_1")
     
     
     )
@@ -48,8 +50,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    observe({print(segments())})
- 
+
     observeEvent(codebook(), { 
       
       if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
@@ -81,13 +82,13 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
 
 
 
-    segments_intialize <- eventReactive(c(input$code_filter, input$document_filter, segments()), {
+    segments_df <- eventReactive(c(input$code_filter, input$document_filter, segments()), {
       
       req(input$code_filter, input$document_filter)
       
       if ( isTruthy(project()$active_project) & isTruthy(codebook()) & isTruthy(documents()) ) {
 
-        segments_df <- load_segments_analysis(project()$project_db,
+         load_segments_analysis(project()$project_db,
                              project()$active_project,
                              input$code_filter,
                              input$document_filter) %>% 
@@ -96,29 +97,38 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
         dplyr::left_join(tibble::enframe(documents(),
                                          name = "doc_name",
                                          value = "doc_id"),
-                         by = "doc_id")
+                         by = "doc_id")       } else {
+                           
+                           ""
+                         }
+      })
    
+      observe(print(segments_df()))
+    segments_taglist <- eventReactive(segments_df(), { 
       
-     purrr::pmap(list(segments_df$segment_text, 
-                           segments_df$doc_name, 
-                           segments_df$code_name, 
-                           segments_df$code_color),
+      if (isTruthy(segments_df())) {
+     purrr::pmap(list(segments_df()$segment_text, 
+                           segments_df()$doc_name, 
+                           segments_df()$code_name, 
+                           segments_df()$code_color),
                       ~format_cutouts(segment_text = ..1,
                                       segment_document = ..2,
                                       segment_code = ..3,
                                       segment_color = ..4)
                       ) 
-      } else (
-        
-        "No coded segments in the project."
-        
-      )
+
+      }
+      
   
     })
     
     output$segments <- renderUI({
-      segments_intialize()
+      segments_taglist()
     })
+    
+    
+
+return(reactive(segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)))
     
   })
 }
