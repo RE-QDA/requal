@@ -11,14 +11,14 @@ mod_launchpad_creator_ui <- function(id){
   ns <- NS(id)
   tagList(
     
-    h3("Project name"),
+    h3("New project name"),
     textInput(
       ns("project_name"),
       label = NULL,
       placeholder = "The name of your project."
     ),
     
-    h3("Project folder"),
+    h3("New project folder"),
     
     div(span(textOutput(
       ns("project_path")
@@ -30,7 +30,7 @@ mod_launchpad_creator_ui <- function(id){
       "Please select a project folder"
     ),
     
-    h3("Project description"),
+    h3("New project description"),
     
     textAreaInput(
       ns("project_description"),
