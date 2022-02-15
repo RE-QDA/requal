@@ -31,7 +31,7 @@ set_dashboard_body <- function() {
   from {color: white;}
   to {color: red;}
 }
-  }
+
   '))),
 
 shinydashboard::tabItems(
