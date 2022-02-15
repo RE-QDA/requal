@@ -115,18 +115,46 @@ list_db_projects <- function(project_db) {
 
 list_db_documents <- function(project_db, active_project) {
 
+    doc_id <- doc_name <- NULL
+    
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
                           )
     on.exit(DBI::dbDisconnect(con))
 
     active_project <- as.integer(active_project)
+
+    project_documents <- dplyr::tbl(con, "documents") %>%
+        dplyr::filter(.data$project_id == .env$active_project) %>%
+        dplyr::select(.data$doc_id, .data$doc_name) %>%
+        dplyr::collect() %>%
+        dplyr::mutate(doc_name = ifelse(is.na(doc_name), "", doc_name))
+        
+       
+    documents_list <- project_documents$doc_id
+    names(documents_list) <- project_documents$doc_name
     
-    project_documents <- dplyr::tbl(con, "documents") %>% 
-        dplyr::filter(project_id == active_project) %>% 
-        dplyr::pull(doc_id)
+    return(documents_list)
     
-    return(project_documents)
+}
+
+list_db_document_table <- function(project_db, active_project) {
+    
+
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db
+    )
+    on.exit(DBI::dbDisconnect(con))
+    
+    active_project <- as.integer(active_project)
+    
+    documents_table <- dplyr::tbl(con, "documents") %>%
+        dplyr::filter(.data$project_id == .env$active_project) %>%
+        dplyr::collect() 
+
+
+    
+    return(documents_table)
     
 }
 

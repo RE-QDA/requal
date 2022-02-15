@@ -1,0 +1,8 @@
+.custom_label {
+  color: black !important;
+} 
+.required > label::after {
+  content: "*";
+  color: red;
+  margin-left:2px
+} 

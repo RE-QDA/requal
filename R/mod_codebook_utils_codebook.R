@@ -11,14 +11,14 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             
             textInput(
                 ns("code_name"),
-                label = NULL,
-                placeholder = "Code name"
-            ),
+                label = "Code name",
+                placeholder = "Short but informative name"
+            ) %>% tagAppendAttributes(class = "required"),
             
             textAreaInput(
                 ns("code_desc"),
-                label = NULL,
-                placeholder = "Code description"
+                label = "Code description",
+                placeholder = "Description and instructions"
             ),
             
             colourpicker::colourInput(

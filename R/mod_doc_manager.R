@@ -17,7 +17,7 @@ mod_doc_manager_ui <- function(id){
              uiOutput(ns("project_active")),
              
 
-      textOutput(ns("doc_list_text"))
+      tableOutput(ns("doc_list_table"))
       
     ),
       
@@ -27,9 +27,12 @@ mod_doc_manager_ui <- function(id){
                 collapsible = TRUE,
                 width = NULL,
                
-               textInput(ns("doc_name"), label = "Document name", placeholder = "Short name"),
+               
+                textInput(ns("doc_name"), label = "Document name", placeholder = "Short name") %>% 
+                  tagAppendAttributes(class = "required"),
                textAreaInput(ns("doc_description"), label = "Document description", placeholder = "Description"),
-               textAreaInput(ns("doc_text"), label = NULL, placeholder = "Paste the new document content here"),
+                textAreaInput(ns("doc_text"), label = "Document content", placeholder = "Paste the new document content here") %>% 
+                 tagAppendAttributes(class = "required"),
                actionButton(ns("doc_add"), label = "Add document", class = "btn-success")
                
             ),
@@ -76,14 +79,20 @@ mod_doc_manager_server <- function(id, project){
 
     ## render existing documents ----
 
-output$doc_list_text <- renderText({
+output$doc_list_table <- renderTable({
 
     req(project()$active_project)
 
     if (isTruthy(doc_list()))
     {
     
-      doc_list()
+      list_db_document_table(project_db = project()$project_db,
+                             active_project = project()$active_project) %>% 
+        dplyr::select("ID" = doc_id,
+                      "Name" = doc_name,
+                      "Description" = doc_description,
+                      "Date added" = created_at)
+      
     } else {
       
       "This project does not contain any documents yet."
@@ -102,20 +111,17 @@ output$doc_list_text <- renderText({
     
 
 observeEvent(input$doc_add, {
-#
-#   # this module processes document input
-#   mod_doc_manager_server("doc_manager_ui_1",
-#                          connection = project()$project_db,
-#                          project = project()$active_project)
-#   # this module displays active documents
-#   mod_doc_list_server("doc_list_ui_1",
-#                       connection = project()$project_db,
-#                       project = project()$active_project)
-#   # the delete module is called to update delete UI by adding new document
-#   mod_doc_delete_server("doc_delete_ui_1",
-#                         connection = project()$project_db,
-#                         project = project()$active_project)
-    # update reactive value containing project documents
+
+  req(input$doc_name, input$doc_text)
+  
+  add_input_document(connection = project()$project_db,
+                     project = project()$active_project,
+                     doc_name = input$doc_name,
+                     doc_text = input$doc_text,
+                     doc_description = input$doc_description
+  )
+  
+  
     doc_list(list_db_documents(project_db = project()$project_db,
                                active_project = project()$active_project))
 
@@ -124,11 +130,7 @@ observeEvent(input$doc_add, {
     # document removal ----
     observeEvent(input$doc_remove, {
       
-      req(input$doc_delete_list)
-      
-      delete_db_documents(connection,
-                          project,
-                          delete_doc_id = input$doc_delete_list)
+ 
       
       # update reactive value containing project documents
       doc_list(list_db_documents(project_db = project()$project_db,
