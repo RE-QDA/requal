@@ -128,7 +128,7 @@ mod_document_code_server <- function(id, project, codebook, documents){
 
       if (isTruthy(project()$active_project)) {
         
-        if (isTruthy(codebook()$active_codebook)) {
+        if (isTruthy(codebook())) {
           code_df$active_codebook <- codebook$active_codebook
         } else {
           code_df$active_codebook <- list_db_codes(

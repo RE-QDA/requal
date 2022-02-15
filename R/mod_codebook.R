@@ -38,7 +38,17 @@ mod_codebook_server <- function(id, project) {
 
     # codebook observer ----
 
-    codebook_observer <- reactiveVal(0)
+    codebook <- reactiveVal()
+    
+    observeEvent(project()$active_project, {
+      # update codebook return valueb
+      
+      codebook(
+        list_db_codes(project()$project_db,
+                      project()$active_project)
+      )
+      
+    })
 
 # List existing codes in codes boxes ----
     output$codes_ui <- renderUI({
@@ -117,9 +127,10 @@ mod_codebook_server <- function(id, project) {
 
 
       # update codebook return value
-      codebook$active_codebook <-
+      codebook(
         list_db_codes(project()$project_db,
                       project()$active_project)
+      )
 
     })
 
@@ -155,17 +166,16 @@ mod_codebook_server <- function(id, project) {
 
 
       # update codebook return value
-      codebook$active_codebook <-
+      codebook(
         list_db_codes(project()$project_db,
                       project()$active_project)
+      )
 
     })
  
 # return active codebook details ----
 
-    codebook <- reactiveValues()
-    
-       return(reactive(codebook$active_codebook))
+       return(reactive(codebook()))
     
     
  # end of server module function   
