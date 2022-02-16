@@ -11,31 +11,47 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 The goal of `requal` is to provide reproducibility support for
-qualitative coding.  
-Supported by The Technology Agency of the Czech Republic, project
-n. TL05000054.
+qualitative coding.
 
 ## Installation
 
-You can install the development version of `requal` from
-[GitHub](https://github.com/) by following these steps:
+### Prerequisites
 
-1.  download the current release from
+To use `requal`, you need to have the [R
+language](https://www.r-project.org) installed and running on your
+machine. You can download and install R from
+[here](https://cloud.r-project.org)). You will also need a web browser
+with JavaScript support (i.e. any of the standard issue browsers like
+Firefox, Chrome, or Safari).
+
+### Package
+
+You can install the development version of `requal` from
+[GitHub](https://github.com/) by following these steps (assuming you
+have R installed on your machine :
+
+1.  download the current release of \`requal\`\` from
     [Releases](https://github.com/RE-QDA/requal/releases).
 2.  install `remotes` package by running `install.packages("remotes")`
-    in R console.
+    command in R console.
 3.  install `requal` package by running
-    `remotes::install_local("PATH_TO/requal_0.0.0.9000.tar.gz")` where
-    `PATH_TO` needs to be replaced by a path to the `.tar.gz` file (such
-    as `~Downloads/requal_0.0.0.9000.tar.gz` or
-    `C:/Users/michael.skvrnak/Downloads/requal_0.0.0.9000.tar.gz` on
-    Windows)
+    `remotes::install_local(file.choose())` and selecting the downloaded
+    `requal` release file on your hard-drive.
 
 ## Usage
 
-The shiny application for coding documents can be launched by the
-following command.
+The `requal` `shiny` application can be launched with the following
+command:
 
 ``` r
-requal::run_app()
+requal::run_app(options = list("launch.browser"))
 ```
+
+The application runs in your browser and provides basic functionality
+for annotating texts with codes. The annotated text segments can be
+filtered and exported. More functions are coming up.
+
+## Acknowledgement
+
+The application development has been supported by The Technology Agency
+of the Czech Republic, project n. TL05000054.
