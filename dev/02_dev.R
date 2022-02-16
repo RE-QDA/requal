@@ -15,7 +15,6 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package( "quanteda", type = "Enhances")
 usethis::use_package( "rlang" )
 usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "shinyFiles" )

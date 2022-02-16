@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# requal
+# ReQual
 
 <!-- badges: start -->
 
@@ -28,28 +28,34 @@ Firefox, Chrome, or Safari).
 
 You can install the development version of `requal` from
 [GitHub](https://github.com/) by following these steps (assuming you
-have R installed on your machine :
+have R installed on your machine):
 
-1.  download the current release of \`requal\`\` from
+1.  Download the current release of `requal` from
     [Releases](https://github.com/RE-QDA/requal/releases).
-2.  install `remotes` package by running `install.packages("remotes")`
-    command in R console.
-3.  install `requal` package by running
+2.  Install the `remotes` package by running
+    `install.packages("remotes")` command in R console.
+3.  Install the `requal` package by running
     `remotes::install_local(file.choose())` and selecting the downloaded
-    `requal` release file on your hard-drive.
+    release file on your hard-drive.
 
 ## Usage
 
-The `requal` `shiny` application can be launched with the following
+The `requal` app can be launched from the R console with the following
 command:
 
 ``` r
 requal::run_app(options = list("launch.browser"))
 ```
 
-The application runs in your browser and provides basic functionality
-for annotating texts with codes. The annotated text segments can be
-filtered and exported. More functions are coming up.
+On the first launch of the app, use the “Create” menu to set up a new
+project by providing a name a selecting a folder for your project. The
+app will create an SQLite database file with the `.requal` extension and
+start up the project.
+
+`requal` is a `shiny` application that runs in your browser and provides
+basic functionality for annotating documents in plain text with
+user-defined codes. The annotated text segments can be filtered and
+exported. More functions are coming up.
 
 ## Acknowledgement
 
