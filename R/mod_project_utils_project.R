@@ -115,33 +115,68 @@ list_db_projects <- function(project_db) {
 
 list_db_documents <- function(project_db, active_project) {
 
+    doc_id <- doc_name <- NULL
+    
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db
                           )
     on.exit(DBI::dbDisconnect(con))
+
+    active_project <- as.integer(active_project)
+
+    project_documents <- dplyr::tbl(con, "documents") %>%
+        dplyr::filter(.data$project_id == .env$active_project) %>%
+        dplyr::select(.data$doc_id, .data$doc_name) %>%
+        dplyr::collect() %>%
+        dplyr::mutate(doc_name = ifelse(is.na(doc_name), "", doc_name))
+        
+       
+    documents_list <- project_documents$doc_id
+    names(documents_list) <- project_documents$doc_name
+    
+    return(documents_list)
+    
+}
+
+list_db_document_table <- function(project_db, active_project) {
+    
+
+    con <- DBI::dbConnect(RSQLite::SQLite(),
+                          project_db
+    )
+    on.exit(DBI::dbDisconnect(con))
     
     active_project <- as.integer(active_project)
     
-    project_documents <- dplyr::tbl(con, "documents") %>% 
-        dplyr::filter(project_id == active_project) %>% 
-        dplyr::pull(doc_id)
+    documents_table <- dplyr::tbl(con, "documents") %>%
+        dplyr::filter(.data$project_id == .env$active_project) %>%
+        dplyr::collect() %>% 
+        dplyr::select(#"ID" = doc_id,
+                      "Name" = doc_name,
+                      "Description" = doc_description,
+                      "Date added" = created_at)
+
+
     
-    return(project_documents)
+    return(documents_table)
     
 }
 
-# delete documents from project
-delete_db_documents <- function(project_db, 
-                                active_project, 
-                                delete_doc_id) {
+make_doc_table <- function(connection, active_project, doc_list)
+renderTable(colnames = FALSE, {
     
-    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-    on.exit(DBI::dbDisconnect(con))
+    req(active_project)
     
-    DBI::dbExecute(con,
-                   "DELETE from documents
-                   WHERE doc_id IN (?)",
-                   params = list(delete_doc_id))
-    log_delete_document_record(con, active_project, delete_doc_id)
-}
-
+    if (isTruthy(doc_list))
+    {
+        
+        list_db_document_table(project_db = connection,
+                               active_project = active_project)
+        
+        
+    } else {
+        
+        "This project does not contain any documents yet."
+        
+    }
+})

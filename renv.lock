@@ -632,14 +632,6 @@
       "Repository": "CRAN",
       "Hash": "5c0cdb37f063c58cdab3c7e9fbb8bd2c"
     },
-    "requal": {
-      "Package": "requal",
-      "Version": "0.0.0.9000",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "/Users/radimhladik/ownCloud/Temp_ownCloud/requal_0.0.0.9000.tar.gz",
-      "Hash": "1ba79cc59b9ad717c20a6f6a1350973e"
-    },
     "rlang": {
       "Package": "rlang",
       "Version": "0.4.10",

@@ -11,70 +11,78 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             
             textInput(
                 ns("code_name"),
-                label = NULL,
-                placeholder = "Code name"
-            ),
+                label = "Code name",
+                placeholder = "Short but informative name"
+            ) %>% tagAppendAttributes(class = "required"),
             
             textAreaInput(
                 ns("code_desc"),
-                label = NULL,
-                placeholder = "Code description"
+                label = "Code description",
+                placeholder = "Description and instructions"
+            ),
+            
+            colourpicker::colourInput(
+              ns("color_pick"),
+              label = "Highlight",
+              value = "yellow",
+              showColour = "background",
+              closeOnClick = TRUE
             ),
             
             actionButton(ns("code_add"),
                          label = "Create",
                          class = "btn-success")
         ),
-        box(
-            title = "Edit codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
-            width = NULL,
-            
-            selectInput(
-                ns("code_to_edit"),
-                label = "Select code to edit",
-                choices = c("", "placeholder1", "placeholder2"),
-                selected = "",
-                multiple = FALSE
-            ),
-            
-            uiOutput(ns("code_editor")),
-            
-            actionButton(ns("code_edit"),
-                         label = "Edit",
-                         class = "btn-warning")
-            
-        ),
-        
-        box(
-            title = "Merge codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
-            width = NULL,
-            
-            selectInput(
-                ns("code_merge_from"),
-                label = "Select codes to merge",
-                choices = c("placeholder1", "placeholder2"),
-                selected = "",
-                multiple = TRUE
-            ),
-            
-            selectInput(
-                ns("code_merge_to"),
-                label = "Select codes to merge",
-                choices = c("placeholder1", "placeholder2"),
-                selected = "",
-                multiple = TRUE
-            ),
-            
-            actionButton(ns("code_merge"),
-                         label = "Merge",
-                         class = "btn-warning")
-            
-        ),
-        
+        # box(
+        #     title = "Edit codes",
+        #     collapsible = TRUE,
+        #     collapsed = TRUE,
+        #     width = NULL,
+        #     
+        #     selectInput(
+        #         ns("code_to_edit"),
+        #         label = "Select code to edit",
+        #         choices = c("", "placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = FALSE
+        #     ),
+        #     
+        #     uiOutput(ns("code_editor")),
+        #     
+        #     actionButton(ns("code_edit"),
+        #                  label = "Edit",
+        #                  class = "btn-warning")
+        #     
+        # ),
+        # 
+        # box(
+        #     title = "Merge codes",
+        #     collapsible = TRUE,
+        #     collapsed = TRUE,
+        #     width = NULL,
+        #     
+        #     selectInput(
+        #         ns("code_merge_from"),
+        #         label = "Select codes to merge",
+        #         choices = c("placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = TRUE
+        #     ),
+        #     
+        #     selectInput(
+        #         ns("code_merge_to"),
+        #         label = "Select codes to merge",
+        #         choices = c("placeholder1", "placeholder2"),
+        #         selected = "",
+        #         multiple = TRUE
+        #     ),
+        #     
+        #     actionButton(ns("code_merge"),
+        #                  label = "Merge",
+        #                  class = "btn-warning")
+        #     
+        # ),
+        # 
         box(
             title = "Delete codes",
             collapsible = TRUE,
@@ -110,7 +118,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
 list_db_codes <- function(project_db, project_id) {
   
 ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
-  code_id <- code_name <- code_description <- NULL
+  code_id <- code_name <- code_description <- code_color <- NULL
 
   
     con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -119,7 +127,10 @@ list_db_codes <- function(project_db, project_id) {
     
     project_codes <- dplyr::tbl(con, "codes") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
-        dplyr::select(code_id, code_name, code_description) %>%
+        dplyr::select(code_id, 
+                      code_name, 
+                      code_description,
+                      code_color) %>%
         dplyr::collect()
     
     return(project_codes)
@@ -149,7 +160,8 @@ return(choices)
 # Generate boxes of codes -----
 gen_codes_ui <- function(code_id,
                          code_name,
-                         code_description) {
+                         code_description,
+                         code_color) {
     box(
         code_description,
         id = code_id,
@@ -160,13 +172,16 @@ gen_codes_ui <- function(code_id,
         collapsible = TRUE,
         collapsed = TRUE,
         boxToolSize = "md",
-        label = boxLabel(text = "code",
-                         status = "warning"),
-        dropdownMenu = boxDropdown(
-            boxDropdownItem("Edit"),
-            boxDropdownItem("Merge"),
-            boxDropdownItem("Delete")
-        ),
+        label = tagAppendAttributes(
+          boxLabel(text = "code",
+                   status = "warning"),
+          style = paste0("background-color:", code_color," !important;"),
+          class = "custom_label"),
+        # dropdownMenu = boxDropdown(
+        #     boxDropdownItem("Edit"),
+        #     boxDropdownItem("Merge"),
+        #     boxDropdownItem("Delete")
+        #),
         ""
     )
     

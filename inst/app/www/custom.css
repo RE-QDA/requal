@@ -1,0 +1,57 @@
+.custom_label {
+  color: black !important;
+} 
+.required > label::after {
+  content: "*";
+  color: red;
+  margin-left:2px
+} 
+.scrollable80{
+    border: none;
+    height:80vh;
+    overflow-y:scroll;
+}
+.scrollable90{
+    border: none;
+    height:90vh;
+    overflow-y:scroll;
+}
+.overflow_barrier {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.overflow_barrier:hover {
+    overflow: visible;
+    overflow-wrap: break-word;
+    word-break: break-all; 
+    background: white;
+}
+.code-button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.code-button:hover {
+    overflow: visible;
+}
+
+.quote{
+font-size: medium;
+line-height: 1;
+background-color: #E8E8E8;
+}
+
+.segment_badge{
+display: inline-block;
+padding: .2em .6em .3em;
+font-size: 10;
+font-weight: 700;
+line-height: 1;
+color: black;
+text-align: center;
+white-space: nowrap;
+vertical-align: baseline;
+border-radius: .25em;
+background-color: white;
+}
+

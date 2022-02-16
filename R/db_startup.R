@@ -33,7 +33,7 @@ CREATE_DOCUMENTS_SQL <- "
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   project_id INTEGER
-,   doc_name TEXT UNIQUE
+,   doc_name TEXT
 ,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -46,6 +46,7 @@ CREATE TABLE if not exists codes (
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
+,   code_color TEXT
 )"
 
 CREATE_SEGMENTS_SQL <- "

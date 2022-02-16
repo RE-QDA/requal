@@ -15,11 +15,12 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package( "quanteda" )
+usethis::use_package( "quanteda", type = "Enhances")
 usethis::use_package( "rlang" )
 usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "shinyFiles" )
 usethis::use_package( "shinyjs" )
+usethis::use_package( "colourpicker")
 usethis::use_package( "DBI" )
 usethis::use_package( "RSQLite" )
 usethis::use_package( "dplyr" )
@@ -27,29 +28,31 @@ usethis::use_package( "tibble" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
+usethis::use_package( "stringr" )
+
 
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "left_menu" ) # Name of the module
-golem::add_module( name = "dashboard_body" ) # Name of the module
+golem::add_module( name = "launchpad_loader" ) # Name of the module
+golem::add_module( name = "launchpad_creator" ) # Name of the module
 
 # Project menu
 golem::add_module( name = "project" ) # Name of the module
 golem::add_module( name = "doc_manager" ) # Name of the module
-golem::add_module( name = "doc_list" ) # Name of the module
-golem::add_module( name = "doc_delete" ) # Name of the module
+
 
 # Codebook menu
 golem::add_module( name = "codebook" ) # Name of the module
 
 # Coding workspace
 golem::add_module( name = "document_code" ) # Name of the module
-golem::add_module( name = "code_button" ) # Name of the module
 
 
-
+# Analysis
 golem::add_module( name = "analysis" ) # Name of the module
+golem::add_module( name = "download_handler" ) # Name of the module
+
 golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
 golem::add_module( name = "about" ) # Name of the module
@@ -61,6 +64,10 @@ golem::add_fct( "helpers" )
 golem::add_utils( "project", module = "project" )
 golem::add_utils( "codebook", module = "codebook" )
 golem::add_utils( "document_code", module = "document_code" )
+golem::add_utils( "doc_manager", module = "doc_manager" )
+golem::add_utils( "analysis", module = "analysis" )
+
+
 
 
 
