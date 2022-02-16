@@ -6,6 +6,7 @@ Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports: 
     attempt,
+    colourpicker,
     config (>= 0.3.1),
     DBI,
     dbplyr,
