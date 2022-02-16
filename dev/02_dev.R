@@ -15,12 +15,12 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package( "quanteda" )
+usethis::use_package( "quanteda", type = "Enhances")
 usethis::use_package( "rlang" )
 usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "shinyFiles" )
 usethis::use_package( "shinyjs" )
-usethis::use_package( "colourpicker" )
+usethis::use_package( "colourpicker")
 usethis::use_package( "DBI" )
 usethis::use_package( "RSQLite" )
 usethis::use_package( "dplyr" )
@@ -28,6 +28,7 @@ usethis::use_package( "tibble" )
 usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
+usethis::use_package( "stringr" )
 
 
 

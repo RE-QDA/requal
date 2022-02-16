@@ -6,7 +6,18 @@ utils::globalVariables(c("project_name",
                          "code_id",
                          "segment_id",
                          "code_color",
-                         "text"))
+                         "text",
+                         "packageVersion",
+                         "doc_name",
+                         "doc_description",
+                         "created_at",
+                         "value",
+                         "name",
+                         "id",
+                         "segment_end",
+                         ".",
+                         "segment_start",
+                         "segment_text"))
 
 
 set_dashboard_body <- function() {

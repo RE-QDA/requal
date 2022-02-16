@@ -90,7 +90,7 @@ mod_codebook_server <- function(id, project) {
                                    code_color = paste0("rgb(",
                                                        paste(
                                                          as.vector(
-                                                           col2rgb(
+                                                           grDevices::col2rgb(
                                                              input$color_pick
                                                              )
                                                            ), collapse = ", "),

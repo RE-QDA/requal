@@ -58,7 +58,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
         
       updateSelectInput(session = session,
                         "code_filter",
-                        choices = setNames(codebook()$code_id,
+                        choices = stats::setNames(codebook()$code_id,
                                            codebook()$code_name),
                         selected = codebook()$code_id
                            )
@@ -80,8 +80,7 @@ mod_analysis_server <- function(id, project, codebook, documents, segments) {
       
       
     })
-    observe(print(segments()))
-    
+
 
     segments_df <- reactiveVal()
     
