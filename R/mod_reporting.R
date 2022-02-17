@@ -13,7 +13,7 @@ mod_reporting_ui <- function(id){
     
     tabsetPanel(type = "tabs", id = "tabset",
                 tabPanel("Instructions", textOutput(ns("report_instructions"))),
-                tabPanel("Logs", dataTableOutput(ns("report_logs"))),
+                tabPanel("Logs", dataTableOutput(ns("report_logs")))
     )
  
   )
