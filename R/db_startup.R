@@ -117,8 +117,8 @@ add_documents_record <- function(con, project_id, document_df){
 add_codes_record <- function(con, project_id, codes_df){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
-        log_add_document_record(con, project_id, codes_df)    
+        log_add_code_record(con, project_id, codes_df)    
     }else{
-        warning("document not added")
+        warning("code not added")
     }
 }

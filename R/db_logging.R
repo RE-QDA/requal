@@ -37,7 +37,7 @@ log_create_project_record <- function(con, project_id, project_df){
 log_add_document_record <- function(con, project_id, doc){
     log_action(con, 
                project_id = project_id, 
-               action = "Add documents", 
+               action = "Add document", 
                data = doc)
 }
 
@@ -46,4 +46,32 @@ log_delete_document_record <- function(con, project_id, doc_ids){
                project_id = project_id, 
                action = "Delete documents", 
                data = doc_ids)
+}
+
+log_add_code_record <- function(con, project_id, code){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add code", 
+               data = code)
+}
+
+log_delete_code_record <- function(con, project_id, code_ids){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete codes", 
+               data = code_ids)
+}
+
+log_add_segment_record <- function(con, project_id, segment){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add segment", 
+               data = segment)
+}
+
+log_delete_segment_record <- function(con, project_id, segment){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete segment", 
+               data = segment)
 }

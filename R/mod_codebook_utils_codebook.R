@@ -201,7 +201,7 @@ delete_db_codes <-
                        WHERE code_id IN (?);",
                        params = list(delete_code_id))
         
-        #log_delete_code_record(con, active_project, delete_code_id)
+        log_delete_code_record(con, active_project, delete_code_id)
     }
 
 

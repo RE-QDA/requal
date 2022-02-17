@@ -66,6 +66,7 @@ golem::add_utils( "codebook", module = "codebook" )
 golem::add_utils( "document_code", module = "document_code" )
 golem::add_utils( "doc_manager", module = "doc_manager" )
 golem::add_utils( "analysis", module = "analysis" )
+golem::add_utils( "reporting", module = "reporting" )
 
 
 
