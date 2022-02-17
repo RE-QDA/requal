@@ -32,13 +32,30 @@ mod_reporting_server <- function(id, project){
     )
     
     # logs ------------
-    output$report_logs <- renderDataTable({
-      load_logs_for_reporting(project()$project_db,
+    
+    
+    
+      logs_df <- eventReactive(project()$active_project, {
+        
+        if (isTruthy(project()$active_project)) {
+          
+        load_logs_for_reporting(project()$project_db,
                               project()$active_project)
-    })
+          
+      }  else {""}
+      }) 
+      
+      output$report_logs <- renderDataTable({
+        req(logs_df())
+        logs_df() %>% 
+          dplyr::mutate(payload = paste0(substr(payload, 1, 100), "..."))
+        
+      })
+    
  
-  })
-}
+ 
+
+})}
     
 ## To be copied in the UI
 # mod_reporting_ui("reporting_ui_1")
