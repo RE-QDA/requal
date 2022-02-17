@@ -8,17 +8,17 @@ function getCaretCharacterOffsetWithin(element) {
     if (typeof win.getSelection != "undefined") {
         sel = win.getSelection();
         // https://stackoverflow.com/questions/7224368/how-do-i-remove-siblings-from-the-dom
-        var previous = sel.previousSibling;
+        // var previous = sel.previousSibling;
         
         // iterate until we find an element node or there is no previous sibling
-        while(previous && previous.nodeType !== 1) {
-            previous = previous.previousSibling;
-        }
+        // while(previous && previous.nodeType !== 1) {
+        //     previous = previous.previousSibling;
+        // }
 
         // if there is a sibling, remove it
-        if(previous) {
-            previous.parentNode.removeChild(previous);
-        }
+       //  if(previous) {
+       //      previous.parentNode.removeChild(previous);
+      //   }
         if (sel.rangeCount > 0) {
             var range = win.getSelection().getRangeAt(0);
             var preCaretRange = range.cloneRange();

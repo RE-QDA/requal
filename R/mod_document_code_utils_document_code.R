@@ -272,13 +272,13 @@ load_doc_to_display <- function(active_project,
                                       tag_start = "<article><p>",
                                       tag_end = "</p></article>")
         
-        linebreaks <- stringr::str_locate_all(raw_text, "[\n\n]")[[1]] %>% 
-            tibble::as_tibble() %>% 
-            tibble::add_column(tag_start = "</p><p>",
-                               position_type = "segment_start") %>% 
-            dplyr::select(position_start = start, position_type, tag_start)
+        # linebreaks <- stringr::str_locate_all(raw_text, "[\n\n]")[[1]] %>% 
+        #     tibble::as_tibble() %>% 
+        #     tibble::add_column(tag_start = "</p><p>",
+        #                        position_type = "segment_start") %>% 
+        #     dplyr::select(position_start = start, position_type, tag_start)
         
-  
+
         content_df <- dplyr::bind_rows(initial_row,
                                        coded_segments %>% 
                                            dplyr::mutate(code_id = as.character(code_id))) %>% 
@@ -304,7 +304,7 @@ load_doc_to_display <- function(active_project,
                                                   code_name,
                                                   '">'),
                                            tag_start)) %>% 
-            dplyr::bind_rows(linebreaks) %>% 
+            # dplyr::bind_rows(linebreaks) %>% 
             
             dplyr::group_by(position_start, position_type) %>% 
             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
@@ -315,7 +315,7 @@ load_doc_to_display <- function(active_project,
                                        tag_start, 
                                        tag_end)) %>% 
            dplyr::ungroup() %>% 
-           dplyr::mutate(position_end = dplyr::lead(position_start)-1) %>% 
+           dplyr::mutate(position_end = dplyr::lead(position_start)) %>% 
            dplyr::mutate(position_end = ifelse(is.na(position_end),
                                                position_start, 
                                                position_end))
