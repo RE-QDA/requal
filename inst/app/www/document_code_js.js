@@ -1,3 +1,5 @@
+// Function to calculate selection positions
+
 function getCaretCharacterOffsetWithin(element) {
     var caretOffset = 0;
     var doc = element.ownerDocument || element.document;
@@ -5,6 +7,18 @@ function getCaretCharacterOffsetWithin(element) {
     var sel;
     if (typeof win.getSelection != "undefined") {
         sel = win.getSelection();
+        // https://stackoverflow.com/questions/7224368/how-do-i-remove-siblings-from-the-dom
+        var previous = sel.previousSibling;
+        
+        // iterate until we find an element node or there is no previous sibling
+        while(previous && previous.nodeType !== 1) {
+            previous = previous.previousSibling;
+        }
+
+        // if there is a sibling, remove it
+        if(previous) {
+            previous.parentNode.removeChild(previous);
+        }
         if (sel.rangeCount > 0) {
             var range = win.getSelection().getRangeAt(0);
             var preCaretRange = range.cloneRange();
@@ -21,6 +35,9 @@ function getCaretCharacterOffsetWithin(element) {
     }
     return caretOffset;
 }
+
+
+// Function to send calculated positions to Shiny
 
 $( document ).ready(function() {
 
@@ -43,7 +60,7 @@ document.addEventListener('mouseup', function () {
 }, false);
 })
 
-
+// Auxiliary function to add highlight in the browser
 
 $( document ).ready(function() {
   Shiny.addCustomMessageHandler('highlight', function(arg_color) {
