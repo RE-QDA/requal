@@ -56,9 +56,10 @@ document.addEventListener('mouseup', function () {
 
       if (endOffset === 0) {
         var endOffset = endOffset+1;
-      } else {
-        null;
-      }
+      } 
+      if (startOffset > endOffset) {
+        var endOffset = startOffset; 
+      } 
 
 
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();

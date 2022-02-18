@@ -61,8 +61,7 @@ load_doc <- function(con, project_id, doc_id){
         dplyr::tbl(con, "documents") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-        dplyr::pull(doc_text) %>%
-            gsub("[\n\r]", "", .)
+        dplyr::pull(doc_text)
 }
 
 # Load segments for document display  -------------------------------------------
@@ -137,7 +136,7 @@ write_segment_db <- function(
     startOff,
     endOff
 ) {
-    segment_start <- segment_end <- NULL
+
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -272,11 +271,11 @@ load_doc_to_display <- function(active_project,
                                       tag_start = "<article><p>",
                                       tag_end = "</p></article>")
         
-        linebreaks <- stringr::str_locate_all(raw_text, "[\\n\\r]")[[1]] %>%
-            tibble::as_tibble() %>%
-            tibble::add_column(tag_start = "</p><p>",
-                               position_type = "segment_start") %>%
-            dplyr::select(position_start = start, position_type, tag_start)
+        # linebreaks <- stringr::str_locate_all(raw_text, "[\\n\\r]")[[1]] %>%
+        #     tibble::as_tibble() %>%
+        #     tibble::add_column(tag_start = "</p><p>",
+        #                        position_type = "segment_start") %>%
+        #     dplyr::select(position_start = start, position_type, tag_start)
         
 
         content_df <- dplyr::bind_rows(initial_row,
@@ -291,20 +290,20 @@ load_doc_to_display <- function(active_project,
             # dplyr::mutate(dplyr::across(dplyr::everything(), 
             #               ~tidyr::replace_na(.x, "")))
             dplyr::mutate(tag_end = ifelse(is.na(tag_end),
-                                            "</mark>",
+                                            "</b>",
                                            tag_end),
                           tag_start = ifelse(is.na(tag_start),
                                            
                                            
-                                           paste0('<mark id="',
+                                           paste0('<b id="',
                                                   code_id,
-                                                  '" class="code" style="padding:0; background-color:',
+                                                  '" class="segment" style="padding:0; background-color:',
                                                   code_color,
                                                   '" title="',
                                                   code_name,
                                                   '">'),
                                            tag_start)) %>% 
-            dplyr::bind_rows(linebreaks) %>%
+            # dplyr::bind_rows(linebreaks) %>%
             
             dplyr::group_by(position_start, position_type) %>% 
             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
@@ -327,22 +326,24 @@ load_doc_to_display <- function(active_project,
                                                    content_df$tag),
                                               ~paste0(..3, 
                                                       substr(
-                                                                 stringr::str_replace_all(raw_text, "[\\n\\r]",
-                                                                                          ""), 
+                                                                 
+                                                          raw_text, 
                                                              ..1, 
                                                              ..2))),
-                              collapse = "") 
+                              collapse = "") %>% 
+           stringr::str_replace_all("[\\n\\r]",
+                                    "</p><div class='br'>\\&#8203</div><p class='docpar'>")
          
 
 
     }else{
 
         df_non_coded <- paste0(
-            "<article><p>",
+            "<article><p class='document_par'>",
             
             raw_text %>%
             stringr::str_replace_all("[\\n\\r]",
-                               "\\&#8203</p><p>"),
+                               "</p><div class='br'>\\&#8203</div><p class='docpar'>"),
             
             "</p></article")
 
@@ -383,7 +384,7 @@ load_segment_codes_db <- function(active_project,
 parse_tag_pos <- function(tag_postion, which_part) {
 
 
-    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]+1
+    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]
     endOff <- as.integer(unlist(strsplit(tag_postion, "-")))[2]
 
     switch(which_part,

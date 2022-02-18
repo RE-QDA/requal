@@ -35,13 +35,13 @@
     overflow: visible;
 }
 
-.quote{
+.quote {
 font-size: medium;
 line-height: 1;
 background-color: #E8E8E8;
 }
 
-.segment_badge{
+.segment_badge {
 display: inline-block;
 padding: .2em .6em .3em;
 font-size: 10;
@@ -55,3 +55,14 @@ border-radius: .25em;
 background-color: white;
 }
 
+p.docpar {
+  margin: 0px 0px 5px 0px;
+}
+
+.br {
+height: 0px;
+}
+
+b.segment {
+font-weight: normal; 
+}
