@@ -17,6 +17,8 @@ mod_about_ui <- function(id){
     "ReQual CAQDAS"
     ), 
     
+    textOutput(ns("version")),
+    
     p(),
     
     p("The development of this tool has been supported by", 
@@ -32,15 +34,30 @@ mod_about_ui <- function(id){
 #' about Server Functions
 #'
 #' @noRd 
-mod_about_server <- function(id){
+mod_about_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
+    
+    
+    read_version <-
+      function(project_db,
+               active_project) {
+        
+        con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+        on.exit(DBI::dbDisconnect(con))
+        
+        version <- dplyr::tbl(con, "requal_version") %>%
+          dplyr::pull(version) 
+      }
+    
+    output$version <- renderText({
+      if (isTruthy(project()$active_project)) {
+      read_version(project()$project_db,
+                                   project()$active_project)
+      } else {""}
+    })
  
   })
 }
     
-## To be copied in the UI
-# mod_about_ui("about_ui_1")
-    
-## To be copied in the server
-# mod_about_server("about_ui_1")
+

@@ -1,7 +1,24 @@
 Package: requal
-Title: Qualitative Data Analysis with Reproducibility Support
-Version: 0.1.1
-Authors@R: person('Martin', 'Hájek', email = 'hajek@fsv.cuni.cz', role = c('cre', 'aut'))
+Title: Shiny Application for Computer-assisted Qualitative Data Analysis 
+Version: 0.2.1
+Authors@R: 
+    c(
+    person(given = "Radim",
+           family = "Hladík",
+           role = c("aut"),
+           email = "radim.hladik@fulbrightmail.org",
+           comment = c(ORCID = "0000-0001-8078-6477")),
+    person(given = "Michael",
+           family = "Škvrňák",
+           role = c("aut", "cre"),
+           email = "michael.skvrnak@protonmail.com",
+           comment = c(ORCID = "0000-0003-4647-4095")),
+    person(given = "Martin",
+           family = "Hájek",
+           role = c("ctb"),
+           email = "martin.hajek@fsv.cuni.cz",
+           comment = c(ORCID = "0000-0001-9213-6404"))
+    )
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports: 
@@ -41,5 +58,4 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Language: en-US
-Enhances: 
-    quanteda
+
