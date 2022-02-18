@@ -1,16 +1,16 @@
 Package: requal
 Title: Shiny Application for Computer-assisted Qualitative Data Analysis 
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     c(
     person(given = "Radim",
            family = "Hladík",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "radim.hladik@fulbrightmail.org",
            comment = c(ORCID = "0000-0001-8078-6477")),
     person(given = "Michael",
            family = "Škvrňák",
-           role = c("aut"),
+           role = c("aut", "cre"),
            email = "majky@skaut.cz",
            comment = c(ORCID = "0000-0003-4647-4095")),
     person(given = "Martin",
