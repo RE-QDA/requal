@@ -240,7 +240,9 @@ load_doc_to_display <- function(active_project,
 
     coded_segments <- load_segments_db(active_project,
                                        project_db,
-                                       doc_selector)
+                                       doc_selector) %>% 
+        calculate_code_overlap()
+    
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -265,9 +267,6 @@ load_doc_to_display <- function(active_project,
                                 code_names)
         )
         
-     
-
-
         content_df <-coded_segments %>% 
             dplyr::mutate(code_id = as.character(code_id)) %>% 
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
