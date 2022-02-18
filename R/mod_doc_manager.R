@@ -60,7 +60,13 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
       
       actionButton(ns("doc_upload_add"), 
                    "Upload",
-                   class = "btn-success")
+                   class = "btn-success"),
+      selectInput(ns("encoding"),
+                  "Encoding",
+                  choices = iconvlist(),
+                  selected = "UTF-8",
+                  width = "30%"
+                  )
             
             ),
             box(title = "Delete documents",
@@ -225,6 +231,14 @@ observeEvent(input$doc_add, {
 
       if (!is.integer(input$doc_upload)) {
       doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
+      
+      if (input$encoding != "UTF-8") {
+        
+        doc_upload_text <- iconv(doc_upload_text, 
+                                 from = input$encoding,
+                                 to = "UTF-8")
+        
+      }
 
       if (!isTruthy(input$doc_upload_name)) {
         doc_name_parsed <- sub(".*/", "", doc_file_load())
