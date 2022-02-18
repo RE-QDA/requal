@@ -267,7 +267,6 @@ load_doc_to_display <- function(active_project,
         
      
 
-        browser()
 
         content_df <-coded_segments %>% 
             dplyr::mutate(code_id = as.character(code_id)) %>% 
@@ -336,7 +335,7 @@ load_doc_to_display <- function(active_project,
             
             raw_text %>%
             stringr::str_replace_all("[\\n\\r]",
-                               "</p><div class='br'>\\&#8203</div><p class='docpar'>"),
+                               "<span class='br'>\\&#8203</span></p><p class='docpar'>"),
             
             "</p></article")
 
