@@ -268,16 +268,11 @@ load_doc_to_display <- function(active_project,
         initial_row <- tibble::tibble(code_id = "_NA",
                                       segment_start = 0,
                                       segment_end = nchar(raw_text)+1,
-                                      tag_start = "<article><p>",
+                                      tag_start = "<article><p class='docpar'>",
                                       tag_end = "</p></article>")
-        
-        # linebreaks <- stringr::str_locate_all(raw_text, "[\\n\\r]")[[1]] %>%
-        #     tibble::as_tibble() %>%
-        #     tibble::add_column(tag_start = "</p><p>",
-        #                        position_type = "segment_start") %>%
-        #     dplyr::select(position_start = start, position_type, tag_start)
-        
 
+        
+browser()
         content_df <- dplyr::bind_rows(initial_row,
                                        coded_segments %>% 
                                            dplyr::mutate(code_id = as.character(code_id))) %>% 
@@ -287,8 +282,6 @@ load_doc_to_display <- function(active_project,
                                 values_drop_na = TRUE
                                     ) %>% 
             dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
-            # dplyr::mutate(dplyr::across(dplyr::everything(), 
-            #               ~tidyr::replace_na(.x, "")))
             dplyr::mutate(tag_end = ifelse(is.na(tag_end),
                                             "</b>",
                                            tag_end),
@@ -303,8 +296,6 @@ load_doc_to_display <- function(active_project,
                                                   code_name,
                                                   '">'),
                                            tag_start)) %>% 
-            # dplyr::bind_rows(linebreaks) %>%
-            
             dplyr::group_by(position_start, position_type) %>% 
             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
                              tag_end = paste(tag_end, collapse = ""),
@@ -314,10 +305,11 @@ load_doc_to_display <- function(active_project,
                                        tag_start, 
                                        tag_end)) %>% 
            dplyr::ungroup() %>% 
-           dplyr::mutate(position_end = dplyr::lead(position_start)) %>% 
-           dplyr::mutate(position_end = ifelse(is.na(position_end),
+           dplyr::mutate(position_end = (dplyr::lead(position_start, default = max(position_start)+1)),
+                         position_end = ifelse(is.na(position_end),
                                                position_start, 
-                                               position_end))
+                                               position_end),
+                         position_start = position_start+1) 
            
             
         
@@ -332,7 +324,7 @@ load_doc_to_display <- function(active_project,
                                                              ..2))),
                               collapse = "") %>% 
            stringr::str_replace_all("[\\n\\r]",
-                                    "</p><div class='br'>\\&#8203</div><p class='docpar'>")
+                                    "<span class='br'>\\&#8203</span></p><p class='docpar'>")
          
 
 
