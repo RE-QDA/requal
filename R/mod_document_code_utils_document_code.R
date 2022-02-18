@@ -267,8 +267,8 @@ load_doc_to_display <- function(active_project,
         
      
 
-        
-browser()
+        browser()
+
         content_df <-coded_segments %>% 
             dplyr::mutate(code_id = as.character(code_id)) %>% 
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
@@ -285,6 +285,23 @@ browser()
                                                   '" title="',
                                                   code_name,
                                                   '">')) %>% 
+            dplyr::bind_rows(
+                # start doc
+                tibble::tibble(position_start = 0,
+                               position_type =  "segment_start",
+                               tag_start = "<article><p class='docpar'>"),
+                
+                # content
+                .,
+                
+                # end doc
+                tibble::tibble(position_start = nchar(raw_text),
+                               position_type = "segment_end",
+                               tag_end = "</p></article>")
+            ) %>% 
+            dplyr::mutate(position_start = ifelse(position_type == "segment_end",
+                                                  position_start+1,
+                                                  position_start)) %>% 
             dplyr::group_by(position_start, position_type) %>% 
             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
                              tag_end = paste(tag_end, collapse = ""),
@@ -293,26 +310,13 @@ browser()
             dplyr::transmute(tag = ifelse(position_type == "segment_start",
                                        tag_start, 
                                        tag_end)) %>% 
-           dplyr::ungroup() %>% 
-           dplyr::mutate(position_end = dplyr::lead(position_start, default = max(position_start)+1)) %>% 
-           dplyr::mutate(position_start = dplyr::lag(position_end+1, default = min(position_start)))
-                        
-        content_df_wrap <- dplyr::bind_rows(
-            tibble::tibble(position_start = 0,
-                           position_end = 0,
-                           tag = "<article><p class='docpar'>"),
-            
-            content_df,
-            
-            tibble::tibble(position_start = nchar(raw_text)+1,
-                           position_end = nchar(raw_text)+1,
-                           tag = "</p></article>")
-        ) 
+           dplyr::ungroup()  %>% 
+           dplyr::mutate(position_end = dplyr::lead(position_start-1, default = max(position_start))) 
             
         
-       html_content <- paste0(purrr::pmap_chr(list(content_df_wrap$position_start,
-                                                   content_df_wrap$position_end,
-                                                   content_df_wrap$tag),
+       html_content <- paste0(purrr::pmap_chr(list(content_df$position_start,
+                                                   content_df$position_end,
+                                                   content_df$tag),
                                               ~paste0(..3, 
                                                       substr(
                                                                  
