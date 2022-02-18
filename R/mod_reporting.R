@@ -10,10 +10,13 @@
 mod_reporting_ui <- function(id){
   ns <- NS(id)
   tagList(
-    
     tabsetPanel(type = "tabs", id = "tabset",
-                tabPanel("Instructions", textOutput(ns("report_instructions"))),
-                tabPanel("Logs", dataTableOutput(ns("report_logs")))
+                tabPanel("Instructions", 
+                         value = "instructions",
+                         textOutput(ns("report_instructions"))),
+                tabPanel("Logs", 
+                         value = "logs",
+                         dataTableOutput(ns("report_logs")))
     )
  
   )
@@ -23,7 +26,7 @@ mod_reporting_ui <- function(id){
 #'
 #' @noRd 
 mod_reporting_server <- function(id, project){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
     
     # instructions ------------
@@ -31,30 +34,22 @@ mod_reporting_server <- function(id, project){
       "Instructions for using this module..."
     )
     
-    # logs ------------
-    
-    
-    
-      logs_df <- eventReactive(project()$active_project, {
-        
-        if (isTruthy(project()$active_project)) {
-          
+    logs_df <- eventReactive({
+      project()$active_project
+    }, {
+      if(isTruthy(project()$active_project)){
         load_logs_for_reporting(project()$project_db,
-                              project()$active_project)
-          
-      }  else {""}
-      }) 
-      
-      output$report_logs <- renderDataTable({
-        req(logs_df())
-        logs_df() %>% 
-          dplyr::mutate(payload = paste0(substr(payload, 1, 100), "..."))
-        
-      })
+                                project()$active_project)
+      }else{""}
+    })
+  
+    # logs ------------
+    output$report_logs <- renderDataTable({
+      req(logs_df())
+      logs_df() %>% 
+        dplyr::mutate(payload = purrr::map_chr(.data$payload, parse_payload_json))
+    })
     
- 
- 
-
 })}
     
 ## To be copied in the UI
