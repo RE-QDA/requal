@@ -11,7 +11,7 @@ Authors@R:
     person(given = "Michael",
            family = "Škvrňák",
            role = c("aut", "cre"),
-           email = "majky@skaut.cz",
+           email = "michael.skvrnak@protonmail.com",
            comment = c(ORCID = "0000-0003-4647-4095")),
     person(given = "Martin",
            family = "Hájek",
