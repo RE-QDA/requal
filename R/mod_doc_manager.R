@@ -62,10 +62,10 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                    "Upload",
                    class = "btn-success"),
       selectInput(ns("encoding"),
-                  "Encoding",
+                  "File encoding",
                   choices = iconvlist(),
                   selected = "UTF-8",
-                  width = "30%"
+                  width = "40%"
                   )
             
             ),
@@ -233,10 +233,10 @@ observeEvent(input$doc_add, {
       doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
       
       if (input$encoding != "UTF-8") {
-        
+        browser()
         doc_upload_text <- iconv(doc_upload_text, 
                                  from = input$encoding,
-                                 to = "UTF-8")
+                                 to = "UTF-8", sub="")
         
       }
 
