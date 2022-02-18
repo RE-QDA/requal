@@ -233,7 +233,7 @@ observeEvent(input$doc_add, {
       doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
       
       if (input$encoding != "UTF-8") {
-        browser()
+       
         doc_upload_text <- iconv(doc_upload_text, 
                                  from = input$encoding,
                                  to = "UTF-8", sub="")
