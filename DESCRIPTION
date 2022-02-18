@@ -1,29 +1,24 @@
 Package: requal
-Title: ReQual - Shiny Application for Qualitative Data Analysis with Reproducibility Support
+Title: Shiny Application for Computer-assisted Qualitative Data Analysis 
 Version: 0.2.1
 Authors@R: 
     c(
     person(given = "Radim",
            family = "Hladík",
-           role = c("aut", "fnd"),
+           role = c("aut", "cre"),
            email = "radim.hladik@fulbrightmail.org",
            comment = c(ORCID = "0000-0001-8078-6477")),
     person(given = "Michael",
            family = "Škvrňák",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "majky@skaut.cz",
            comment = c(ORCID = "0000-0003-4647-4095")),
     person(given = "Martin",
            family = "Hájek",
-           role = c("ctb", "fnd"),
-           email = "martin.hajek@fsv.cuni.cz",
-           comment = c(ORCID = "0000-0001-9213-6404")),
-    person(given = "Nina",
-           family = "Fárová",
            role = c("ctb"),
-           email = "nina.farova@soc.cas.cz",
-           comment = c(ORCID = "000-0002-9480-686X"))
-           )
+           email = "martin.hajek@fsv.cuni.cz",
+           comment = c(ORCID = "0000-0001-9213-6404"))
+    )
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports: 
