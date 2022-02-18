@@ -41,9 +41,12 @@ app_server <- function(input, output, session) {
   segments_df <- mod_analysis_server("analysis_ui_1", project_observer, codebook, documents, segments_observer)
 
   mod_download_handler_server("download_handler_ui_1", segments_df)
+
+  # reporting
   
-  # about -----
+  reporting <- mod_reporting_server("reporting_ui_1", project_observer)
+
+    # about -----
   
   mod_about_server("about_ui_1", project_observer)
-  
 }

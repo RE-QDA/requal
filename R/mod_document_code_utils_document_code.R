@@ -196,14 +196,11 @@ write_segment_db <- function(
         res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
     }
 
-
-    # TODO: logging
-
-    # if(res){
-    #     log_add_document_record(con, project_id, document_df)
-    # }else{
-    #     warning("document not added")
-    # }
+    if(res){
+        log_add_segment_record(con, project_id = active_project, segment_df)
+    }else{
+        warning("segment not added")
+    }
 
 }
 
@@ -394,7 +391,8 @@ delete_segment_codes_db <- function(project_db,
                        AND segment_id = {segment_id}", .con = con)
 
     purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
-
+    
+    log_delete_segment_record(con, project_id = active_project, segment_id)
 
 }
 
