@@ -265,37 +265,26 @@ load_doc_to_display <- function(active_project,
                                 code_names)
         )
         
-        initial_row <- tibble::tibble(code_id = "_NA",
-                                      segment_start = 0,
-                                      segment_end = nchar(raw_text)+1,
-                                      tag_start = "<article><p class='docpar'>",
-                                      tag_end = "</p></article>")
+     
 
         
 browser()
-        content_df <- dplyr::bind_rows(initial_row,
-                                       coded_segments %>% 
-                                           dplyr::mutate(code_id = as.character(code_id))) %>% 
+        content_df <-coded_segments %>% 
+            dplyr::mutate(code_id = as.character(code_id)) %>% 
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
                                 values_to = "position_start", 
                                 names_to = "position_type",
                                 values_drop_na = TRUE
                                     ) %>% 
             dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
-            dplyr::mutate(tag_end = ifelse(is.na(tag_end),
-                                            "</b>",
-                                           tag_end),
-                          tag_start = ifelse(is.na(tag_start),
-                                           
-                                           
-                                           paste0('<b id="',
+            dplyr::mutate(tag_end = "</b>",
+                          tag_start = paste0('<b id="',
                                                   code_id,
                                                   '" class="segment" style="padding:0; background-color:',
                                                   code_color,
                                                   '" title="',
                                                   code_name,
-                                                  '">'),
-                                           tag_start)) %>% 
+                                                  '">')) %>% 
             dplyr::group_by(position_start, position_type) %>% 
             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
                              tag_end = paste(tag_end, collapse = ""),
@@ -305,17 +294,25 @@ browser()
                                        tag_start, 
                                        tag_end)) %>% 
            dplyr::ungroup() %>% 
-           dplyr::mutate(position_end = (dplyr::lead(position_start, default = max(position_start)+1)),
-                         position_end = ifelse(is.na(position_end),
-                                               position_start, 
-                                               position_end),
-                         position_start = position_start+1) 
-           
+           dplyr::mutate(position_end = dplyr::lead(position_start, default = max(position_start)+1)) %>% 
+           dplyr::mutate(position_start = dplyr::lag(position_end+1, default = min(position_start)))
+                        
+        content_df_wrap <- dplyr::bind_rows(
+            tibble::tibble(position_start = 0,
+                           position_end = 0,
+                           tag = "<article><p class='docpar'>"),
+            
+            content_df,
+            
+            tibble::tibble(position_start = nchar(raw_text)+1,
+                           position_end = nchar(raw_text)+1,
+                           tag = "</p></article>")
+        ) 
             
         
-       html_content <- paste0(purrr::pmap_chr(list(content_df$position_start,
-                                                   content_df$position_end,
-                                                   content_df$tag),
+       html_content <- paste0(purrr::pmap_chr(list(content_df_wrap$position_start,
+                                                   content_df_wrap$position_end,
+                                                   content_df_wrap$tag),
                                               ~paste0(..3, 
                                                       substr(
                                                                  
