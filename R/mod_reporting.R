@@ -20,7 +20,7 @@ mod_reporting_ui <- function(id){
                          value = "logs",
                          actionButton(ns("logs_refresh"),
                                       label = "",
-                                      icon = icon("refresh")) %>% 
+                                      icon = icon("sync")) %>% 
                            tagAppendAttributes(style = "float:right;"),
                          dataTableOutput(ns("report_logs")))
     )
