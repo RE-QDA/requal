@@ -52,8 +52,11 @@ mod_about_server <- function(id, project){
     
     output$version <- renderText({
       if (isTruthy(project()$active_project)) {
-      read_version(project()$project_db,
-                                   project()$active_project)
+        paste0(
+          "The current project was created with requal version ",
+          read_version(project()$project_db,
+                       project()$active_project)
+        )
       } else {""}
     })
  
