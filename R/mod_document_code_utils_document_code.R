@@ -61,8 +61,7 @@ load_doc <- function(con, project_id, doc_id){
         dplyr::tbl(con, "documents") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-        dplyr::pull(doc_text) %>%
-        gsub("[\n\r]", "", .)
+        dplyr::pull(doc_text)
 }
 
 # Load segments for document display  -------------------------------------------
@@ -137,7 +136,7 @@ write_segment_db <- function(
     startOff,
     endOff
 ) {
-    segment_start <- segment_end <- NULL
+
     con <- DBI::dbConnect(RSQLite::SQLite(),
                           project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -236,25 +235,27 @@ load_doc_to_display <- function(active_project,
                                 codebook,
                                 ns){
 
-    code_id <- segment_start <- segment_end <- code_end <- NULL
 
     raw_text <- load_doc_db(active_project, project_db, doc_selector)
 
     coded_segments <- load_segments_db(active_project,
                                        project_db,
-                                       doc_selector)
+                                       doc_selector) %>% 
+        calculate_code_overlap()
+    
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
 
     if(nrow(coded_segments)){
 
-        highlighted_segments <- coded_segments %>%
-            calculate_code_overlap()
 
-        distinct_code_ids <- highlighted_segments %>%
+
+        distinct_code_ids <- as.character(
+            coded_segments %>%
             dplyr::distinct(code_id) %>%
             dplyr::pull(code_id)
+        )
 
         code_names_lookup <- tibble::tibble(
             code_id = distinct_code_ids,
@@ -265,61 +266,77 @@ load_doc_to_display <- function(active_project,
                                 blend_colors,
                                 code_names)
         )
-
-        df_source <- strsplit(raw_text, "")[[1]] %>% 
-            tibble::enframe() 
-
-            df_breaks <- df_source %>%
-                dplyr::filter(stringr::str_detect(value, "[\\n\\r]")) %>%
-                dplyr::mutate(value = "<br>") %>%
-                dplyr::rename(id = name)
-
-            df_temp <- df_source %>%
-                dplyr::filter(!stringr::str_detect(value, "[\\n\\r]")) %>%
-                dplyr::mutate(id = name,
-                              name = seq(1, length(name))) %>%
-                dplyr::left_join(highlighted_segments %>%
-                                 dplyr::select(code_id, segment_start),
-                             by=c("name" = "segment_start")
-                             ) %>%
-            dplyr::left_join(highlighted_segments %>%
-                                 dplyr::select(code_end = code_id, segment_end),
-                             by=c("name" = "segment_end")
-                             ) %>%
-            dplyr::left_join(code_names_lookup,
-                             by = c("code_id")) %>%
-            dplyr::mutate(code_end = ifelse(!is.na(code_end),
-                                            "</mark>",
-                                            ""),
-                          code_id = ifelse(!is.na(code_id),
-
-
-                                           paste0('<mark id="',
+        
+        content_df <-coded_segments %>% 
+            dplyr::mutate(code_id = as.character(code_id)) %>% 
+            tidyr::pivot_longer(cols = c(segment_start, segment_end),
+                                values_to = "position_start", 
+                                names_to = "position_type",
+                                values_drop_na = TRUE
+                                    ) %>% 
+            dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
+            dplyr::mutate(tag_end = "</b>",
+                          tag_start = paste0('<b id="',
                                                   code_id,
-                                                  '" class="code" style="padding:0; background-color:',
+                                                  '" class="segment" style="padding:0; background-color:',
                                                   code_color,
                                                   '" title="',
                                                   code_name,
-                                                  '">'),
-                                           ""))
+                                                  '">')) %>% 
+            dplyr::bind_rows(
+                # start doc
+                tibble::tibble(position_start = 0,
+                               position_type =  "segment_start",
+                               tag_start = "<article><p class='docpar'>"),
+                
+                # content
+                .,
+                
+                # end doc
+                tibble::tibble(position_start = nchar(raw_text),
+                               position_type = "segment_end",
+                               tag_end = "</p></article>")
+            ) %>% 
+            dplyr::mutate(position_start = ifelse(position_type == "segment_end",
+                                                  position_start+1,
+                                                  position_start)) %>% 
+            dplyr::group_by(position_start, position_type) %>% 
+            dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
+                             tag_end = paste(tag_end, collapse = ""),
+                             .groups = "drop")  %>% 
+            dplyr::group_by(position_start) %>% 
+            dplyr::transmute(tag = ifelse(position_type == "segment_start",
+                                       tag_start, 
+                                       tag_end)) %>% 
+           dplyr::ungroup()  %>% 
+           dplyr::mutate(position_end = dplyr::lead(position_start-1, default = max(position_start))) 
+            
+        
+       html_content <- paste0(purrr::pmap_chr(list(content_df$position_start,
+                                                   content_df$position_end,
+                                                   content_df$tag),
+                                              ~paste0(..3, 
+                                                      substr(
+                                                                 
+                                                          raw_text, 
+                                                             ..1, 
+                                                             ..2))),
+                              collapse = "") %>% 
+           stringr::str_replace_all("[\\n\\r]",
+                                    "<span class='br'>\\&#8203</span></p><p class='docpar'>")
+         
 
-df <- dplyr::bind_rows(df_temp, df_breaks) %>%
-    dplyr::select(-name) %>%
-    dplyr::arrange(id) %>%
-    replace(is.na(.), "")
-
-
-        paste0(df$code_id, df$value, df$code_end, collapse = "")
 
     }else{
 
-        df_non_coded <- strsplit(raw_text, "")[[1]] %>%
-            tibble::enframe() %>%
-            dplyr::mutate(value = stringr::str_replace(value,
-                                               "[\\n\\r]",
-                                               "<br>"))
-
-        paste0(df_non_coded$value, collapse = "")
+        df_non_coded <- paste0(
+            "<article><p class='document_par'>",
+            
+            raw_text %>%
+            stringr::str_replace_all("[\\n\\r]",
+                               "<span class='br'>\\&#8203</span></p><p class='docpar'>"),
+            
+            "</p></article")
 
     }
 }
@@ -358,7 +375,7 @@ load_segment_codes_db <- function(active_project,
 parse_tag_pos <- function(tag_postion, which_part) {
 
 
-    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]+1
+    startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]
     endOff <- as.integer(unlist(strsplit(tag_postion, "-")))[2]
 
     switch(which_part,

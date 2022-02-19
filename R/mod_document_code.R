@@ -112,9 +112,9 @@ segments_observer <- reactiveVal(0)
     } 
     })
     # Render selected text
-    output$focal_text <- renderUI({
+    output$focal_text <- renderText({
       
-     HTML(text())
+     text()
       
     })
     
