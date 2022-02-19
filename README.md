@@ -15,6 +15,8 @@ qualitative coding.
 
 ⚠️ **The package is in development and experimental stage.** ⚠️
 
+<img src="https://owncloud.cesnet.cz/index.php/s/mQcxC998RC6qwVP/download" width="100%" />
+
 ## Installation
 
 ### Prerequisites

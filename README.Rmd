@@ -24,6 +24,11 @@ The goal of `requal` is to provide reproducibility support for qualitative codin
 
 ⚠️ __The package is in development and experimental stage.__ ⚠️
 
+```{r screenshot, echo=FALSE}
+knitr::include_graphics("https://owncloud.cesnet.cz/index.php/s/mQcxC998RC6qwVP/download")
+```
+
+
 ## Installation
 
 ### Prerequisites
