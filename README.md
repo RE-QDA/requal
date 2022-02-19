@@ -13,6 +13,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 The goal of `requal` is to provide reproducibility support for
 qualitative coding.
 
+⚠️**The package is in development and in experimental stage.**⚠️
+
 ## Installation
 
 ### Prerequisites
@@ -27,16 +29,10 @@ Firefox, Chrome, or Safari).
 ### Package
 
 You can install the development version of `requal` from
-[GitHub](https://github.com/) by following these steps (assuming you
-have R installed on your machine):
+[GitHub](https://github.com/) by running this code in R:
 
-1.  Download the current release of `requal` from
-    [Releases](https://github.com/RE-QDA/requal/releases).
-2.  Install the `remotes` package by running
-    `install.packages("remotes")` command in R console.
-3.  Install the `requal` package by running
-    `remotes::install_local(file.choose())` and selecting the downloaded
-    release file on your hard-drive.
+    install.packages("devtools")
+    devtools::install_github("RE-QDA/requal")
 
 ## Usage
 
