@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 The goal of `requal` is to provide reproducibility support for qualitative coding.  
 
-⚠️**The package is in development and experimental stage.**⚠️
+⚠️ __The package is in development and experimental stage.__ ⚠️
 
 ## Installation
 
