@@ -245,13 +245,16 @@ for (i in seq_along(vals)) {
     )
   }
 }
+
+if (nrow(res)) {
 prefinal <- res %>%
   dplyr::mutate(
     code_id = dplyr::lead(code_id),
     segment_end = dplyr::lead(segment_end)
   ) %>%
   dplyr::filter(code_id != "",
-                !is.na(code_id)) 
+                !is.na(code_id)) %>% 
+    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  }else {res}
     
 
 }
