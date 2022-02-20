@@ -205,26 +205,44 @@ write_segment_db <- function(
 
 calculate_code_overlap <- function(raw_segments){
 
-    segment_start <- segment_end <- char_no <- code_id <- segment_id <- segment_break <- NULL
-
-    raw_segments %>%
-        dplyr::mutate(char_no = purrr::map2(segment_start,
-                                            segment_end,
-                                            function(x, y) seq(from = x, to = y, by = 1))
-                      ) %>%
-        tidyr::unnest(char_no) %>%
-        dplyr::group_by(char_no) %>%
-        dplyr::summarise(code_id = paste0(code_id, collapse = "+"),
-                         count_codes = dplyr::n(),
-                         .groups = "drop") %>%
-        dplyr::mutate(segment_break = code_id != dplyr::lag(code_id) |
-                          char_no != dplyr::lag(char_no) + 1) %>%
-        dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
-        dplyr::mutate(segment_id = cumsum(segment_break)) %>%
-        dplyr::group_by(segment_id, code_id) %>%
-        dplyr::summarise(segment_start = min(char_no),
-                         segment_end = max(char_no),
-                         .groups = "drop")
+    
+    check_running_codes <- function(x, df) {
+        
+        running_codes <- df %>% 
+            dplyr::filter(x >= segment_start & x < segment_end) %>% 
+            dplyr::pull(code_id)
+        
+        
+        
+        paste0(sort(running_codes), collapse = "+")
+    }
+    
+    
+    
+    
+    
+   raw_segments %>% 
+        tidyr::pivot_longer(cols = c(segment_start,
+                              segment_end)) %>% 
+        dplyr::arrange(value) %>% 
+        dplyr::mutate(code_id = purrr::map_chr(value, ~check_running_codes(.x, raw_segments))) %>% 
+        dplyr::arrange(value, name) %>% 
+        tibble::rownames_to_column("segment_id") %>% 
+        tidyr::pivot_wider(names_from = name, values_from = value) %>% 
+        dplyr::mutate(
+            
+            segment_start = ifelse(is.na(segment_start),
+                                   segment_end+1, 
+                                   segment_start),
+            
+            segment_end = dplyr::lead(segment_end),
+            
+            segment_end = ifelse(is.na(segment_end), 
+                           dplyr::lead(segment_start)-1, 
+                           segment_end)) %>% 
+       dplyr::filter(code_id != "")
+       
+            
 }
 
 # Generate text to be displayed -----
