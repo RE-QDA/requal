@@ -25,11 +25,15 @@ mod_document_code_ui <- function(id){
 
     
 
-    
+    div(
 
     selectInput(ns("doc_selector"), label = "Select a document to code", 
                 choices = "",
                 selected = ""),
+    
+    radioButtons(ns("tagstyle"), "", choices = c("highlight", "underline"), selected = "highlight")
+    
+    ),
     
     htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
 
@@ -99,13 +103,15 @@ segments_observer <- reactiveVal(0)
       
     })
 
-    observeEvent(input$doc_selector, {
+    observeEvent({input$doc_selector
+      input$tagstyle}, {
     if (isTruthy(input$doc_selector)) {
 
       display_text <- load_doc_to_display(project()$active_project, 
                                           project()$project_db, 
                                           input$doc_selector, 
                                           code_df$active_codebook,
+                                          tagstyle = input$tagstyle,
                                           ns=NS(id))
       text(display_text)
       segments_observer(segments_observer()+1)
@@ -179,6 +185,7 @@ segments_observer <- reactiveVal(0)
                                             project()$project_db, 
                                             input$doc_selector,
                                             code_df$active_codebook,
+                                            tagstyle = input$tagstyle,
                                             ns=NS(id))
         text(display_text)
         segments_observer(segments_observer()+1)
@@ -220,6 +227,7 @@ segments_observer <- reactiveVal(0)
           project()$project_db,
           input$doc_selector,
           code_df$active_codebook,
+          tagstyle = input$tagstyle,
           ns = NS(id)
         )
         text(display_text)
@@ -268,6 +276,7 @@ segments_observer <- reactiveVal(0)
                                             project()$project_db, 
                                             input$doc_selector,
                                             code_df$active_codebook,
+                                            tagstyle = input$tagstyle,
                                             ns=NS(id))
         text(display_text)
         segments_observer(segments_observer()+1)

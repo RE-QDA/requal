@@ -235,6 +235,7 @@ load_doc_to_display <- function(active_project,
                                 project_db,
                                 doc_selector,
                                 codebook,
+                                tagstyle,
                                 ns){
 
 
@@ -280,7 +281,7 @@ load_doc_to_display <- function(active_project,
             dplyr::mutate(tag_end = "</b>",
                           tag_start = paste0('<b id="',
                                                   code_id,
-                                                  '" class="segment" style="padding:0; text-decoration-line: underline; 5px; text-decoration-thickness: 5px; text-decoration-opacity: 0.5; text-decoration-color:',
+                                                  b_tag_style(tagstyle),
                                                   code_color,
                                                   '" title="',
                                                   code_name,
@@ -470,4 +471,16 @@ blend_colors <- function(string_id, code_names) {
 
     paste0("rgb(", color_mean_string, ")")
 
+}
+
+# highlight/underline ----
+
+b_tag_style <- function(choice) {
+
+    switch(choice,
+           underline = '" class="segment" style="padding:0; text-decoration-line: underline; text-decoration-thickness: 5px; text-underline-offset: 3px; text-decoration-color:',
+           highlight = '" class="segment" style="padding:0; background-color:',
+    )
+
+    
 }
