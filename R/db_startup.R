@@ -3,7 +3,7 @@ create_db_schema <- function(con){
 }
 
 CREATE_PROJECT_SQL <- "
-CREATE TABLE projects 
+CREATE TABLE if not exists projects 
 (    project_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,    project_name TEXT
 ,    project_description TEXT
@@ -90,6 +90,16 @@ CREATE TABLE if not exists segments (
 # TODO: memos
 # TODO: memos_documents_map, memos_codes_map, memos_segments_map
 # TODO: code_categories
+
+create_db_schema.default <- function(con){
+    # TODO: Full DB structure
+    DBI::dbExecute(con, CREATE_PROJECT_SQL)
+    DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(con, CREATE_LOG_SQL)
+    DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
+    DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+}
 
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
