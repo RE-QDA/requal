@@ -12,7 +12,11 @@ import_rqda(rqda_file, requal_connection)
 \item{requal_connection}{Connection to REQUAL database}
 }
 \description{
+<<<<<<< HEAD
 Import data from RQDA database to requal. Currently only import from
 RQDA tables "project", "source" (documents), "freecode" (codes) 
 and "coding" (coded segments) is implemented.
+=======
+Import data from RQDA to Requal
+>>>>>>> 9586f18 (Import from RQDA)
 }

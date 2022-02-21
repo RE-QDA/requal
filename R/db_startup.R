@@ -189,6 +189,7 @@ create_db_schema.default <- function(con){
     DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
+
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)

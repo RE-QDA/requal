@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #' Sample colours 
 sample_colours <- function(n){
     sampled_colours <- sample(colours(), size = n, replace = FALSE)
@@ -15,6 +16,10 @@ sample_colours <- function(n){
 #' RQDA tables "project", "source" (documents), "freecode" (codes) 
 #' and "coding" (coded segments) is implemented.
 #'
+=======
+#' Import data from RQDA to Requal
+#'
+>>>>>>> 9586f18 (Import from RQDA)
 #' @param rqda_file Path to RQDA database
 #' @param requal_connection Connection to REQUAL database
 #'
@@ -58,7 +63,11 @@ import_rqda <- function(rqda_file, requal_connection){
                       segment_end = selend)
     
     # Create requal schema
+<<<<<<< HEAD
     create_db_schema(requal_connection)
+=======
+    requal:::create_db_schema(requal_connection)
+>>>>>>> 9586f18 (Import from RQDA)
     
     # Import to requal
     create_project_record(requal_connection, project_df)
@@ -74,6 +83,7 @@ import_rqda <- function(rqda_file, requal_connection){
         add_documents_record(requal_connection, requal_project_id, documents_df[x, ])
     })
     
+<<<<<<< HEAD
     n_colours <- rqda_codes %>% 
         dplyr::filter(is.na(code_color)) %>% 
         nrow()
@@ -83,6 +93,12 @@ import_rqda <- function(rqda_file, requal_connection){
                       code_color = ifelse(is.na(code_color), 
                                           sample_colours(n = n_colours), 
                                           code_color))
+=======
+    codes_df <- rqda_codes %>% 
+        dplyr::mutate(project_id = requal_project_id, 
+                      code_color = ifelse(is.na(code_color), 
+                                          "rgb(255,255,0)", code_color))
+>>>>>>> 9586f18 (Import from RQDA)
     purrr::walk(1:nrow(codes_df), function(x) {
         add_codes_record(requal_connection, requal_project_id, codes_df[x, ])    
     })
