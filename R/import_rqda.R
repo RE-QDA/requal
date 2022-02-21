@@ -1,4 +1,19 @@
+
+sample_colours <- function(n){
+    sampled_colours <- sample(colours(), size = n, replace = FALSE)
+    rgb_colours <- col2rgb(sampled_colours)
+    purrr::map_chr(1:ncol(rgb_colours), function(x) {
+        paste0("rgb(",
+               rgb_colours[1, x], ",",
+               rgb_colours[2, x], ",",
+               rgb_colours[3, x], ")")})
+}
+
 #' Import data from RQDA to Requal
+#'
+#' Import data from RQDA database to requal. Currently only import from
+#' RQDA tables "project", "source" (documents), "freecode" (codes) 
+#' and "coding" (coded segments) is implemented.
 #'
 #' @param rqda_file Path to RQDA database
 #' @param requal_connection Connection to REQUAL database
@@ -59,10 +74,15 @@ import_rqda <- function(rqda_file, requal_connection){
         add_documents_record(requal_connection, requal_project_id, documents_df[x, ])
     })
     
+    n_colours <- rqda_codes %>% 
+        dplyr::filter(is.na(code_color)) %>% 
+        nrow()
+    
     codes_df <- rqda_codes %>% 
         dplyr::mutate(project_id = requal_project_id, 
                       code_color = ifelse(is.na(code_color), 
-                                          "rgb(255,255,0)", code_color))
+                                          sample_colours(n = n_colours), 
+                                          code_color))
     purrr::walk(1:nrow(codes_df), function(x) {
         add_codes_record(requal_connection, requal_project_id, codes_df[x, ])    
     })
