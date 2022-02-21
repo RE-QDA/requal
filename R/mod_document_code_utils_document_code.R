@@ -235,7 +235,7 @@ load_doc_to_display <- function(active_project,
                                 project_db,
                                 doc_selector,
                                 codebook,
-                                tagstyle,
+                                tagstyle = "highlight",
                                 ns){
 
 
