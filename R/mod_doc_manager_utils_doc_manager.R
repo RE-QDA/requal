@@ -22,7 +22,7 @@ add_input_document <- function(connection, project, doc_name, doc_text, doc_desc
     
     on.exit(DBI::dbDisconnect(con))
 
-        text_df <- tibble::tibble(
+    text_df <- tibble::tibble(
         project_id = project,
         doc_name = .env$doc_name,
         doc_description = .env$doc_description,
