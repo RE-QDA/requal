@@ -5,6 +5,44 @@
 #' @import shiny
 #' @import shinydashboardPlus
 #' @noRd
+
+is_local <- Sys.getenv('SHINY_PORT') == ""
+if (FALSE) {
+
+  app_ui <- function(request) {
+    tagList(
+      # Leave this function for adding external resources
+      golem_add_external_resources(),
+      # Your application UI logic
+      dashboardPage(title = "ReQual",
+                    options = list(sidebarExpandOnHover = FALSE),
+                    header = dashboardHeader(title = tags$span(
+                      tags$img(src="www/requal_logo.png", 
+                               height="70%", style = "margin-right: 20px"), "ReQual"),
+                      controlbarIcon = icon("power-off", id = "launchpad_icon")
+                    ),
+                    sidebar = set_left_menu(),
+                    body = set_dashboard_body(),
+                    controlbar = set_controlbar()
+      )
+    )
+  }
+  
+} else {
+# define some credentials
+credentials <- data.frame(
+  user = c("admin", "requal"), # mandatory
+  password = c("admin", "requal"), # mandatory
+  start = c("2019-04-15"), # optinal (all others)
+  expire = c(NA, "2019-12-31"),
+  admin = c(FALSE, TRUE),
+  comment = "Simple and secure authentification mechanism 
+  for single ‘Shiny’ applications.",
+  stringsAsFactors = FALSE
+)
+
+
+
 app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
@@ -24,6 +62,8 @@ app_ui <- function(request) {
   )
 }
 
+app_ui <- shinymanager::secure_app(app_ui)
+}
 #' Add external Resources to the Application
 #' 
 #' This function is internally used to add external 

@@ -7,6 +7,19 @@
 app_server <- function(input, output, session) {
   # Your application server logic
   
+  # call the server part
+  # check_credentials returns a function to authenticate users
+  res_auth <- shinymanager::secure_server(
+    check_credentials = shinymanager::check_credentials(credentials)
+  )
+  
+  output$auth_output <- renderPrint({
+    reactiveValuesToList(res_auth)
+  })
+  
+  # your classic server logic
+  observe({print(req(res_auth$user))})
+  
  project_observer <- reactiveVal()
   
  project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
