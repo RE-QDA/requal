@@ -223,13 +223,13 @@ res <- dplyr::tibble(
 )
 
 for (i in seq_along(vals)) {
-  test <- raw_segments %>%
+  overlap_df <- raw_segments %>%
     dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
   if (names(vals[i]) == "segment_start") {
     res <- dplyr::bind_rows(
       res,
       tibble::tibble(
-        code_id = paste0(sort(test$code_id), collapse = "+"),
+        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
         segment_start = vals[i],
         segment_end = vals[i] - 1
       )
@@ -238,9 +238,9 @@ for (i in seq_along(vals)) {
     res <- dplyr::bind_rows(
       res,
       tibble::tibble(
-        code_id = paste0(sort(test$code_id), collapse = "+"),
+        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
         segment_start = vals[i] + 1,
-        segment_end = min(test$segment_end)
+        segment_end = min(overlap_df$segment_end)
       )
     )
   }
@@ -254,7 +254,7 @@ prefinal <- res %>%
   ) %>%
   dplyr::filter(code_id != "",
                 !is.na(code_id)) %>% 
-    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  }else {res}
+    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  } else {res}
     
 
 }
