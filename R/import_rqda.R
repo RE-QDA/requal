@@ -1,4 +1,4 @@
-
+#' Sample colours 
 sample_colours <- function(n){
     sampled_colours <- sample(colours(), size = n, replace = FALSE)
     rgb_colours <- col2rgb(sampled_colours)
@@ -58,7 +58,7 @@ import_rqda <- function(rqda_file, requal_connection){
                       segment_end = selend)
     
     # Create requal schema
-    requal:::create_db_schema(requal_connection)
+    create_db_schema(requal_connection)
     
     # Import to requal
     create_project_record(requal_connection, project_df)
