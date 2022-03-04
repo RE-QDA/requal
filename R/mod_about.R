@@ -17,7 +17,9 @@ mod_about_ui <- function(id){
     "ReQual CAQDAS"
     ), 
     
-    textOutput(ns("version")),
+    textOutput(ns("version_project")),
+    
+    textOutput(ns("version_package")),
     
     p(),
     
@@ -50,14 +52,19 @@ mod_about_server <- function(id, project){
           dplyr::pull(version) 
       }
     
-    output$version <- renderText({
+    output$version_project <- renderText({
       if (isTruthy(project()$active_project)) {
         paste0(
           "The current project was created with requal version ",
           read_version(project()$project_db,
-                       project()$active_project)
+                       project()$active_project), ". "
         )
       } else {""}
+    })
+    
+    output$version_package <- renderText({
+      paste0("The current version of requal package installed is ", 
+      packageVersion("requal"), ".")
     })
  
   })
