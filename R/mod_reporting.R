@@ -53,7 +53,7 @@ mod_reporting_server <- function(id, project){
     output$report_logs <- renderDataTable({
       req(logs_df())
       logs_df() %>% 
-        dplyr::mutate(payload = purrr::map_chr(.data$payload, parse_payload_json))
+        dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json))
     })
     
 })}

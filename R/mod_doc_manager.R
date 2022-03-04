@@ -171,10 +171,11 @@ observeEvent(input$doc_add, {
     # document removal ----
     observeEvent(input$doc_remove, {
       
- 
-      delete_db_documents(project()$project_db, 
-                                      project()$active_project, 
-                                      input$doc_delete_list)
+      if(length(input$doc_delete_list)){
+        delete_db_documents(project()$project_db, 
+                            project()$active_project, 
+                            input$doc_delete_list)
+      }
       
       # update reactive value containing project documents
       doc_list(list_db_documents(project_db = project()$project_db,
