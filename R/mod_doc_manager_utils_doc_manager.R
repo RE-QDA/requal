@@ -11,7 +11,9 @@ delete_db_documents <- function(project_db,
                    "DELETE from documents
                    WHERE doc_id IN (?)",
                    params = list(delete_doc_id))
-    log_delete_document_record(con, active_project, delete_doc_id)
+    if(length(delete_doc_id)){
+        log_delete_document_record(con, active_project, delete_doc_id)   
+    }
 }
 
 

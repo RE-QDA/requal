@@ -11,7 +11,7 @@ load_logs_for_reporting <- function(project_db,
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
         dplyr::select(.data$user,
                       .data$action, 
-                      .data$payload, 
+                      detail = .data$payload, 
                       .data$created_at) %>%
         dplyr::collect()
     
@@ -42,3 +42,4 @@ parse_payload_json <- function(x){
         paste0(., collapse = "; ")
 }
 
+possibly_parse_payload_json <- purrr::possibly(parse_payload_json, "")
