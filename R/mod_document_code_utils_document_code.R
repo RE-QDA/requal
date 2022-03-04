@@ -205,28 +205,60 @@ write_segment_db <- function(
 
 }
 
+# calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments){
 
-    segment_start <- segment_end <- char_no <- code_id <- segment_id <- segment_break <- NULL
 
-    raw_segments %>%
-        dplyr::mutate(char_no = purrr::map2(segment_start,
-                                            segment_end,
-                                            function(x, y) seq(from = x, to = y, by = 1))
-                      ) %>%
-        tidyr::unnest(char_no) %>%
-        dplyr::group_by(char_no) %>%
-        dplyr::summarise(code_id = paste0(code_id, collapse = "+"),
-                         count_codes = dplyr::n(),
-                         .groups = "drop") %>%
-        dplyr::mutate(segment_break = code_id != dplyr::lag(code_id) |
-                          char_no != dplyr::lag(char_no) + 1) %>%
-        dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
-        dplyr::mutate(segment_id = cumsum(segment_break)) %>%
-        dplyr::group_by(segment_id, code_id) %>%
-        dplyr::summarise(segment_start = min(char_no),
-                         segment_end = max(char_no),
-                         .groups = "drop")
+prevals <- raw_segments %>%
+  tidyr::pivot_longer(cols = c(
+    segment_start,
+    segment_end
+  )) %>%
+  dplyr::arrange(value)
+vals <- prevals$value
+names(vals) <- prevals$name
+
+res <- dplyr::tibble(
+  code_id = NULL,
+  segment_start = NULL,
+  segment_end = NULL
+)
+
+for (i in seq_along(vals)) {
+  overlap_df <- raw_segments %>%
+    dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
+  if (names(vals[i]) == "segment_start") {
+    res <- dplyr::bind_rows(
+      res,
+      tibble::tibble(
+        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+        segment_start = vals[i],
+        segment_end = vals[i] - 1
+      )
+    )
+  } else {
+    res <- dplyr::bind_rows(
+      res,
+      tibble::tibble(
+        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+        segment_start = vals[i] + 1,
+        segment_end = min(overlap_df$segment_end)
+      )
+    )
+  }
+}
+
+if (nrow(res)) {
+prefinal <- res %>%
+  dplyr::mutate(
+    code_id = dplyr::lead(code_id),
+    segment_end = dplyr::lead(segment_end)
+  ) %>%
+  dplyr::filter(code_id != "",
+                !is.na(code_id)) %>% 
+    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  } else {res}
+    
+
 }
 
 # Generate text to be displayed -----
