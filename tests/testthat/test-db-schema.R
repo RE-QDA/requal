@@ -4,7 +4,8 @@ create_db_schema(con)
 test_that("DB Schema was created", {
     expect_true(DBI::dbExistsTable(con, "projects"))
     expect_true(DBI::dbExistsTable(con, "logs"))
-    expect_true(DBI::dbExistsTable(con, "documents"))   
+    expect_true(DBI::dbExistsTable(con, "documents"))
+    expect_true(DBI::dbExistsTable(con, "segments"))
 })
 
 project_df <- dplyr::tibble(
