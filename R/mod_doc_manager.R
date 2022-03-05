@@ -32,10 +32,13 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                
                 textInput(ns("doc_name"), label = "Document name", placeholder = "Short name") %>% 
                   tagAppendAttributes(class = "required"),
+                
                textAreaInput(ns("doc_description"), label = "Document description", placeholder = "Description"),
+               
                 textAreaInput(ns("doc_text"), label = "Document content", placeholder = "Paste the new document content here") %>% 
                  tagAppendAttributes(class = "required"),
-               actionButton(ns("doc_add"), label = "Add document", class = "btn-success")
+               
+               actionButton(ns("doc_add"), label = "Add document")
                
             ),
              
@@ -59,11 +62,10 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                   multiple = FALSE),
       
       actionButton(ns("doc_upload_add"), 
-                   "Upload",
-                   class = "btn-success"),
+                   "Upload"),
       selectInput(ns("encoding"),
                   "File encoding",
-                  choices = iconvlist(),
+                  choices = support_encodings(),
                   selected = "UTF-8",
                   width = "40%"
                   )
@@ -162,6 +164,12 @@ observeEvent(input$doc_add, {
     doc_list(list_db_documents(project_db = project()$project_db,
                                active_project = project()$active_project))
     
+    updateTextInput(session = session,
+                    "doc_name", value = "")
+    updateTextInput(session = session,
+                    "doc_description", value = "")
+    updateTextAreaInput(session = session,
+                    "doc_text", value = "")
     updateSelectInput(session = session,
                       "doc_delete_list", 
                       choices = doc_list())
