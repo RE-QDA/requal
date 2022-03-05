@@ -22,7 +22,7 @@ mod_reporting_ui <- function(id){
                                       label = "",
                                       icon = icon("sync")) %>% 
                            tagAppendAttributes(style = "float:right;"),
-                         dataTableOutput(ns("report_logs")))
+                         DT::dataTableOutput(ns("report_logs")))
     )
  
   )
@@ -45,21 +45,33 @@ mod_reporting_server <- function(id, project){
       if(isTruthy(project()$active_project)){
         load_logs_for_reporting(project()$project_db,
                                 project()$active_project) %>% 
-          dplyr::arrange(dplyr::desc(created_at))
+          dplyr::arrange(dplyr::desc(created_at)) %>% 
+          dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json)) 
       }else{""}
     })
   
     # logs ------------
-    output$report_logs <- renderDataTable({
-      req(logs_df())
-      logs_df() %>% 
-        dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json))
+
+    output$report_logs <- DT::renderDataTable(server = FALSE, {
+      DT::datatable(
+         logs_df(),
+        filter = "top",
+        extensions = c("Buttons"),
+        
+        options = list(
+          paging = TRUE,
+          searching = TRUE,
+          fixedColumns = TRUE,
+          autoWidth = TRUE,
+          ordering = TRUE,
+          dom = "lfrtpBi",
+          buttons = c("csv")
+        ),
+        
+        class = "display"
+      )
+
     })
-    
+  
 })}
-    
-## To be copied in the UI
-# mod_reporting_ui("reporting_ui_1")
-    
-## To be copied in the server
-# mod_reporting_server("reporting_ui_1")
+
