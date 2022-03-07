@@ -58,8 +58,4 @@ mod_reporting_server <- function(id, project){
     
 })}
     
-## To be copied in the UI
-# mod_reporting_ui("reporting_ui_1")
-    
-## To be copied in the server
-# mod_reporting_server("reporting_ui_1")
+

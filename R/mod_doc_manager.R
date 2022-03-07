@@ -148,6 +148,8 @@ observeEvent(input$doc_add, {
 
   req(input$doc_name, input$doc_text)
   
+  if (!input$doc_name %in% names(doc_list())) {
+  
   add_input_document(connection = project()$project_db,
                      project = project()$active_project,
                      doc_name = input$doc_name,
@@ -173,6 +175,9 @@ observeEvent(input$doc_add, {
     updateSelectInput(session = session,
                       "doc_delete_list", 
                       choices = doc_list())
+    
+  } else {showModal(modalDialog(title = "Warning",
+                                "Document names must be unique."))}
 
 })
 
@@ -239,6 +244,8 @@ observeEvent(input$doc_add, {
 
     observeEvent(input$doc_upload_add, {
 
+      if (!input$doc_upload_name %in% names(doc_list())) {
+        
       if (!is.integer(input$doc_upload)) {
       doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
       
@@ -276,10 +283,22 @@ observeEvent(input$doc_add, {
       updateSelectInput(session = session,
                         "doc_delete_list", 
                         choices = doc_list())
+      updateSelectInput(session = session,
+                        "encoding",
+                        selected = "UTF-8")
+      updateTextInput(session = session,
+                      "doc_upload_name", 
+                      value = "")
+      updateTextInput(session = session,
+                     "doc_upload_path", 
+                     value = "")
+      
+      
       
       } else {NULL}
       
-      
+      } else {showModal(modalDialog(title = "Warning",
+                                    "Document names must be unique."))}
       
     })
     
