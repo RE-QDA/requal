@@ -53,7 +53,7 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                 textAreaInput(ns("doc_upload_description"), label = "Document description", placeholder = "Description"),
                 
       # upload UI ----
-      fileInput(ns("doc_path"), "",
+      fileInput(ns("doc_path"), NULL,
                 multiple = FALSE,
                 buttonLabel = "Select file",
                 accept = c("text/plain", ".txt")),
