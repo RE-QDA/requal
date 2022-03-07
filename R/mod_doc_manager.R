@@ -11,6 +11,8 @@ mod_doc_manager_ui <- function(id){
   ns <- NS(id)
 
     fluidRow(
+      tags$style(".shiny-file-input-progress {display: none}"),  
+      
       column(width = 6,
              br(),
              htmlOutput(ns("project_name")),
@@ -96,7 +98,6 @@ mod_doc_manager_server <- function(id, project){
     ns <- session$ns
     
     doc_list <- reactiveVal()
-
     ## list documents initially ----
     observeEvent(project()$active_project, {
       
