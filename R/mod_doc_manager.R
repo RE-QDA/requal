@@ -51,18 +51,13 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                 textAreaInput(ns("doc_upload_description"), label = "Document description", placeholder = "Description"),
                 
       # upload UI ----
-      div(span(textOutput(
-        ns("doc_upload_path")
-      ), class = "form-control"), class = "form-group shiny-input-container"),
-      
-                shinyFiles::shinyFilesButton(
-                  ns("doc_upload"),
-                  "Select file",
-                  "Select file",
-                  multiple = FALSE),
+      fileInput(ns("doc_path"), "",
+                multiple = FALSE,
+                buttonLabel = "Select file",
+                accept = c("text/plain", ".txt")),
       
       actionButton(ns("doc_upload_add"), 
-                   "Upload"),
+                   "Add document"),
       selectInput(ns("encoding"),
                   "File encoding",
                   choices = support_encodings(),
@@ -207,47 +202,17 @@ observeEvent(input$doc_add, {
       
     })
     
-
-    
-    # document upload
-    
-    # file system prep ----
-    
-    volumes <- c(Home = fs::path_home())
-    
-    
-    shinyFiles::shinyFileChoose(
-      input,
-      "doc_upload",
-      roots = volumes,
-      session = session,
-      restrictions = system.file(package = "base"),
-      pattern = c('\\.txt')
-    )
-
-    
-    
-    doc_file_load <-
-      reactive({
-        normalizePath(shinyFiles::parseFilePaths(volumes, input$doc_upload)$datapath)
-      })
-    
-    output$doc_upload_path <- renderText({
-      if (is.integer(input$doc_upload)) {
-        "No document file has been selected."
-      } else {
-        doc_file_load()
-      }
-    })
-    
     # document upload ----
 
     observeEvent(input$doc_upload_add, {
-
-      if (!input$doc_upload_name %in% names(doc_list())) {
-        
-      if (!is.integer(input$doc_upload)) {
-      doc_upload_text <- paste0(readLines(doc_file_load()), collapse = "\n")
+#browser()
+      if ((!input$doc_upload_name %in% names(doc_list()) & 
+           isTruthy(input$doc_upload_name)) |
+          (!isTruthy(input$doc_upload_name) &
+          !input$doc_path[["name"]] %in% names(doc_list()))) {
+      if (isTruthy(input$doc_path[["datapath"]])) {
+       
+      doc_upload_text <- paste0(readLines(input$doc_path[["datapath"]]), collapse = "\n")
       
       if (input$encoding != "UTF-8") {
        
@@ -258,7 +223,7 @@ observeEvent(input$doc_add, {
       }
 
       if (!isTruthy(input$doc_upload_name)) {
-        doc_name_parsed <- sub(".*/", "", doc_file_load())
+        doc_name_parsed <- input$doc_path[["name"]]
       } else {
         doc_name_parsed <- input$doc_upload_name
       }
@@ -289,10 +254,7 @@ observeEvent(input$doc_add, {
       updateTextInput(session = session,
                       "doc_upload_name", 
                       value = "")
-      updateTextInput(session = session,
-                     "doc_upload_path", 
-                     value = "")
-      
+      shinyjs::reset("doc_path")
       
       
       } else {NULL}
