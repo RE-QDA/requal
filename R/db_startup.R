@@ -23,7 +23,7 @@ CREATE_USERS_SQL <- "
 CREATE TABLE if not exists users (
     user_id INTEGER PRIMARY KEY
 ,   user_name TEXT
--- ,   user_mail TEXT
+,   user_mail TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 "
