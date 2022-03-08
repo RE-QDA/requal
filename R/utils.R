@@ -147,21 +147,24 @@ get_volume_paths <- function() {
   if (tolower(sysinfo["sysname"]) == "darwin") {
     
     volumes <- list.dirs(paste0(.Platform$file.sep, "Volumes"), recursive = FALSE)
-    names(volumes) <- volumes
-    volumes
+    volumes_checked <- volumes[purrr::map_lgl(volumes, function(x) length(dir(x)) > 1)]
+    names(volumes_checked) <- volumes_checked
+    volumes_checked
     
   } else if (tolower(sysinfo["sysname"]) == "linux") {
     
     volumes <- list.dirs(paste0(.Platform$file.sep, "media"), recursive = FALSE)
-    names(volumes) <- volumes
-    volumes
+    volumes_checked <- volumes[purrr::map_lgl(volumes, function(x) length(dir(x)) > 1)]
+    names(volumes_checked) <- volumes_checked
+    volumes_checked
     
   } else if (tolower(sysinfo["sysname"]) == "windows") {
     
     volumes_string <- system("wmic logicaldisk get caption", intern = TRUE)
     volumes <- unlist(stringr::str_extract_all(volumes_string, "[A-Z]\\:"))
-    names(volumes) <- volumes
-    volumes
+    volumes_checked <- volumes[purrr::map_lgl(volumes, function(x) length(dir(x)) > 1)]
+    names(volumes_checked) <- volumes_checked
+    volumes_checked
     
   } else {
     
