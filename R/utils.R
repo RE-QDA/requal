@@ -137,32 +137,40 @@ set_controlbar <- function() {
             )
         )
     )
-    
-# get volumes paths -----
+}
 
-  get_volume_paths <- function() {
+# File system: get_volume_paths  ----
+get_volume_paths <- function() {
+  
+  sysinfo <- Sys.info()
+  
+  if (tolower(sysinfo["sysname"]) == "darwin") {
     
-    if (tolower(Sys.info()["sysname"]) == "darwin") {
-     
-    volumes <- list.files(paste0(.Platform$file.sep, "Volumes"))
+    volumes <- list.dirs(paste0(.Platform$file.sep, "Volumes"), recursive = FALSE)
     names(volumes) <- volumes
     volumes
-
-    } else if (tolower(Sys.info()["sysname"]) == "linux") {
-      
-      c(Volumes = list.files(paste0(.Platform$file.sep, "media")))
-      
-    } else if (tolower(Sys.info()["sysname"]) == "windows") {
-      
-      
-    } else {
-      
-      c(Volumes = fs::path_home())
-    }
     
+  } else if (tolower(sysinfo["sysname"]) == "linux") {
     
+    volumes <- list.dirs(paste0(.Platform$file.sep, "media"), recursive = FALSE)
+    names(volumes) <- volumes
+    volumes
+    
+  } else if (tolower(sysinfo["sysname"]) == "windows") {
+    
+    volumes_string <- system("wmic logicaldisk get caption", intern = TRUE)
+    volumes <- unlist(stringr::str_extract_all(volumes_string, "[A-Z]\\:"))
+    names(volumes) <- volumes
+    volumes
+    
+  } else {
+    
+    c(Volumes = fs::path_home())
   }
+  
+  
+}
   
 
     
-}
+

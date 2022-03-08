@@ -57,9 +57,7 @@ mod_launchpad_loader_server <- function(id){
     doc_list <- reactiveVal(NULL)
     project <- reactiveValues()
     
-    
     # file system prep ----
-    
     volumes <- c(Home = fs::path_home(), get_volume_paths())
     
     
@@ -67,6 +65,7 @@ mod_launchpad_loader_server <- function(id){
       input,
       "sel_file_load",
       roots = volumes,
+      defaultRoot = "Home",
       session = session,
       restrictions = system.file(package = "base"),
       pattern = c('\\.requal')

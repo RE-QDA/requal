@@ -63,17 +63,15 @@ mod_launchpad_creator_server <- function(id){
     doc_list <- reactiveVal(NULL)
     project <- reactiveValues()
     
-    
-    # file system prep ----
-    
+   # file system prep -----
     volumes <- c(Home = fs::path_home(), get_volume_paths())
-    
     
     
     shinyFiles::shinyDirChoose(
       input,
       "sel_directory",
       roots = volumes,
+      defaultRoot = "Home",
       session = session,
       restrictions = system.file(package = "base"),
       allowDirCreate = TRUE
