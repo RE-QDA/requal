@@ -32,9 +32,9 @@ CREATE_USER_PERMISSIONS_SQL <- "
 CREATE TABLE if not exists user_permissions (
     user_id INTEGER
 ,   project_id INTEGER
-,   is_viewer INTEGER
-,   is_coder INTEGER
-,   is_admin INTEGER
+,   can_code INTEGER
+,   can_upload INTEGER
+,   can_manage INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 );
@@ -126,9 +126,9 @@ create_default_user <- function(con, project_id){
     user_permission_df <- tibble::tibble(
         user_id = user_df_stored$user_id, 
         project_id = project_id, 
-        is_viewer = 0, 
-        is_coder = 0, 
-        is_admin = 1
+        can_code = 1, 
+        can_upload = 1, 
+        can_manage = 1
     )
     
     DBI::dbWriteTable(con, "user_permissions", user_permission_df, append = TRUE)
