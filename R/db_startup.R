@@ -18,7 +18,28 @@ CREATE TABLE if not exists requal_version (
 );
 "
 
-# TODO: users table & user_attributes
+# TODO: user_attributes
+CREATE_USERS_SQL <- "
+CREATE TABLE if not exists users (
+    user_id INTEGER PRIMARY KEY
+,   user_name TEXT
+-- ,   user_mail TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"
+
+CREATE_USER_PERMISSIONS_SQL <- "
+CREATE TABLE if not exists user_permissions (
+    user_id INTEGER
+,   project_id INTEGER
+,   is_viewer INTEGER
+,   is_coder INTEGER
+,   is_admin INTEGER
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+);
+"
+
 CREATE_LOG_SQL <- "
 CREATE TABLE if not exists logs 
 (   user TEXT
@@ -71,6 +92,8 @@ create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
     DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(con, CREATE_USERS_SQL)
+    DBI::dbExecute(con, CREATE_USER_PERMISSIONS_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
@@ -82,10 +105,33 @@ create_db_schema.PqConnection <- function(con){
     # TODO: optimize sql for Postgres (e.g. created_at fields as date type)
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
     DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(con, CREATE_USERS_SQL)
+    DBI::dbExecute(con, CREATE_USER_PERMISSIONS_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+}
+
+create_default_user <- function(con, project_id){
+    user_df <- tibble::tibble(
+        user_name = Sys.info()["user"]
+    )
+    
+    DBI::dbWriteTable(con, "users", user_df, append = TRUE)
+    user_df_stored <- dplyr::tbl(con, "users") %>% 
+        dplyr::filter(.data$user_name == !!user_df$user_name) %>% 
+        dplyr::collect()
+    
+    user_permission_df <- tibble::tibble(
+        user_id = user_df_stored$user_id, 
+        project_id = project_id, 
+        is_viewer = 0, 
+        is_coder = 0, 
+        is_admin = 1
+    )
+    
+    DBI::dbWriteTable(con, "user_permissions", user_permission_df, append = TRUE)
 }
 
 create_project_record <- function(con, project_df){
@@ -103,6 +149,8 @@ create_project_record <- function(con, project_df){
         version = as.character(packageVersion("requal"))
     )
     res_v <- DBI::dbWriteTable(con, "requal_version", requal_version_df, append = TRUE)
+    
+    create_default_user(con, project_id)
 }
 
 add_documents_record <- function(con, project_id, document_df){
