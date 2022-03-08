@@ -49,7 +49,7 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                 collapsed = TRUE,
                 width = NULL,
 
-                textInput(ns("doc_upload_name"), label = "Document name", placeholder = "Short name"),
+                textInput(ns("doc_upload_name"), label = "Document name", placeholder = "Optional filename replacement"),
                 textAreaInput(ns("doc_upload_description"), label = "Document description", placeholder = "Description"),
 
       # upload UI ----
