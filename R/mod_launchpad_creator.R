@@ -66,7 +66,7 @@ mod_launchpad_creator_server <- function(id){
     
     # file system prep ----
     
-    volumes <- c(Home = fs::path_home())
+    volumes <- c(Home = fs::path_home(), get_volume_paths())
     
     
     

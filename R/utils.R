@@ -138,7 +138,31 @@ set_controlbar <- function() {
         )
     )
     
+# get volumes paths -----
 
+  get_volume_paths <- function() {
+    
+    if (tolower(Sys.info()["sysname"]) == "darwin") {
+     
+    volumes <- list.files(paste0(.Platform$file.sep, "Volumes"))
+    names(volumes) <- volumes
+    volumes
+
+    } else if (tolower(Sys.info()["sysname"]) == "linux") {
+      
+      c(Volumes = list.files(paste0(.Platform$file.sep, "media")))
+      
+    } else if (tolower(Sys.info()["sysname"]) == "windows") {
+      
+      
+    } else {
+      
+      c(Volumes = fs::path_home())
+    }
+    
+    
+  }
+  
 
     
 }
