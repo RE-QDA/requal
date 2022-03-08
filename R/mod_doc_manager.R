@@ -200,7 +200,7 @@ observeEvent(input$doc_add, {
     
     # file system prep ----
     
-    volumes <- c(Home = fs::path_home())
+    volumes <- c(Home = fs::path_home(), get_volume_paths())
     
     
     shinyFiles::shinyFileChoose(
