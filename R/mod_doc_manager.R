@@ -164,7 +164,7 @@ observeEvent(input$doc_add, {
     
     updateTextInput(session = session,
                     "doc_name", value = "")
-    updateTextInput(session = session,
+    updateTextAreaInput(session = session,
                     "doc_description", value = "")
     updateTextAreaInput(session = session,
                     "doc_text", value = "")
@@ -255,6 +255,8 @@ observeEvent(input$doc_add, {
       updateTextInput(session = session,
                       "doc_upload_name", 
                       value = "")
+      updateTextAreaInput(session = session,
+                           "doc_upload_description", value = "")
       shinyjs::reset("doc_path")
       
       
