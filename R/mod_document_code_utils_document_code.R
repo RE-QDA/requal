@@ -198,7 +198,16 @@ write_segment_db <- function(
     }
 
     if(res){
-        log_add_segment_record(con, project_id = active_project, segment_df)
+      written_segment <- dplyr::tbl(con, "segments") %>% 
+        dplyr::filter(.data$project_id == !!segment_df$project_id & 
+                      .data$doc_id == !!segment_df$doc_id &
+                      .data$code_id == !!segment_df$code_id &
+                      .data$segment_start == !!segment_df$segment_start& 
+                      .data$segment_end == !!segment_df$segment_end) %>% 
+        dplyr::collect()
+      
+      log_add_segment_record(con, project_id = active_project, segment_df %>% 
+                               dplyr::mutate(segment_id = written_segment$segment_id))
     }else{
         warning("segment not added")
     }
