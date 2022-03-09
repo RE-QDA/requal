@@ -239,14 +239,22 @@ merge_codes <- function(project_db,
                         active_project,
                         merge_from,
                         merge_to) {
-  print(project_db)
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
   
   # should rewrite all merge from ids to the value of merge to in segments
-  # should delete merge from row from codes
-  # should log action with from-to ids
-  print(merge_from)
-  print(merge_to)
+  update_segments_sql <- glue::glue_sql("UPDATE segments
+                 SET code_id = {merge_to}
+                 WHERE code_id = {merge_from}", .con = con)
+  res <- DBI::dbSendStatement(con, update_segments_sql)
+  DBI::dbClearResult(res)
   
+  # should delete merge from row from codes
+  delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}", 
+                                    .con = con)
+  res2 <- DBI::dbSendStatement(con, delete_code_sql)
+  DBI::dbClearResult(res2)
+  
+  # should log action with from-to ids
+  log_merge_code_record(con, project_id = active_project, merge_from, merge_to)
 }
