@@ -3,21 +3,29 @@ Title: Shiny Application for Computer-assisted Qualitative Data Analysis
 Version: 0.3.1
 Authors@R:
     c(
-    person(given = "Radim",
-           family = "Hladík",
-           role = c("aut"),
-           email = "radim.hladik@fulbrightmail.org",
-           comment = c(ORCID = "0000-0001-8078-6477")),
+     person(given = "Radim",
+            family = "Hladík",
+            role = c("aut"),
+            email = "radim.hladik@fulbrightmail.org",
+            comment = c(ORCID = "0000-0001-8078-6477")),
     person(given = "Michael",
-           family = "Škvrňák",
-           role = c("aut", "cre"),
-           email = "michael.skvrnak@protonmail.com",
-           comment = c(ORCID = "0000-0003-4647-4095")),
+            family = "Škvrňák",
+            role = c("aut", "cre"),
+            email = "michael.skvrnak@protonmail.com",
+            comment = c(ORCID = "0000-0003-4647-4095")),
+    person(given = "Nina",
+            family = "Fárová",
+            role = c("aut"),
+            email = "nina.farova@soc.cas.cz",
+            comment = c(ORCID = "000-0002-9480-686X")),
     person(given = "Martin",
-           family = "Hájek",
-           role = c("ctb"),
-           email = "martin.hajek@fsv.cuni.cz",
-           comment = c(ORCID = "0000-0001-9213-6404"))
+            family = "Hájek",
+            role = c("aut"),
+            email = "martin.hajek@fsv.cuni.cz",
+            comment = c(ORCID = "0000-0001-9213-6404")),
+    person(given = "TACR",
+            role = "fnd",
+            comment = "TL05000054"))
     )
 Description: PKG_DESC.
 License: MIT + file LICENSE
