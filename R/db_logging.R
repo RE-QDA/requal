@@ -62,6 +62,13 @@ log_delete_code_record <- function(con, project_id, code_ids){
                data = list(code_id = code_ids))
 }
 
+log_merge_code_record <- function(con, project_id, from, to){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Merge codes", 
+               data = list(merge_from = from, merge_to = to))
+}
+
 log_add_segment_record <- function(con, project_id, segment){
     log_action(con, 
                project_id = project_id, 
@@ -75,3 +82,5 @@ log_delete_segment_record <- function(con, project_id, segment){
                action = "Delete segment", 
                data = list(segment_id = segment))
 }
+
+

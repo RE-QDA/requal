@@ -2,6 +2,7 @@
 
 #' @importFrom rlang .data
 codebook_manager_UI <- function(id, project_db, project_id) {
+  
     ns <- NS(id)
     tagList(
         box(
@@ -30,8 +31,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             ),
             
             actionButton(ns("code_add"),
-                         label = "Create",
-                         class = "btn-success")
+                         label = "Create")
         ),
         # box(
         #     title = "Edit codes",
@@ -54,35 +54,39 @@ codebook_manager_UI <- function(id, project_db, project_id) {
         #                  class = "btn-warning")
         #     
         # ),
-        # 
-        # box(
-        #     title = "Merge codes",
-        #     collapsible = TRUE,
-        #     collapsed = TRUE,
-        #     width = NULL,
-        #     
-        #     selectInput(
-        #         ns("code_merge_from"),
-        #         label = "Select codes to merge",
-        #         choices = c("placeholder1", "placeholder2"),
-        #         selected = "",
-        #         multiple = TRUE
-        #     ),
-        #     
-        #     selectInput(
-        #         ns("code_merge_to"),
-        #         label = "Select codes to merge",
-        #         choices = c("placeholder1", "placeholder2"),
-        #         selected = "",
-        #         multiple = TRUE
-        #     ),
-        #     
-        #     actionButton(ns("code_merge"),
-        #                  label = "Merge",
-        #                  class = "btn-warning")
-        #     
-        # ),
-        # 
+
+        box(
+            title = "Merge codes",
+            collapsible = TRUE,
+            collapsed = TRUE,
+            width = NULL,
+
+            selectInput(
+                ns("merge_from"),
+                label = "Merge from",
+                choices = c("", list_db_codes(project_db = project_db,
+                                              project_id = project_id) %>% 
+                              pair_code_id()),
+                selected = "",
+                multiple = FALSE
+            ),
+
+            selectInput(
+                ns("merge_to"),
+                label = "Merge into",
+                choices = c("", list_db_codes(project_db = project_db,
+                                              project_id = project_id) %>% 
+                              pair_code_id()),
+                selected = "",
+                multiple = FALSE
+            ),
+
+            actionButton(ns("code_merge"),
+                         label = "Merge",
+                         class = "btn-warning")
+
+        ),
+
         box(
             title = "Delete codes",
             collapsible = TRUE,
@@ -100,7 +104,8 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             ),
             
             actionButton(ns("code_del_btn"),
-                         label = "Delete")
+                         label = "Delete",
+                         class = "btn-danger")
             
         )
         
@@ -227,3 +232,29 @@ render_codes <- function(active_project,
     }
 }
 
+
+# Merge codes ------
+
+merge_codes <- function(project_db,
+                        active_project,
+                        merge_from,
+                        merge_to) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+  
+  # should rewrite all merge from ids to the value of merge to in segments
+  update_segments_sql <- glue::glue_sql("UPDATE segments
+                 SET code_id = {merge_to}
+                 WHERE code_id = {merge_from}", .con = con)
+  res <- DBI::dbSendStatement(con, update_segments_sql)
+  DBI::dbClearResult(res)
+  
+  # should delete merge from row from codes
+  delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}", 
+                                    .con = con)
+  res2 <- DBI::dbSendStatement(con, delete_code_sql)
+  DBI::dbClearResult(res2)
+  
+  # should log action with from-to ids
+  log_merge_code_record(con, project_id = active_project, merge_from, merge_to)
+}
