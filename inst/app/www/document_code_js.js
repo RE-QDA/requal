@@ -53,15 +53,21 @@ document.addEventListener('mouseup', function () {
       var endOffset = getCaretCharacterOffsetWithin(el);
       var startOffset_js = endOffset - range.toString().length;
       var startOffset = startOffset_js+1;
+      var text_length = $('#document_code_ui_1-focal_text').text().length;
 
-      if (endOffset === 0) {
+      if (endOffset == 0) {
         var endOffset = endOffset+1;
       } 
       if (startOffset > endOffset) {
         var endOffset = startOffset; 
       } 
-
-
+      if (startOffset < 1) {
+        var startOffset = 1;
+      } 
+      if (endOffset > text_length) {
+        var endOffset = text_length;
+      } 
+      
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
         
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
