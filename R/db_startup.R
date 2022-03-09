@@ -136,17 +136,57 @@ CREATE TABLE if not exists case_document_map (
 " 
 
 # TODO: hierarchy between codes, cases, categories (code_code_map, case_case_map, category_category_map)
-# TODO: memos
-# TODO: memos_documents_map, memos_codes_map, memos_segments_map
+
+# memos
+CREATE_MEMO_SQL <- "
+CREATE TABLE if not exists memos (
+    memo_id INTEGER PRIMARY KEY
+,   text TEXT
+)"
+
+CREATE_MEMO_DOCUMENT_MAP_SQL <- "
+CREATE TABLE if not exists memos_documents_map (
+    memo_id INTEGER
+,   doc_id INTEGER
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+CREATE_MEMO_CODE_MAP_SQL <- "
+CREATE TABLE if not exists memos_codes_map (
+    memo_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+CREATE_MEMO_SEGMENT_MAP_SQL <- "
+CREATE TABLE if not exists memos_segments_map (
+    memo_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(code_id) REFERENCES segments(code_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
 
 create_db_schema.default <- function(con){
     # TODO: Full DB structure
     DBI::dbExecute(con, CREATE_PROJECT_SQL)
     DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(con, CREATE_USERS_SQL)
+    DBI::dbExecute(con, CREATE_USER_PERMISSIONS_SQL)
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_CASES_SQL)
+    DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
 create_db_schema.SQLiteConnection <- function(con){
@@ -163,6 +203,10 @@ create_db_schema.SQLiteConnection <- function(con){
     DBI::dbExecute(con, CREATE_CASES_SQL)
     DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
 create_db_schema.PqConnection <- function(con){
@@ -180,6 +224,10 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_CASES_SQL)
     DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
 create_default_user <- function(con, project_id){
