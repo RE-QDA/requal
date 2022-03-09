@@ -173,6 +173,14 @@ get_volume_paths <- function() {
   
   
 }
+
+# warnings ------
+
+warn_user <- function(warning) {
+  
+  showModal(modalDialog(title = "Warning",
+                        warning))
+}
   
 
     

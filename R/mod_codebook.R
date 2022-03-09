@@ -41,7 +41,7 @@ mod_codebook_server <- function(id, project) {
     codebook <- reactiveVal()
     
     observeEvent(project()$active_project, {
-      # update codebook return valueb
+      # update codebook return values
       
       codebook(
         list_db_codes(project()$project_db,
@@ -58,14 +58,14 @@ mod_codebook_server <- function(id, project) {
 
 
     })
-#---Generate codes manager UI (if there is an active project)--------------
+#---Generate codes UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project()$active_project)) {
 
-
         codebook_manager_UI(id,
                             project_db = project()$project_db,
-                            project_id = project()$active_project)
+                            project_id = project()$active_project,
+                            codebook)
       }
     })
 
@@ -172,7 +172,29 @@ mod_codebook_server <- function(id, project) {
       )
 
     })
- 
+
+#---Delete existing code-----------------------------------------------------
+    
+    observeEvent(input$code_merge, {
+      
+      if (input$merge_from == input$merge_to) {
+        warn_user("Cannot merge a code into itself.")
+      } else {
+        
+        merge_codes(project()$project_db,
+                    project()$active_project,
+                    input$merge_from,
+                    input$merge_to)
+        
+        # update codebook return value
+        codebook(
+          list_db_codes(project()$project_db,
+                        project()$active_project)
+        )
+      }
+      
+    })
+    
 # return active codebook details ----
 
        return(reactive(codebook()))

@@ -1,7 +1,13 @@
 # Create codebook manager UI
 
 #' @importFrom rlang .data
-codebook_manager_UI <- function(id, project_db, project_id) {
+codebook_manager_UI <- function(id, project_db, project_id, codebook) {
+  
+  code_list <- codebook()$code_id
+  code_names <- codebook()$code_name
+  names(code_list) <- code_names 
+ 
+  
     ns <- NS(id)
     tagList(
         box(
@@ -54,35 +60,35 @@ codebook_manager_UI <- function(id, project_db, project_id) {
         #                  class = "btn-warning")
         #     
         # ),
-        # 
-        # box(
-        #     title = "Merge codes",
-        #     collapsible = TRUE,
-        #     collapsed = TRUE,
-        #     width = NULL,
-        #     
-        #     selectInput(
-        #         ns("code_merge_from"),
-        #         label = "Select codes to merge",
-        #         choices = c("placeholder1", "placeholder2"),
-        #         selected = "",
-        #         multiple = TRUE
-        #     ),
-        #     
-        #     selectInput(
-        #         ns("code_merge_to"),
-        #         label = "Select codes to merge",
-        #         choices = c("placeholder1", "placeholder2"),
-        #         selected = "",
-        #         multiple = TRUE
-        #     ),
-        #     
-        #     actionButton(ns("code_merge"),
-        #                  label = "Merge",
-        #                  class = "btn-warning")
-        #     
-        # ),
-        # 
+
+        box(
+            title = "Merge codes",
+            collapsible = TRUE,
+            collapsed = TRUE,
+            width = NULL,
+
+            selectInput(
+                ns("merge_from"),
+                label = "Merge from",
+                choices = c("", code_list),
+                selected = "",
+                multiple = FALSE
+            ),
+
+            selectInput(
+                ns("merge_to"),
+                label = "Merge into",
+                choices = c("", code_list),
+                selected = "",
+                multiple = FALSE
+            ),
+
+            actionButton(ns("code_merge"),
+                         label = "Merge",
+                         class = "btn-warning")
+
+        ),
+
         box(
             title = "Delete codes",
             collapsible = TRUE,
@@ -227,3 +233,21 @@ render_codes <- function(active_project,
     }
 }
 
+
+# Merge codes ------
+
+merge_codes <- function(project_db,
+                        active_project,
+                        merge_from,
+                        merge_to) {
+  print(project_db)
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+  
+  # should rewrite all merge from ids to the value of merge to in segments
+  # should delete merge from row from codes
+  # should log action with from-to ids
+  print(merge_from)
+  print(merge_to)
+  
+}
