@@ -36,8 +36,7 @@ codebook_manager_UI <- function(id, project_db, project_id, codebook) {
             ),
             
             actionButton(ns("code_add"),
-                         label = "Create",
-                         class = "btn-success")
+                         label = "Create")
         ),
         # box(
         #     title = "Edit codes",
