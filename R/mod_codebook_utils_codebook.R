@@ -104,7 +104,8 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             ),
             
             actionButton(ns("code_del_btn"),
-                         label = "Delete")
+                         label = "Delete",
+                         class = "btn-danger")
             
         )
         
