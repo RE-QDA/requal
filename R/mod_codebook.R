@@ -176,9 +176,13 @@ mod_codebook_server <- function(id, project) {
     
     observeEvent(input$code_merge, {
       
+      if (isTruthy(input$merge_from) & isTruthy(input$merge_to)) {
+        
       if (input$merge_from == input$merge_to) {
         warn_user("Cannot merge a code into itself.")
       } else {
+        
+        
         
         merge_codes(project()$project_db,
                     project()$active_project,
@@ -210,7 +214,7 @@ mod_codebook_server <- function(id, project) {
         
         
         
-       }
+       } } else {NULL}
       
     })
     
