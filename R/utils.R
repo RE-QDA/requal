@@ -31,11 +31,11 @@ set_dashboard_body <- function() {
         
         tags$head(tags$style(HTML('
 #launchpad_icon{
-  margin-right: 20px;
+  margin-right: 10px;
   color: white;
   animation-name: launchpad-animation;
-  animation-duration: 2s;
-  animation-iteration-count: 3;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
 }
 
 @keyframes launchpad-animation {
