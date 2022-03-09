@@ -25,7 +25,7 @@ Authors@R:
             comment = c(ORCID = "0000-0001-9213-6404")),
     person(given = "TACR",
             role = "fnd",
-            comment = "TL05000054"))
+            comment = "TL05000054")
     )
 Description: PKG_DESC.
 License: MIT + file LICENSE
