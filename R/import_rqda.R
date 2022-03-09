@@ -59,7 +59,7 @@ import_rqda <- function(rqda_file, requal_connection){
     
     # Create requal schema
     create_db_schema(requal_connection)
-    
+
     # Import to requal
     create_project_record(requal_connection, project_df)
     
