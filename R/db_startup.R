@@ -113,8 +113,8 @@ CREATE TABLE if not exists memos_codes_map (
 CREATE_MEMO_SEGMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
-,   code_id INTEGER
-,   FOREIGN KEY(code_id) REFERENCES segments(code_id)
+,   segment_id INTEGER
+,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
 ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
 )"
 
