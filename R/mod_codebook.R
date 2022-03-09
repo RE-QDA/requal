@@ -64,8 +64,7 @@ mod_codebook_server <- function(id, project) {
 
         codebook_manager_UI(id,
                             project_db = project()$project_db,
-                            project_id = project()$active_project,
-                            codebook)
+                            project_id = project()$active_project)
       }
     })
 
@@ -173,7 +172,7 @@ mod_codebook_server <- function(id, project) {
 
     })
 
-#---Delete existing code-----------------------------------------------------
+#---Merge codes-----------------------------------------------------
     
     observeEvent(input$code_merge, {
       
@@ -191,7 +190,27 @@ mod_codebook_server <- function(id, project) {
           list_db_codes(project()$project_db,
                         project()$active_project)
         )
-      }
+        
+        # relist remaining codes
+        output$codes_ui <- renderUI({
+          
+          render_codes(active_project = project()$active_project,
+                       project_db = project()$project_db)
+        })
+        
+        # re-render manager UI
+        
+        output$codes_manager <- renderUI({
+          if (isTruthy(project()$active_project)) {
+            codebook_manager_UI(id,
+                                project_db = project()$project_db,
+                                project_id = project()$active_project)
+          }
+        })
+        
+        
+        
+       }
       
     })
     

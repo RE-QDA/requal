@@ -1,12 +1,7 @@
 # Create codebook manager UI
 
 #' @importFrom rlang .data
-codebook_manager_UI <- function(id, project_db, project_id, codebook) {
-  
-  code_list <- codebook()$code_id
-  code_names <- codebook()$code_name
-  names(code_list) <- code_names 
- 
+codebook_manager_UI <- function(id, project_db, project_id) {
   
     ns <- NS(id)
     tagList(
@@ -69,7 +64,9 @@ codebook_manager_UI <- function(id, project_db, project_id, codebook) {
             selectInput(
                 ns("merge_from"),
                 label = "Merge from",
-                choices = c("", code_list),
+                choices = c("", list_db_codes(project_db = project_db,
+                                              project_id = project_id) %>% 
+                              pair_code_id()),
                 selected = "",
                 multiple = FALSE
             ),
@@ -77,7 +74,9 @@ codebook_manager_UI <- function(id, project_db, project_id, codebook) {
             selectInput(
                 ns("merge_to"),
                 label = "Merge into",
-                choices = c("", code_list),
+                choices = c("", list_db_codes(project_db = project_db,
+                                              project_id = project_id) %>% 
+                              pair_code_id()),
                 selected = "",
                 multiple = FALSE
             ),
