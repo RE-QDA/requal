@@ -15,6 +15,8 @@ app_ui <- function(request) {
       header = dashboardHeader(title = tags$span(
         tags$img(src="www/requal_logo.png", 
                  height="70%", style = "margin-right: 20px"), "ReQual"),
+        tags$li(mod_user_ui("user_ui_1")) %>% 
+          tagAppendAttributes(class = "dropdown"),
         controlbarIcon = icon("ellipsis-v", id = "launchpad_icon")
         ),
       sidebar = set_left_menu(),

@@ -49,4 +49,10 @@ app_server <- function(input, output, session) {
     # about -----
   
   mod_about_server("about_ui_1", project_observer)
+  
+  # user
+  user <- mod_user_server("user_ui_1", project_observer)
+  
+  
+  
 }
