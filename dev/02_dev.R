@@ -43,6 +43,8 @@ golem::add_module( name = "doc_manager" ) # Name of the module
 
 # Codebook menu
 golem::add_module( name = "codebook" ) # Name of the module
+golem::add_module( name = "categories" ) # Name of the module
+
 
 # Coding workspace
 golem::add_module( name = "document_code" ) # Name of the module
