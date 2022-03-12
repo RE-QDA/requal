@@ -11,71 +11,106 @@ mod_categories_ui <- function(id){
   ns <- NS(id)
 
     fluidRow(
-      tags$head(
-        tags$style(HTML(".bucket-list-container {min-height: 90%;
-                            border: none;
-                            height:30vh;
-                            overflow-y:scroll;}"))
-      ),
       
       column(width = 8,
+             
     fluidRow(
       column(
-        width = 12,
-        tags$h3("Uncategorized codes"),
+        width = 6,
+        tags$h4("Orphan codes"),
         
-        sortable::bucket_list(
-          header = NULL,
-          group_name = "bucket_list_group",
-          orientation = "horizontal",
-          sortable::add_rank_list(
-            input_id = ns("rank_list_1"),
-            text = "Assign codes to categories",
-            labels = list(
-              "one",
-              "two",
-              "three",
-              htmltools::tags$div(
-                htmltools::em("Complex"), " html tag without a name"
-              ),
-              "five" = htmltools::tags$div(
-                htmltools::em("Complex"), " html tag with name: 'five'"
-              )
-            )
-          ))
-      )
-    ),
-  
+        uiOutput(
+          ns("uncategorized")
+          )
+      ),
+      column(width = 6,
+             tags$h4("Categories"),
+             tags$br(),
+             
+             uiOutput(
+               ns("categories_ui")
+             )
+             
+             )
+    )),
+ 
   column(width = 4,
          uiOutput(
            ns("categories_manager")
-         )
-  )))
+         ),
+         
+         verbatimTextOutput(ns("category_list_1")),
+         verbatimTextOutput(ns("category_list_2")),
+         actionButton(ns("test"), "test")
+  )
+         
+  )
   
 }
     
 #' categories Server Functions
 #'
 #' @noRd 
-mod_categories_server <- function(id){
+mod_categories_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
-    output$results_1 <-
+    observeEvent(input$test, {browser()})
+    
+    output$category_list_1 <-
       renderPrint(
-        input$rank_list_1 # This matches the input_id of the second rank list
+        input$category_list_1 # This matches the input_id of the second rank list
       )
     
-    output$results_2 <-
+    output$category_list_2 <-
       renderPrint(
-        input$rank_list_2 # This matches the input_id of the second rank list
+        input$category_list_2 # This matches the input_id of the second rank list
       )
     
-    output$results_3 <-
-      renderPrint(
-        input$rank_list_3 # This matches the input_id of the second rank list
-      )
 
+    output$uncategorized <- renderUI({
+    sortable::bucket_list(
+      header = NULL,
+      group_name = "categories",
+      orientation = "horizontal",
+      sortable::add_rank_list(
+        input_id = ns("code_list"),
+        text = NULL,
+        labels = render_codes(active_project = project()$active_project,
+                                project_db = project()$project_db)
+        )
+      )
+    })
+    
+    # List existing categories in category boxes ----
+    output$categories_ui <- renderUI({
+      
+      render_categories(id = id,
+                        active_project = project()$active_project,
+                   project_db = project()$project_db)
+      
+      
+    })
+    
+    #---Generate categories UI (if there is an active project)--------------
+    output$codes_manager <- renderUI({
+      if (isTruthy(project()$active_project)) {
+        
+        codebook_manager_UI(id,
+                            project_db = project()$project_db,
+                            project_id = project()$active_project)
+      }
+    })
+    
+    #---Generate categories UI (if there is an active project)--------------
+    # output$categories_manager <- renderUI({
+    #   if (isTruthy(project()$active_project)) {
+    #     
+    #     codebook_manager_UI(id,
+    #                         project_db = project()$project_db,
+    #                         project_id = project()$active_project)
+    #   }
+    # })
     
   })
 }
