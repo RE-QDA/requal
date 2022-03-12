@@ -170,7 +170,7 @@ observeEvent(input$doc_add, {
                       "doc_delete_list",
                       choices = doc_list())
 
-  } else { warn_user("Documents need to have content and their names must be unique.")}
+  } else { warn_user("Documents need to have a content and their names must be unique.")}
 
 })
 
@@ -259,7 +259,7 @@ observeEvent(input$doc_add, {
 
       }
 
-      } else {warn_user("Documents need to have content and their names must be unique.")}
+      } else {warn_user("Documents need to have a content and their names must be unique.")}
 
     })
 
