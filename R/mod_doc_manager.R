@@ -57,15 +57,14 @@ tags$div(      tableOutput(ns("doc_list_table")) ) %>%
                 multiple = FALSE,
                 buttonLabel = "Select file",
                 accept = c("text/plain", ".txt")),
-
-      actionButton(ns("doc_upload_add"),
-                   "Add document"),
       selectInput(ns("encoding"),
                   "File encoding",
                   choices = support_encodings(),
                   selected = "UTF-8",
                   width = "40%"
-                  )
+      ),
+      actionButton(ns("doc_upload_add"),
+                   "Add document")
 
             ),
             box(title = "Delete documents",
@@ -142,9 +141,8 @@ output$doc_list_table <- make_doc_table(
 
 observeEvent(input$doc_add, {
 
-  req(input$doc_name, input$doc_text)
-
-  if (!input$doc_name %in% names(doc_list())) {
+  if ((!input$doc_name %in% c("", names(doc_list()))) & 
+      isTruthy(input$doc_text)) {
 
   add_input_document(connection = project()$project_db,
                      project = project()$active_project,
@@ -172,8 +170,7 @@ observeEvent(input$doc_add, {
                       "doc_delete_list",
                       choices = doc_list())
 
-  } else {showModal(modalDialog(title = "Warning",
-                                "Document names must be unique."))}
+  } else { warn_user("Documents need to have a content and their names must be unique.")}
 
 })
 
@@ -206,11 +203,11 @@ observeEvent(input$doc_add, {
     # document upload ----
 
     observeEvent(input$doc_upload_add, {
-#browser()
-      if ((!input$doc_upload_name %in% names(doc_list()) &
-           isTruthy(input$doc_upload_name)) |
-          (!isTruthy(input$doc_upload_name) &
-          !input$doc_path[["name"]] %in% names(doc_list()))) {
+      if (
+        
+        ((!input$doc_upload_name %in% c("", names(doc_list()))) & !is.null(input$doc_path)) |
+         (!is.null(input$doc_path) && (!input$doc_path[["name"]] %in% names(doc_list())))) {
+        
       if (isTruthy(input$doc_path[["datapath"]])) {
 
       doc_upload_text <- paste0(readLines(input$doc_path[["datapath"]]), collapse = "\n")
@@ -260,10 +257,10 @@ observeEvent(input$doc_add, {
       shinyjs::reset("doc_path")
 
 
-      } else {NULL}
+      }
 
-      } else {showModal(modalDialog(title = "Warning",
-                                    "Document names must be unique."))}
+      } else {warn_user("Documents need to have a content and their names must be unique.")
+        shinyjs::reset("doc_path")}
 
     })
 
