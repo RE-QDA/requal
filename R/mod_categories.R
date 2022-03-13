@@ -69,15 +69,21 @@ mod_categories_server <- function(id, project){
     
 
     output$uncategorized <- renderUI({
-    sortable::bucket_list(
-      header = NULL,
-      group_name = "categories",
-      orientation = "horizontal",
-      sortable::add_rank_list(
+
+      
+    
+      sortable::rank_list(
         input_id = ns("code_list"),
         text = NULL,
         labels = render_codes(active_project = project()$active_project,
-                                project_db = project()$project_db)
+                                project_db = project()$project_db),
+        options = sortable::sortable_options(
+          group = list(
+            name = "categories",
+            pull = "clone",
+            put = TRUE
+          ),
+            onAdd = htmlwidgets::JS("function (evt) { this.el.removeChild(evt.item); }")
         )
       )
     })

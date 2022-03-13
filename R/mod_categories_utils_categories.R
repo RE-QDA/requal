@@ -17,20 +17,21 @@ gen_categories_ui <- function(id,
         collapsed = TRUE,
         label = boxLabel(text = "category",
                          status = "warning"),
-        sortable::bucket_list(
-            header = NULL,
-            group_name = "categories",
-            orientation = "horizontal",
-            class = "category-rank-list",
-            sortable::add_rank_list(
+        
+            sortable::rank_list(
                 input_id = glue::glue(ns("category_list_{category_id}")),
                 text = NULL,
-                labels = NULL
+                labels = NULL,
+                options = sortable::sortable_options(
+                  group = list(
+                    name = "categories",
+                    pull = TRUE,
+                    put = TRUE
+                  )
+                )
             ) 
         ) 
 
-      
-    )
     
 }
 
