@@ -205,7 +205,7 @@ observeEvent(input$doc_add, {
     observeEvent(input$doc_upload_add, {
       if (
         
-        (!input$doc_upload_name %in% c("", names(doc_list()))) |
+        ((!input$doc_upload_name %in% c("", names(doc_list()))) & !is.null(input$doc_path)) |
          (!is.null(input$doc_path) && (!input$doc_path[["name"]] %in% names(doc_list())))) {
         
       if (isTruthy(input$doc_path[["datapath"]])) {
