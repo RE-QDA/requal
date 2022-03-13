@@ -79,6 +79,7 @@ mod_categories_server <- function(id, project){
                                 project_db = project()$project_db),
         class = "uncategorized",
         options = sortable::sortable_options(
+          sort = FALSE,
           group = list(
             name = "categories",
             pull = "clone",
