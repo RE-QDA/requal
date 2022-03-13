@@ -79,6 +79,7 @@ golem::add_utils( "user", module = "user" )
 ## External resources
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file( "document_code_js" )
+golem::add_js_file( "check_categories" )
 golem::add_js_handler( "handlers" )
 golem::add_css_file( "custom" )
 

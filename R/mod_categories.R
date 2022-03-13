@@ -77,6 +77,7 @@ mod_categories_server <- function(id, project){
         text = NULL,
         labels = render_codes(active_project = project()$active_project,
                                 project_db = project()$project_db),
+        class = "uncategorized",
         options = sortable::sortable_options(
           group = list(
             name = "categories",

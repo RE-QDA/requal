@@ -22,13 +22,14 @@ gen_categories_ui <- function(id,
                 input_id = glue::glue(ns("category_list_{category_id}")),
                 text = NULL,
                 labels = NULL,
+                class = "category",
                 options = sortable::sortable_options(
                   group = list(
                     name = "categories",
                     pull = TRUE,
                     put = TRUE
                   )
-                )
+                  )
             ) 
         ) 
 
