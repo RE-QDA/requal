@@ -90,6 +90,11 @@ mod_categories_server <- function(id, project){
       )
     })
     
+    myinput = reactive({
+      paste(input$edge_category)
+    })
+    observe(print(myinput()))
+    
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({
       

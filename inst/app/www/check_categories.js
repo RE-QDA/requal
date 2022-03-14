@@ -1,4 +1,4 @@
-function check_categories(evt) {
+function check_categories(evt, el) {
      
      var dragged_code_id = evt.item.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
      var dragged_code_id = Number(dragged_code_id);
@@ -8,20 +8,30 @@ function check_categories(evt) {
      
      var preexisting_codes = evt.item.getElementsByClassName('code_item').item(0).closest('.category-rank-list').getElementsByClassName("code_item");
      
-     var preexisting_code_ids = [];
-     console.log(preexisting_code_ids);
+     var id_exists = 0;
 
      for (let i = 0; i < preexisting_codes.length; i++) {
 
-            preexisting_code_ids[i] = Number(preexisting_codes.item(i).getAttribute('data-code_id'));
+            if (dragged_code_id === Number(preexisting_codes.item(i).getAttribute('data-code_id'))) {
+                
+                     var id_exists = id_exists+i;
+            }
 
         }
+
+     var check = id_exists > 0;
+
+     if (check) { // if the code is present, cancel action
+         
+        el.removeChild(evt.item);
+        return;
         
-     console.log(preexisting_code_ids);
-     console.log(dragged_code_id);
-
-
-     var check = preexisting_code_ids.includes(dragged_code_id);
-     console.log(check);
+        } else { // if the code is missing, set input values
+            
+            console.log(dragged_code_id)
+            // mod_categories_ui_1-
+            Shiny.setInputValue("edge_category", dragged_code_id);
+            
+        }
 }
 

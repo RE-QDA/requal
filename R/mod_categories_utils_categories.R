@@ -30,7 +30,7 @@ gen_categories_ui <- function(id,
           pull = TRUE,
           put = TRUE 
         ),
-        onAdd =  htmlwidgets::JS("function (evt) {check_categories(evt);}")
+        onAdd =  htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}")
         # onAdd =  htmlwidgets::JS("function (evt) { var x = evt.item.getElementsByClassName('code_item').item(0).getAttribute('data-id'); console.log(x); console.log(evt.item.getElementsByClassName('code_item').item(0).closest('.category-rank-list'))}")
         #onAdd =  htmlwidgets::JS("function (evt) { console.log(this.el.getAttribute('data-id')); }")
       )
