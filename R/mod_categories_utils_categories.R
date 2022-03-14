@@ -6,18 +6,15 @@ gen_categories_ui <- function(id,
   ns <- NS(id)
  tags$div(
   box(
-    category_description,
+    tags$div(category_description, tags$p(), tags$p(tags$i("Drag & drop codes below"), style = "text-align: center; font-size: 80%;")),
     id = category_id,
     title = category_name,
     closable = FALSE,
     width = NULL,
-    background = "light-blue",
+    background = "blue",
     collapsible = TRUE,
     collapsed = TRUE,
-    label = boxLabel(
-      text = "category",
-      status = "warning"
-    ),
+    label = NULL,
     sortable::rank_list(
       input_id = glue::glue(ns("category_list_{category_id}")),
       text = NULL,
@@ -94,4 +91,33 @@ list_db_categories <- function(id, project_db, project_id) {
     dplyr::bind_cols(tibble::tibble("id" = id))
 
   return(project_categories)
+}
+
+# new category UI -----
+
+create_new_category_UI <- function(id) {
+  
+  ns <- NS(id)
+  box(
+    title = "Create category",
+    collapsible = TRUE,
+    closable = TRUE,
+    width = NULL,
+    
+    textInput(
+      ns("category_name"),
+      label = "Category name",
+      placeholder = "Short but informative name"
+    ) %>% tagAppendAttributes(class = "required"),
+    
+    textAreaInput(
+      ns("category_desc"),
+      label = "Category description",
+      placeholder = "Description and instructions"
+    ),
+    
+    actionButton(ns("code_add"),
+                 label = "Create")
+  )
+  
 }

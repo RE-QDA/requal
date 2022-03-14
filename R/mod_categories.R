@@ -10,40 +10,41 @@
 mod_categories_ui <- function(id){
   ns <- NS(id)
 
+  tagList(
     fluidRow(
       
-      column(width = 8,
+      column(width = 6
+      
+      ),
+      column(width = 6,
              
+             actionButton(ns("new_category"), "Create category"),
+             actionButton(ns("delete_category"), "Delete category")
+             
+    )
+      ),
+
     fluidRow(
-      column(
-        width = 6,
-        tags$h4("Orphan codes"),
-        
+      column(width = 6,
+             tags$br(),
+             
         uiOutput(
           ns("uncategorized")
           )
       ),
       column(width = 6,
-             tags$h4("Categories"),
              tags$br(),
+             
+             uiOutput(ns("categories_manager")),
              
              uiOutput(
                ns("categories_ui")
-             )
+             ),
+             actionButton(ns("test"), "test")
+             
              
              )
-    )),
- 
-  column(width = 4,
-         uiOutput(
-           ns("categories_manager")
-         ),
-         
-         verbatimTextOutput(ns("category_list_1")),
-         verbatimTextOutput(ns("category_list_2")),
-         textAreaInput(ns("mytest"), NULL),
-         actionButton(ns("test"), "test")
-  )
+    )
          
   )
   
@@ -58,21 +59,11 @@ mod_categories_server <- function(id, project){
  
     observeEvent(input$test, {browser()})
     
-    output$category_list_1 <-
-      renderPrint(
-        input$category_list_1 # This matches the input_id of the second rank list
-      )
-    
-    output$category_list_2 <-
-      renderPrint(
-        input$edges_category # This matches the input_id of the second rank list
-      )
-    
 
+    # List existing codes in code boxes --------
+    
     output$uncategorized <- renderUI({
 
-      
-    
       sortable::rank_list(
         input_id = ns("code_list"),
         text = NULL,
@@ -80,7 +71,7 @@ mod_categories_server <- function(id, project){
                                 project_db = project()$project_db),
         class = "uncategorized",
         options = sortable::sortable_options(
-          sort = FALSE,
+          sort = TRUE,
           group = list(
             name = "categories",
             pull = "clone",
@@ -89,12 +80,9 @@ mod_categories_server <- function(id, project){
             onAdd = htmlwidgets::JS("function (evt) { this.el.removeChild(evt.item); }")
         )
       )
+      
     })
     
-    myinput = reactive({
-      paste(input$code_list)
-    })
-    observe(print(input$mytest))
     
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({
@@ -108,24 +96,18 @@ mod_categories_server <- function(id, project){
     
 
     #---Generate categories UI (if there is an active project)--------------
-    output$codes_manager <- renderUI({
-      if (isTruthy(project()$active_project)) {
-        
-        codebook_manager_UI(id,
-                            project_db = project()$project_db,
-                            project_id = project()$active_project)
-      }
-    })
     
-    #---Generate categories UI (if there is an active project)--------------
-    # output$categories_manager <- renderUI({
-    #   if (isTruthy(project()$active_project)) {
-    #     
-    #     codebook_manager_UI(id,
-    #                         project_db = project()$project_db,
-    #                         project_id = project()$active_project)
-    #   }
-    # })
+    observeEvent(input$new_category, {
+      
+      
+      output$categories_manager <- renderUI({
+        create_new_category_UI(id)
+      })
+      
+      
+    })
+  
+    observe(print(input$edges_category))
     
   })
 }
