@@ -1,12 +1,13 @@
 function check_categories(evt, el) {
      console.log(evt.clone);
+     console.log(evt.item.closest('.category-container'));
      var dragged_code_id = evt.clone.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
      var dragged_code_id = Number(dragged_code_id);
      
      var dragged_category_id = evt.item.closest('.category-container').getAttribute('data-category_id');
      var dragged_category_id = Number(dragged_category_id);
      
-     var preexisting_codes = evt.item.closest('.category-rank-list').getElementsByClassName("code_item");
+     var preexisting_codes = evt.item.closest('.category-container').getElementsByClassName("code_item");
      
      var id_exists = 0;
 

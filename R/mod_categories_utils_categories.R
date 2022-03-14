@@ -20,7 +20,7 @@ gen_categories_ui <- function(id,
       text = NULL,
       labels = NULL,
       class = "category-rank-list",
-      css_id = glue::glue(ns("category-rank-list_{category_id}")),
+      css_id = glue::glue(ns("rank-list_{category_id}")),
       options = sortable::sortable_options(
         group = list(
           name = "categories",
@@ -31,7 +31,7 @@ gen_categories_ui <- function(id,
       )
     )  
   ),
-  class = "category-container",
+  class = "category-container", # extra div to capture category id
   `data-category_id` = category_id)
   
 }
