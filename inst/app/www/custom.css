@@ -70,7 +70,28 @@ font-weight: normal;
 
 
 
+.default-sortable .rank-list {
+flex: 1 0 auto;
+-webkit-border-radius: 1px;
+background: none;
+border-color: light-blue !important;
+border-radius: 1px;
+border-style: dashed;
+border-width: 1px;
+margin: 0px !important;
+min-height: 45px;
+padding: 0px !important;
+}
 
+.default-sortable .rank-list.rank-list-empty {
+-webkit-border-radius: 1px;
+background: white !important;
+border-radius: 1px;
+border-width: 1px;
+min-height: 45px;
+margin: 0px !important;
+padding: 0px !important;
+}
 
 .rank-list-item {
 border-radius: 0px !important;
