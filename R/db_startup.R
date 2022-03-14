@@ -162,14 +162,14 @@ create_project_record <- function(con, project_df){
 add_documents_record <- function(con, project_id, document_df){
     res <- DBI::dbWriteTable(con, "documents", document_df, append = TRUE)
     if(res){
-        written_document <- dplyr::tbl(con, "documents") %>% 
+        written_document_id <- dplyr::tbl(con, "documents") %>% 
             dplyr::filter(.data$doc_name == !!document_df$doc_name &
                           .data$doc_description == !!document_df$doc_description & 
                           .data$doc_text == !!document_df$doc_text &
                           .data$project_id == project_id) %>% 
-            dplyr::collect()
+            dplyr::pull(doc_id)
         log_add_document_record(con, project_id, document_df %>% 
-                                    dplyr::mutate(doc_id = written_document$doc_id))    
+                                    dplyr::mutate(doc_id = written_document_id))    
     }else{
         warning("document not added")
     }
@@ -178,13 +178,13 @@ add_documents_record <- function(con, project_id, document_df){
 add_codes_record <- function(con, project_id, codes_df){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
-        written_code <- dplyr::tbl(con, "codes") %>% 
+        written_code_id <- dplyr::tbl(con, "codes") %>% 
             dplyr::filter(.data$code_name == !!codes_df$code_name &
                           .data$code_description == !!codes_df$code_description &
                           .data$project_id == project_id) %>% 
-            dplyr::collect()
+            dplyr::pull(code_id)
         log_add_code_record(con, project_id, codes_df %>% 
-                                dplyr::mutate(code_id = written_code$code_id))    
+                                dplyr::mutate(code_id = written_code_id))    
     }else{
         warning("code not added")
     }
