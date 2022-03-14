@@ -187,7 +187,7 @@ gen_codes_ui <- function(code_id,
         #     boxDropdownItem("Delete")
         #),
         ""
-    ) %>% tagAppendAttributes(`data-index` = code_id,
+    ) %>% tagAppendAttributes(`data-id` = code_id,
                               class = "code_item")
     
 }

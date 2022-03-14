@@ -100,6 +100,7 @@ mod_categories_server <- function(id, project){
       
     })
     
+
     #---Generate categories UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project()$active_project)) {
