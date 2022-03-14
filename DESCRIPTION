@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-assisted Qualitative Data Analysis
-Version: 0.4.2
+Version: 0.4.3
 Authors@R:
     c(
      person(given = "Radim",
