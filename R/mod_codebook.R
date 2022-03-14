@@ -31,7 +31,7 @@ mod_codebook_ui <- function(id) {
 #' codebook Server Functions
 #'
 #' @noRd
-mod_codebook_server <- function(id, project) {
+mod_codebook_server <- function(id, project, user) {
   moduleServer(id, function(input, output, session) {
     
     ns <- session$ns
