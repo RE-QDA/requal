@@ -137,6 +137,14 @@ segments_observer <- reactiveVal(0)
           )
         }
         
+        if (isTruthy(req(input$doc_selector))) {
+          text(load_doc_to_display(project()$active_project, 
+                                   project()$project_db, 
+                                   input$doc_selector, 
+                                   code_df$active_codebook,
+                                   ns=NS(id)))
+        }
+        
         purrr::pmap(
           list(
           code_df$active_codebook$code_id,
@@ -148,6 +156,7 @@ segments_observer <- reactiveVal(0)
                                   code_name = ..2,
                                   code_color = ..3)
         )
+        
         
       } else {
         ""
