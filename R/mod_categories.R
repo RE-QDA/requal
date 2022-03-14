@@ -41,6 +41,7 @@ mod_categories_ui <- function(id){
          
          verbatimTextOutput(ns("category_list_1")),
          verbatimTextOutput(ns("category_list_2")),
+         textAreaInput(ns("mytest"), NULL),
          actionButton(ns("test"), "test")
   )
          
@@ -64,7 +65,7 @@ mod_categories_server <- function(id, project){
     
     output$category_list_2 <-
       renderPrint(
-        input$category_list_2 # This matches the input_id of the second rank list
+        input$edges_category # This matches the input_id of the second rank list
       )
     
 
@@ -91,9 +92,9 @@ mod_categories_server <- function(id, project){
     })
     
     myinput = reactive({
-      paste(input$edge_category)
+      paste(input$code_list)
     })
-    observe(print(myinput()))
+    observe(print(input$mytest))
     
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({

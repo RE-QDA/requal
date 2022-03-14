@@ -23,7 +23,7 @@ gen_categories_ui <- function(id,
       text = NULL,
       labels = NULL,
       class = "category-rank-list",
-      css_id = glue::glue(ns("category-rank-list{category_id}")),
+      css_id = glue::glue(ns("category-rank-list_{category_id}")),
       options = sortable::sortable_options(
         group = list(
           name = "categories",
@@ -31,8 +31,6 @@ gen_categories_ui <- function(id,
           put = TRUE 
         ),
         onAdd =  htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}")
-        # onAdd =  htmlwidgets::JS("function (evt) { var x = evt.item.getElementsByClassName('code_item').item(0).getAttribute('data-id'); console.log(x); console.log(evt.item.getElementsByClassName('code_item').item(0).closest('.category-rank-list'))}")
-        #onAdd =  htmlwidgets::JS("function (evt) { console.log(this.el.getAttribute('data-id')); }")
       )
     )  
   ),

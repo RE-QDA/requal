@@ -30,7 +30,7 @@ function check_categories(evt, el) {
             
             console.log(dragged_code_id)
             // mod_categories_ui_1-
-            Shiny.setInputValue("edge_category", dragged_code_id);
+            Shiny.setInputValue("categories_ui_1-edges_category", {category_id: dragged_category_id, code_id: dragged_code_id});
             
         }
 }
