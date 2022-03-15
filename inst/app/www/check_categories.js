@@ -1,28 +1,32 @@
 function check_categories(evt, el) {
-     console.log(evt.clone);
-     console.log(evt.item.closest('.category-container'));
+     // console.log(evt.clone);
+     // console.log(evt.item.closest('.category-container'));
      var dragged_code_id = evt.clone.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
      var dragged_code_id = Number(dragged_code_id);
      
      var dragged_category_id = evt.item.closest('.category-container').getAttribute('data-category_id');
      var dragged_category_id = Number(dragged_category_id);
      
-     var preexisting_codes = evt.item.closest('.category-container').getElementsByClassName("code_item");
+     var existing_codes = evt.item.closest('.category-container').getElementsByClassName("code_item");
+     // console.log(existing_codes);
+
+     var existing_code_ids = [];
+     // console.log(existing_code_ids);
      
-     var id_exists = 0;
-
-     for (let i = 0; i < preexisting_codes.length; i++) {
-
-            if (dragged_code_id === Number(preexisting_codes.item(i).getAttribute('data-code_id'))) {
-                
-                     var id_exists = id_exists+i;
-            }
-
+     // write existing codes ids to array
+     for (let i = 0; i < existing_codes.length; i++) {
+            existing_code_ids[i] = Number(existing_codes.item(i).getAttribute('data-code_id'));
         }
+        
+     // console.log(existing_code_ids);
+     // console.log(dragged_code_id);
+     
+     // get an array of unique code ids
+     var unique = existing_code_ids.filter((item, i, ar) => ar.indexOf(item) === i);
+     // console.log(unique);
 
-     var check = id_exists > 0;
 
-     if (check) { // if the code is present, cancel action
+     if (existing_code_ids.length > unique.length){ // if the code is present, cancel action
          
         el.removeChild(evt.item);
         return;

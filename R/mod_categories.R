@@ -53,7 +53,7 @@ mod_categories_ui <- function(id){
 #' categories Server Functions
 #'
 #' @noRd 
-mod_categories_server <- function(id, project){
+mod_categories_server <- function(id, project, user){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
