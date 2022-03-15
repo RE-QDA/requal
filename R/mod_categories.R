@@ -171,11 +171,19 @@ mod_categories_server <- function(id, project, user, codebook) {
         delete_cat_id = input$categories_to_del
       )
       
+      # remove from edges
+      edge <- list()
+      edge$category_id <- input$categories_to_del
+      delete_db_edge(project_db = project()$project_db,
+                     active_project = project()$active_project,
+                     user = user,
+                     edge = edge)
+
       # refresh delete UI
       updateSelectInput(
         session = session,
         inputId = "categories_to_del",
-        choices = c("", read_db_codes(
+        choices = c("", read_db_categories(
           project_db = project()$project_db,
           active_project = project()$active_project
         ))

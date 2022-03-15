@@ -243,12 +243,19 @@ delete_db_edge <- function(project_db,
   on.exit(DBI::dbDisconnect(con))
   # delete edge
   # delete edges based on categories
-  if (!is.null(edge$category_id)) {
+  if (!is.null(edge$category_id) & !is.null(edge$code_id) ) {
   query <- glue::glue_sql("DELETE FROM categories_edges
                        WHERE category_id = {edge$category_id}
                        AND code_id = {edge$code_id}", .con = con)
   DBI::dbExecute(con, 
                  query)
+  } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
+    query <- glue::glue_sql("DELETE FROM categories_edges 
+                       WHERE category_id IN (?);", .con = con)
+    DBI::dbExecute(con,
+                   query,
+                   params = list(edge$category_id))
+    
   } else {
     # delete edges based on codebook
     query <- glue::glue_sql("DELETE FROM categories_edges 
