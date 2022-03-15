@@ -13,6 +13,7 @@ mod_analysis_ui <- function(id) {
     fluidRow(
       column(
         width = 8,
+        actionButton(ns("test"), "test"),
         uiOutput(ns("segments")) %>%
           tagAppendAttributes(class = "scrollable90")
       ),
@@ -26,6 +27,14 @@ mod_analysis_ui <- function(id) {
           width = "100%",
           size = 15
         ),
+        selectInput(ns("category_filter"),
+                    label = "Filter by category",
+                    choices = "",
+                    multiple = TRUE,
+                    selectize = FALSE,
+                    width = "100%",
+                    size = 15
+        ),
         selectInput(ns("document_filter"),
           label = "Filter by document",
           choices = "",
@@ -34,7 +43,7 @@ mod_analysis_ui <- function(id) {
           width = "100%",
           size = 15
         )
-      ),
+      ) %>% tagAppendAttributes(class = "scrollable90") ,
       uiOutput(ns("download"))
     )
   )
@@ -47,13 +56,17 @@ mod_analysis_server <- function(id, project, codebook, category, documents, segm
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    observeEvent(input$test,{browser()})
+    
+    # Filters ----
+    
     observeEvent(codebook(), {
       updateSelectInput(
         session = session,
         "code_filter",
-        choices = stats::setNames(
+        choices = c("", stats::setNames(
           codebook()$code_id,
-          codebook()$code_name
+          codebook()$code_name)
         ),
         selected = codebook()$code_id
       )
@@ -63,29 +76,41 @@ mod_analysis_server <- function(id, project, codebook, category, documents, segm
       updateSelectInput(
         session = session,
         "document_filter",
-        choices = documents(),
+        choices = c("", documents()),
         selected = documents()
       )
     })
+    observeEvent(category(), {
+      updateSelectInput(
+        session = session,
+        "category_filter",
+        choices = c("", category()),
+        selected = category()
+      )
+    })
 
+    # Segments to display and filter ----
 
     segments_df <- reactiveVal()
 
     observeEvent(
       {
         input$code_filter
+        input$category_filter
         input$document_filter
         segments()
         codebook()
+        category()
         documents()
         project()$active_project
       },
       {
         temp_df <- load_segments_analysis(
-          project()$project_db,
-          project()$active_project,
-          input$code_filter,
-          input$document_filter
+          project_db = project()$project_db, 
+          active_project = project()$active_project,
+          selected_codes = input$code_filter,
+          selected_categories = input$category_filter,
+          selected_docs = input$document_filter
         )
 
         if (nrow(temp_df) > 0) {

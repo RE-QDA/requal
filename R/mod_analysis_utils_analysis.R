@@ -3,19 +3,26 @@
 load_segments_analysis <- function(project_db, 
                                   active_project, 
                                   selected_codes,
+                                  selected_categories,
                                   selected_docs) {
    
-    if (isTruthy(selected_codes)) {
+    if (isTruthy(selected_codes) | isTruthy(selected_categories)) {
         
-        
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
+      con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+      on.exit(DBI::dbDisconnect(con))
+
+        category_edges <- dplyr::tbl(con, "categories_edges") %>%
+        dplyr::filter(.data$category_id %in% !!selected_categories) %>%
+        dplyr::pull(code_id)
+      
+      code_filter <- as.integer(unique(c(category_edges[isTruthy(category_edges)], selected_codes[isTruthy(selected_codes)])))
+
+
         
         segments <- dplyr::tbl(con, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(code_id  %in% !! as.integer(selected_codes)) %>%
-            dplyr::filter(doc_id  %in% !! as.integer(selected_docs)) %>%
+            dplyr::filter(code_id  %in% !!code_filter) %>%
+            dplyr::filter(doc_id  %in% !!as.integer(selected_docs)) %>%
             dplyr::select(code_id,
                           doc_id,
                           segment_id,
