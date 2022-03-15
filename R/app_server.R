@@ -42,7 +42,7 @@ app_server <- function(input, output, session) {
   
   # analysis ----
   
-  segments_df <- mod_analysis_server("analysis_ui_1", project_observer, codebook, documents, segments_observer)
+  segments_df <- mod_analysis_server("analysis_ui_1", project_observer, codebook, category, documents, segments_observer)
 
   mod_download_handler_server("download_handler_ui_1", segments_df)
 

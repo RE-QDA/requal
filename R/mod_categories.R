@@ -39,7 +39,17 @@ mod_categories_ui <- function(id) {
 mod_categories_server <- function(id, project, user, codebook) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # set up return value object
+    
+    category <- reactiveVal()
 
+    # update return value
+    observeEvent(project()$active_project, {
+    category(read_db_categories(
+      project_db = project()$project_db,
+      active_project = project()$active_project))
+      })
 
     # List existing codes in code boxes --------
     observeEvent(codebook(), {
@@ -144,6 +154,12 @@ mod_categories_server <- function(id, project, user, codebook) {
           inputId = "category_description",
           value = ""
         )
+        
+        # update return value
+        category(read_db_categories(
+          project_db = project()$project_db,
+          active_project = project()$active_project
+        ))
       } else {
         warn_user("Category name must be unique.")
       }
@@ -197,6 +213,12 @@ mod_categories_server <- function(id, project, user, codebook) {
           project_db = project()$project_db
         )
       })
+      
+      # update return value
+      category(read_db_categories(
+        project_db = project()$project_db,
+        active_project = project()$active_project
+      ))
     })
 
   # Create edge
@@ -213,6 +235,11 @@ mod_categories_server <- function(id, project, user, codebook) {
                                user = user,
                                edge = input$edges_category_delete) 
     })
+    
+    
+    # return active categories details ----
+    
+    return(reactive(category()))
     
   })
 }
