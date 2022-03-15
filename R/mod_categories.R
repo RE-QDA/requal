@@ -64,7 +64,7 @@ mod_categories_server <- function(id, project, user, codebook) {
               pull = "clone",
               put = TRUE
             ),
-            onAdd = htmlwidgets::JS("function (evt) {check_categories_delete(evt, this.el);}")
+            onAdd = htmlwidgets::JS("function (evt) { this.el.removeChild(evt.item); }")
           )
         )
       })

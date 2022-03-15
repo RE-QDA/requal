@@ -43,14 +43,12 @@ function check_categories(evt, el) {
 function check_categories_delete(evt, el) {
 
 
-     var dragged_code_id = evt.clone.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
+     var dragged_code_id = evt.item.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
      var dragged_code_id = Number(dragged_code_id);
      
      previous_category_id = Number(evt.from.closest('.category-container').getAttribute('data-category_id'));
      
      // categories_ui_1- must be prepended to match module name
      Shiny.setInputValue("categories_ui_1-edges_category_delete", {category_id: previous_category_id, code_id: dragged_code_id});
-
-     el.removeChild(evt.item);
    
 }

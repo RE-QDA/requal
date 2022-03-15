@@ -32,7 +32,8 @@ gen_categories_ui <- function(id,
             pull = TRUE,
             put = TRUE
           ),
-          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}")
+          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}"), 
+          onRemove = htmlwidgets::JS("function (evt) {check_categories_delete(evt, this.el);}")
         )
       )
     ),
