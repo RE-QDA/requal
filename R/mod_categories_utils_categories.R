@@ -20,7 +20,8 @@ gen_categories_ui <- function(id,
       sortable::rank_list(
         input_id = glue::glue(ns("category_list_{category_id}")),
         text = NULL,
-        labels = render_category_edges(project_db = project_db,
+        labels = render_category_edges(
+          project_db = project_db,
           active_project = active_project,
           category_id = category_id
         ),
@@ -32,7 +33,7 @@ gen_categories_ui <- function(id,
             pull = TRUE,
             put = TRUE
           ),
-          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}"), 
+          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}"),
           onRemove = htmlwidgets::JS("function (evt) {check_categories_delete(evt, this.el);}")
         )
       )
@@ -53,9 +54,11 @@ render_categories <- function(id,
       id = id,
       project_db = project_db,
       project_id = active_project
-    ) %>% 
-      dplyr::mutate(project_db = project_db,
-                    active_project = active_project)
+    ) %>%
+      dplyr::mutate(
+        project_db = project_db,
+        active_project = active_project
+      )
 
 
     if (nrow(project_categories) == 0) {
@@ -210,71 +213,64 @@ add_category_record <- function(con, project_id, user, categories_df) {
 # add edge record -----
 
 add_edge_record <- function(project_db,
-                active_project,
-                user,
-                edge) {
-  
+                            active_project,
+                            user,
+                            edge) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
-  
+
   edge_df <- as.data.frame(edge)
   edge_df$project_id <- active_project
-    
+
   res <- DBI::dbWriteTable(con, "categories_edges", edge_df, append = TRUE)
   on.exit(DBI::dbDisconnect(con))
-  
+
   if (res) {
     # log_add_record_record(con, project_id, user, categories_df)
   } else {
     warning("category not added")
   }
-  
 }
 
 # delete edge record -----
 
 delete_db_edge <- function(project_db,
-           active_project,
-           user,
-           edge) {
-    
-    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-    on.exit(DBI::dbDisconnect(con))
-    # delete edge
-    query <- glue::glue_sql("DELETE FROM categories_edges
+                           active_project,
+                           user,
+                           edge) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+  # delete edge
+  query <- glue::glue_sql("DELETE FROM categories_edges
                        WHERE category_id = {edge$category_id}
                        AND code_id = {edge$code_id}", .con = con)
-    
-      DBI::dbExecute(con, query)
-      #TODO
-      #log_delete_edge_record(con, active_project, user, edge)
+
+  DBI::dbExecute(con, query)
+  # TODO
+  # log_delete_edge_record(con, active_project, user, edge)
 }
 
 # render existing edges -----
 
 render_category_edges <- function(project_db,
-                      active_project,
-                      category_id) {
-  
+                                  active_project,
+                                  category_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
-  
-  category_edges <- dplyr::tbl(con, "categories_edges") %>% 
-    dplyr::filter(.data$category_id == .env$category_id) %>% 
+
+  category_edges <- dplyr::tbl(con, "categories_edges") %>%
+    dplyr::filter(.data$category_id == .env$category_id) %>%
     dplyr::pull(code_id)
 
-    project_codes <- list_db_codes(project_db = project_db,
-                                   project_id = active_project) %>% 
-      dplyr::filter(code_id %in% category_edges)
-    
-    if (nrow(project_codes) == 0) {
-      
-      NULL
-      
-    } else {
-      
-      purrr::pmap(project_codes, gen_codes_ui)
-      
-    }
+  project_codes <- list_db_codes(
+    project_db = project_db,
+    project_id = active_project
+  ) %>%
+    dplyr::filter(code_id %in% category_edges)
 
+  if (nrow(project_codes) == 0) {
+    NULL
+  } else {
+    purrr::pmap(project_codes, gen_codes_ui)
+  }
 }

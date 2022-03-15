@@ -27,8 +27,7 @@ mod_categories_ui <- function(id) {
         tags$br(),
         uiOutput(
           ns("categories_ui")
-        ),
-        actionButton(ns("test"), "test")
+        )
       )
     )
   )
@@ -40,10 +39,6 @@ mod_categories_ui <- function(id) {
 mod_categories_server <- function(id, project, user, codebook) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
-    observeEvent(input$test, {
-      browser()
-    })
 
 
     # List existing codes in code boxes --------
