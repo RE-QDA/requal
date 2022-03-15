@@ -3,12 +3,13 @@ create_db_schema <- function(con){
 }
 
 CREATE_PROJECT_SQL <- "
-CREATE TABLE projects 
-(    project_id INTEGER PRIMARY KEY AUTOINCREMENT
+CREATE TABLE projects (    
+     project_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,    project_name TEXT
 ,    project_description TEXT
 ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-)"
+);
+"
 
 CREATE_REQUAL_INFO_SQL <- "
 CREATE TABLE if not exists requal_version (
@@ -51,7 +52,8 @@ CREATE TABLE if not exists logs
 ,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
-)"
+);
+"
 
 CREATE_DOCUMENTS_SQL <- "
 CREATE TABLE if not exists documents (
@@ -62,7 +64,8 @@ CREATE TABLE if not exists documents (
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
-)"
+);
+"
 
 CREATE_CODES_SQL <- "
 CREATE TABLE if not exists codes (
@@ -71,7 +74,9 @@ CREATE TABLE if not exists codes (
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
-)"
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
 
 CREATE_SEGMENTS_SQL <- "
 CREATE TABLE if not exists segments (
@@ -85,7 +90,29 @@ CREATE TABLE if not exists segments (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
 ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-)"
+);
+"
+
+CREATE_CATEGORIES_SQL <- "
+CREATE TABLE if not exists categories (
+    project_id INTEGER
+,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   category_name
+,   category_description
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+);
+"
+
+CREATE_CATEGORIES_EDGES_SQL <- "
+CREATE TABLE if not exists categories_edges (
+    project_id INTEGER
+,   category_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(category_id) REFERENCES categories(category_id)     
+,   FOREIGN KEY(code_id) REFERENCES codes(codes_id)     
+);
+"
 
 # TODO: memos
 # TODO: memos_documents_map, memos_codes_map, memos_segments_map
@@ -100,6 +127,8 @@ create_db_schema.SQLiteConnection <- function(con){
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_EDGES_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 
@@ -113,6 +142,8 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_LOG_SQL)
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_EDGES_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 

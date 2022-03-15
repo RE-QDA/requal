@@ -4,112 +4,203 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
-mod_categories_ui <- function(id){
+#' @importFrom shiny NS tagList
+mod_categories_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
     fluidRow(
-      
-      column(width = 6
-      
-      ),
-      column(width = 6,
-             
-             actionButton(ns("new_category"), "Create category"),
-             actionButton(ns("delete_category"), "Delete category")
-             
-    )
-      ),
-
+      actionButton(ns("category_create"), "Create category"),
+      actionButton(ns("category_delete"), "Delete category")
+    ),
     fluidRow(
-      column(width = 6,
-             tags$br(),
-             
-        uiOutput(
-          ns("uncategorized")
-          )
+      column(
+        width = 6,
+        tags$br(),
+        uiOutput(ns("categories_manager")),
+        uiOutput(ns("uncategorized"))
       ),
-      column(width = 6,
-             tags$br(),
-             
-             uiOutput(ns("categories_manager")),
-             
-             uiOutput(
-               ns("categories_ui")
-             ),
-             actionButton(ns("test"), "test")
-             
-             
-             )
+      column(
+        width = 6,
+        tags$br(),
+        uiOutput(
+          ns("categories_ui")
+        ),
+        actionButton(ns("test"), "test")
+      )
     )
-         
   )
-  
 }
-    
+
 #' categories Server Functions
 #'
-#' @noRd 
-mod_categories_server <- function(id, project, user){
-  moduleServer( id, function(input, output, session){
+#' @noRd
+mod_categories_server <- function(id, project, user, codebook) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
- 
-    observeEvent(input$test, {browser()})
-    
+
+    observeEvent(input$test, {
+      browser()
+    })
+
 
     # List existing codes in code boxes --------
-    
-    output$uncategorized <- renderUI({
-
-      sortable::rank_list(
-        input_id = ns("code_list"),
-        text = NULL,
-        labels = render_codes(active_project = project()$active_project,
-                                project_db = project()$project_db),
-        class = "codes-rank-list",
-        options = sortable::sortable_options(
-          sort = TRUE,
-          group = list(
-            name = "categories",
-            pull = "clone",
-            put = TRUE
+    observeEvent(codebook(), {
+      output$uncategorized <- renderUI({
+        sortable::rank_list(
+          input_id = ns("code_list"),
+          text = NULL,
+          labels = render_codes(
+            active_project = project()$active_project,
+            project_db = project()$project_db
           ),
-            onAdd = htmlwidgets::JS("function (evt) { this.el.removeChild(evt.item); }")
+          class = "codes-rank-list",
+          options = sortable::sortable_options(
+            sort = TRUE,
+            group = list(
+              name = "categories",
+              pull = "clone",
+              put = TRUE
+            ),
+            onAdd = htmlwidgets::JS("function (evt) {check_categories_delete(evt, this.el);}")
+          )
         )
-      )
-      
+      })
     })
-    
-    
+
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({
-      
-      render_categories(id = id,
-                        active_project = project()$active_project,
-                   project_db = project()$project_db)
-      
-      
+      render_categories(
+        id = id,
+        active_project = project()$active_project,
+        project_db = project()$project_db
+      )
     })
-    
 
-    #---Generate categories UI (if there is an active project)--------------
-    
-    observeEvent(input$new_category, {
-      
-      
+
+    #---Generate create categories UI --------------
+
+    observeEvent(input$category_create, {
       output$categories_manager <- renderUI({
         create_new_category_UI(id)
       })
-      
-      
     })
-  
-    observe(print(input$edges_category))
+
+    # Create categories ------
+    observeEvent(input$category_add, {
+
+
+      # check if code name is unique
+      category_names <- list_db_categories(
+        id = id,
+        project_db = project()$project_db,
+        project_id = project()$active_project
+      )$category_name
+
+      if (!input$category_name %in% category_names & input$category_name != "") {
+        con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
+        on.exit(DBI::dbDisconnect(con))
+
+        categories_input_df <- data.frame(
+          project_id = project()$active_project,
+          category_name = input$category_name,
+          category_description = input$category_desc
+        )
+
+
+        add_category_record(
+          con = con,
+          project_id = project()$active_project,
+          user = user,
+          categories_df = categories_input_df
+        )
+
+        output$categories_ui <- renderUI({
+          render_categories(
+            id = id,
+            active_project = project()$active_project,
+            project_db = project()$project_db
+          )
+        })
+        
+        # refresh create UI
+        updateTextInput(
+          session = session,
+          inputId = "category_name",
+          value = ""
+        )
+        updateTextAreaInput(
+          session = session,
+          inputId = "category_description",
+          value = ""
+        )
+      } else {
+        warn_user("Category name must be unique.")
+      }
+    })
+
+    # Delete categories ------
+    # delete UI
+    observeEvent(input$category_delete, {
+      output$categories_manager <- renderUI({
+        delete_category_UI(id,
+          project_db = project()$project_db,
+          active_project = project()$active_project
+        )
+      })
+    })
+    
+    # delete action
+    observeEvent(input$category_remove, {
+
+      # remove from db
+      delete_db_category(
+        project_db = project()$project_db,
+        active_project = project()$active_project,
+        user = user,
+        delete_cat_id = input$categories_to_del
+      )
+      
+      # refresh delete UI
+      updateSelectInput(
+        session = session,
+        inputId = "categories_to_del",
+        choices = c("", read_db_codes(
+          project_db = project()$project_db,
+          active_project = project()$active_project
+        ))
+      )
+
+      # refresh listed categories
+      output$categories_ui <- renderUI({
+        render_categories(
+          id = id,
+          active_project = project()$active_project,
+          project_db = project()$project_db
+        )
+      })
+    })
+
+  # Create edge
+
+    observeEvent(input$edges_category, {
+    add_edge_record(project_db = project()$project_db,
+                    active_project = project()$active_project,
+                    user = user,
+                    edge = input$edges_category)
+  })
+  # Delete edge
+    observe(print(input$edges_category_delete))
+    
+    #TODO
+    observeEvent(input$edges_category_delete, {
+    delete_db_edge(project_db = project()$project_db,
+                               active_project = project()$active_project,
+                               user = user,
+                               edge = input$edges_category_delete) 
+    })
     
   })
 }
-    
-

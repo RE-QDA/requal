@@ -4,36 +4,36 @@ gen_categories_ui <- function(id,
                               category_name,
                               category_description) {
   ns <- NS(id)
- tags$div(
-  box(
-    tags$div(category_description, tags$p(), tags$p(tags$i("Drag & drop codes below"), style = "text-align: center; font-size: 80%;")),
-    id = category_id,
-    title = category_name,
-    closable = FALSE,
-    width = NULL,
-    background = "blue",
-    collapsible = TRUE,
-    collapsed = TRUE,
-    label = NULL,
-    sortable::rank_list(
-      input_id = glue::glue(ns("category_list_{category_id}")),
-      text = NULL,
-      labels = NULL,
-      class = "category-rank-list",
-      css_id = glue::glue(ns("rank-list_{category_id}")),
-      options = sortable::sortable_options(
-        group = list(
-          name = "categories",
-          pull = TRUE,
-          put = TRUE 
-        ),
-        onAdd =  htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}")
+  tags$div(
+    box(
+      tags$div(category_description, tags$p(), tags$p(tags$i("Drag & drop codes below"), style = "text-align: center; font-size: 80%;")),
+      id = category_id,
+      title = category_name,
+      closable = FALSE,
+      width = NULL,
+      background = "blue",
+      collapsible = TRUE,
+      collapsed = TRUE,
+      label = NULL,
+      sortable::rank_list(
+        input_id = glue::glue(ns("category_list_{category_id}")),
+        text = NULL,
+        labels = NULL,
+        class = "category-rank-list",
+        css_id = glue::glue(ns("rank-list_{category_id}")),
+        options = sortable::sortable_options(
+          group = list(
+            name = "categories",
+            pull = TRUE,
+            put = TRUE
+          ),
+          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}")
+        )
       )
-    )  
-  ),
-  class = "category-container", # extra div to capture category id
-  `data-category_id` = category_id)
-  
+    ),
+    class = "category-container", # extra div to capture category id
+    `data-category_id` = category_id
+  )
 }
 
 
@@ -60,11 +60,36 @@ render_categories <- function(id,
   }
 }
 
+# Read categories--------------------------------------------------------
 
-# List codes--------------------------------------------------------
+read_db_codes <- function(project_db, active_project) {
+  category_id <- category_description <- NULL
 
 
-# Read codes from the DB
+  con <- DBI::dbConnect(
+    RSQLite::SQLite(),
+    project_db
+  )
+  on.exit(DBI::dbDisconnect(con))
+
+  project_categories_df <- dplyr::tbl(con, "categories") %>%
+    dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
+    dplyr::select(
+      category_id,
+      category_name
+    ) %>%
+    dplyr::collect()
+
+  project_categories <- project_categories_df$category_id
+  names(project_categories) <- project_categories_df$category_name
+
+  return(project_categories)
+}
+
+# List categories--------------------------------------------------------
+
+
+# Read categories from the DB
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
@@ -93,31 +118,126 @@ list_db_categories <- function(id, project_db, project_id) {
   return(project_categories)
 }
 
-# new category UI -----
+# create category UI -----
 
 create_new_category_UI <- function(id) {
-  
   ns <- NS(id)
   box(
     title = "Create category",
     collapsible = TRUE,
     closable = TRUE,
     width = NULL,
-    
     textInput(
       ns("category_name"),
       label = "Category name",
       placeholder = "Short but informative name"
     ) %>% tagAppendAttributes(class = "required"),
-    
     textAreaInput(
       ns("category_desc"),
       label = "Category description",
       placeholder = "Description and instructions"
     ),
-    
-    actionButton(ns("code_add"),
-                 label = "Create")
+    actionButton(ns("category_add"),
+      label = "Create"
+    )
   )
+}
+
+# delete category UI -----
+
+delete_category_UI <- function(id, project_db, active_project) {
+  ns <- NS(id)
+  box(
+    title = "Delete category",
+    collapsible = TRUE,
+    closable = TRUE,
+    width = NULL,
+    selectInput(
+      ns("categories_to_del"),
+      label = "Select categories to delete",
+      choices = c("", read_db_codes(
+        project_db = project_db,
+        active_project = active_project
+      )),
+      selected = "",
+      multiple = TRUE
+    ),
+    actionButton(ns("category_remove"),
+      label = "Remove",
+      class = "btn-danger"
+    )
+  )
+}
+
+# delete category UI -----
+
+delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+
+
+  DBI::dbExecute(con,
+    "DELETE from categories
+                   WHERE category_id IN (?)",
+    params = list(delete_cat_id)
+  )
+  # TODO
+  # if(length(delete_cat_id)){
+  #   log_delete_category_record(con, active_project, user, delete_cat_id)
+  # }
+}
+
+# add category record -----
+
+add_category_record <- function(con, project_id, user, categories_df) {
+  res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
+  on.exit(DBI::dbDisconnect(con))
+  if (res) {
+    # log_add_categories_record(con, project_id, user, categories_df)
+  } else {
+    warning("category not added")
+  }
+}
+
+# add edge record -----
+
+add_edge_record <- function(project_db,
+                active_project,
+                user,
+                edge) {
   
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+  
+  edge_df <- as.data.frame(edge)
+  edge_df$project_id <- active_project
+    
+  res <- DBI::dbWriteTable(con, "categories_edges", edge_df, append = TRUE)
+  on.exit(DBI::dbDisconnect(con))
+  
+  if (res) {
+    # log_add_record_record(con, project_id, user, categories_df)
+  } else {
+    warning("category not added")
+  }
+  
+}
+
+# delete edge record -----
+
+delete_db_edge <- function(project_db,
+           active_project,
+           user,
+           edge) {
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+    on.exit(DBI::dbDisconnect(con))
+    # delete edge
+    query <- glue::glue_sql("DELETE FROM categories_edges
+                       WHERE category_id = {edge$category_id}
+                       AND code_id = {edge$code_id}", .con = con)
+    
+      DBI::dbExecute(con, query)
+      #TODO
+      #log_delete_edge_record(con, active_project, user, edge)
 }
