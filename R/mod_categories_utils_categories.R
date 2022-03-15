@@ -1,5 +1,7 @@
 # Generate boxes of categories -----
 gen_categories_ui <- function(id,
+                              project_db,
+                              active_project,
                               category_id,
                               category_name,
                               category_description) {
@@ -18,7 +20,10 @@ gen_categories_ui <- function(id,
       sortable::rank_list(
         input_id = glue::glue(ns("category_list_{category_id}")),
         text = NULL,
-        labels = NULL,
+        labels = render_category_edges(project_db = project_db,
+          active_project = active_project,
+          category_id = category_id
+        ),
         class = "category-rank-list",
         css_id = glue::glue(ns("rank-list_{category_id}")),
         options = sortable::sortable_options(
@@ -47,7 +52,9 @@ render_categories <- function(id,
       id = id,
       project_db = project_db,
       project_id = active_project
-    )
+    ) %>% 
+      dplyr::mutate(project_db = project_db,
+                    active_project = active_project)
 
 
     if (nrow(project_categories) == 0) {
@@ -62,7 +69,7 @@ render_categories <- function(id,
 
 # Read categories--------------------------------------------------------
 
-read_db_codes <- function(project_db, active_project) {
+read_db_categories <- function(project_db, active_project) {
   category_id <- category_description <- NULL
 
 
@@ -155,7 +162,7 @@ delete_category_UI <- function(id, project_db, active_project) {
     selectInput(
       ns("categories_to_del"),
       label = "Select categories to delete",
-      choices = c("", read_db_codes(
+      choices = c("", read_db_categories(
         project_db = project_db,
         active_project = active_project
       )),
@@ -240,4 +247,33 @@ delete_db_edge <- function(project_db,
       DBI::dbExecute(con, query)
       #TODO
       #log_delete_edge_record(con, active_project, user, edge)
+}
+
+# render existing edges -----
+
+render_category_edges <- function(project_db,
+                      active_project,
+                      category_id) {
+  
+  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
+  on.exit(DBI::dbDisconnect(con))
+  
+  category_edges <- dplyr::tbl(con, "categories_edges") %>% 
+    dplyr::filter(.data$category_id == .env$category_id) %>% 
+    dplyr::pull(code_id)
+
+    project_codes <- list_db_codes(project_db = project_db,
+                                   project_id = active_project) %>% 
+      dplyr::filter(code_id %in% category_edges)
+    
+    if (nrow(project_codes) == 0) {
+      
+      NULL
+      
+    } else {
+      
+      purrr::pmap(project_codes, gen_codes_ui)
+      
+    }
+
 }

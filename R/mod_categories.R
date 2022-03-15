@@ -184,7 +184,6 @@ mod_categories_server <- function(id, project, user, codebook) {
     })
 
   # Create edge
-
     observeEvent(input$edges_category, {
     add_edge_record(project_db = project()$project_db,
                     active_project = project()$active_project,
@@ -192,9 +191,6 @@ mod_categories_server <- function(id, project, user, codebook) {
                     edge = input$edges_category)
   })
   # Delete edge
-    observe(print(input$edges_category_delete))
-    
-    #TODO
     observeEvent(input$edges_category_delete, {
     delete_db_edge(project_db = project()$project_db,
                                active_project = project()$active_project,
