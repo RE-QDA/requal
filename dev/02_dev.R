@@ -28,6 +28,9 @@ usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
 usethis::use_package( "stringr" )
+usethis::use_package( "htmlwidgets" )
+usethis::use_package( "sortable" )
+
 
 
 
