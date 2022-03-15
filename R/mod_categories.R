@@ -73,6 +73,19 @@ mod_categories_server <- function(id, project, user, codebook) {
         project_db = project()$project_db
       )
     })
+    
+    # Relist categories on codebook changes
+    observeEvent(codebook(), {
+      
+      output$categories_ui <- renderUI({
+        render_categories(
+          id = id,
+          active_project = project()$active_project,
+          project_db = project()$project_db
+        )
+      })
+      
+    })
 
 
     #---Generate create categories UI --------------
