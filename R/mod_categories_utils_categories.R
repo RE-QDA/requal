@@ -201,8 +201,7 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
 # add category record -----
 
 add_category_record <- function(con, project_id, user, categories_df) {
-  on.exit(DBI::dbDisconnect(con))
-  DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
+  res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
   # if (res) {
   #   # log_add_categories_record(con, project_id, user, categories_df)
   # } else {
@@ -242,26 +241,24 @@ delete_db_edge <- function(project_db,
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
   # delete edge
-  # delete edges based on categories
+  # delete edges based on codes and categories
   if (!is.null(edge$category_id) & !is.null(edge$code_id) ) {
-  query <- glue::glue_sql("DELETE FROM categories_edges
-                       WHERE category_id = {edge$category_id}
-                       AND code_id = {edge$code_id}", .con = con)
   DBI::dbExecute(con, 
-                 query)
+                 glue::glue("DELETE FROM categories_edges
+                       WHERE category_id = {edge$category_id}
+                       AND code_id = {edge$code_id};"))
   } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
-    query <- glue::glue_sql("DELETE FROM categories_edges 
-                       WHERE category_id IN (?);", .con = con)
+    # delete edges based on categories
     DBI::dbExecute(con,
-                   query,
+                   "DELETE FROM categories_edges 
+                       WHERE category_id IN (?);",
                    params = list(edge$category_id))
     
   } else {
     # delete edges based on codebook
-    query <- glue::glue_sql("DELETE FROM categories_edges 
-                       WHERE code_id IN (?);", .con = con)
     DBI::dbExecute(con,
-                   query,
+                   "DELETE FROM categories_edges 
+                       WHERE code_id IN (?);",
                    params = list(edge$code_id))
   }
 
