@@ -168,6 +168,14 @@ mod_codebook_server <- function(id, project) {
       delete_db_codes(project_db = project()$project_db,
                       active_project = project()$active_project,
                       delete_code_id = input$code_to_del)
+      
+      # delete edges
+      edge <- list()
+      edge$code_id <- input$code_to_del
+      delete_db_edge(project_db = project()$project_db,
+                     active_project = project()$active_project,
+                     user = user,
+                     edge = edge)
 
       # re-render manager UI
 

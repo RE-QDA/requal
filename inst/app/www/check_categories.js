@@ -1,4 +1,5 @@
 function check_categories(evt, el) {
+      
      // console.log(evt.clone);
      // console.log(evt.item.closest('.category-container'));
      var dragged_code_id = evt.clone.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
@@ -34,14 +35,13 @@ function check_categories(evt, el) {
         } else { // if the code is missing, set input values
             
             // categories_ui_1- must be prepended to match module name
-            Shiny.setInputValue("categories_ui_1-edges_category", {category_id: dragged_category_id, code_id: dragged_code_id});
+            Shiny.setInputValue("categories_ui_1-edges_category", {category_id: dragged_category_id, code_id: dragged_code_id}, {priority: "event"});
             return;
             
         }
 }
 
-function check_categories_delete(evt, el) {
-
+function check_categories_delete(evt) {
 
      var dragged_code_id = evt.item.getElementsByClassName('code_item').item(0).getAttribute('data-code_id'); 
      var dragged_code_id = Number(dragged_code_id);
@@ -49,6 +49,7 @@ function check_categories_delete(evt, el) {
      previous_category_id = Number(evt.from.closest('.category-container').getAttribute('data-category_id'));
      
      // categories_ui_1- must be prepended to match module name
-     Shiny.setInputValue("categories_ui_1-edges_category_delete", {category_id: previous_category_id, code_id: dragged_code_id});
-   
+     Shiny.setInputValue("categories_ui_1-edges_category_delete", {category_id: previous_category_id, code_id: dragged_code_id}, {priority: "event"});
+     
+     
 }

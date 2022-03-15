@@ -33,8 +33,8 @@ gen_categories_ui <- function(id,
             pull = TRUE,
             put = TRUE
           ),
-          onAdd = htmlwidgets::JS("function (evt) {check_categories(evt, this.el);}"),
-          onRemove = htmlwidgets::JS("function (evt) {check_categories_delete(evt, this.el);}")
+          onAdd = htmlwidgets::JS("function (evt) { check_categories(evt, this.el); }"),
+          onRemove = htmlwidgets::JS("function (evt) { check_categories_delete(evt); }")
         )
       )
     ),
@@ -241,11 +241,23 @@ delete_db_edge <- function(project_db,
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
   # delete edge
+  # delete edges based on categories
+  if (!is.null(edge$category_id)) {
   query <- glue::glue_sql("DELETE FROM categories_edges
                        WHERE category_id = {edge$category_id}
                        AND code_id = {edge$code_id}", .con = con)
+  DBI::dbExecute(con, 
+                 query)
+  } else {
+    # delete edges based on codebook
+    query <- glue::glue_sql("DELETE FROM categories_edges 
+                       WHERE code_id IN (?);", .con = con)
+    DBI::dbExecute(con,
+                   query,
+                   params = list(edge$code_id))
+  }
 
-  DBI::dbExecute(con, query)
+ 
   # TODO
   # log_delete_edge_record(con, active_project, user, edge)
 }
