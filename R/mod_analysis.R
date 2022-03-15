@@ -13,7 +13,6 @@ mod_analysis_ui <- function(id) {
     fluidRow(
       column(
         width = 8,
-        actionButton(ns("test"), "test"),
         uiOutput(ns("segments")) %>%
           tagAppendAttributes(class = "scrollable90")
       ),
@@ -56,8 +55,7 @@ mod_analysis_server <- function(id, project, codebook, category, documents, segm
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    observeEvent(input$test,{browser()})
-    
+
     # Filters ----
     
     observeEvent(codebook(), {
