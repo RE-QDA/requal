@@ -201,13 +201,14 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
 # add category record -----
 
 add_category_record <- function(con, project_id, user, categories_df) {
-  res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
   on.exit(DBI::dbDisconnect(con))
-  if (res) {
-    # log_add_categories_record(con, project_id, user, categories_df)
-  } else {
-    warning("category not added")
-  }
+  DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
+  # if (res) {
+  #   # log_add_categories_record(con, project_id, user, categories_df)
+  # } else {
+  #   warning("category not added")
+  # }
+
 }
 
 # add edge record -----
@@ -222,14 +223,14 @@ add_edge_record <- function(project_db,
   edge_df <- as.data.frame(edge)
   edge_df$project_id <- active_project
 
-  res <- DBI::dbWriteTable(con, "categories_edges", edge_df, append = TRUE)
-  on.exit(DBI::dbDisconnect(con))
+  DBI::dbWriteTable(con, "categories_edges", edge_df, append = TRUE)
 
-  if (res) {
-    # log_add_record_record(con, project_id, user, categories_df)
-  } else {
-    warning("category not added")
-  }
+  # if (res) {
+  #   # log_add_record_record(con, project_id, user, categories_df)
+  # } else {
+  #   warning("category not added")
+  # }
+
 }
 
 # delete edge record -----
