@@ -135,8 +135,8 @@ create_new_category_UI <- function(id) {
   ns <- NS(id)
   box(
     title = "Create category",
-    collapsible = TRUE,
-    closable = TRUE,
+    collapsible = FALSE,
+    closable = FALSE,
     width = NULL,
     textInput(
       ns("category_name"),
@@ -160,8 +160,8 @@ delete_category_UI <- function(id, project_db, active_project) {
   ns <- NS(id)
   box(
     title = "Delete category",
-    collapsible = TRUE,
-    closable = TRUE,
+    collapsible = FALSE,
+    closable = FALSE,
     width = NULL,
     selectInput(
       ns("categories_to_del"),

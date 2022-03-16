@@ -12,24 +12,41 @@ mod_categories_ui <- function(id) {
 
   tagList(
     fluidRow(
-      actionButton(ns("category_create"), "Create category"),
-      actionButton(ns("category_delete"), "Delete category")
-    ),
-    fluidRow(
-      column(
-        width = 6,
-        tags$br(),
-        uiOutput(ns("categories_manager")),
-        uiOutput(ns("uncategorized"))
-      ),
-      column(
-        width = 6,
-        tags$br(),
-        uiOutput(
-          ns("categories_ui")
-        )
-      )
-    )
+        column(
+          width = 6,
+          tags$br(),
+          uiOutput(ns("uncategorized"))
+        ),
+        column(
+          width = 6,
+          tags$br(),
+          #tags$div(
+            uiOutput(ns("categories_ui")),
+            #) %>% tagAppendAttributes(style = "float: left; position: relative; display: flex;"),
+        
+        #tags$div(
+          shinyWidgets::dropdownButton(
+            uiOutput(ns("category_create")),
+            label = "Create category",
+            tooltip = shinyWidgets::tooltipOptions(placement = "left", 
+                                                   title = "Create category", 
+                                                   html = FALSE),
+            status = "primary",
+            circle = TRUE, size = "sm", width = "100%",
+            icon = icon("plus"), right = TRUE
+          ),
+          tags$br(),
+          shinyWidgets::dropdownButton(
+            uiOutput(ns("category_delete")),
+            status = "primary",
+            tooltip = shinyWidgets::tooltipOptions(placement = "left", 
+                                                   title = "Delete category", 
+                                                   html = FALSE),
+            circle = TRUE, size = "sm", width = "500px",
+            icon = icon("minus"), right = TRUE
+          )
+        #) %>% tagAppendAttributes(style = "float: right; position: relative; display: flex;")
+    ))
   )
 }
 
@@ -39,17 +56,18 @@ mod_categories_ui <- function(id) {
 mod_categories_server <- function(id, project, user, codebook) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
+
     # set up return value object
-    
+
     category <- reactiveVal()
 
     # update return value
     observeEvent(project()$active_project, {
-    category(read_db_categories(
-      project_db = project()$project_db,
-      active_project = project()$active_project))
-      })
+      category(read_db_categories(
+        project_db = project()$project_db,
+        active_project = project()$active_project
+      ))
+    })
 
     # List existing codes in code boxes --------
     observeEvent(codebook(), {
@@ -83,10 +101,9 @@ mod_categories_server <- function(id, project, user, codebook) {
         project_db = project()$project_db
       )
     })
-    
+
     # Relist categories on codebook changes
     observeEvent(codebook(), {
-      
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
@@ -94,17 +111,16 @@ mod_categories_server <- function(id, project, user, codebook) {
           project_db = project()$project_db
         )
       })
-      
     })
 
 
     #---Generate create categories UI --------------
 
-    observeEvent(input$category_create, {
-      output$categories_manager <- renderUI({
-        create_new_category_UI(id)
-      })
+
+    output$category_create <- renderUI({
+      create_new_category_UI(id)
     })
+    outputOptions(output, "category_create", suspendWhenHidden = FALSE)
 
     # Create categories ------
     observeEvent(input$category_add, {
@@ -142,7 +158,7 @@ mod_categories_server <- function(id, project, user, codebook) {
             project_db = project()$project_db
           )
         })
-        
+
         # refresh create UI
         updateTextInput(
           session = session,
@@ -154,7 +170,7 @@ mod_categories_server <- function(id, project, user, codebook) {
           inputId = "category_description",
           value = ""
         )
-        
+
         # update return value
         category(read_db_categories(
           project_db = project()$project_db,
@@ -167,15 +183,15 @@ mod_categories_server <- function(id, project, user, codebook) {
 
     # Delete categories ------
     # delete UI
-    observeEvent(input$category_delete, {
-      output$categories_manager <- renderUI({
-        delete_category_UI(id,
-          project_db = project()$project_db,
-          active_project = project()$active_project
-        )
-      })
+    output$category_delete <- renderUI({
+      delete_category_UI(id,
+        project_db = project()$project_db,
+        active_project = project()$active_project
+      )
     })
-    
+    outputOptions(output, "category_delete", suspendWhenHidden = FALSE)
+
+
     # delete action
     observeEvent(input$category_remove, {
 
@@ -186,14 +202,16 @@ mod_categories_server <- function(id, project, user, codebook) {
         user = user,
         delete_cat_id = input$categories_to_del
       )
-      
+
       # remove from edges
       edge <- list()
       edge$category_id <- input$categories_to_del
-      delete_db_edge(project_db = project()$project_db,
-                     active_project = project()$active_project,
-                     user = user,
-                     edge = edge)
+      delete_db_edge(
+        project_db = project()$project_db,
+        active_project = project()$active_project,
+        user = user,
+        edge = edge
+      )
 
       # refresh delete UI
       updateSelectInput(
@@ -213,7 +231,7 @@ mod_categories_server <- function(id, project, user, codebook) {
           project_db = project()$project_db
         )
       })
-      
+
       # update return value
       category(read_db_categories(
         project_db = project()$project_db,
@@ -221,25 +239,28 @@ mod_categories_server <- function(id, project, user, codebook) {
       ))
     })
 
-  # Create edge
+    # Create edge
     observeEvent(input$edges_category, {
-    add_edge_record(project_db = project()$project_db,
-                    active_project = project()$active_project,
-                    user = user,
-                    edge = input$edges_category)
-  })
-  # Delete edge
-    observeEvent(input$edges_category_delete, {
-    delete_db_edge(project_db = project()$project_db,
-                               active_project = project()$active_project,
-                               user = user,
-                               edge = input$edges_category_delete) 
+      add_edge_record(
+        project_db = project()$project_db,
+        active_project = project()$active_project,
+        user = user,
+        edge = input$edges_category
+      )
     })
-    
-    
+    # Delete edge
+    observeEvent(input$edges_category_delete, {
+      delete_db_edge(
+        project_db = project()$project_db,
+        active_project = project()$active_project,
+        user = user,
+        edge = input$edges_category_delete
+      )
+    })
+
+
     # return active categories details ----
-    
+
     return(reactive(category()))
-    
   })
 }
