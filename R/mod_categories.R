@@ -20,34 +20,43 @@ mod_categories_ui <- function(id) {
         column(
           width = 6,
           tags$br(),
-          #tags$div(
-            uiOutput(ns("categories_ui")),
-            #) %>% tagAppendAttributes(style = "float: left; position: relative; display: flex;"),
-        
-        #tags$div(
-          shinyWidgets::dropdownButton(
+      
+
+            tags$div(
+            uiOutput(ns("categories_ui")) 
+            ) %>% tagAppendAttributes(style = "left: 0;
+                                      right:0; 
+                                      margin-right: 10%; 
+                                      margin-left: 5%; 
+                                      position: absolute;"),
+     tags$div(
+  shinyWidgets::dropdownButton(
             uiOutput(ns("category_create")),
             label = "Create category",
-            tooltip = shinyWidgets::tooltipOptions(placement = "left", 
-                                                   title = "Create category", 
-                                                   html = FALSE),
+            # tooltip = shinyWidgets::tooltipOptions(placement = "left", 
+            #                                        title = "Create category", 
+            #                                        html = FALSE),
             status = "primary",
-            circle = TRUE, size = "sm", width = "100%",
+            circle = TRUE, size = "default", width = "500px",
             icon = icon("plus"), right = TRUE
-          ),
-          tags$br(),
+          )  
+        
+          
+          ,tags$br(),
+  
           shinyWidgets::dropdownButton(
             uiOutput(ns("category_delete")),
             status = "primary",
-            tooltip = shinyWidgets::tooltipOptions(placement = "left", 
-                                                   title = "Delete category", 
-                                                   html = FALSE),
-            circle = TRUE, size = "sm", width = "500px",
+            # tooltip = shinyWidgets::tooltipOptions(placement = "left", 
+            #                                        title = "Delete category", 
+            #                                        html = FALSE),
+            circle = TRUE, size = "default", width = "500px",
             icon = icon("minus"), right = TRUE
-          )
-        #) %>% tagAppendAttributes(style = "float: right; position: relative; display: flex;")
-    ))
-  )
+          ) ) %>% tagAppendAttributes(style = "right:0; 
+                                      margin-right: 5px; 
+                                      position: absolute;")
+    ) 
+  ))
 }
 
 #' categories Server Functions
