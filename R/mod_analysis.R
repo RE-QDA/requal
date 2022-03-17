@@ -43,7 +43,7 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, project, codebook, documents, segments) {
+mod_analysis_server <- function(id, project, user, codebook, documents, segments) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
