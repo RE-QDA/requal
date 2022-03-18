@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-assisted Qualitative Data Analysis
-Version: 0.4.3
+Version: 0.5.0
 Authors@R:
     c(
      person(given = "Radim",
@@ -41,6 +41,7 @@ Imports:
     glue,
     golem (>= 0.3.1),
     htmltools,
+    htmlwidgets,
     jsonlite,
     magrittr,
     processx,
@@ -52,6 +53,7 @@ Imports:
     shinydashboardPlus,
     shinyFiles,
     shinyjs,
+    sortable,
     stringr,
     tibble,
     tidyr

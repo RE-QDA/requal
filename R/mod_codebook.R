@@ -12,19 +12,42 @@ mod_codebook_ui <- function(id) {
   
 
 
-    fluidRow(
-      
-
-      column(width = 6,
-             uiOutput(ns(
-               "codes_ui"
-               ))) %>% tagAppendAttributes(class = "scrollable90"),
-             
-      column(width = 6,
-             uiOutput(
-               ns("codes_manager")
-               )))
+  tagList(
+ 
+  tabsetPanel(
+    type = "tabs", 
+    id = ns("codebook_tabset"),
     
+   
+    tabPanel("Codebook",
+      id = ns("codebook_tabset"),
+      value = "codebook_tabset",
+      tags$br(), 
+      
+      column(
+        width = 6,
+        uiOutput(
+          ns("codes_ui")
+          )
+      ) %>% tagAppendAttributes(class = "scrollable90"),
+      
+      column(
+        width = 6,
+        uiOutput(
+          ns("codes_manager")
+        )
+      )
+    ),
+    
+    tabPanel("Categories",
+      id = ns("categories"),
+      value = "categories",
+      
+      mod_categories_ui("categories_ui_1")
+      
+    )
+  )
+)
   
 }
 
@@ -145,6 +168,14 @@ mod_codebook_server <- function(id, project, user) {
       delete_db_codes(project_db = project()$project_db,
                       active_project = project()$active_project,
                       delete_code_id = input$code_to_del)
+      
+      # delete edges
+      edge <- list()
+      edge$code_id <- input$code_to_del
+      delete_category_code_record(project_db = project()$project_db,
+                                  active_project = project()$active_project,
+                                  user = user,
+                                  edge = edge)
 
       # re-render manager UI
 

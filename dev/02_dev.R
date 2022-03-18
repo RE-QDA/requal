@@ -28,6 +28,9 @@ usethis::use_package( "magrittr" )
 usethis::use_package( "dbplyr" )
 usethis::use_package( "purrr" )
 usethis::use_package( "stringr" )
+usethis::use_package( "htmlwidgets" )
+usethis::use_package( "sortable" )
+
 
 
 
@@ -43,6 +46,8 @@ golem::add_module( name = "doc_manager" ) # Name of the module
 
 # Codebook menu
 golem::add_module( name = "codebook" ) # Name of the module
+golem::add_module( name = "categories" ) # Name of the module
+
 
 # Coding workspace
 golem::add_module( name = "document_code" ) # Name of the module
@@ -62,6 +67,7 @@ golem::add_module( name = "user" ) # Name of the module
 golem::add_fct( "helpers" ) 
 golem::add_utils( "project", module = "project" )
 golem::add_utils( "codebook", module = "codebook" )
+golem::add_utils( "categories", module = "categories" )
 golem::add_utils( "document_code", module = "document_code" )
 golem::add_utils( "doc_manager", module = "doc_manager" )
 golem::add_utils( "analysis", module = "analysis" )
@@ -76,6 +82,7 @@ golem::add_utils( "user", module = "user" )
 ## External resources
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file( "document_code_js" )
+golem::add_js_file( "check_categories" )
 golem::add_js_handler( "handlers" )
 golem::add_css_file( "custom" )
 

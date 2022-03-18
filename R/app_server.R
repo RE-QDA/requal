@@ -30,7 +30,11 @@ app_server <- function(input, output, session) {
   
   # codebook  ----
   
-  codebook <- mod_codebook_server("codebook_ui_1", project_observer, user)
+  codebook <- mod_codebook_server("codebook_ui_1", project_observer)
+  category <- mod_categories_server("categories_ui_1", 
+                                    project_observer, 
+                                    user, 
+                                    codebook)
   
   # workdesk ----
  
@@ -38,7 +42,7 @@ app_server <- function(input, output, session) {
   
   # analysis ----
   
-  segments_df <- mod_analysis_server("analysis_ui_1", project_observer, user, codebook, documents, segments_observer)
+  segments_df <- mod_analysis_server("analysis_ui_1", project_observer, user, codebook, category, documents, segments_observer)
 
   mod_download_handler_server("download_handler_ui_1", segments_df)
 
