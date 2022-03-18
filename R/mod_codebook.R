@@ -172,10 +172,10 @@ mod_codebook_server <- function(id, project) {
       # delete edges
       edge <- list()
       edge$code_id <- input$code_to_del
-      delete_db_edge(project_db = project()$project_db,
-                     active_project = project()$active_project,
-                     user = user,
-                     edge = edge)
+      delete_category_code_record(project_db = project()$project_db,
+                                  active_project = project()$active_project,
+                                  user = user,
+                                  edge = edge)
 
       # re-render manager UI
 

@@ -83,4 +83,31 @@ log_delete_segment_record <- function(con, project_id, segment){
                data = list(segment_id = segment))
 }
 
+log_add_category_record <- function(con, project_id, category){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add category", 
+               data = category)
+}
+
+log_delete_category_record <- function(con, project_id, category){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete category", 
+               data = list(category_id = category, project_id = project_id))
+}
+
+log_add_category_code_record <- function(con, project_id, df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add code to category", 
+               data = df)
+}
+
+log_delete_category_code_record <- function(con, project_id, df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete code from category", 
+               data = df)
+}
 

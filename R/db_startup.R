@@ -97,14 +97,14 @@ CREATE_CATEGORIES_SQL <- "
 CREATE TABLE if not exists categories (
     project_id INTEGER
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   category_name
-,   category_description
+,   category_name TEXT
+,   category_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
 );
 "
 
-CREATE_CATEGORIES_EDGES_SQL <- "
-CREATE TABLE if not exists categories_edges (
+CREATE_CATEGORY_CODE_MAP_SQL <- "
+CREATE TABLE if not exists category_code_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
@@ -114,9 +114,30 @@ CREATE TABLE if not exists categories_edges (
 );
 "
 
+CREATE_CASES_SQL <- "
+CREATE TABLE if not exists cases (
+    project_id INTEGER
+,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   case_name TEXT
+,   case_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CASE_DOC_MAP_SQL <- "
+CREATE TABLE if not exists case_document_map (
+    project_id INTEGER
+,   case_id INTEGER
+,   doc_id INTEGER
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+);
+" 
+
+# TODO: hierarchy between codes, cases, categories (code_code_map, case_case_map, category_category_map)
 # TODO: memos
 # TODO: memos_documents_map, memos_codes_map, memos_segments_map
-# TODO: code_categories
 
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
@@ -128,7 +149,9 @@ create_db_schema.SQLiteConnection <- function(con){
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
     DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
-    DBI::dbExecute(con, CREATE_CATEGORIES_EDGES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_CASES_SQL)
+    DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 
@@ -143,7 +166,9 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
     DBI::dbExecute(con, CREATE_CODES_SQL)
     DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
-    DBI::dbExecute(con, CREATE_CATEGORIES_EDGES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_CASES_SQL)
+    DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
 }
 
