@@ -76,7 +76,6 @@ import_rqda <- function(rqda_file, requal_connection){
     # Create requal schema
     message("Creating Requal scheme")
     create_db_schema(requal_connection)
-    requal:::create_db_schema(requal_connection)
 
     # Import to requal
     create_project_record(requal_connection, project_df)
@@ -103,10 +102,6 @@ import_rqda <- function(rqda_file, requal_connection){
                       code_color = ifelse(is.na(code_color), 
                                           sample_colours(n = n_colours), 
                                           code_color))
-    codes_df <- rqda_codes %>% 
-        dplyr::mutate(project_id = requal_project_id, 
-                      code_color = ifelse(is.na(code_color), 
-                                          "rgb(255,255,0)", code_color))
     purrr::walk(1:nrow(codes_df), function(x) {
         add_codes_record(requal_connection, requal_project_id, codes_df[x, ])    
     })
