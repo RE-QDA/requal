@@ -12,9 +12,9 @@ import_rqda(rqda_file, requal_file)
 \item{requal_file}{Path to requal database to be created by import, it must not exist}
 }
 \description{
-Import data from RQDA database to requal. Only import from
+Import data from RQDA database to requal. It uses tables
 RQDA tables "project", "source" (documents), "freecode" (codes) 
-and "coding" (coded segments) is implemented.
-Memos from "source" and "freecode" are used as descriptions. 
+and "coding" (coded segments), "cases", "caselinkage", "codecat" (categories).
+Memos from "source", "freecode", "cases" and "codecat" are used as descriptions. 
 Memos from "coding" are stored as memos.
 }

@@ -1,9 +1,10 @@
 #' Sample colours 
 #' 
 #' @param n N colours to be sampled
+#' @importFrom grDevices colours col2rgb
 sample_colours <- function(n){
-    sampled_colours <- sample(colours(), size = n, replace = FALSE)
-    rgb_colours <- col2rgb(sampled_colours)
+    sampled_colours <- sample(grDevices::colours(), size = n, replace = FALSE)
+    rgb_colours <- grDevices::col2rgb(sampled_colours)
     purrr::map_chr(1:ncol(rgb_colours), function(x) {
         paste0("rgb(",
                rgb_colours[1, x], ",",
@@ -119,7 +120,7 @@ import_rqda <- function(rqda_file, requal_file){
     requal_project_id <- dplyr::tbl(requal_connection, "projects") %>% 
         dplyr::collect() %>% 
         dplyr::pull(project_id) %>% 
-        tail(1)
+        utils::tail(1)
     
     message("Importing documents")
     documents_df <- rqda_documents %>% 

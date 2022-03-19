@@ -6,6 +6,9 @@
 \usage{
 sample_colours(n)
 }
+\arguments{
+\item{n}{N colours to be sampled}
+}
 \description{
 Sample colours
 }
