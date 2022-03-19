@@ -66,13 +66,13 @@ import_rqda <- function(rqda_file, requal_file){
                       segment_start = selfirst, 
                       segment_end = selend, 
                       memo) %>% 
-        dplyr::mutate(segment_id = row_number())
+        dplyr::mutate(segment_id = dplyr::row_number())
     
     if(!all(is.na(rqda_segments$memo))){
         memos_df <- rqda_segments %>% 
             dplyr::select(segment_id, memo) %>% 
             dplyr::filter(!is.na(memo)) %>% 
-            dplyr::mutate(memo_id = row_number()) %>% 
+            dplyr::mutate(memo_id = dplyr::row_number()) %>% 
             dplyr::rename(text = memo)
         
         memos_segments_map_df <- memos_df %>% 
@@ -100,7 +100,7 @@ import_rqda <- function(rqda_file, requal_file){
                       category_description = memo) %>% 
         dplyr::collect() 
     
-    rqda_category_code_map <- dplyr::tbl(rqda_con, "codecat") %>% 
+    rqda_category_code_map <- dplyr::tbl(rqda_con, "treecode") %>% 
         dplyr::filter(.data$status == 1) %>% 
         dplyr::select(category_id = catid, 
                       code_id = cid) %>% 
@@ -165,7 +165,7 @@ import_rqda <- function(rqda_file, requal_file){
     category_code_map <- rqda_category_code_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(category_code_map)), function(x) {
-        add_category_code_record(requal_connection, requal_project_id, NULL, category_code_map[x, ])
+        add_category_code_record(requal_file, requal_project_id, NULL, category_code_map[x, ])
     })
     
     message("Importing segments")
@@ -191,5 +191,6 @@ import_rqda <- function(rqda_file, requal_file){
         DBI::dbWriteTable(requal_connection, "memos_segments_map", memos_segments_map_df, append = TRUE)
     }
     
-    dbDisconnect()
+    DBI::dbDisconnect(rqda_con)
+    DBI::dbDisconnect(requal_connection)
 }
