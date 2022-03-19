@@ -199,7 +199,11 @@ add_category_record <- function(con, project_id, user, categories_df) {
   res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
   
   if (res) {
-    log_add_category_record(con, project_id, categories_df)
+    written_category_id <- dplyr::tbl(con, "categories") %>% 
+      dplyr::filter(.data$category_name == !!categories_df$category_name) %>% 
+      dplyr::pull(category_id)
+    log_add_category_record(con, project_id, categories_df %>% 
+                              dplyr::mutate(category_id = written_category_id))
   } else {
     warning("category not added")
   }
