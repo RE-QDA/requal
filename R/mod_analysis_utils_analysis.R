@@ -11,7 +11,7 @@ load_segments_analysis <- function(project_db,
       con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
       on.exit(DBI::dbDisconnect(con))
 
-        category_edges <- dplyr::tbl(con, "category_code_map") %>%
+        category_edges <- dplyr::tbl(con, "categories_codes_map") %>%
         dplyr::filter(.data$category_id %in% !!selected_categories) %>%
         dplyr::pull(code_id)
       

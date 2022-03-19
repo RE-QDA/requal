@@ -73,6 +73,33 @@ import_rqda <- function(rqda_file, requal_connection){
             
     }
     
+    rqda_cases <- dplyr::tbl(rqda_con, "cases") %>% 
+        dplyr::filter(.data$status == 1) %>% 
+        dplyr::select(case_id = id, 
+                      case_name = name, 
+                      case_description = memo) %>% 
+        dplyr::collect()
+    
+    rqda_case_doc_map <- dplyr::tbl(rqda_con, "caselinkage") %>% 
+        dplyr::filter(.data$status == 1) %>% 
+        dplyr::select(case_id = caseid, 
+                      doc_id = fid) %>% 
+        dplyr::collect()
+    
+    rqda_categories <- dplyr::tbl(rqda_con, "codecat") %>% 
+        dplyr::filter(.data$status == 1) %>% 
+        dplyr::select(category_id = catid, 
+                      category_name = name, 
+                      category_description = memo) %>% 
+        dplyr::collect() 
+    
+    rqda_category_code_map <- dplyr::tbl(rqda_con, "codecat") %>% 
+        dplyr::filter(.data$status == 1) %>% 
+        dplyr::select(category_id = catid, 
+                      code_id = cid) %>% 
+        dplyr::collect() %>% 
+        dplyr::filter(!is.na(cid))
+    
     # Create requal schema
     message("Creating Requal scheme")
     create_db_schema(requal_connection)
@@ -88,8 +115,18 @@ import_rqda <- function(rqda_file, requal_connection){
     message("Importing documents")
     documents_df <- rqda_documents %>% 
         dplyr::mutate(project_id = requal_project_id)
-    purrr::walk(1:nrow(documents_df), function(x) {
+    purrr::walk(seq_along(documents_df), function(x) {
         add_documents_record(requal_connection, requal_project_id, documents_df[x, ])
+    })
+    
+    message("Importing cases")
+    purrr::walk(seq_along(rqda_cases), function(x) {
+        add_cases_record(requal_connection, requal_project_id, rqda_cases[x, ])
+    })
+    
+    message("Importing case document map")
+    purrr::walk(seq_along(rqda_case_doc_map), function(x) {
+        add_case_doc_record(requal_connection, requal_project_id, rqda_case_doc_map[x, ])
     })
     
     n_colours <- rqda_codes %>% 
@@ -102,8 +139,18 @@ import_rqda <- function(rqda_file, requal_connection){
                       code_color = ifelse(is.na(code_color), 
                                           sample_colours(n = n_colours), 
                                           code_color))
-    purrr::walk(1:nrow(codes_df), function(x) {
+    purrr::walk(seq_along(codes_df), function(x) {
         add_codes_record(requal_connection, requal_project_id, codes_df[x, ])    
+    })
+    
+    message("Importing categories")
+    purrr::walk(seq_along(rqda_categories), function(x) {
+        add_category_record(requal_connection, requal_project_id, rqda_categories[x, ])
+    })
+    
+    message("Importing category code mapping")
+    purrr::walk(seq_along(rqda_category_code_map), function(x) {
+        add_category_code_record(requal_connection, requal_project_id, NULL, rqda_category_code_map[x, ])
     })
     
     message("Importing segments")
@@ -117,7 +164,7 @@ import_rqda <- function(rqda_file, requal_connection){
                               })) %>% 
         dplyr::select(-memo)
     
-    purrr::walk(1:nrow(segments_df), function(x) {
+    purrr::walk(seq_along(segments_df), function(x) {
         DBI::dbWriteTable(requal_connection, "segments", segments_df[x, ], append = TRUE)
         log_add_segment_record(requal_connection, requal_project_id, segments_df[x, ])    
     })

@@ -48,6 +48,20 @@ log_delete_document_record <- function(con, project_id, doc_ids){
                data = list(doc_id = doc_ids))
 }
 
+log_add_case_record <- function(con, project_id, case_df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add case", 
+               data = case_df)
+}
+
+log_add_case_doc_record <- function(con, project_id, case_doc_map_df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add case document link", 
+               data = case_doc_map_df)
+}
+
 log_add_code_record <- function(con, project_id, code){
     log_action(con, 
                project_id = project_id, 

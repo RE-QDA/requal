@@ -104,7 +104,7 @@ CREATE TABLE if not exists categories (
 "
 
 CREATE_CATEGORY_CODE_MAP_SQL <- "
-CREATE TABLE if not exists category_code_map (
+CREATE TABLE if not exists categories_codes_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
@@ -125,7 +125,7 @@ CREATE TABLE if not exists cases (
 "
 
 CREATE_CASE_DOC_MAP_SQL <- "
-CREATE TABLE if not exists case_document_map (
+CREATE TABLE if not exists cases_documents_map (
     project_id INTEGER
 ,   case_id INTEGER
 ,   doc_id INTEGER
@@ -312,6 +312,21 @@ add_documents_record <- function(con, project_id, document_df){
     }
 }
 
+add_cases_record <- function(con, project_id, case_df){
+    res <- DBI::dbWriteTable(con, "cases", case_df, append = TRUE)
+    if(res){
+        written_case_id <- dplyr::tbl(con, "case") %>% 
+            dplyr::filter(.data$case_name == !!case_df$case_name &
+                              .data$case_description == !!case_df$case_description &
+                              .data$project_id == project_id) %>% 
+            dplyr::pull(case_id)
+        log_add_case_record(con, project_id, case_df %>% 
+                                dplyr::mutate(case_id = written_case_id))    
+    }else{
+        warning("case not added")
+    }
+}
+
 add_codes_record <- function(con, project_id, codes_df){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
@@ -324,5 +339,14 @@ add_codes_record <- function(con, project_id, codes_df){
                                 dplyr::mutate(code_id = written_code_id))    
     }else{
         warning("code not added")
+    }
+}
+
+add_case_doc_record <- function(con, project_id, case_doc_df){
+    res <- DBI::dbWriteTable(con, "case_document_map", case_doc_df, append = TRUE)
+    if(res){
+        log_add_case_doc_record(con, project_id, case_doc_df)
+    }else{
+        warning("code document map not added")
     }
 }
