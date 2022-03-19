@@ -10,53 +10,32 @@
 mod_categories_ui <- function(id) {
   ns <- NS(id)
 
-  tagList(
-    fluidRow(
-        column(
-          width = 6,
-          tags$br(),
-          uiOutput(ns("uncategorized"))
-        ),
-        column(
-          width = 6,
-          tags$br(),
-      
 
-            tags$div(
-            uiOutput(ns("categories_ui")) 
-            ) %>% tagAppendAttributes(style = "left: 0;
-                                      right:0; 
-                                      margin-right: 10%; 
-                                      margin-left: 5%; 
-                                      position: absolute;"),
-     tags$div(
-  shinyWidgets::dropdownButton(
-            uiOutput(ns("category_create")),
-            label = "Create category",
-            # tooltip = shinyWidgets::tooltipOptions(placement = "left", 
-            #                                        title = "Create category", 
-            #                                        html = FALSE),
-            status = "primary",
-            circle = TRUE, size = "default", width = "500px",
-            icon = icon("plus"), right = TRUE
-          )  
-        
-          
-          ,tags$br(),
-  
-          shinyWidgets::dropdownButton(
-            uiOutput(ns("category_delete")),
-            status = "primary",
-            # tooltip = shinyWidgets::tooltipOptions(placement = "left", 
-            #                                        title = "Delete category", 
-            #                                        html = FALSE),
-            circle = TRUE, size = "default", width = "500px",
-            icon = icon("minus"), right = TRUE
-          ) ) %>% tagAppendAttributes(style = "right:0; 
-                                      margin-right: 5px; 
-                                      position: absolute;")
-    ) 
-  ))
+  fluidRow(
+    column(
+      width = 5,
+      tags$br(),
+      uiOutput(ns("uncategorized"))
+    ),
+    column(
+      width = 5,
+      tags$br(),
+      uiOutput(ns("categories_ui"))
+    ),
+
+    # menu
+    menu_column(
+      width = 2,
+      menu_btn(
+        uiOutput(ns("category_create")),
+        label = "Create category",
+        icon = "plus"),
+      menu_btn(
+        uiOutput(ns("category_delete")),
+        label =  "Delete category",
+        icon = "minus")
+      )
+  )
 }
 
 #' categories Server Functions

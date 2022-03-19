@@ -42,7 +42,7 @@ mod_analysis_ui <- function(id) {
           width = "100%",
           size = 15
         )
-      ) %>% tagAppendAttributes(class = "scrollable90") ,
+      ) %>% tagAppendAttributes(class = "scrollable90"),
       uiOutput(ns("download"))
     )
   )
