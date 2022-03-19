@@ -5,9 +5,9 @@ codebook_manager_UI <- function(id, project_db, project_id) {
   
     ns <- NS(id)
     tagList(
-        box(
+       menu_btn(box(
             title = "Create codes",
-            collapsible = TRUE,
+            collapsible = FALSE,
             width = NULL,
             
             textInput(
@@ -32,7 +32,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
             
             actionButton(ns("code_add"),
                          label = "Create")
-        ),
+        ), label = NULL, icon = "plus"),
         # box(
         #     title = "Edit codes",
         #     collapsible = TRUE,
@@ -55,10 +55,10 @@ codebook_manager_UI <- function(id, project_db, project_id) {
         #     
         # ),
 
-        box(
+        menu_btn(box(
             title = "Merge codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
+            collapsible = FALSE,
+            collapsed = FALSE,
             width = NULL,
 
             selectInput(
@@ -85,12 +85,12 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                          label = "Merge",
                          class = "btn-warning")
 
-        ),
+        ), label = NULL, icon ="hammer") ,
 
-        box(
+        menu_btn( box(
             title = "Delete codes",
-            collapsible = TRUE,
-            collapsed = TRUE,
+            collapsible = FALSE,
+            collapsed = FALSE,
             width = NULL,
             
             selectInput(
@@ -107,7 +107,7 @@ codebook_manager_UI <- function(id, project_db, project_id) {
                          label = "Delete",
                          class = "btn-danger")
             
-        )
+        ), label = NULL, icon = "trash")
         
     )
 }

@@ -25,14 +25,14 @@ mod_codebook_ui <- function(id) {
       tags$br(), 
       
       column(
-        width = 6,
+        width = 10,
         uiOutput(
           ns("codes_ui")
           )
-      ) %>% tagAppendAttributes(class = "scrollable90"),
+      ) %>% tagAppendAttributes(class = "scrollable90", style = "max-width=60%"),
       
-      column(
-        width = 6,
+      menu_column(
+        width = 2,
         uiOutput(
           ns("codes_manager")
         )

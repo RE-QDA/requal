@@ -143,7 +143,7 @@ set_controlbar <- function() {
 
 menu_btn <- function(..., label, icon) {
   
-  shinyWidgets::dropdownButton(
+  shinyWidgets::dropdown(
    ...,
     label = label,
     tooltip = shinyWidgets::tooltipOptions(
@@ -152,9 +152,12 @@ menu_btn <- function(..., label, icon) {
       html = FALSE
     ),
     status = "primary",
-    circle = TRUE, size = "default", width = "370px",
-    icon = icon(icon), right = TRUE
-  ) %>% tagAppendAttributes(style = "padding-right: 5px; top: 1vh; position: relative;")
+    circle = TRUE, 
+    size = "default", 
+    width = "370px",
+    icon = icon(icon), 
+    right = TRUE
+  ) %>% tagAppendAttributes(style = "padding-right: 5px; top: 1vh; position: relative; min-width: 50%")
 }
 
 menu_column <- function(width = 2, ...) {
