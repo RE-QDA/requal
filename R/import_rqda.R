@@ -1,4 +1,6 @@
 #' Sample colours 
+#' 
+#' @param n N colours to be sampled
 sample_colours <- function(n){
     sampled_colours <- sample(colours(), size = n, replace = FALSE)
     rgb_colours <- col2rgb(sampled_colours)
