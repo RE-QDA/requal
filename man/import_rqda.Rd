@@ -4,12 +4,12 @@
 \alias{import_rqda}
 \title{Import data from RQDA to Requal}
 \usage{
-import_rqda(rqda_file, requal_connection)
+import_rqda(rqda_file, requal_file)
 }
 \arguments{
 \item{rqda_file}{Path to RQDA database}
 
-\item{requal_connection}{Connection to REQUAL database}
+\item{requal_file}{Path to requal database to be created by import, it must not exist}
 }
 \description{
 Import data from RQDA database to requal. Only import from

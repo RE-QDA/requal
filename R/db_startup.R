@@ -301,7 +301,6 @@ add_documents_record <- function(con, project_id, document_df){
     if(res){
         written_document_id <- dplyr::tbl(con, "documents") %>% 
             dplyr::filter(.data$doc_name == !!document_df$doc_name &
-                          .data$doc_description == !!document_df$doc_description & 
                           .data$doc_text == !!document_df$doc_text &
                           .data$project_id == project_id) %>% 
             dplyr::pull(doc_id)
@@ -315,9 +314,8 @@ add_documents_record <- function(con, project_id, document_df){
 add_cases_record <- function(con, project_id, case_df){
     res <- DBI::dbWriteTable(con, "cases", case_df, append = TRUE)
     if(res){
-        written_case_id <- dplyr::tbl(con, "case") %>% 
+        written_case_id <- dplyr::tbl(con, "cases") %>% 
             dplyr::filter(.data$case_name == !!case_df$case_name &
-                              .data$case_description == !!case_df$case_description &
                               .data$project_id == project_id) %>% 
             dplyr::pull(case_id)
         log_add_case_record(con, project_id, case_df %>% 
@@ -332,7 +330,6 @@ add_codes_record <- function(con, project_id, codes_df){
     if(res){
         written_code_id <- dplyr::tbl(con, "codes") %>% 
             dplyr::filter(.data$code_name == !!codes_df$code_name &
-                          .data$code_description == !!codes_df$code_description &
                           .data$project_id == project_id) %>% 
             dplyr::pull(code_id)
         log_add_code_record(con, project_id, codes_df %>% 
@@ -343,7 +340,7 @@ add_codes_record <- function(con, project_id, codes_df){
 }
 
 add_case_doc_record <- function(con, project_id, case_doc_df){
-    res <- DBI::dbWriteTable(con, "case_document_map", case_doc_df, append = TRUE)
+    res <- DBI::dbWriteTable(con, "cases_documents_map", case_doc_df, append = TRUE)
     if(res){
         log_add_case_doc_record(con, project_id, case_doc_df)
     }else{
