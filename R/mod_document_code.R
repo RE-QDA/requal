@@ -184,12 +184,11 @@ segments_observer <- reactiveVal(0)
                          startOff, 
                          endOff)
         
-        display_text <- load_doc_to_display(project()$active_project, 
+        text(load_doc_to_display(project()$active_project, 
                                             project()$project_db, 
                                             input$doc_selector,
                                             code_df$active_codebook,
-                                            ns=NS(id))
-        text(display_text)
+                                            ns=NS(id)))
         segments_observer(segments_observer()+1)
         
         }

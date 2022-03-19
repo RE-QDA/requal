@@ -235,7 +235,7 @@ res <- dplyr::tibble(
 
 for (i in seq_along(vals)) { 
   overlap_df <- raw_segments %>%
-    dplyr::filter(vals[i] >= segment_start && vals[i] <= segment_end)
+    dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
   if (names(vals[i]) == "segment_start") {
     res <- dplyr::bind_rows(
       res,
