@@ -1,6 +1,6 @@
 
-import_rqda_test_file <- here::here("test_rqda_import.rqda")
-import_requal_test_file <- here::here("test_rqda_import.requal")
+import_rqda_test_file <- "test_rqda_import.rqda"
+import_requal_test_file <- "test_rqda_import.requal"
 
 rqda_con <- DBI::dbConnect(RSQLite::SQLite(), import_rqda_test_file)
 DBI::dbWriteTable(rqda_con, "project", data.frame(
