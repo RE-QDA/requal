@@ -145,15 +145,15 @@ menu_btn <- function(..., label, icon) {
   
   shinyWidgets::dropdown(
    ...,
-    label = label,
+    label = NULL,
+    style = "material-circle",
     tooltip = shinyWidgets::tooltipOptions(
       placement = "left",
       title = label,
       html = FALSE
     ),
     status = "primary",
-    circle = TRUE, 
-    size = "default", 
+    size = "md", 
     width = "370px",
     icon = icon(icon), 
     right = TRUE
