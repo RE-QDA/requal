@@ -64,7 +64,7 @@ DBI::dbWriteTable(rqda_con, "treecode", data.frame(
 ))
 
 
-import_rqda(import_rqda_test_file, import_requal_test_file)
+rql_import_rqda(import_rqda_test_file, import_requal_test_file)
 import_con <- DBI::dbConnect(RSQLite::SQLite(), import_requal_test_file)
 
 test_that("Import from RQDA works", {

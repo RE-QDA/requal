@@ -25,7 +25,7 @@ sample_colours <- function(n){
 #'
 #' @export
 #' @importFrom rlang .data
-import_rqda <- function(rqda_file, requal_file){
+rql_import_rqda <- function(rqda_file, requal_file){
     
     # Load RQDA DB
     rqda_con <- DBI::dbConnect(RSQLite::SQLite(), rqda_file)
