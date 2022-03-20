@@ -104,7 +104,7 @@ CREATE TABLE if not exists categories (
 "
 
 CREATE_CATEGORY_CODE_MAP_SQL <- "
-CREATE TABLE if not exists category_code_map (
+CREATE TABLE if not exists categories_codes_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
@@ -125,7 +125,7 @@ CREATE TABLE if not exists cases (
 "
 
 CREATE_CASE_DOC_MAP_SQL <- "
-CREATE TABLE if not exists case_document_map (
+CREATE TABLE if not exists cases_documents_map (
     project_id INTEGER
 ,   case_id INTEGER
 ,   doc_id INTEGER
@@ -136,8 +136,81 @@ CREATE TABLE if not exists case_document_map (
 " 
 
 # TODO: hierarchy between codes, cases, categories (code_code_map, case_case_map, category_category_map)
-# TODO: memos
-# TODO: memos_documents_map, memos_codes_map, memos_segments_map
+
+# memos
+CREATE_MEMO_SQL <- "
+CREATE TABLE if not exists memos (
+    memo_id INTEGER PRIMARY KEY
+,   text TEXT
+)"
+
+CREATE_MEMO_DOCUMENT_MAP_SQL <- "
+CREATE TABLE if not exists memos_documents_map (
+    memo_id INTEGER
+,   doc_id INTEGER
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+CREATE_MEMO_CODE_MAP_SQL <- "
+CREATE TABLE if not exists memos_codes_map (
+    memo_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+# memos
+CREATE_MEMO_SQL <- "
+CREATE TABLE if not exists memos (
+    memo_id INTEGER PRIMARY KEY
+,   text TEXT
+)"
+
+CREATE_MEMO_DOCUMENT_MAP_SQL <- "
+CREATE TABLE if not exists memos_documents_map (
+    memo_id INTEGER
+,   doc_id INTEGER
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+CREATE_MEMO_CODE_MAP_SQL <- "
+CREATE TABLE if not exists memos_codes_map (
+    memo_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+CREATE_MEMO_SEGMENT_MAP_SQL <- "
+CREATE TABLE if not exists memos_segments_map (
+    memo_id INTEGER
+,   segment_id INTEGER
+,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
+,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+)"
+
+
+create_db_schema.default <- function(con){
+    # TODO: Full DB structure
+    DBI::dbExecute(con, CREATE_PROJECT_SQL)
+    DBI::dbExecute(con, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(con, CREATE_USERS_SQL)
+    DBI::dbExecute(con, CREATE_USER_PERMISSIONS_SQL)
+    DBI::dbExecute(con, CREATE_LOG_SQL)
+    DBI::dbExecute(con, CREATE_DOCUMENTS_SQL)
+    DBI::dbExecute(con, CREATE_CODES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORIES_SQL)
+    DBI::dbExecute(con, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_CASES_SQL)
+    DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
+    DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
+}
 
 create_db_schema.SQLiteConnection <- function(con){
     # TODO: Full DB structure
@@ -153,6 +226,10 @@ create_db_schema.SQLiteConnection <- function(con){
     DBI::dbExecute(con, CREATE_CASES_SQL)
     DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
 create_db_schema.PqConnection <- function(con){
@@ -170,6 +247,10 @@ create_db_schema.PqConnection <- function(con){
     DBI::dbExecute(con, CREATE_CASES_SQL)
     DBI::dbExecute(con, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(con, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(con, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
 create_default_user <- function(con, project_id){
@@ -220,7 +301,6 @@ add_documents_record <- function(con, project_id, document_df){
     if(res){
         written_document_id <- dplyr::tbl(con, "documents") %>% 
             dplyr::filter(.data$doc_name == !!document_df$doc_name &
-                          .data$doc_description == !!document_df$doc_description & 
                           .data$doc_text == !!document_df$doc_text &
                           .data$project_id == project_id) %>% 
             dplyr::pull(doc_id)
@@ -231,17 +311,39 @@ add_documents_record <- function(con, project_id, document_df){
     }
 }
 
+add_cases_record <- function(con, project_id, case_df){
+    res <- DBI::dbWriteTable(con, "cases", case_df, append = TRUE)
+    if(res){
+        written_case_id <- dplyr::tbl(con, "cases") %>% 
+            dplyr::filter(.data$case_name == !!case_df$case_name &
+                              .data$project_id == project_id) %>% 
+            dplyr::pull(case_id)
+        log_add_case_record(con, project_id, case_df %>% 
+                                dplyr::mutate(case_id = written_case_id))    
+    }else{
+        warning("case not added")
+    }
+}
+
 add_codes_record <- function(con, project_id, codes_df){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
         written_code_id <- dplyr::tbl(con, "codes") %>% 
             dplyr::filter(.data$code_name == !!codes_df$code_name &
-                          .data$code_description == !!codes_df$code_description &
                           .data$project_id == project_id) %>% 
             dplyr::pull(code_id)
         log_add_code_record(con, project_id, codes_df %>% 
                                 dplyr::mutate(code_id = written_code_id))    
     }else{
         warning("code not added")
+    }
+}
+
+add_case_doc_record <- function(con, project_id, case_doc_df){
+    res <- DBI::dbWriteTable(con, "cases_documents_map", case_doc_df, append = TRUE)
+    if(res){
+        log_add_case_doc_record(con, project_id, case_doc_df)
+    }else{
+        warning("code document map not added")
     }
 }

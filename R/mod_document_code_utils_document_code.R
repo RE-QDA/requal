@@ -121,8 +121,7 @@ summarise_new_segment_range <- function(overlap_df, startOff, endOff){
 }
 
 get_segment_text <- function(con, project_id, doc_id, start, end){
-
-        load_doc(con, project_id, doc_id) %>%
+    load_doc(con, project_id, doc_id) %>%
         substr(start = start, stop = end)
 }
 
