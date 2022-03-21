@@ -139,6 +139,8 @@ mod_categories_server <- function(id, project, user, codebook) {
           user = user,
           categories_df = categories_input_df
         )
+        
+        # refresh listed categories
 
         output$categories_ui <- renderUI({
           render_categories(
@@ -159,6 +161,17 @@ mod_categories_server <- function(id, project, user, codebook) {
           inputId = "category_description",
           value = ""
         )
+        
+        # refresh delete UI
+        updateSelectInput(
+          session = session,
+          inputId = "categories_to_del",
+          choices = c("", read_db_categories(
+            project_db = project()$project_db,
+            active_project = project()$active_project
+          ))
+        )
+        
 
         # update return value
         category(read_db_categories(
