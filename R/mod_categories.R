@@ -15,12 +15,12 @@ mod_categories_ui <- function(id) {
     column(
       width = 5,
       tags$br(),
-      uiOutput(ns("uncategorized"))
+      uiOutput(ns("uncategorized")) %>% tagAppendAttributes(class = "scrollable90")
     ),
     column(
       width = 5,
       tags$br(),
-      uiOutput(ns("categories_ui"))
+      uiOutput(ns("categories_ui")) %>% tagAppendAttributes(class = "scrollable90")
     ),
 
     # menu

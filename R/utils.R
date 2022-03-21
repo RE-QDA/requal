@@ -152,12 +152,11 @@ menu_btn <- function(..., label, icon) {
       title = label,
       html = FALSE
     ),
-    status = "primary",
     size = "md", 
     width = "370px",
-    icon = icon(icon), 
+    icon = icon(icon) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
     right = TRUE
-  ) %>% tagAppendAttributes(style = "padding-right: 5px; top: 1vh; position: relative; min-width: 50%")
+  ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
 menu_column <- function(width = 2, ...) {
