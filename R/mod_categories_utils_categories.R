@@ -133,11 +133,8 @@ list_db_categories <- function(id, project_db, project_id) {
 
 create_new_category_UI <- function(id) {
   ns <- NS(id)
-  box(
-    title = "Create category",
-    collapsible = FALSE,
-    closable = FALSE,
-    width = NULL,
+  tags$div(
+    h4("Create category"),
     textInput(
       ns("category_name"),
       label = "Category name",
@@ -151,18 +148,15 @@ create_new_category_UI <- function(id) {
     actionButton(ns("category_add"),
       label = "Create"
     )
-  )
+  ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # delete category UI -----
 
 delete_category_UI <- function(id, project_db, active_project) {
   ns <- NS(id)
-  box(
-    title = "Delete category",
-    collapsible = FALSE,
-    closable = FALSE,
-    width = NULL,
+  tags$div(
+    h4("Delete category"),
     selectInput(
       ns("categories_to_del"),
       label = "Select categories to delete",
@@ -177,7 +171,7 @@ delete_category_UI <- function(id, project_db, active_project) {
       label = "Remove",
       class = "btn-danger"
     )
-  )
+  ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # delete category UI -----
