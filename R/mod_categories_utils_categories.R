@@ -99,6 +99,7 @@ read_db_categories <- function(project_db, active_project) {
 
 # List categories--------------------------------------------------------
 
+
 # Read categories from the DB
 
 #' @importFrom rlang .env
@@ -129,13 +130,11 @@ list_db_categories <- function(id, project_db, project_id) {
 }
 
 # create category UI -----
+
 create_new_category_UI <- function(id) {
   ns <- NS(id)
-  box(
-    title = "Create category",
-    collapsible = TRUE,
-    closable = TRUE,
-    width = NULL,
+  tags$div(
+    h4("Create category"),
     textInput(
       ns("category_name"),
       label = "Category name",
@@ -149,17 +148,15 @@ create_new_category_UI <- function(id) {
     actionButton(ns("category_add"),
       label = "Create"
     )
-  )
+  ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # delete category UI -----
+
 delete_category_UI <- function(id, project_db, active_project) {
   ns <- NS(id)
-  box(
-    title = "Delete category",
-    collapsible = TRUE,
-    closable = TRUE,
-    width = NULL,
+  tags$div(
+    h4("Delete category"),
     selectInput(
       ns("categories_to_del"),
       label = "Select categories to delete",
@@ -174,10 +171,11 @@ delete_category_UI <- function(id, project_db, active_project) {
       label = "Remove",
       class = "btn-danger"
     )
-  )
+  ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # delete category UI -----
+
 delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
@@ -188,7 +186,7 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
                    WHERE category_id IN (?)",
     params = list(delete_cat_id)
   )
-  
+
   if(res & length(delete_cat_id)){
     log_delete_category_record(con, active_project, delete_cat_id)
   }
@@ -197,12 +195,12 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
 # add category record -----
 add_category_record <- function(con, project_id, user, categories_df) {
   res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
-  
+
   if (res) {
-    written_category_id <- dplyr::tbl(con, "categories") %>% 
-      dplyr::filter(.data$category_name == !!categories_df$category_name) %>% 
+    written_category_id <- dplyr::tbl(con, "categories") %>%
+      dplyr::filter(.data$category_name == !!categories_df$category_name) %>%
       dplyr::pull(category_id)
-    log_add_category_record(con, project_id, categories_df %>% 
+    log_add_category_record(con, project_id, categories_df %>%
                               dplyr::mutate(category_id = written_category_id))
   } else {
     warning("category not added")
@@ -242,21 +240,21 @@ delete_category_code_record <- function(project_db,
   # delete edge
   # delete edges based on codes and categories
   if (!is.null(edge$category_id) & !is.null(edge$code_id) ) {
-  res <- DBI::dbExecute(con, 
+  res <- DBI::dbExecute(con,
                  glue::glue_sql("DELETE FROM categories_codes_map
                        WHERE category_id = {edge$category_id}
                        AND code_id = {edge$code_id};", .con = con))
   } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
     # delete edges based on categories
     res <- DBI::dbExecute(con,
-                   "DELETE FROM categories_codes_map 
+                   "DELETE FROM categories_codes_map
                        WHERE category_id IN (?);",
                    params = list(edge$category_id))
-    
+
   } else {
     # delete edges based on codebook
     res <- DBI::dbExecute(con,
-                   "DELETE FROM categories_codes_map 
+                   "DELETE FROM categories_codes_map
                        WHERE code_id IN (?);",
                    params = list(edge$code_id))
   }

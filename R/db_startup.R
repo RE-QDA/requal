@@ -3,7 +3,7 @@ create_db_schema <- function(con){
 }
 
 CREATE_PROJECT_SQL <- "
-CREATE TABLE projects (    
+CREATE TABLE projects (
      project_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,    project_name TEXT
 ,    project_description TEXT
@@ -15,7 +15,7 @@ CREATE_REQUAL_INFO_SQL <- "
 CREATE TABLE if not exists requal_version (
     project_id INTEGER
 ,   version TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
 
@@ -40,18 +40,18 @@ CREATE TABLE if not exists user_permissions (
 ,   can_delete_documents INTEGER
 ,   can_manage INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
 
 CREATE_LOG_SQL <- "
-CREATE TABLE if not exists logs 
+CREATE TABLE if not exists logs
 (   user TEXT
 ,   project_id INTEGER
 ,   action TEXT
 ,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
 
@@ -63,7 +63,7 @@ CREATE TABLE if not exists documents (
 ,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
 
@@ -87,7 +87,7 @@ CREATE TABLE if not exists segments (
 ,   segment_start INTEGER
 ,   segment_end INTEGER
 ,   segment_text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
 ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
 );
@@ -99,7 +99,7 @@ CREATE TABLE if not exists categories (
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   category_name TEXT
 ,   category_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
 
@@ -108,9 +108,9 @@ CREATE TABLE if not exists categories_codes_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)     
-,   FOREIGN KEY(category_id) REFERENCES categories(category_id)     
-,   FOREIGN KEY(code_id) REFERENCES codes(codes_id)     
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(codes_id)
 );
 "
 
@@ -133,7 +133,7 @@ CREATE TABLE if not exists cases_documents_map (
 ,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
 ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
 );
-" 
+"
 
 # TODO: hierarchy between codes, cases, categories (code_code_map, case_case_map, category_category_map)
 
@@ -257,55 +257,55 @@ create_default_user <- function(con, project_id){
     user_df <- tibble::tibble(
         user_name = Sys.info()["user"]
     )
-    
+
     DBI::dbWriteTable(con, "users", user_df, append = TRUE)
-    user_df_stored <- dplyr::tbl(con, "users") %>% 
-        dplyr::filter(.data$user_name == !!user_df$user_name) %>% 
+    user_df_stored <- dplyr::tbl(con, "users") %>%
+        dplyr::filter(.data$user_name == !!user_df$user_name) %>%
         dplyr::collect()
-    
+
     user_permission_df <- tibble::tibble(
-        user_id = user_df_stored$user_id, 
-        project_id = project_id, 
-        can_code = 1, 
+        user_id = user_df_stored$user_id,
+        project_id = project_id,
+        can_code = 1,
         can_modify_codes = 1,
         can_delete_codes = 1,
         can_modify_documents = 1,
         can_delete_documents = 1,
         can_manage = 1
     )
-    
+
     DBI::dbWriteTable(con, "user_permissions", user_permission_df, append = TRUE)
 }
 
 create_project_record <- function(con, project_df){
     res <- DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
-    project_id <- dplyr::tbl(con, "projects") %>% 
+    project_id <- dplyr::tbl(con, "projects") %>%
         dplyr::filter(project_name == !!project_df$project_name) %>%
         dplyr::pull(project_id)
-    
+
     if(res){
-        log_create_project_record(con, project_id, project_df)   
+        log_create_project_record(con, project_id, project_df)
     }
-    
+
     requal_version_df <- data.frame(
         project_id = project_id,
         version = as.character(packageVersion("requal"))
     )
     res_v <- DBI::dbWriteTable(con, "requal_version", requal_version_df, append = TRUE)
-    
+
     create_default_user(con, project_id)
 }
 
 add_documents_record <- function(con, project_id, document_df){
     res <- DBI::dbWriteTable(con, "documents", document_df, append = TRUE)
     if(res){
-        written_document_id <- dplyr::tbl(con, "documents") %>% 
+        written_document_id <- dplyr::tbl(con, "documents") %>%
             dplyr::filter(.data$doc_name == !!document_df$doc_name &
                           .data$doc_text == !!document_df$doc_text &
-                          .data$project_id == project_id) %>% 
+                          .data$project_id == project_id) %>%
             dplyr::pull(doc_id)
-        log_add_document_record(con, project_id, document_df %>% 
-                                    dplyr::mutate(doc_id = written_document_id))    
+        log_add_document_record(con, project_id, document_df %>%
+                                    dplyr::mutate(doc_id = written_document_id))
     }else{
         warning("document not added")
     }
@@ -314,12 +314,12 @@ add_documents_record <- function(con, project_id, document_df){
 add_cases_record <- function(con, project_id, case_df){
     res <- DBI::dbWriteTable(con, "cases", case_df, append = TRUE)
     if(res){
-        written_case_id <- dplyr::tbl(con, "cases") %>% 
+        written_case_id <- dplyr::tbl(con, "cases") %>%
             dplyr::filter(.data$case_name == !!case_df$case_name &
-                              .data$project_id == project_id) %>% 
+                              .data$project_id == project_id) %>%
             dplyr::pull(case_id)
-        log_add_case_record(con, project_id, case_df %>% 
-                                dplyr::mutate(case_id = written_case_id))    
+        log_add_case_record(con, project_id, case_df %>%
+                                dplyr::mutate(case_id = written_case_id))
     }else{
         warning("case not added")
     }
@@ -328,12 +328,12 @@ add_cases_record <- function(con, project_id, case_df){
 add_codes_record <- function(con, project_id, codes_df){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
-        written_code_id <- dplyr::tbl(con, "codes") %>% 
+        written_code_id <- dplyr::tbl(con, "codes") %>%
             dplyr::filter(.data$code_name == !!codes_df$code_name &
-                          .data$project_id == project_id) %>% 
+                          .data$project_id == project_id) %>%
             dplyr::pull(code_id)
-        log_add_code_record(con, project_id, codes_df %>% 
-                                dplyr::mutate(code_id = written_code_id))    
+        log_add_code_record(con, project_id, codes_df %>%
+                                dplyr::mutate(code_id = written_code_id))
     }else{
         warning("code not added")
     }

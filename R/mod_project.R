@@ -34,7 +34,7 @@ mod_project_server <- function(id, project, user) {
         if (!is.null(project()$active_project) & !is.null(project()$project_db) ) {
           tagList(tabsetPanel(
             tabPanel("Manage documents",
-             mod_doc_manager_ui(ns("doc_manager_ui_1"))
+             mod_doc_manager_ui("doc_manager_ui_1")
              )
             )#,
             # tabPanel("Project information"),
@@ -49,13 +49,10 @@ mod_project_server <- function(id, project, user) {
         }
     
     })
-      # update documents from embedded module
-      
-    documents_from_manager <- mod_doc_manager_server("doc_manager_ui_1", project)
-    
+     
 
     
-  return(reactive(documents_from_manager()))
+  return(NULL)
   
   })
 }

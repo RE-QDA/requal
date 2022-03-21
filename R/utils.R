@@ -139,6 +139,32 @@ set_controlbar <- function() {
     )
 }
 
+# menu col and btn ---
+
+menu_btn <- function(..., label, icon) {
+  
+  shinyWidgets::dropdown(
+   ...,
+    label = NULL,
+    style = "material-circle",
+    tooltip = shinyWidgets::tooltipOptions(
+      placement = "left",
+      title = label,
+      html = FALSE
+    ),
+    size = "md", 
+    width = "370px",
+    icon = icon(icon) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
+    right = TRUE
+  ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
+}
+
+menu_column <- function(width = 2, ...) {
+    column(width = width,
+           ...) %>% tagAppendAttributes(style = "text-align: right; valign: bottom; padding-right: 0px !important;")
+  }
+
+
 # File system: get_volume_paths  ----
 get_volume_paths <- function() {
   

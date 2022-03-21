@@ -1,11 +1,11 @@
 .custom_label {
   color: black !important;
-} 
+}
 .required > label::after {
   content: "*";
   color: red;
   margin-left:2px
-} 
+}
 .scrollable80{
     border: none;
     height:80vh;
@@ -23,7 +23,7 @@
 .overflow_barrier:hover {
     overflow: visible;
     overflow-wrap: break-word;
-    word-break: break-all; 
+    word-break: break-all;
     background: white;
 }
 .code-button {
@@ -65,32 +65,22 @@ width: 0px;
 }
 
 b.segment {
-font-weight: normal; 
+font-weight: normal;
 }
 
 
 
-.default-sortable .rank-list {
-flex: 1 0 auto;
+
+.category-rank-list {
 -webkit-border-radius: 1px;
-background: none;
-border-color: light-blue !important;
 border-radius: 1px;
 border-style: dashed;
 border-width: 1px;
-margin: 0px !important;
+border-color: #ddd;
+background: transparent;
+margin: 0px;
 min-height: 45px;
-padding: 0px !important;
-}
-
-.default-sortable .rank-list.rank-list-empty {
--webkit-border-radius: 1px;
-background: white !important;
-border-radius: 1px;
-border-width: 1px;
-min-height: 45px;
-margin: 0px !important;
-padding: 0px !important;
+padding: 0px;
 }
 
 .rank-list-item {
@@ -103,23 +93,10 @@ border: 0px !important;
 overflow: hidden;
 }
 
-.category-rank-list {
-min-height: 45px;
--webkit-border-radius: 1px;
-border-radius: 1px;
-border-style: dashed;
-border-width: 1px;
-border-color: #ddd;
-background: transparent;
- margin: 0px; 
-padding: 0px;
-}
-
-.box {
+.box.box-solid {
 margin-top: 2px !important;
 margin-left: 0px !important; 
 margin-right: 0px !important; 
 margin-bottom: 5px !important; 
 }
-
 

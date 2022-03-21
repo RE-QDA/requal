@@ -57,7 +57,7 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
 
 
     # Filters ----
-    
+
     observeEvent(codebook(), {
       updateSelectInput(
         session = session,
@@ -104,7 +104,7 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
       },
       {
         temp_df <- load_segments_analysis(
-          project_db = project()$project_db, 
+          project_db = project()$project_db,
           active_project = project()$active_project,
           selected_codes = input$code_filter,
           selected_categories = input$category_filter,
