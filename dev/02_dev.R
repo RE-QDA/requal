@@ -30,6 +30,7 @@ usethis::use_package( "purrr" )
 usethis::use_package( "stringr" )
 usethis::use_package( "htmlwidgets" )
 usethis::use_package( "sortable" )
+usethis::use_package( "shinyWidgets" )
 
 
 
