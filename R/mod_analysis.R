@@ -42,7 +42,7 @@ mod_analysis_ui <- function(id) {
           width = "100%",
           size = 15
         )
-      ) %>% tagAppendAttributes(class = "scrollable90"),
+      ) %>% tagAppendAttributes(class = "scrollable90") ,
       uiOutput(ns("download"))
     )
   )
@@ -51,13 +51,13 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, project, codebook, category, documents, segments) {
+mod_analysis_server <- function(id, project, user, codebook, category, documents, segments) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
 
     # Filters ----
-    
+
     observeEvent(codebook(), {
       updateSelectInput(
         session = session,
@@ -104,7 +104,7 @@ mod_analysis_server <- function(id, project, codebook, category, documents, segm
       },
       {
         temp_df <- load_segments_analysis(
-          project_db = project()$project_db, 
+          project_db = project()$project_db,
           active_project = project()$active_project,
           selected_codes = input$code_filter,
           selected_categories = input$category_filter,

@@ -9,28 +9,28 @@
 #' @importFrom shiny NS tagList
 mod_codebook_ui <- function(id) {
   ns <- NS(id)
-  
+
 
 
   tagList(
- 
+
   tabsetPanel(
-    type = "tabs", 
+    type = "tabs",
     id = ns("codebook_tabset"),
-    
-   
+
+
     tabPanel("Codebook",
       id = ns("codebook_tabset"),
       value = "codebook_tabset",
-      tags$br(), 
-      
+      tags$br(),
+
       column(
         width = 10,
         uiOutput(
           ns("codes_ui")
           )
       ) %>% tagAppendAttributes(class = "scrollable90", style = "max-width=60%"),
-      
+
       menu_column(
         width = 2,
         uiOutput(
@@ -38,39 +38,39 @@ mod_codebook_ui <- function(id) {
         )
       )
     ),
-    
+
     tabPanel("Categories",
       id = ns("categories"),
       value = "categories",
-      
+
       mod_categories_ui("categories_ui_1")
-      
+
     )
   )
 )
-  
+
 }
 
 #' codebook Server Functions
 #'
 #' @noRd
-mod_codebook_server <- function(id, project) {
+mod_codebook_server <- function(id, project, user) {
   moduleServer(id, function(input, output, session) {
-    
+
     ns <- session$ns
 
     # codebook observer ----
 
     codebook <- reactiveVal()
-    
+
     observeEvent(project()$active_project, {
       # update codebook return values
-      
+
       codebook(
         list_db_codes(project()$project_db,
                       project()$active_project)
       )
-      
+
     })
 
 # List existing codes in codes boxes ----
@@ -168,14 +168,14 @@ mod_codebook_server <- function(id, project) {
       delete_db_codes(project_db = project()$project_db,
                       active_project = project()$active_project,
                       delete_code_id = input$code_to_del)
-      
+
       # delete edges
       edge <- list()
       edge$code_id <- input$code_to_del
-      delete_db_edge(project_db = project()$project_db,
-                     active_project = project()$active_project,
-                     user = user,
-                     edge = edge)
+      delete_category_code_record(project_db = project()$project_db,
+                                  active_project = project()$active_project,
+                                  user = user,
+                                  edge = edge)
 
       # re-render manager UI
 
@@ -204,37 +204,37 @@ mod_codebook_server <- function(id, project) {
     })
 
 #---Merge codes-----------------------------------------------------
-    
+
     observeEvent(input$code_merge, {
-      
+
       if (isTruthy(input$merge_from) & isTruthy(input$merge_to)) {
-        
+
       if (input$merge_from == input$merge_to) {
         warn_user("Cannot merge a code into itself.")
       } else {
-        
-        
-        
+
+
+
         merge_codes(project()$project_db,
                     project()$active_project,
                     input$merge_from,
                     input$merge_to)
-        
+
         # update codebook return value
         codebook(
           list_db_codes(project()$project_db,
                         project()$active_project)
         )
-        
+
         # relist remaining codes
         output$codes_ui <- renderUI({
-          
+
           render_codes(active_project = project()$active_project,
                        project_db = project()$project_db)
         })
-        
+
         # re-render manager UI
-        
+
         output$codes_manager <- renderUI({
           if (isTruthy(project()$active_project)) {
             codebook_manager_UI(id,
@@ -242,19 +242,18 @@ mod_codebook_server <- function(id, project) {
                                 project_id = project()$active_project)
           }
         })
-        
-        
-        
+
+
+
        } } else {NULL}
-      
+
     })
-    
+
 # return active codebook details ----
 
        return(reactive(codebook()))
-    
-    
- # end of server module function   
+
+
+ # end of server module function
      })
   }
-

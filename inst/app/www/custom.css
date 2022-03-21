@@ -1,11 +1,11 @@
 .custom_label {
   color: black !important;
-} 
+}
 .required > label::after {
   content: "*";
   color: red;
   margin-left:2px
-} 
+}
 .scrollable80{
     border: none;
     height:80vh;
@@ -23,7 +23,7 @@
 .overflow_barrier:hover {
     overflow: visible;
     overflow-wrap: break-word;
-    word-break: break-all; 
+    word-break: break-all;
     background: white;
 }
 .code-button {
@@ -65,7 +65,7 @@ width: 0px;
 }
 
 b.segment {
-font-weight: normal; 
+font-weight: normal;
 }
 
 
@@ -111,12 +111,6 @@ border-style: dashed;
 border-width: 1px;
 border-color: #ddd;
 background: transparent;
- margin: 0px; 
+ margin: 0px;
 padding: 0px;
 }
-
-
-
-
-
-

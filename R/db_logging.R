@@ -48,6 +48,20 @@ log_delete_document_record <- function(con, project_id, doc_ids){
                data = list(doc_id = doc_ids))
 }
 
+log_add_case_record <- function(con, project_id, case_df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add case", 
+               data = case_df)
+}
+
+log_add_case_doc_record <- function(con, project_id, case_doc_map_df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add case document link", 
+               data = case_doc_map_df)
+}
+
 log_add_code_record <- function(con, project_id, code){
     log_action(con, 
                project_id = project_id, 
@@ -83,4 +97,31 @@ log_delete_segment_record <- function(con, project_id, segment){
                data = list(segment_id = segment))
 }
 
+log_add_category_record <- function(con, project_id, category){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add category", 
+               data = category)
+}
+
+log_delete_category_record <- function(con, project_id, category){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete category", 
+               data = list(category_id = category, project_id = project_id))
+}
+
+log_add_category_code_record <- function(con, project_id, df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Add code to category", 
+               data = df)
+}
+
+log_delete_category_code_record <- function(con, project_id, df){
+    log_action(con, 
+               project_id = project_id, 
+               action = "Delete code from category", 
+               data = df)
+}
 

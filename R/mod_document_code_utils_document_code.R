@@ -100,8 +100,8 @@ check_overlap <- function(coded_segments, startOff, endOff){
 
     overlapping_segments <- coded_segments %>%
         dplyr::rowwise() %>%
-        dplyr::mutate(overlapping = dplyr::between(startOff, segment_start, segment_end) |
-                          dplyr::between(endOff, segment_start, segment_end)) %>%
+        dplyr::mutate(overlapping = dplyr::between(segment_start, startOff, endOff) |
+                          dplyr::between(segment_end, startOff, endOff)) %>%
         dplyr::filter(overlapping)
 
     if(!nrow(overlapping_segments)){
@@ -121,8 +121,7 @@ summarise_new_segment_range <- function(overlap_df, startOff, endOff){
 }
 
 get_segment_text <- function(con, project_id, doc_id, start, end){
-
-        load_doc(con, project_id, doc_id) %>%
+    load_doc(con, project_id, doc_id) %>%
         substr(start = start, stop = end)
 }
 
@@ -233,7 +232,7 @@ res <- dplyr::tibble(
   segment_end = NULL
 )
 
-for (i in seq_along(vals)) {
+for (i in seq_along(vals)) { 
   overlap_df <- raw_segments %>%
     dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
   if (names(vals[i]) == "segment_start") {
@@ -258,6 +257,7 @@ for (i in seq_along(vals)) {
 }
 
 if (nrow(res)) {
+  
 prefinal <- res %>%
   dplyr::mutate(
     code_id = dplyr::lead(code_id),
@@ -266,7 +266,6 @@ prefinal <- res %>%
   dplyr::filter(code_id != "",
                 !is.na(code_id)) %>% 
     dplyr::mutate(segment_id = 0:(dplyr::n()-1))  } else {res}
-    
 
 }
 
@@ -286,6 +285,7 @@ load_doc_to_display <- function(active_project,
                                        doc_selector) %>% 
         calculate_code_overlap()
     
+
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -311,6 +311,7 @@ load_doc_to_display <- function(active_project,
         )
         
         content_df <-coded_segments %>% 
+            dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
             dplyr::mutate(code_id = as.character(code_id)) %>% 
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
                                 values_to = "position_start", 

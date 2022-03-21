@@ -181,32 +181,35 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
   on.exit(DBI::dbDisconnect(con))
 
 
-  DBI::dbExecute(con,
+  res <- DBI::dbExecute(con,
     "DELETE from categories
                    WHERE category_id IN (?)",
     params = list(delete_cat_id)
   )
-  # TODO
-  # if(length(delete_cat_id)){
-  #   log_delete_category_record(con, active_project, user, delete_cat_id)
-  # }
+
+  if(res & length(delete_cat_id)){
+    log_delete_category_record(con, active_project, delete_cat_id)
+  }
 }
 
 # add category record -----
-
 add_category_record <- function(con, project_id, user, categories_df) {
   res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
-  # if (res) {
-  #   # log_add_categories_record(con, project_id, user, categories_df)
-  # } else {
-  #   warning("category not added")
-  # }
+
+  if (res) {
+    written_category_id <- dplyr::tbl(con, "categories") %>%
+      dplyr::filter(.data$category_name == !!categories_df$category_name) %>%
+      dplyr::pull(category_id)
+    log_add_category_record(con, project_id, categories_df %>%
+                              dplyr::mutate(category_id = written_category_id))
+  } else {
+    warning("category not added")
+  }
 
 }
 
-# add edge record -----
-
-add_edge_record <- function(project_db,
+# add code to category -----
+add_category_code_record <- function(project_db,
                             active_project,
                             user,
                             edge) {
@@ -216,19 +219,19 @@ add_edge_record <- function(project_db,
   edge_df <- as.data.frame(edge)
   edge_df$project_id <- active_project
 
-  DBI::dbWriteTable(con, "categories_edges", edge_df, append = TRUE)
+  res <- DBI::dbWriteTable(con, "categories_codes_map", edge_df, append = TRUE)
 
-  # if (res) {
-  #   # log_add_record_record(con, project_id, user, categories_df)
-  # } else {
-  #   warning("category not added")
-  # }
+  if (res) {
+    log_add_category_code_record(con, active_project, edge_df)
+  } else {
+    warning("category not added")
+  }
 
 }
 
 # delete edge record -----
 
-delete_db_edge <- function(project_db,
+delete_category_code_record <- function(project_db,
                            active_project,
                            user,
                            edge) {
@@ -237,28 +240,28 @@ delete_db_edge <- function(project_db,
   # delete edge
   # delete edges based on codes and categories
   if (!is.null(edge$category_id) & !is.null(edge$code_id) ) {
-  DBI::dbExecute(con, 
-                 glue::glue("DELETE FROM categories_edges
+  res <- DBI::dbExecute(con,
+                 glue::glue_sql("DELETE FROM categories_codes_map
                        WHERE category_id = {edge$category_id}
-                       AND code_id = {edge$code_id};"))
+                       AND code_id = {edge$code_id};", .con = con))
   } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
     # delete edges based on categories
-    DBI::dbExecute(con,
-                   "DELETE FROM categories_edges 
+    res <- DBI::dbExecute(con,
+                   "DELETE FROM categories_codes_map
                        WHERE category_id IN (?);",
                    params = list(edge$category_id))
-    
+
   } else {
     # delete edges based on codebook
-    DBI::dbExecute(con,
-                   "DELETE FROM categories_edges 
+    res <- DBI::dbExecute(con,
+                   "DELETE FROM categories_codes_map
                        WHERE code_id IN (?);",
                    params = list(edge$code_id))
   }
 
- 
-  # TODO
-  # log_delete_edge_record(con, active_project, user, edge)
+  if(res){
+    log_delete_category_code_record(con, active_project, edge)
+  }
 }
 
 # render existing edges -----
@@ -269,7 +272,7 @@ render_category_edges <- function(project_db,
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
 
-  category_edges <- dplyr::tbl(con, "categories_edges") %>%
+  category_edges <- dplyr::tbl(con, "categories_codes_map") %>%
     dplyr::filter(.data$category_id == .env$category_id) %>%
     dplyr::pull(code_id)
 

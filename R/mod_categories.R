@@ -51,11 +51,10 @@ mod_categories_server <- function(id, project, user, codebook) {
 
     # update return value
     observeEvent(project()$active_project, {
-      category(read_db_categories(
-        project_db = project()$project_db,
-        active_project = project()$active_project
-      ))
-    })
+    category(read_db_categories(
+      project_db = project()$project_db,
+      active_project = project()$active_project))
+      })
 
     # List existing codes in code boxes --------
     observeEvent(codebook(), {
@@ -92,6 +91,7 @@ mod_categories_server <- function(id, project, user, codebook) {
 
     # Relist categories on codebook changes
     observeEvent(codebook(), {
+
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
@@ -99,6 +99,7 @@ mod_categories_server <- function(id, project, user, codebook) {
           project_db = project()$project_db
         )
       })
+
     })
 
 
@@ -194,12 +195,10 @@ mod_categories_server <- function(id, project, user, codebook) {
       # remove from edges
       edge <- list()
       edge$category_id <- input$categories_to_del
-      delete_db_edge(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
-        user = user,
-        edge = edge
-      )
+      delete_category_code_record(project_db = project()$project_db,
+                     active_project = project()$active_project,
+                     user = user,
+                     edge = edge)
 
       # refresh delete UI
       updateSelectInput(
@@ -227,28 +226,25 @@ mod_categories_server <- function(id, project, user, codebook) {
       ))
     })
 
-    # Create edge
+  # Create edge
     observeEvent(input$edges_category, {
-      add_edge_record(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
-        user = user,
-        edge = input$edges_category
-      )
-    })
-    # Delete edge
+    add_category_code_record(project_db = project()$project_db,
+                    active_project = project()$active_project,
+                    user = user,
+                    edge = input$edges_category)
+  })
+  # Delete edge
     observeEvent(input$edges_category_delete, {
-      delete_db_edge(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
-        user = user,
-        edge = input$edges_category_delete
-      )
+    delete_category_code_record(project_db = project()$project_db,
+                               active_project = project()$active_project,
+                               user = user,
+                               edge = input$edges_category_delete)
     })
 
 
     # return active categories details ----
 
     return(reactive(category()))
+
   })
 }

@@ -57,7 +57,7 @@ mod_document_code_ui <- function(id){
 #' document_code Server Functions
 #'
 #' @noRd 
-mod_document_code_server <- function(id, project, codebook, documents){
+mod_document_code_server <- function(id, project, user, codebook, documents){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -184,12 +184,11 @@ segments_observer <- reactiveVal(0)
                          startOff, 
                          endOff)
         
-        display_text <- load_doc_to_display(project()$active_project, 
+        text(load_doc_to_display(project()$active_project, 
                                             project()$project_db, 
                                             input$doc_selector,
                                             code_df$active_codebook,
-                                            ns=NS(id))
-        text(display_text)
+                                            ns=NS(id)))
         segments_observer(segments_observer()+1)
         
         }
