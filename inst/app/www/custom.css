@@ -100,3 +100,14 @@ margin-right: 0px !important;
 margin-bottom: 5px !important; 
 }
 
+.memo ul {
+left: auto !important;
+right: 0 !important;
+width: 375px;
+}
+
+#btn-memo > ul > li > ul > div {
+margin-left: -20px !important;
+margin-right: auto !important; 
+width: 100% !important;  
+} 

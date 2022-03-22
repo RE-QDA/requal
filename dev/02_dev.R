@@ -62,6 +62,8 @@ golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
 golem::add_module( name = "about" ) # Name of the module
 golem::add_module( name = "user" ) # Name of the module
+golem::add_module( name = "memo" ) # Name of the module
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

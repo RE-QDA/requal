@@ -17,7 +17,13 @@ app_ui <- function(request) {
                  height="70%", style = "margin-right: 20px"), "ReQual"),
         tags$li(mod_user_ui("user_ui_1")) %>% 
           tagAppendAttributes(class = "dropdown"),
-        controlbarIcon = icon("ellipsis-v", id = "launchpad_icon")
+        controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
+        dropdownBlock(
+          id = "btn-memo",
+          badgeStatus = NULL,
+          icon = shiny::icon("sticky-note-o"),
+          mod_memo_ui("memo_ui_1")
+        ) %>% tagAppendAttributes(class = "memo") 
         ),
       sidebar = set_left_menu(),
       body = set_dashboard_body(),
