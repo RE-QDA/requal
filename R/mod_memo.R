@@ -68,7 +68,7 @@ mod_memo_server <- function(id, project) {
     
     observeEvent(input$save_close, {
       
-      add_memo_record(project, input$memo_text)
+      add_memo_record(project, req(input$memo_text))
       
       memo_list(list_memo_records(project))
                
@@ -91,7 +91,7 @@ mod_memo_server <- function(id, project) {
           ),
           
           footer = tagList(
-            modalButton("Cancel"),
+            modalButton("Close"),
             actionButton(ns("save_changes"), "Save & Close"),
             actionButton(ns("delete_memo"), "Delete", class = "btn-danger")
           )
@@ -103,7 +103,7 @@ mod_memo_server <- function(id, project) {
     
     observeEvent(input$save_changes, {
       
-      update_memo_record(project, input$selected_memo, input$displayed_memo_text)
+      update_memo_record(project, input$selected_memo, req(input$displayed_memo_text))
       
       memo_list(list_memo_records(project))
       
