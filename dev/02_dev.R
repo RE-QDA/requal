@@ -76,6 +76,8 @@ golem::add_utils( "doc_manager", module = "doc_manager" )
 golem::add_utils( "analysis", module = "analysis" )
 golem::add_utils( "reporting", module = "reporting" )
 golem::add_utils( "user", module = "user" )
+golem::add_utils( "memo", module = "memo" )
+
 
 
 
