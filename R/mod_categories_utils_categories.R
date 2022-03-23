@@ -39,7 +39,8 @@ gen_categories_ui <- function(id,
       )
     ),
     class = "category-container", # extra div to capture category id
-    `data-category_id` = category_id
+    `data-category_id` = category_id,
+    style = "max-width: 500px"
   )
 }
 
