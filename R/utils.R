@@ -17,7 +17,8 @@ utils::globalVariables(c("project_name",
                          "segment_end",
                          ".",
                          "segment_start",
-                         "segment_text"))
+                         "segment_text",
+                         "memo_id"))
 
 
 set_dashboard_body <- function() {
