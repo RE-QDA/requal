@@ -85,3 +85,20 @@ update_memo_record <- function(project, memo_id, memo_text) {
     DBI::dbClearResult(res)
     
 }
+
+# delete memo record -----
+
+delete_memo_record <- function(project, memo_id) {
+    
+    con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
+    on.exit(DBI::dbDisconnect(con))
+    
+    memo_id <- as.integer(memo_id)
+    
+    delete_memo_sql <- glue::glue_sql("DELETE from memos
+                   WHERE memo_id = {memo_id}", .con = con)
+    
+    res <- DBI::dbSendStatement(con, delete_memo_sql)
+    DBI::dbClearResult(res)
+    
+}

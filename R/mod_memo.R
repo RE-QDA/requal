@@ -92,7 +92,8 @@ mod_memo_server <- function(id, project) {
           
           footer = tagList(
             modalButton("Cancel"),
-            actionButton(ns("save_changes"), "Save & Close")
+            actionButton(ns("save_changes"), "Save & Close"),
+            actionButton(ns("delete_memo"), "Delete", class = "btn-danger")
           )
           
         )
@@ -108,6 +109,16 @@ mod_memo_server <- function(id, project) {
       
       removeModal()
     })
+    
+    observeEvent(input$delete_memo, {
+      
+      delete_memo_record(project, input$selected_memo)
+      
+      memo_list(list_memo_records(project))
+      
+      removeModal()
+    })
+    
   
     
 

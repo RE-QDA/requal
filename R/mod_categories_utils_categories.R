@@ -174,7 +174,7 @@ delete_category_UI <- function(id, project_db, active_project) {
   ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
-# delete category UI -----
+# delete category  -----
 
 delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
