@@ -140,7 +140,7 @@ CREATE TABLE if not exists cases_documents_map (
 # memos
 CREATE_MEMO_SQL <- "
 CREATE TABLE if not exists memos (
-    project_id INTEGER
+    project_id INTEGER,
     memo_id INTEGER PRIMARY KEY
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
@@ -149,27 +149,25 @@ CREATE TABLE if not exists memos (
 CREATE_MEMO_DOCUMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_documents_map (
     memo_id INTEGER
-,   doc_id INTEGER
-,   memo_start INTEGER
-,   memo_end INTEGER
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   doc_id INTEGER
+    ,   memo_start INTEGER
+    ,   memo_end INTEGER
+    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
 )"
-
 CREATE_MEMO_CODE_MAP_SQL <- "
 CREATE TABLE if not exists memos_codes_map (
     memo_id INTEGER
-,   code_id INTEGER
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   code_id INTEGER
+    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
 )"
-
 CREATE_MEMO_SEGMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
-,   segment_id INTEGER
-,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
-,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   segment_id INTEGER
+    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
 )"
 
 
