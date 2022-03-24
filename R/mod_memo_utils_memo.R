@@ -15,8 +15,9 @@ list_memo_records <- function(project) {
             memo_id,
             memo_name = text
         ) %>%
-        dplyr::mutate(memo_name = substr(memo_name, 1, 25)) %>% 
-        dplyr::collect() 
+        dplyr::collect() %>% 
+        dplyr::mutate(memo_name = substr(stringr::str_extract(memo_name, "\\A.*"), 1, 50)) 
+      
     
     return(memos_df)
 }
@@ -101,4 +102,46 @@ delete_memo_record <- function(project, memo_id) {
     res <- DBI::dbSendStatement(con, delete_memo_sql)
     DBI::dbClearResult(res)
     
+}
+
+
+# dropdown2 function ----
+
+dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
+{
+  if (!is.null(badgeStatus)) 
+    validateStatus(badgeStatus)
+  items <- c(list(...))
+  dropdownClass <- paste0("dropdown")
+  numItems <- length(items)
+  if (is.null(badgeStatus)) {
+    badge <- NULL
+  }
+  else {
+    badge <- dashboardLabel(status = badgeStatus, numItems)
+  }
+  shiny::tags$li(class = dropdownClass, id = id, shiny::tags$a(href = "#",
+                                                               class = "dropdown-toggle",
+                                                               `data-toggle` = "dropdown", 
+                                                               icon, 
+                                                               title, 
+                                                               badge), 
+                 shiny::tags$ul(class = "dropdown-menu", 
+                                style = "left: 0; right: auto; max-height: 80vh", 
+                                shiny::tags$li(shiny::tags$ul(class = "menu", 
+                                                              shiny::tags$div(style = "margin-left: auto; margin-right: 0; width: 80%;",
+                                                                              items)))))
+}
+
+# memo table styling ----
+
+
+memo_table_options <- function() {
+  list(
+    dom = 'lfrtp',
+    #Bfrtip
+    pageLength = 20,
+    searching = TRUE,
+    lengthChange = FALSE
+  )
 }

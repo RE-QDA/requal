@@ -9,10 +9,12 @@
 #' @importFrom shiny NS tagList
 mod_memo_ui <- function(id) {
   ns <- NS(id)
-
- 
-    uiOutput(ns("memo")) 
-     
+div(
+  tags$b("Memos"),
+  uiOutput(ns("new_memo_btn")) %>% tagAppendAttributes(style="display: inline-block; float: right"),
+  hr(),
+  DT::dataTableOutput(ns("memo"))
+) %>% tagAppendAttributes(class = "scrollable80")
   
 }
 
@@ -26,21 +28,25 @@ mod_memo_server <- function(id, project) {
     memo_list <- reactiveVal()
     observeEvent(project()$active_project, {
      memo_list(list_memo_records(project))
+     output$new_memo_btn <- renderUI({
+        actionButton(ns("new_memo"), "New memo")
+      })
     })
    
 
-    output$memo <- renderUI({
+
+   output$memo <- DT::renderDataTable({
       
-      if (isTruthy(project()$active_project)) {
-        tagList(
-        tags$b("Memos"),
-        actionButton(ns("new_memo"), "New memo", style="display: inline-block; float: right"),
-        hr(),
-        render_memos(id, memo_list())
-        )
-      } else {
-        "No active project."
-      }
+   DT::datatable(req(memo_list()) %>% 
+                        dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>% 
+                        dplyr::select(memo_name), options = memo_table_options(),
+                 class = "compact",
+                 escape = FALSE, 
+                 rownames = FALSE, 
+                 colnames = NULL)
+        
+        
+     
     })
     
     
@@ -53,15 +59,16 @@ mod_memo_server <- function(id, project) {
           title = "New memo",
           
           textAreaInput(ns("memo_text"), "Text",
-                    value = "", width = "100%"
-          ),
+                    value = "", width = "100%", height = "100%",
+                    placeholder = "First 50 characters of the first line will become a searchable title..."
+          ) %>% tagAppendAttributes(style = "height: 50vh"),
           
           footer = tagList(
             modalButton("Cancel"),
             actionButton(ns("save_close"), "Save & Close")
           )
           
-        )
+        ) 
         
       )
     })
@@ -87,8 +94,9 @@ mod_memo_server <- function(id, project) {
           
           textAreaInput(ns("displayed_memo_text"), "Text",
                         value = read_memo_db(project, input$selected_memo), 
-                        width = "100%"
-          ),
+                        width = "100%", height = "100%",
+                        placeholder = "First 50 characters of the first line will become a searchable title..."
+          ) %>% tagAppendAttributes(style = "height: 50vh"),
           
           footer = tagList(
             modalButton("Close"),
@@ -96,7 +104,7 @@ mod_memo_server <- function(id, project) {
             actionButton(ns("delete_memo"), "Delete", class = "btn-danger")
           )
           
-        )
+        ) 
         
       )
     })
