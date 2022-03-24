@@ -38,12 +38,14 @@ mod_memo_server <- function(id, project) {
    output$memo <- DT::renderDataTable({
       
    DT::datatable(req(memo_list()) %>% 
+                   dplyr::arrange(desc(memo_id)) %>% 
                         dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>% 
                         dplyr::select(memo_name), options = memo_table_options(),
                  class = "compact",
                  escape = FALSE, 
                  rownames = FALSE, 
-                 colnames = NULL)
+                 colnames = NULL,
+                 selection = "none")
         
         
      

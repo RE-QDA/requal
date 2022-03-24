@@ -145,3 +145,10 @@ memo_table_options <- function() {
     lengthChange = FALSE
   )
 }
+
+# create memo as link ----
+memo_link <- function(id, text) {
+  js_fun <- "Shiny.setInputValue('memo_ui_1-selected_memo', this.name, {priority: 'event'});"
+  quote_sign <- '"'
+  paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', text, '</a>')
+}
