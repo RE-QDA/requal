@@ -57,6 +57,10 @@ app_server <- function(input, output, session) {
 
   # user
   user <- mod_user_server("user_ui_1", project_observer)
+  
+  # memo
+  
+  mod_memo_server("memo_ui_1", project_observer)
 
 
 

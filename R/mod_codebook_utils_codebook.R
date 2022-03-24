@@ -168,7 +168,7 @@ gen_codes_ui <- function(code_id,
     id = code_id,
     title = code_name,
     closable = FALSE,
-    width = 12,
+    width = NULL,
     background = "light-blue",
     collapsible = TRUE,
     collapsed = TRUE,
@@ -189,7 +189,8 @@ gen_codes_ui <- function(code_id,
     ""
   ) %>% tagAppendAttributes(
     `data-code_id` = code_id,
-    class = "code_item"
+    class = "code_item",
+    style = "max-width: 500px"
   ) 
 }
 

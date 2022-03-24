@@ -40,7 +40,7 @@ mod_codebook_ui <- function(id) {
             menu_btn(
               uiOutput(ns("code_merge_ui")),
               label =  "Merge codes",
-              icon = "hammer"
+              icon = "compress"
             ),
             menu_btn(
               uiOutput(ns("code_delete_ui")),

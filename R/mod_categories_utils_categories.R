@@ -39,7 +39,8 @@ gen_categories_ui <- function(id,
       )
     ),
     class = "category-container", # extra div to capture category id
-    `data-category_id` = category_id
+    `data-category_id` = category_id,
+    style = "max-width: 500px"
   )
 }
 
@@ -174,7 +175,7 @@ delete_category_UI <- function(id, project_db, active_project) {
   ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
-# delete category UI -----
+# delete category  -----
 
 delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
