@@ -21,7 +21,7 @@ app_ui <- function(request) {
         dropdownBlock(
           id = "btn-memo",
           badgeStatus = NULL,
-          icon = shiny::icon("sticky-note-o"),
+          icon = shiny::icon("sticky-note-o", verify_fa = FALSE),
           mod_memo_ui("memo_ui_1")
         ) %>% tagAppendAttributes(class = "memo") 
         ),
