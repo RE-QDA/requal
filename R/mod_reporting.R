@@ -54,7 +54,7 @@ mod_reporting_server <- function(id, project, user){
 
     output$report_logs <- DT::renderDataTable(server = FALSE, {
       DT::datatable(
-         logs_df(),
+         req(logs_df()),
         filter = "top",
         extensions = c("Buttons"),
 
