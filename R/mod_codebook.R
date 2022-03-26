@@ -101,6 +101,7 @@ mod_codebook_server <- function(id, project, user) {
     #---Create code UI --------------
 
     output$code_create_ui <- renderUI({
+      req(project()$active_project)
       create_code_UI(id)
     })
     outputOptions(output, "code_create_ui", suspendWhenHidden = FALSE)
@@ -180,9 +181,10 @@ mod_codebook_server <- function(id, project, user) {
       )
     })
 
-    #---Create code UI --------------
+    #---Delete code UI --------------
 
     output$code_delete_ui <- renderUI({
+      req(project()$active_project)
       delete_code_UI(id, project)
     })
     outputOptions(output, "code_delete_ui", suspendWhenHidden = FALSE)
@@ -238,9 +240,10 @@ mod_codebook_server <- function(id, project, user) {
       )
     })
 
-    #---Create code UI --------------
+    #---Merge code UI --------------
 
     output$code_merge_ui <- renderUI({
+      req(project()$active_project)
       merge_code_UI(id, project)
     })
     outputOptions(output, "code_merge_ui", suspendWhenHidden = FALSE)
