@@ -107,6 +107,7 @@ mod_categories_server <- function(id, project, user, codebook) {
 
 
     output$category_create <- renderUI({
+      req(project()$active_project)
       create_new_category_UI(id)
     })
     outputOptions(output, "category_create", suspendWhenHidden = FALSE)
@@ -186,6 +187,7 @@ mod_categories_server <- function(id, project, user, codebook) {
     # Delete categories ------
     # delete UI
     output$category_delete <- renderUI({
+      req(project()$active_project)
       delete_category_UI(id,
         project_db = project()$project_db,
         active_project = project()$active_project
