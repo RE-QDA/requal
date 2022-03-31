@@ -34,6 +34,14 @@ add_memo_record <- function(project, text) {
                           text = text)
     
     res <- DBI::dbWriteTable(con, "memos", memo_df, append = TRUE)
+    if(res){
+      memo_id <- dplyr::tbl(con, "memos") %>% 
+        dplyr::filter(.data$project_id == !!memo_df$project_id, 
+                      .data$text == !!memo_df$text) %>% 
+        dplyr::pull(memo_id)
+      log_add_memo_record(con, memo_df$project_id, memo_df %>% 
+                            dplyr::mutate(memo_id = memo_id))
+    }
 }
 
 # render memos -----
@@ -85,6 +93,10 @@ update_memo_record <- function(project, memo_id, memo_text) {
     res <- DBI::dbSendStatement(con, update_memo_sql)
     DBI::dbClearResult(res)
     
+    project_id <- project()$active_project
+    log_update_memo_record(con, project_id, 
+                           data.frame(memo_id = memo_id, text = memo_text))
+    
 }
 
 # delete memo record -----
@@ -101,6 +113,8 @@ delete_memo_record <- function(project, memo_id) {
     
     res <- DBI::dbSendStatement(con, delete_memo_sql)
     DBI::dbClearResult(res)
+    
+    log_delete_memo_record(con, project()$active_project, memo_id)
     
 }
 
