@@ -70,6 +70,7 @@ mod_doc_manager_server <- function(id, project, user) {
     #---Delete doc UI --------------
     
     output$doc_delete_ui <- renderUI({
+      req(project()$active_project)
       delete_doc_UI(id, project)
     })
     outputOptions(output, "doc_delete_ui", suspendWhenHidden = FALSE)
