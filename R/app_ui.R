@@ -18,7 +18,7 @@ app_ui <- function(request) {
         tags$li(mod_user_ui("user_ui_1")) %>% 
           tagAppendAttributes(class = "dropdown"),
         controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
-        dropdownBlock(
+        dropdownBlock2(
           id = "btn-memo",
           badgeStatus = NULL,
           icon = shiny::icon("sticky-note-o", verify_fa = FALSE),
