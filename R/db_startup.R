@@ -46,12 +46,13 @@ CREATE TABLE if not exists user_permissions (
 
 CREATE_LOG_SQL <- "
 CREATE TABLE if not exists logs
-(   user TEXT
+(   user_id INTEGER
 ,   project_id INTEGER
 ,   action TEXT
 ,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 "
 
@@ -256,14 +257,14 @@ create_default_user <- function(con, project_id){
     DBI::dbWriteTable(con, "user_permissions", user_permission_df, append = TRUE)
 }
 
-create_project_record <- function(con, project_df){
+create_project_record <- function(con, project_df, user_id){
     res <- DBI::dbWriteTable(con, "projects", project_df, append = TRUE)
     project_id <- dplyr::tbl(con, "projects") %>%
         dplyr::filter(project_name == !!project_df$project_name) %>%
         dplyr::pull(project_id)
 
     if(res){
-        log_create_project_record(con, project_id, project_df)
+        log_create_project_record(con, project_id, project_df, user_id)
     }
 
     requal_version_df <- data.frame(
@@ -275,7 +276,7 @@ create_project_record <- function(con, project_df){
     create_default_user(con, project_id)
 }
 
-add_documents_record <- function(con, project_id, document_df){
+add_documents_record <- function(con, project_id, document_df, user_id){
     res <- DBI::dbWriteTable(con, "documents", document_df, append = TRUE)
     if(res){
         written_document_id <- dplyr::tbl(con, "documents") %>%
@@ -284,7 +285,8 @@ add_documents_record <- function(con, project_id, document_df){
                           .data$project_id == project_id) %>%
             dplyr::pull(doc_id)
         log_add_document_record(con, project_id, document_df %>%
-                                    dplyr::mutate(doc_id = written_document_id))
+                                    dplyr::mutate(doc_id = written_document_id), 
+                                user_id = user_id)
     }else{
         warning("document not added")
     }

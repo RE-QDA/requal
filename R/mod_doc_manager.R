@@ -116,7 +116,8 @@ mod_doc_manager_server <- function(id, project, user) {
           project = project()$active_project,
           doc_name = input$doc_name,
           doc_text = input$doc_text,
-          doc_description = input$doc_description
+          doc_description = input$doc_description, 
+          user = user()$user_id
         )
 
         output$doc_list_table <- make_doc_table(
@@ -211,7 +212,8 @@ mod_doc_manager_server <- function(id, project, user) {
             project = project()$active_project,
             doc_name = doc_name_parsed,
             doc_text = doc_upload_text,
-            doc_description = input$doc_upload_description
+            doc_description = input$doc_upload_description, 
+            user_id = user()$user_id
           )
 
           output$doc_list_table <- make_doc_table(

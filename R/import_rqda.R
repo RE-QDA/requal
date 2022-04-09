@@ -115,7 +115,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     create_db_schema(requal_connection)
 
     # Import to requal
-    create_project_record(requal_connection, project_df)
+    create_project_record(requal_connection, project_df, user_id = 1)
     
     requal_project_id <- dplyr::tbl(requal_connection, "projects") %>% 
         dplyr::collect() %>% 

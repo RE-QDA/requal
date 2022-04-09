@@ -75,7 +75,8 @@ delete_doc_UI <- function(id, project) {
 # delete documents from project ----
 delete_db_documents <- function(project_db,
                                 active_project,
-                                delete_doc_id) {
+                                delete_doc_id, 
+                                user) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
 
@@ -86,13 +87,13 @@ delete_db_documents <- function(project_db,
     params = list(delete_doc_id)
   )
   if (length(delete_doc_id)) {
-    log_delete_document_record(con, active_project, delete_doc_id)
+    log_delete_document_record(con, active_project, delete_doc_id, user_id = user()$user_id)
   }
 }
 
 
 # add input document ----
-add_input_document <- function(connection, project, doc_name, doc_text, doc_description) {
+add_input_document <- function(connection, project, doc_name, doc_text, doc_description, user_id) {
   con <- DBI::dbConnect(
     RSQLite::SQLite(),
     connection
@@ -107,7 +108,7 @@ add_input_document <- function(connection, project, doc_name, doc_text, doc_desc
     doc_text = .env$doc_text
   )
 
-  add_documents_record(con, project, text_df)
+  add_documents_record(con, project, text_df, user_id = user_id)
 }
 
 # encodings -----
