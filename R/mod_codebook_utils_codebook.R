@@ -239,7 +239,8 @@ render_codes <- function(active_project,
 merge_codes <- function(project_db,
                         active_project,
                         merge_from,
-                        merge_to) {
+                        merge_to, 
+                        user_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
 
@@ -258,5 +259,5 @@ merge_codes <- function(project_db,
   DBI::dbClearResult(res2)
 
   # should log action with from-to ids
-  log_merge_code_record(con, project_id = active_project, merge_from, merge_to)
+  log_merge_code_record(con, project_id = active_project, merge_from, merge_to, user_id)
 }

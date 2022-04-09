@@ -292,7 +292,7 @@ add_documents_record <- function(con, project_id, document_df, user_id){
     }
 }
 
-add_cases_record <- function(con, project_id, case_df){
+add_cases_record <- function(con, project_id, case_df, user_id){
     res <- DBI::dbWriteTable(con, "cases", case_df, append = TRUE)
     if(res){
         written_case_id <- dplyr::tbl(con, "cases") %>%
@@ -300,13 +300,14 @@ add_cases_record <- function(con, project_id, case_df){
                               .data$project_id == project_id) %>%
             dplyr::pull(case_id)
         log_add_case_record(con, project_id, case_df %>%
-                                dplyr::mutate(case_id = written_case_id))
+                                dplyr::mutate(case_id = written_case_id), 
+                            user_id = user_id)
     }else{
         warning("case not added")
     }
 }
 
-add_codes_record <- function(con, project_id, codes_df){
+add_codes_record <- function(con, project_id, codes_df, user_id){
     res <- DBI::dbWriteTable(con, "codes", codes_df, append = TRUE)
     if(res){
         written_code_id <- dplyr::tbl(con, "codes") %>%
@@ -314,16 +315,17 @@ add_codes_record <- function(con, project_id, codes_df){
                           .data$project_id == project_id) %>%
             dplyr::pull(code_id)
         log_add_code_record(con, project_id, codes_df %>%
-                                dplyr::mutate(code_id = written_code_id))
+                                dplyr::mutate(code_id = written_code_id), 
+                            user_id = user_id)
     }else{
         warning("code not added")
     }
 }
 
-add_case_doc_record <- function(con, project_id, case_doc_df){
+add_case_doc_record <- function(con, project_id, case_doc_df, user_id){
     res <- DBI::dbWriteTable(con, "cases_documents_map", case_doc_df, append = TRUE)
     if(res){
-        log_add_case_doc_record(con, project_id, case_doc_df)
+        log_add_case_doc_record(con, project_id, case_doc_df, user_id)
     }else{
         warning("code document map not added")
     }
