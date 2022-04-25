@@ -83,7 +83,7 @@ mod_memo_server <- function(id, project) {
         modalDialog(
           title = paste0(memo_list() %>% 
                            dplyr::filter(memo_id == as.integer(input$selected_memo)) %>% 
-                           dplyr::pull(memo_name)),
+                           dplyr::pull(.data$memo_name)),
           
           textAreaInput(ns("displayed_memo_text"), "Text",
                         value = read_memo_db(project, input$selected_memo), 

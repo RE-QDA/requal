@@ -12,45 +12,31 @@ mod_document_code_ui <- function(id){
   fluidRow(
     
     tags$head(
-      
       tags$script(
         src = "www/document_code_js.js"
       ),
-      
-      ),
+    ),
     
+    column(
+      width = 10,
+      selectInput(ns("doc_selector"), label = "Select a document to code", 
+                  choices = "", selected = ""),
+      htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
+      textOutput(ns("captured_range")),
+      verbatimTextOutput(ns("printLabel"))
+    ),
     
-    column(width = 10,
-    
-
-    
-
-    
-
-    selectInput(ns("doc_selector"), label = "Select a document to code", 
-                choices = "",
-                selected = ""),
-    
-    htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
-
-    textOutput(ns("captured_range")),
-    
-    verbatimTextOutput(ns("printLabel"))
-  ),
-  column(width = 2,
-        
-         tags$b("Codes"),
-         br(),
-         actionButton(ns("remove_codes"), 
-                      "Remove code",
-                      class = "btn-danger",
-                      width = "100%"),
-         br(), br(),
-         uiOutput(ns("code_list"))
-         
-
-         
-         )
+    column(
+      width = 2,
+      tags$b("Codes"),
+      br(),
+      actionButton(ns("remove_codes"), 
+                   "Remove code",
+                   class = "btn-danger",
+                   width = "100%"),
+      br(), br(),
+      uiOutput(ns("code_list"))
+    )
   )
 }
     
@@ -58,33 +44,26 @@ mod_document_code_ui <- function(id){
 #'
 #' @noRd 
 mod_document_code_server <- function(id, project, user, codebook, documents){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
+    
     ns <- session$ns
     
-segments_observer <- reactiveVal(0)
+    segments_observer <- reactiveVal(0)
 
-# Selection of documents to code ------------------------------------------
-
-    
+    # Selection of documents to code ------------------------------------------
     doc_choices <- reactiveVal()
     
-
-# Refresh list of documents when documents are added/removed --------
-
+    # Refresh list of documents when documents are added/removed --------
     observe({ 
       if (isTruthy(project()$active_project)) {
-
-      doc_choices(documents())
-
-      updateSelectInput(session = session,
-                        "doc_selector",
-                        choices = c("", doc_choices())
-                        )
-
-        }
+        doc_choices(documents())
+        
+        updateSelectInput(session = session,
+                          "doc_selector",
+                          choices = c("", doc_choices())
+                          )
+      }
     })
-    # 
-
 
 # Displayed text ----------------------------------------------------------
 
@@ -104,6 +83,7 @@ segments_observer <- reactiveVal(0)
 
       display_text <- load_doc_to_display(project()$active_project, 
                                           project()$project_db, 
+                                          user_id = user()$user_id,
                                           input$doc_selector, 
                                           code_df$active_codebook,
                                           ns=NS(id))
@@ -140,6 +120,7 @@ segments_observer <- reactiveVal(0)
         if (isTruthy(req(input$doc_selector))) {
           text(load_doc_to_display(project()$active_project, 
                                    project()$project_db, 
+                                   user_id = user()$user_id,
                                    input$doc_selector, 
                                    code_df$active_codebook,
                                    ns=NS(id)))
@@ -165,7 +146,7 @@ segments_observer <- reactiveVal(0)
 
 
     
-# Coding tools ------------------------------------------------------------
+  # Coding tools ------------------------------------------------------------
 
     observeEvent(input$selected_code, {
       
@@ -179,53 +160,51 @@ segments_observer <- reactiveVal(0)
         
         write_segment_db(project()$active_project,
                          project()$project_db,
+                         user_id = user()$user_id,
                          doc_id = input$doc_selector,
                          code_id = input$selected_code,
                          startOff, 
                          endOff)
         
         text(load_doc_to_display(project()$active_project, 
-                                            project()$project_db, 
-                                            input$doc_selector,
-                                            code_df$active_codebook,
-                                            ns=NS(id)))
+                                 project()$project_db, 
+                                 user_id = user()$user_id,
+                                 input$doc_selector,
+                                 code_df$active_codebook,
+                                 ns=NS(id)))
         segments_observer(segments_observer()+1)
         
         }
     })
     
-    
-    
-    
-
-    
-# Code removal ----------
-    
+    # Segment removal ----------
     observeEvent(input$remove_codes, {
-      
       req(project()$active_project)
-      # browser()
       marked_segments_df <- load_segment_codes_db(
         active_project = project()$active_project,
         project_db = project()$project_db,
+        user_id = user()$user_id,
         active_doc = input$doc_selector,
         marked_codes = parse_tag_pos(
           input$tag_position,
           "start"
         )
       )
+      
       if (nrow(marked_segments_df) == 0) {
         NULL
       } else if (nrow(marked_segments_df) == 1) {
         delete_segment_codes_db(
           project_db = project()$project_db,
           active_project = project()$active_project,
+          user_id = user()$user_id,
           doc_id = input$doc_selector,
           segment_id = marked_segments_df$segment_id
         )
 
         display_text <- load_doc_to_display(project()$active_project,
           project()$project_db,
+          user_id = user()$user_id,
           input$doc_selector,
           code_df$active_codebook,
           ns = NS(id)
@@ -265,15 +244,15 @@ segments_observer <- reactiveVal(0)
         
         delete_segment_codes_db(project_db =  project()$project_db,
                                 active_project = project()$active_project, 
+                                user_id = user()$user_id,
                                 doc_id = input$doc_selector,
                                 segment_id = input$codes_to_remove
         )
         removeModal()
         
-        
-        
         display_text <- load_doc_to_display(project()$active_project, 
                                             project()$project_db, 
+                                            user_id = user()$user_id,
                                             input$doc_selector,
                                             code_df$active_codebook,
                                             ns=NS(id))
@@ -285,8 +264,6 @@ segments_observer <- reactiveVal(0)
   
 #  # Helper (to be commented out in prod): position counter ---------------
 
-  
-    
     output$captured_range <- renderText({input$tag_position})
 
     return(reactive(segments_observer()))

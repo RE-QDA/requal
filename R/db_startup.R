@@ -82,6 +82,7 @@ CREATE TABLE if not exists codes (
 CREATE_SEGMENTS_SQL <- "
 CREATE TABLE if not exists segments (
     project_id INTEGER
+,   user_id INTEGER
 ,   doc_id INTEGER
 ,   code_id INTEGER
 ,   segment_id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -91,6 +92,7 @@ CREATE TABLE if not exists segments (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
 ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
 "
 
@@ -298,7 +300,7 @@ add_cases_record <- function(con, project_id, case_df, user_id){
         written_case_id <- dplyr::tbl(con, "cases") %>%
             dplyr::filter(.data$case_name == !!case_df$case_name &
                               .data$project_id == project_id) %>%
-            dplyr::pull(case_id)
+            dplyr::pull(.data$case_id)
         log_add_case_record(con, project_id, case_df %>%
                                 dplyr::mutate(case_id = written_case_id), 
                             user_id = user_id)

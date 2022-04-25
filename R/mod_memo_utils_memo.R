@@ -15,7 +15,7 @@ list_memo_records <- function(project) {
             memo_id,
             memo_name = text
         ) %>%
-        dplyr::mutate(memo_name = substr(memo_name, 1, 25)) %>% 
+        dplyr::mutate(memo_name = substr(.data$memo_name, 1, 25)) %>% 
         dplyr::collect() 
     
     return(memos_df)

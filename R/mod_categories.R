@@ -137,7 +137,7 @@ mod_categories_server <- function(id, project, user, codebook) {
         add_category_record(
           con = con,
           project_id = project()$active_project,
-          user = user,
+          user_id = user()$user_id,
           categories_df = categories_input_df
         )
         
@@ -203,7 +203,7 @@ mod_categories_server <- function(id, project, user, codebook) {
       delete_db_category(
         project_db = project()$project_db,
         active_project = project()$active_project,
-        user = user,
+        user_id = user()$user_id,
         delete_cat_id = input$categories_to_del
       )
 
@@ -245,14 +245,14 @@ mod_categories_server <- function(id, project, user, codebook) {
     observeEvent(input$edges_category, {
     add_category_code_record(project_db = project()$project_db,
                     active_project = project()$active_project,
-                    user = user,
+                    user_id = user()$user_id,
                     edge = input$edges_category)
   })
   # Delete edge
     observeEvent(input$edges_category_delete, {
     delete_category_code_record(project_db = project()$project_db,
                                active_project = project()$active_project,
-                               user = user,
+                               user_id = user()$user_id,
                                edge = input$edges_category_delete)
     })
 

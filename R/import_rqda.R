@@ -26,7 +26,9 @@ sample_colours <- function(n){
 #' @export
 #' @importFrom rlang .data
 rql_import_rqda <- function(rqda_file, requal_file){
-    
+    memo <- databaseversion <- project_description <- NULL
+    color <- fid <- cid <- selfirst <- selend <- NULL
+    caseid <- catid <- NULL
     # Load RQDA DB
     rqda_con <- DBI::dbConnect(RSQLite::SQLite(), rqda_file)
     if(fs::file_exists(requal_file)){
@@ -166,7 +168,8 @@ rql_import_rqda <- function(rqda_file, requal_file){
     categories_df <- rqda_categories %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(categories_df)), function(x) {
-        add_category_record(requal_connection, requal_project_id, NULL, categories_df[x, ], 
+        add_category_record(requal_connection, requal_project_id, 
+                            categories_df[x, ], 
                             user_id = USER_ID)
     })
     
@@ -174,7 +177,8 @@ rql_import_rqda <- function(rqda_file, requal_file){
     category_code_map <- rqda_category_code_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(category_code_map)), function(x) {
-        add_category_code_record(requal_file, requal_project_id, NULL, category_code_map[x, ], 
+        add_category_code_record(requal_file, requal_project_id, 
+                                 category_code_map[x, ], 
                                  user_id = USER_ID)
     })
     
@@ -186,7 +190,8 @@ rql_import_rqda <- function(rqda_file, requal_file){
                           function(doc, start, end) {
                               get_segment_text(requal_connection, requal_project_id, 
                                                doc, start, end)
-                              })) %>% 
+                              }), 
+                      user_id = USER_ID) %>% 
         dplyr::select(-memo)
     
     purrr::walk(seq_len(nrow(segments_df)), function(x) {

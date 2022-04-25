@@ -208,7 +208,7 @@ mod_codebook_server <- function(id, project, user) {
         project_db = project()$project_db,
         active_project = project()$active_project,
         user_id = user()$user_id,
-        edge = edge, 
+        edge = edge
       )
 
       # re-render UI

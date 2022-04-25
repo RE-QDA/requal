@@ -198,7 +198,8 @@ gen_codes_ui <- function(code_id,
 delete_db_codes <-
   function(project_db,
            active_project,
-           delete_code_id) {
+           delete_code_id, 
+           user_id) {
     con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
     on.exit(DBI::dbDisconnect(con))
 
@@ -208,7 +209,7 @@ delete_db_codes <-
       params = list(delete_code_id)
     )
 
-    log_delete_code_record(con, active_project, delete_code_id)
+    log_delete_code_record(con, active_project, delete_code_id, user_id)
   }
 
 
