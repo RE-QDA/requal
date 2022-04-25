@@ -15,8 +15,8 @@ list_memo_records <- function(project) {
             memo_id,
             memo_name = text
         ) %>%
-        dplyr::mutate(memo_name = substr(.data$memo_name, 1, 25)) %>% 
-        dplyr::collect() 
+        dplyr::collect() %>% 
+        dplyr::mutate(memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 1, 50)) 
     
     return(memos_df)
 }
@@ -33,6 +33,14 @@ add_memo_record <- function(project, text) {
                           text = text)
     
     res <- DBI::dbWriteTable(con, "memos", memo_df, append = TRUE)
+    if(res){
+      memo_id <- dplyr::tbl(con, "memos") %>% 
+        dplyr::filter(.data$project_id == !!memo_df$project_id, 
+                      .data$text == !!memo_df$text) %>% 
+        dplyr::pull(memo_id)
+      log_add_memo_record(con, memo_df$project_id, memo_df %>% 
+                            dplyr::mutate(memo_id = memo_id))
+    }
 }
 
 # render memos -----
@@ -84,6 +92,10 @@ update_memo_record <- function(project, memo_id, memo_text) {
     res <- DBI::dbSendStatement(con, update_memo_sql)
     DBI::dbClearResult(res)
     
+    project_id <- project()$active_project
+    log_update_memo_record(con, project_id, 
+                           data.frame(memo_id = memo_id, text = memo_text))
+    
 }
 
 # delete memo record -----
@@ -101,4 +113,55 @@ delete_memo_record <- function(project, memo_id) {
     res <- DBI::dbSendStatement(con, delete_memo_sql)
     DBI::dbClearResult(res)
     
+    log_delete_memo_record(con, project()$active_project, memo_id)
+    
+}
+
+
+# dropdown2 function ----
+
+dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
+{
+  if (!is.null(badgeStatus)) 
+    validateStatus(badgeStatus)
+  items <- c(list(...))
+  dropdownClass <- paste0("dropdown")
+  numItems <- length(items)
+  if (is.null(badgeStatus)) {
+    badge <- NULL
+  }
+  else {
+    badge <- dashboardLabel(status = badgeStatus, numItems)
+  }
+  shiny::tags$li(class = dropdownClass, id = id, shiny::tags$a(href = "#",
+                                                               class = "dropdown-toggle",
+                                                               `data-toggle` = "dropdown", 
+                                                               icon, 
+                                                               title, 
+                                                               badge), 
+                 shiny::tags$ul(class = "dropdown-menu", 
+                                style = "left: 0; right: auto; max-height: 80vh", 
+                                shiny::tags$li(shiny::tags$ul(class = "menu", 
+                                                              shiny::tags$div(style = "margin-left: auto; margin-right: 0; width: 80%;",
+                                                                              items)))))
+}
+
+# memo table styling ----
+
+
+memo_table_options <- function() {
+  list(
+    dom = 'lfrtp',
+    #Bfrtip
+    pageLength = 20,
+    searching = TRUE,
+    lengthChange = FALSE
+  )
+}
+
+# create memo as link ----
+memo_link <- function(id, text) {
+  js_fun <- "Shiny.setInputValue('memo_ui_1-selected_memo', this.name, {priority: 'event'});"
+  quote_sign <- '"'
+  paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', text, '</a>')
 }
