@@ -87,6 +87,7 @@ mod_codebook_server <- function(id, project, user) {
         project_db = project()$project_db
       )
     })
+    
     #---Generate codes UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project()$active_project)) {
