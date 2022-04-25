@@ -176,7 +176,7 @@ delete_category_UI <- function(id, project_db, active_project) {
 
 # delete category  -----
 
-delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
+delete_db_category <- function(project_db, active_project, user_id, delete_cat_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
 
@@ -188,7 +188,7 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
   )
 
   if(res & length(delete_cat_id)){
-    log_delete_category_record(con, active_project, delete_cat_id)
+    log_delete_category_record(con, active_project, delete_cat_id, user_id)
   }
 }
 

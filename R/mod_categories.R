@@ -212,7 +212,7 @@ mod_categories_server <- function(id, project, user, codebook) {
       edge$category_id <- input$categories_to_del
       delete_category_code_record(project_db = project()$project_db,
                      active_project = project()$active_project,
-                     user = user,
+                     user_id = user()$user_id,
                      edge = edge)
 
       # refresh delete UI
