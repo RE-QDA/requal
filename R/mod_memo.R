@@ -21,7 +21,7 @@ div(
 #' memo Server Functions
 #'
 #' @noRd
-mod_memo_server <- function(id, project) {
+mod_memo_server <- function(id, project, user) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -38,7 +38,7 @@ mod_memo_server <- function(id, project) {
    output$memo <- DT::renderDataTable({
       
    DT::datatable(req(memo_list()) %>% 
-                   dplyr::arrange(desc(memo_id)) %>% 
+                   dplyr::arrange(dplyr::desc(memo_id)) %>% 
                         dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>% 
                         dplyr::select(memo_name), options = memo_table_options(),
                  class = "compact",
@@ -77,7 +77,7 @@ mod_memo_server <- function(id, project) {
     
     observeEvent(input$save_close, {
       
-      add_memo_record(project, req(input$memo_text))
+      add_memo_record(project, req(input$memo_text), user_id = user()$user_id)
       
       memo_list(list_memo_records(project))
                
@@ -113,7 +113,8 @@ mod_memo_server <- function(id, project) {
     
     observeEvent(input$save_changes, {
       
-      update_memo_record(project, input$selected_memo, req(input$displayed_memo_text))
+      update_memo_record(project, input$selected_memo, req(input$displayed_memo_text), 
+                         user_id = user()$user_id)
       
       memo_list(list_memo_records(project))
       
@@ -122,7 +123,8 @@ mod_memo_server <- function(id, project) {
     
     observeEvent(input$delete_memo, {
       
-      delete_memo_record(project, input$selected_memo)
+      delete_memo_record(project, input$selected_memo, 
+                         user_id = user()$user_id)
       
       memo_list(list_memo_records(project))
       

@@ -60,7 +60,7 @@ app_server <- function(input, output, session) {
   
   # memo
   
-  mod_memo_server("memo_ui_1", project_observer)
+  mod_memo_server("memo_ui_1", project_observer, user)
 
 
 

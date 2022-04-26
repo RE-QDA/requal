@@ -141,22 +141,25 @@ log_delete_category_code_record <- function(con, project_id, df, user_id){
                data = df)
 }
 
-log_add_memo_record <- function(con, project_id, df){
+log_add_memo_record <- function(con, project_id, df, user_id){
     log_action(con, 
+               user_id = user_id,
                project_id = project_id, 
                action = "Add memo", 
                data = df)
 }
 
-log_update_memo_record <- function(con, project_id, df){
+log_update_memo_record <- function(con, project_id, df, user_id){
     log_action(con, 
+               user_id = user_id,
                project_id = project_id, 
                action = "Update memo", 
                data = df)
 }
 
-log_delete_memo_record <- function(con, project_id, memo_id){
+log_delete_memo_record <- function(con, project_id, memo_id, user_id){
     log_action(con, 
+               user_id = user_id,
                project_id, 
                action = "Delete memo", 
                data = list(memo_id = memo_id))
