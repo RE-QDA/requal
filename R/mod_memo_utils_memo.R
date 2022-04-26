@@ -16,8 +16,7 @@ list_memo_records <- function(project) {
             memo_name = text
         ) %>%
         dplyr::collect() %>% 
-        dplyr::mutate(memo_name = substr(stringr::str_extract(memo_name, "\\A.*"), 1, 50)) 
-      
+        dplyr::mutate(memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 1, 50)) 
     
     return(memos_df)
 }
@@ -25,7 +24,7 @@ list_memo_records <- function(project) {
 
 
 # write new free memo to db ------
-add_memo_record <- function(project, text) {
+add_memo_record <- function(project, text, user_id) {
     
     con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -40,7 +39,8 @@ add_memo_record <- function(project, text) {
                       .data$text == !!memo_df$text) %>% 
         dplyr::pull(memo_id)
       log_add_memo_record(con, memo_df$project_id, memo_df %>% 
-                            dplyr::mutate(memo_id = memo_id))
+                            dplyr::mutate(memo_id = memo_id), 
+                          user_id = user_id)
     }
 }
 
@@ -77,7 +77,7 @@ read_memo_db <- function(project, memo_id) {
 
 # update memo record ------
 
-update_memo_record <- function(project, memo_id, memo_text) {
+update_memo_record <- function(project, memo_id, memo_text, user_id) {
     
     
     con <- DBI::dbConnect(RSQLite::SQLite(),
@@ -95,13 +95,14 @@ update_memo_record <- function(project, memo_id, memo_text) {
     
     project_id <- project()$active_project
     log_update_memo_record(con, project_id, 
-                           data.frame(memo_id = memo_id, text = memo_text))
+                           data.frame(memo_id = memo_id, text = memo_text), 
+                           user_id = user_id)
     
 }
 
 # delete memo record -----
 
-delete_memo_record <- function(project, memo_id) {
+delete_memo_record <- function(project, memo_id, user_id) {
     
     con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
     on.exit(DBI::dbDisconnect(con))
@@ -114,7 +115,8 @@ delete_memo_record <- function(project, memo_id) {
     res <- DBI::dbSendStatement(con, delete_memo_sql)
     DBI::dbClearResult(res)
     
-    log_delete_memo_record(con, project()$active_project, memo_id)
+    log_delete_memo_record(con, project()$active_project, memo_id, 
+                           user_id = user_id)
     
 }
 

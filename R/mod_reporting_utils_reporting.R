@@ -9,8 +9,11 @@ load_logs_for_reporting <- function(project_db,
     
     logs <- dplyr::tbl(con, "logs") %>%
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-        dplyr::select(.data$user,
-                      .data$action, 
+        dplyr::left_join(., dplyr::tbl(con, "users") %>% 
+                             dplyr::select(.data$user_id, .data$user_name), 
+                         by = "user_id") %>% 
+        dplyr::select(.data$action, 
+                      user = .data$user_name, 
                       detail = .data$payload, 
                       .data$created_at) %>%
         dplyr::collect()

@@ -31,7 +31,7 @@ app_server <- function(input, output, session) {
 
   # codebook  ----
 
-  codebook <- mod_codebook_server("codebook_ui_1", project_observer)
+  codebook <- mod_codebook_server("codebook_ui_1", project_observer, user)
   category <- mod_categories_server("categories_ui_1",
                                     project_observer,
                                     user,
@@ -60,7 +60,7 @@ app_server <- function(input, output, session) {
   
   # memo
   
-  mod_memo_server("memo_ui_1", project_observer)
+  mod_memo_server("memo_ui_1", project_observer, user)
 
 
 

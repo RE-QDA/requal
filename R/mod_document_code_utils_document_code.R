@@ -58,15 +58,15 @@ load_doc_db <- function(active_project, project_db, doc_id) {
 load_doc <- function(con, project_id, doc_id){
     doc_text <- NULL
 
-        dplyr::tbl(con, "documents") %>%
-        dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
-        dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-        dplyr::pull(doc_text)
+    dplyr::tbl(con, "documents") %>%
+      dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
+      dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
+      dplyr::pull(doc_text)
 }
 
 # Load segments for document display  -------------------------------------------
 
-load_segments_db <- function(active_project, project_db, doc_id) {
+load_segments_db <- function(active_project, project_db, user_id, doc_id) {
     code_id <- segment_start <- segment_end <- NULL
     if (isTruthy(active_project)) {
 
@@ -77,6 +77,7 @@ load_segments_db <- function(active_project, project_db, doc_id) {
         segments <- dplyr::tbl(con, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
+            dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
             dplyr::select(code_id,
                           segment_start,
                           segment_end) %>%
@@ -130,6 +131,7 @@ get_segment_text <- function(con, project_id, doc_id, start, end){
 write_segment_db <- function(
     active_project,
     project_db,
+    user_id,
     doc_id,
     code_id,
     startOff,
@@ -144,9 +146,10 @@ write_segment_db <- function(
     # - return segments with the same document ID and code ID from the DB
     coded_segments <- dplyr::tbl(con, "segments") %>%
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+        dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
         dplyr::filter(.data$code_id == as.integer(.env$code_id)) %>%
-        dplyr::select(project_id, doc_id, code_id, segment_id,
+        dplyr::select(project_id, user_id, doc_id, code_id, segment_id,
                       segment_start,
                       segment_end) %>%
         dplyr::collect()
@@ -161,7 +164,8 @@ write_segment_db <- function(
                                                    project_id = active_project,
                                                    doc_id,
                                                    .data$segment_start,
-                                                   .data$segment_end))
+                                                   .data$segment_end), 
+                          user_id = .env$user_id)
 
 
         # delete_segments that are to be replaced by segment_df
@@ -169,12 +173,13 @@ write_segment_db <- function(
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
                        AND code_id = {code_id}
+                       AND user_id = {user_id}
                        AND segment_start = {overlap$segment_start}
                        AND segment_end = {overlap$segment_end}", .con = con)
 
         purrr::walk(query, function(x) {
             DBI::dbExecute(con, x)
-            log_delete_segment_record(con, active_project, overlap$segment_id)
+            log_delete_segment_record(con, active_project, overlap$segment_id, user_id)
         })
 
         res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
@@ -182,6 +187,7 @@ write_segment_db <- function(
     }else{
         # in case of no overlap write in DB directly
         segment_df <- data.frame(project_id = active_project,
+                                 user_id = user_id,
                                  doc_id = doc_id,
                                  code_id = code_id,
                                  segment_start = startOff,
@@ -201,12 +207,14 @@ write_segment_db <- function(
         dplyr::filter(.data$project_id == !!segment_df$project_id & 
                       .data$doc_id == !!segment_df$doc_id &
                       .data$code_id == !!segment_df$code_id &
-                      .data$segment_start == !!segment_df$segment_start& 
-                      .data$segment_end == !!segment_df$segment_end) %>% 
+                      .data$segment_start == !!segment_df$segment_start & 
+                      .data$segment_end == !!segment_df$segment_end & 
+                      .data$user_id == !!segment_df$user_id) %>% 
         dplyr::pull(segment_id)
       
       log_add_segment_record(con, project_id = active_project, segment_df %>% 
-                               dplyr::mutate(segment_id = written_segment_id))
+                               dplyr::mutate(segment_id = written_segment_id), 
+                             user_id = user_id)
     }else{
         warning("segment not added")
     }
@@ -214,74 +222,77 @@ write_segment_db <- function(
 }
 
 # calculate code overlap for doc display ----
-calculate_code_overlap <- function(raw_segments){
+calculate_code_overlap <- function(raw_segments) {
+  prevals <- raw_segments %>%
+    tidyr::pivot_longer(cols = c(
+      segment_start,
+      segment_end
+    )) %>%
+    dplyr::arrange(value)
+  vals <- prevals$value
+  names(vals) <- prevals$name
 
+  res <- dplyr::tibble(
+    code_id = NULL,
+    segment_start = NULL,
+    segment_end = NULL
+  )
 
-prevals <- raw_segments %>%
-  tidyr::pivot_longer(cols = c(
-    segment_start,
-    segment_end
-  )) %>%
-  dplyr::arrange(value)
-vals <- prevals$value
-names(vals) <- prevals$name
-
-res <- dplyr::tibble(
-  code_id = NULL,
-  segment_start = NULL,
-  segment_end = NULL
-)
-
-for (i in seq_along(vals)) { 
-  overlap_df <- raw_segments %>%
-    dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
-  if (names(vals[i]) == "segment_start") {
-    res <- dplyr::bind_rows(
-      res,
-      tibble::tibble(
-        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-        segment_start = vals[i],
-        segment_end = vals[i] - 1
+  for (i in seq_along(vals)) {
+    overlap_df <- raw_segments %>%
+      dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
+    if (names(vals[i]) == "segment_start") {
+      res <- dplyr::bind_rows(
+        res,
+        tibble::tibble(
+          code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+          segment_start = vals[i],
+          segment_end = vals[i] - 1
+        )
       )
-    )
-  } else {
-    res <- dplyr::bind_rows(
-      res,
-      tibble::tibble(
-        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-        segment_start = vals[i] + 1,
-        segment_end = min(overlap_df$segment_end)
+    } else {
+      res <- dplyr::bind_rows(
+        res,
+        tibble::tibble(
+          code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+          segment_start = vals[i] + 1,
+          segment_end = min(overlap_df$segment_end)
+        )
       )
-    )
+    }
   }
-}
 
-if (nrow(res)) {
-  
-prefinal <- res %>%
-  dplyr::mutate(
-    code_id = dplyr::lead(code_id),
-    segment_end = dplyr::lead(segment_end)
-  ) %>%
-  dplyr::filter(code_id != "",
-                !is.na(code_id)) %>% 
-    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  } else {res}
-
+  if (nrow(res)) {
+    prefinal <- res %>%
+      dplyr::mutate(
+        code_id = dplyr::lead(code_id),
+        segment_end = dplyr::lead(segment_end)
+      ) %>%
+      dplyr::filter(
+        code_id != "",
+        !is.na(code_id)
+      ) %>%
+      dplyr::mutate(segment_id = 0:(dplyr::n() - 1))
+  } else {
+    res
+  }
 }
 
 # Generate text to be displayed -----
 
 load_doc_to_display <- function(active_project,
                                 project_db,
+                                user_id,
                                 doc_selector,
                                 codebook,
                                 ns){
 
-
+    position_type <- position_start <- tag_start <- tag_end <- NULL
     raw_text <- load_doc_db(active_project, project_db, doc_selector)
 
     coded_segments <- load_segments_db(active_project,
                                        project_db,
+                                       user_id,
                                        doc_selector) %>% 
         calculate_code_overlap()
     
@@ -310,7 +321,7 @@ load_doc_to_display <- function(active_project,
                                 code_names)
         )
         
-        content_df <-coded_segments %>% 
+        content_df <- coded_segments %>% 
             dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
             dplyr::mutate(code_id = as.character(code_id)) %>% 
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
@@ -390,6 +401,7 @@ load_doc_to_display <- function(active_project,
 
 load_segment_codes_db <- function(active_project, 
                                   project_db,
+                                  user_id,
                                   active_doc,
                                   marked_codes) {
 
@@ -405,13 +417,13 @@ load_segment_codes_db <- function(active_project,
                                by = "code_id"
                                ) %>%
             dplyr::filter(.data$project_id == as.integer(active_project) &
-                          .data$doc_id == as.integer(active_doc)) %>%
+                          .data$doc_id == as.integer(active_doc) &
+                          .data$user_id == as.integer(user_id)) %>%
             dplyr::filter(dplyr::between(marked_codes,
                                          .data$segment_start,
                                          .data$segment_end)) %>%
             dplyr::select(code_id, code_name, segment_id) %>%
             dplyr::collect()
-
 }
 
 # Parse tag position -----------
@@ -438,6 +450,7 @@ parse_tag_pos <- function(tag_postion, which_part) {
 
 delete_segment_codes_db <- function(project_db,
                                     active_project,
+                                    user_id,
                                     doc_id,
                                     segment_id) {
 
@@ -449,12 +462,12 @@ delete_segment_codes_db <- function(project_db,
     query <- glue::glue_sql("DELETE FROM segments
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
+                       AND user_id = {user_id}
                        AND segment_id = {segment_id}", .con = con)
 
     purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
     
-    log_delete_segment_record(con, project_id = active_project, segment_id)
-
+    log_delete_segment_record(con, project_id = active_project, segment_id, user_id)
 }
 
 

@@ -13,7 +13,7 @@ project_df <- dplyr::tibble(
     project_description = "test",
     created_at = "2021-01-01 00:00:00"
 )
-create_project_record(con, project_df)
+create_project_record(con, project_df, user_id = 1)
 
 test_that("Test project is recorded", {
     expect_true((dplyr::tbl(con, "projects") %>% 

@@ -24,7 +24,7 @@ create_project_db <- function(project_directory,
         create_db_schema(con)
     }
 
-    create_project_record(con, project_df)
+    create_project_record(con, project_df, user_id = 1)
     
     active_project_df <- dplyr::tbl(con, "projects") %>% 
         dplyr::select(project_id, project_name) %>% 

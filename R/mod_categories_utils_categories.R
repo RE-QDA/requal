@@ -75,8 +75,7 @@ render_categories <- function(id,
 # Read categories--------------------------------------------------------
 
 read_db_categories <- function(project_db, active_project) {
-  category_id <- category_description <- NULL
-
+  category_id <- category_description <- category_name <- NULL
 
   con <- DBI::dbConnect(
     RSQLite::SQLite(),
@@ -177,7 +176,7 @@ delete_category_UI <- function(id, project_db, active_project) {
 
 # delete category  -----
 
-delete_db_category <- function(project_db, active_project, user, delete_cat_id) {
+delete_db_category <- function(project_db, active_project, user_id, delete_cat_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
 
@@ -189,20 +188,21 @@ delete_db_category <- function(project_db, active_project, user, delete_cat_id) 
   )
 
   if(res & length(delete_cat_id)){
-    log_delete_category_record(con, active_project, delete_cat_id)
+    log_delete_category_record(con, active_project, delete_cat_id, user_id)
   }
 }
 
 # add category record -----
-add_category_record <- function(con, project_id, user, categories_df) {
+add_category_record <- function(con, project_id, user_id, categories_df) {
   res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
 
   if (res) {
     written_category_id <- dplyr::tbl(con, "categories") %>%
       dplyr::filter(.data$category_name == !!categories_df$category_name) %>%
-      dplyr::pull(category_id)
+      dplyr::pull(.data$category_id)
     log_add_category_record(con, project_id, categories_df %>%
-                              dplyr::mutate(category_id = written_category_id))
+                              dplyr::mutate(category_id = written_category_id), 
+                            user_id = user_id)
   } else {
     warning("category not added")
   }
@@ -212,7 +212,7 @@ add_category_record <- function(con, project_id, user, categories_df) {
 # add code to category -----
 add_category_code_record <- function(project_db,
                             active_project,
-                            user,
+                            user_id,
                             edge) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
@@ -223,7 +223,7 @@ add_category_code_record <- function(project_db,
   res <- DBI::dbWriteTable(con, "categories_codes_map", edge_df, append = TRUE)
 
   if (res) {
-    log_add_category_code_record(con, active_project, edge_df)
+    log_add_category_code_record(con, active_project, edge_df, user_id)
   } else {
     warning("category not added")
   }
@@ -234,8 +234,8 @@ add_category_code_record <- function(project_db,
 
 delete_category_code_record <- function(project_db,
                            active_project,
-                           user,
-                           edge) {
+                           edge, 
+                           user_id) {
   con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
   on.exit(DBI::dbDisconnect(con))
   # delete edge
@@ -261,7 +261,7 @@ delete_category_code_record <- function(project_db,
   }
 
   if(res){
-    log_delete_category_code_record(con, active_project, edge)
+    log_delete_category_code_record(con, active_project, edge, user_id)
   }
 }
 

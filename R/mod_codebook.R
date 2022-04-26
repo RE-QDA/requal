@@ -67,7 +67,6 @@ mod_codebook_server <- function(id, project, user) {
     ns <- session$ns
 
     # codebook observer ----
-
     codebook <- reactiveVal()
 
     observeEvent(project()$active_project, {
@@ -88,6 +87,7 @@ mod_codebook_server <- function(id, project, user) {
         project_db = project()$project_db
       )
     })
+    
     #---Generate codes UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
       if (isTruthy(project()$active_project)) {
@@ -108,10 +108,7 @@ mod_codebook_server <- function(id, project, user) {
 
     #---Create new code------------------------------------------------------
 
-
-
     observeEvent(input$code_add, {
-
 
       # check if code name is unique
       code_names <- list_db_codes(
@@ -144,7 +141,8 @@ mod_codebook_server <- function(id, project, user) {
         add_codes_record(
           con = con,
           project_id = project()$active_project,
-          codes_df = codes_input_df
+          codes_df = codes_input_df, 
+          user_id = user()$user_id
         )
 
         output$codes_ui <- renderUI({
@@ -200,7 +198,8 @@ mod_codebook_server <- function(id, project, user) {
       delete_db_codes(
         project_db = project()$project_db,
         active_project = project()$active_project,
-        delete_code_id = input$code_to_del
+        delete_code_id = input$code_to_del, 
+        user_id = user()$user_id
       )
 
       # delete edges
@@ -209,7 +208,7 @@ mod_codebook_server <- function(id, project, user) {
       delete_category_code_record(
         project_db = project()$project_db,
         active_project = project()$active_project,
-        user = user,
+        user_id = user()$user_id,
         edge = edge
       )
 
@@ -259,7 +258,8 @@ mod_codebook_server <- function(id, project, user) {
             project()$project_db,
             project()$active_project,
             input$merge_from,
-            input$merge_to
+            input$merge_to, 
+            user_id = user()$user_id
           )
 
           # update codebook return value

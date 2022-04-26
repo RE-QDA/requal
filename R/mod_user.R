@@ -40,10 +40,8 @@ mod_user_server <- function(id, project){
         tidyr::pivot_longer(dplyr::everything(),
                             names_to = "permissions",
                             values_to = "granted") %>% 
-        dplyr::filter(granted == 1) %>% 
-        dplyr::pull(permissions) 
-      
-      
+        dplyr::filter(.data$granted == 1) %>% 
+        dplyr::pull(.data$permissions) 
       
       
       if (isTruthy( project()$active_project)) {
