@@ -164,7 +164,8 @@ write_segment_db <- function(
                                                    project_id = active_project,
                                                    doc_id,
                                                    .data$segment_start,
-                                                   .data$segment_end))
+                                                   .data$segment_end), 
+                          user_id = .env$user_id)
 
 
         # delete_segments that are to be replaced by segment_df
@@ -206,8 +207,9 @@ write_segment_db <- function(
         dplyr::filter(.data$project_id == !!segment_df$project_id & 
                       .data$doc_id == !!segment_df$doc_id &
                       .data$code_id == !!segment_df$code_id &
-                      .data$segment_start == !!segment_df$segment_start& 
-                      .data$segment_end == !!segment_df$segment_end) %>% 
+                      .data$segment_start == !!segment_df$segment_start & 
+                      .data$segment_end == !!segment_df$segment_end & 
+                      .data$user_id == !!segment_df$user_id) %>% 
         dplyr::pull(segment_id)
       
       log_add_segment_record(con, project_id = active_project, segment_df %>% 
@@ -220,59 +222,60 @@ write_segment_db <- function(
 }
 
 # calculate code overlap for doc display ----
-calculate_code_overlap <- function(raw_segments){
+calculate_code_overlap <- function(raw_segments) {
+  prevals <- raw_segments %>%
+    tidyr::pivot_longer(cols = c(
+      segment_start,
+      segment_end
+    )) %>%
+    dplyr::arrange(value)
+  vals <- prevals$value
+  names(vals) <- prevals$name
 
+  res <- dplyr::tibble(
+    code_id = NULL,
+    segment_start = NULL,
+    segment_end = NULL
+  )
 
-prevals <- raw_segments %>%
-  tidyr::pivot_longer(cols = c(
-    segment_start,
-    segment_end
-  )) %>%
-  dplyr::arrange(value)
-vals <- prevals$value
-names(vals) <- prevals$name
-
-res <- dplyr::tibble(
-  code_id = NULL,
-  segment_start = NULL,
-  segment_end = NULL
-)
-
-for (i in seq_along(vals)) { 
-  overlap_df <- raw_segments %>%
-    dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
-  if (names(vals[i]) == "segment_start") {
-    res <- dplyr::bind_rows(
-      res,
-      tibble::tibble(
-        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-        segment_start = vals[i],
-        segment_end = vals[i] - 1
+  for (i in seq_along(vals)) {
+    overlap_df <- raw_segments %>%
+      dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
+    if (names(vals[i]) == "segment_start") {
+      res <- dplyr::bind_rows(
+        res,
+        tibble::tibble(
+          code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+          segment_start = vals[i],
+          segment_end = vals[i] - 1
+        )
       )
-    )
-  } else {
-    res <- dplyr::bind_rows(
-      res,
-      tibble::tibble(
-        code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-        segment_start = vals[i] + 1,
-        segment_end = min(overlap_df$segment_end)
+    } else {
+      res <- dplyr::bind_rows(
+        res,
+        tibble::tibble(
+          code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
+          segment_start = vals[i] + 1,
+          segment_end = min(overlap_df$segment_end)
+        )
       )
-    )
+    }
   }
-}
 
-if (nrow(res)) {
-  
-prefinal <- res %>%
-  dplyr::mutate(
-    code_id = dplyr::lead(code_id),
-    segment_end = dplyr::lead(segment_end)
-  ) %>%
-  dplyr::filter(code_id != "",
-                !is.na(code_id)) %>% 
-    dplyr::mutate(segment_id = 0:(dplyr::n()-1))  } else {res}
-
+  if (nrow(res)) {
+    prefinal <- res %>%
+      dplyr::mutate(
+        code_id = dplyr::lead(code_id),
+        segment_end = dplyr::lead(segment_end)
+      ) %>%
+      dplyr::filter(
+        code_id != "",
+        !is.na(code_id)
+      ) %>%
+      dplyr::mutate(segment_id = 0:(dplyr::n() - 1))
+  } else {
+    res
+  }
 }
 
 # Generate text to be displayed -----
