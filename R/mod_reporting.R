@@ -22,7 +22,13 @@ mod_reporting_ui <- function(id){
                                       label = "",
                                       icon = icon("sync")) %>%
                            tagAppendAttributes(style = "float:right;"),
-                         DT::dataTableOutput(ns("report_logs")))
+                         DT::dataTableOutput(ns("report_logs"))), 
+                tabPanel("Reproducibility measures", 
+                         id = ns("repro"), 
+                         value = "repro", 
+                         actionButton(ns("segment_overlap"), 
+                                      label = "Show segment overlap"), 
+                         uiOutput(ns("reproducibility")))
     )
 
   )
@@ -72,5 +78,11 @@ mod_reporting_server <- function(id, project, user){
       )
 
     })
+    
+
+  # Reproducibility measures ------------------------------------------------
+  output$reproducibility <- renderUI({
+    "hello"
+  })
 
 })}
