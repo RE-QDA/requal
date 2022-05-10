@@ -10,8 +10,9 @@
 mod_reproducibility_ui <- function(id){
   ns <- NS(id)
   tagList(
-    "hello, reproducible world!", 
-    actionButton(ns("test"), "test")
+
+      actionButton(ns("test"), "test"),
+      textOutput(ns("mean_no_codes"))
   )
 }
     
@@ -22,7 +23,7 @@ mod_reproducibility_server <- function(id, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    observeEvent(input$test, {
+    output$mean_no_codes <- eventReactive(input$test, {
       browser()
       
       segments <- load_all_segments_db(project_db = project()$project_db, 
@@ -32,13 +33,20 @@ mod_reproducibility_server <- function(id, project){
         dplyr::count(user_id) %>% 
         dplyr::pull(n) %>% 
         mean()
+      
+      # 1. kolik % segmentů má překryv a kolik ne → zobrazit prostý referenční překryv, tzn. číslo 
+      # (zohlednit nějak počet kodérů) a jeden dokument se všemi kódovanými texty pod sebou; dvěma 
+      # barvami vyznačené překrývající a nepřekrývající segmenty
+      
+      # 2. stejný výpočet a vizualizaci pro každý kód
+      
+      # 3. pro vybraný kód spočítat, kolik % segmentů má překryv dvou, tří a čtyř kodérů + 
+      # heatmapa hodnot překryvu jednotlivých kodérů
+      
     })
+    
+    
     
   })
 }
     
-## To be copied in the UI
-# mod_reproducibility_ui("reproducibility_ui_1")
-    
-## To be copied in the server
-# mod_reproducibility_server("reproducibility_ui_1")

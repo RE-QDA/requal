@@ -15,6 +15,10 @@ mod_reporting_ui <- function(id){
                          id = ns("instructions"),
                          value = "instructions",
                          textOutput(ns("report_instructions"))),
+                tabPanel("Reproducibility", 
+                         id = ns("repro"), 
+                         value = "repro", 
+                         mod_reproducibility_ui("reproducibility_ui_1")),
                 tabPanel("Logs",
                          id = ns("logs"),
                          value = "logs",
@@ -22,11 +26,8 @@ mod_reporting_ui <- function(id){
                                       label = "",
                                       icon = icon("sync")) %>%
                            tagAppendAttributes(style = "float:right;"),
-                         DT::dataTableOutput(ns("report_logs"))), 
-                tabPanel("Reproducibility measures", 
-                         id = ns("repro"), 
-                         value = "repro", 
-                         mod_reproducibility_ui("reproducibility_ui_1"))
+                         DT::dataTableOutput(ns("report_logs"))) 
+
     )
   )
 }
@@ -76,19 +77,5 @@ mod_reporting_server <- function(id, project, user){
 
     })
     
-
-  # Reproducibility measures ------------------------------------------------
-  output$reproducibility <- renderUI({
-    # 1. kolik % segmentů má překryv a kolik ne → zobrazit prostý referenční překryv, tzn. číslo 
-    # (zohlednit nějak počet kodérů) a jeden dokument se všemi kódovanými texty pod sebou; dvěma 
-    # barvami vyznačené překrývající a nepřekrývající segmenty
-    
-    # 2. stejný výpočet a vizualizaci pro každý kód
-    
-    # 3. pro vybraný kód spočítat, kolik % segmentů má překryv dvou, tří a čtyř kodérů + 
-    # heatmapa hodnot překryvu jednotlivých kodérů
-    
-    "hello"
-  })
 
 })}
