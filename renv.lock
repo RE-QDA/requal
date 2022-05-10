@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.0.3",
+    "Version": "4.2.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -702,14 +702,6 @@
       "Repository": "CRAN",
       "Hash": "5c0cdb37f063c58cdab3c7e9fbb8bd2c"
     },
-    "requal": {
-      "Package": "requal",
-      "Version": "0.2.1",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "/Users/radimhladik/repos/requal_0.2.1.tar.gz",
-      "Hash": "1fc8dd4fafd6f7bb9c1025eff7d1d423"
-    },
     "rlang": {
       "Package": "rlang",
       "Version": "0.4.10",
@@ -831,10 +823,10 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.5.3",
+      "Version": "1.7.6",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "a063ebea753c92910a4cca7b18bc1f05"
+      "Hash": "bba431031d30789535745a9627ac9271"
     },
     "stringr": {
       "Package": "stringr",
