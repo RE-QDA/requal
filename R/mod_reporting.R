@@ -30,7 +30,6 @@ mod_reporting_ui <- function(id){
                                       label = "Show segment overlap"), 
                          uiOutput(ns("reproducibility")))
     )
-
   )
 }
 
@@ -82,6 +81,15 @@ mod_reporting_server <- function(id, project, user){
 
   # Reproducibility measures ------------------------------------------------
   output$reproducibility <- renderUI({
+    # 1. kolik % segmentů má překryv a kolik ne → zobrazit prostý referenční překryv, tzn. číslo 
+    # (zohlednit nějak počet kodérů) a jeden dokument se všemi kódovanými texty pod sebou; dvěma 
+    # barvami vyznačené překrývající a nepřekrývající segmenty
+    
+    # 2. stejný výpočet a vizualizaci pro každý kód
+    
+    # 3. pro vybraný kód spočítat, kolik % segmentů má překryv dvou, tří a čtyř kodérů + 
+    # heatmapa hodnot překryvu jednotlivých kodérů
+    
     "hello"
   })
 
