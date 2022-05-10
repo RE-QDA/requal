@@ -26,9 +26,7 @@ mod_reporting_ui <- function(id){
                 tabPanel("Reproducibility measures", 
                          id = ns("repro"), 
                          value = "repro", 
-                         actionButton(ns("segment_overlap"), 
-                                      label = "Show segment overlap"), 
-                         uiOutput(ns("reproducibility")))
+                         mod_reproducibility_ui("reproducibility_ui_1"))
     )
   )
 }
