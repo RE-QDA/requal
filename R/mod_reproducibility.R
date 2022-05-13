@@ -109,7 +109,7 @@ mod_reproducibility_server <- function(id, project){
             dplyr::group_by(code_id) %>% 
             dplyr::summarise(total_overlap = mean(is_overlap), 
                              n_segments = length(unique(segment_id)), 
-                             n_coders = length(unique(c(coder1_id, coder2_id)))) %>% 
+                             n_coders = length(unique(c(coder1, coder2)))) %>% 
             dplyr::left_join(., codes, by = "code_id") %>% 
             dplyr::select(code_name, total_overlap, 
                           n_segments, n_coders) %>% 
