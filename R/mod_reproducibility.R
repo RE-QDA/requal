@@ -20,9 +20,11 @@ mod_reproducibility_ui <- function(id){
                             "Total overlap [segments]"="total_segment", 
                             "Overlap by code [segments]" = "by_code_segment", 
                             "Overlap by coder [segments]" = "by_user_segment", 
-                            "Overlap by coder and code [segments]" = "by_user_code_segment")),
+                            "Overlap by coder and code [segments]" = "by_user_code_segment", 
+                            "Browse documents"="docs")),
     actionButton(ns("test"), "Calculate"),
     uiOutput(ns("overlap_table")), 
+    uiOutput(ns("overlap_documents")),
     plotOutput(ns("overlap_plot"))
   )
 }
@@ -51,6 +53,7 @@ mod_reproducibility_server <- function(id, project){
           # (zohlednit nějak počet kodérů) a jeden dokument se všemi kódovanými texty pod sebou; dvěma 
           # barvami vyznačené překrývající a nepřekrývající segmenty
           
+          output$overlap_documents <- NULL
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({overlap_df})
       })
@@ -67,6 +70,7 @@ mod_reproducibility_server <- function(id, project){
                              n_segments = length(unique(segment_id)), 
                              n_coders = length(unique(c(coder1_id, coder2_id))))
           
+          output$overlap_documents <- NULL
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({overlap_df})
         })
@@ -92,6 +96,7 @@ mod_reproducibility_server <- function(id, project){
                           n_char_coded, n_coders) %>% 
             dplyr::arrange(dplyr::desc(w_total_overlap))
           
+          output$overlap_documents <- NULL
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({overlap_df})
         })
@@ -109,12 +114,13 @@ mod_reproducibility_server <- function(id, project){
             dplyr::group_by(code_id) %>% 
             dplyr::summarise(total_overlap = mean(is_overlap), 
                              n_segments = length(unique(segment_id)), 
-                             n_coders = length(unique(c(coder1, coder2)))) %>% 
+                             n_coders = length(unique(c(coder1_id, coder2_id)))) %>% 
             dplyr::left_join(., codes, by = "code_id") %>% 
             dplyr::select(code_name, total_overlap, 
                           n_segments, n_coders) %>% 
             dplyr::arrange(dplyr::desc(total_overlap))
           
+          output$overlap_documents <- NULL
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({overlap_df})
         })
@@ -162,6 +168,7 @@ mod_reproducibility_server <- function(id, project){
                           fill = "Overlap") + 
             ggplot2::coord_fixed()
             
+          output$overlap_documents <- NULL
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({overlap_heatmap})
         })
@@ -177,13 +184,12 @@ mod_reproducibility_server <- function(id, project){
           
           overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
             dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                             by = c("coder1"="user_id")) %>% 
+                             by = c("coder1_id"="user_id")) %>% 
             dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                             by = c("coder2"="user_id")) %>% 
-            dplyr::group_by(coder1_name, coder2_name, coder1, coder2) %>% 
+                             by = c("coder2_id"="user_id")) %>% 
+            dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>% 
             dplyr::summarise(total_overlap = mean(is_overlap), 
-                             .groups = "drop") %>% 
-            dplyr::rename(coder1_id = coder1, coder2_id = coder2)
+                             .groups = "drop")
           
           # make it symmetrical
           overlap_df <- dplyr::bind_rows(overlap_df, 
@@ -210,6 +216,7 @@ mod_reproducibility_server <- function(id, project){
                           fill = "Overlap") + 
             ggplot2::coord_fixed()
           
+          output$overlap_documents <- NULL
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({overlap_heatmap})
         })
@@ -256,6 +263,7 @@ mod_reproducibility_server <- function(id, project){
             ggplot2::coord_fixed() + 
             ggplot2::facet_wrap(ggplot2::vars(code_name))
           
+          output$overlap_documents <- NULL
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({overlap_heatmap})
         })
@@ -271,14 +279,13 @@ mod_reproducibility_server <- function(id, project){
                                     active_project = project()$active_project)
           
           overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
-            dplyr::group_by(code_id, coder1, coder2) %>% 
+            dplyr::group_by(code_id, coder1_id, coder2_id) %>% 
             dplyr::summarise(total_overlap = mean(is_overlap)) %>% 
             dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                             by = c("coder1"="user_id")) %>% 
+                             by = c("coder1_id"="user_id")) %>% 
             dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                             by = c("coder2"="user_id")) %>% 
-            dplyr::left_join(., codes, by = "code_id") %>% 
-            dplyr::rename(coder1_id = coder1, coder2_id = coder2)
+                             by = c("coder2_id"="user_id")) %>% 
+            dplyr::left_join(., codes, by = "code_id")
           
           overlap_df <- dplyr::bind_rows(overlap_df, 
                                          overlap_df %>% 
@@ -305,12 +312,102 @@ mod_reproducibility_server <- function(id, project){
             ggplot2::coord_fixed() + 
             ggplot2::facet_wrap(ggplot2::vars(code_name))
           
+          output$overlap_documents <- NULL
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({overlap_heatmap})
         })
       }
-      
-    })
+        
+        if(input$metrics_select == "docs"){
+            observeEvent(input$test, {
+                DOC_ID <- 2
+                docs <- load_all_docs_db(project_db = project()$project_db, 
+                                         active_project = project()$active_project)
+                doc_to_display <- docs %>% dplyr::filter(doc_id == DOC_ID) %>% 
+                    dplyr::pull(doc_text)
+                
+                segments <- load_all_segments_db(project_db = project()$project_db, 
+                                                 active_project = project()$active_project) %>% 
+                    dplyr::filter(doc_id == DOC_ID)
+                
+                overlap <- segments %>% 
+                    dplyr::filter(code_id == 5) %>% 
+                    dplyr::mutate(marked = purrr::map2(segment_start, segment_end, 
+                                                       function(x, y) seq(from = x, to = y, by = 1))) %>% 
+                    tidyr::unnest(., marked) %>% 
+                    dplyr::count(marked) %>% 
+                    dplyr::mutate(segment_break = marked != dplyr::lag(marked) + 1 | n != dplyr::lag(n)) %>%
+                    dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
+                    dplyr::mutate(segment_id = cumsum(segment_break)) %>%
+                    dplyr::group_by(segment_id, n) %>%
+                    dplyr::summarise(min_intersect = min(marked), 
+                                     max_intersect = max(marked), 
+                                     intersect_length = max_intersect - min_intersect + 1)
+                
+                max_n <- max(overlap$n)
+                palette <- viridisLite::viridis(max_n)
+                
+                overlap_df <- overlap %>% 
+                    dplyr::rename(segment_start = min_intersect, 
+                                  segment_end = max_intersect) %>% 
+                    tidyr::pivot_longer(cols = c(segment_start, segment_end),
+                                        values_to = "position_start", 
+                                        names_to = "position_type",
+                                        values_drop_na = TRUE
+                    ) %>% 
+                    dplyr::mutate(tag_end = "</b>",
+                                  tag_start = paste0('<b id="consensus_',
+                                                     as.character(n),
+                                                     '" class="segment" style="padding:0; background-color:',
+                                                     palette[n],
+                                                     '">')) %>% 
+                    dplyr::bind_rows(
+                        # start doc
+                        tibble::tibble(position_start = 0,
+                                       position_type =  "segment_start",
+                                       tag_start = "<article><p class='docpar'>"),
+                        
+                        # content
+                        .,
+                        
+                        # end doc
+                        tibble::tibble(position_start = nchar(doc_to_display),
+                                       position_type = "segment_end",
+                                       tag_end = "</p></article>")
+                    ) %>% 
+                    dplyr::mutate(position_start = ifelse(position_type == "segment_end",
+                                                          position_start+1,
+                                                          position_start)) %>% 
+                    dplyr::group_by(position_start, position_type) %>% 
+                    dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
+                                     tag_end = paste(tag_end, collapse = ""),
+                                     .groups = "drop")  %>% 
+                    dplyr::group_by(position_start) %>% 
+                    dplyr::transmute(tag = ifelse(position_type == "segment_start",
+                                                  tag_start, 
+                                                  tag_end)) %>% 
+                    dplyr::ungroup()  %>% 
+                    dplyr::mutate(position_end = dplyr::lead(position_start-1, default = max(position_start))) 
+                
+                
+                html_content <- paste0(purrr::pmap_chr(list(overlap_df$position_start,
+                                                            overlap_df$position_end,
+                                                            overlap_df$tag),
+                                                       ~paste0(..3, 
+                                                               substr(
+                                                                   
+                                                                   doc_to_display, 
+                                                                   ..1, 
+                                                                   ..2))),
+                                       collapse = "") %>% 
+                    stringr::str_replace_all("[\\n\\r]",
+                                             "<span class='br'>\\&#8203</span></p><p class='docpar'>")    
+                
+                output$overlap_documents <- renderText({html_content})
+                output$overlap_table <- NULL
+                output$overlap_plot <- NULL
+        })
+        }
 
     
     # 3. pro vybraný kód spočítat, kolik % segmentů má překryv dvou, tří a čtyř kodérů + 
@@ -319,5 +416,5 @@ mod_reproducibility_server <- function(id, project){
     
     
   })
-}
-    
+})
+}    

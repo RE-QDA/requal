@@ -20,6 +20,21 @@ load_all_segments_db <- function(active_project, project_db) {
     } else {""}
 }
 
+load_all_docs_db <- function(active_project, project_db){
+    if (isTruthy(active_project)) {
+        
+        con <- DBI::dbConnect(RSQLite::SQLite(),
+                              project_db)
+        on.exit(DBI::dbDisconnect(con))
+        
+        docs <- dplyr::tbl(con, "documents") %>%
+            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+            dplyr::collect()
+        
+        return(docs)
+    } else {""}
+}
+
 load_users_names <- function(active_project, project_db){
     user_id <- user_name <- NULL
     if (isTruthy(active_project)) {
@@ -155,6 +170,8 @@ calculate_segment_overlap_by_users <- function(segments){
             dplyr::mutate(coder1 = coder1_id, 
                           coder2 = coder2_id)
         
-        dplyr::bind_rows(coder1, coder2)
+        dplyr::bind_rows(coder1, coder2) %>% 
+            dplyr::rename(coder1_id = coder1, 
+                          coder2_id = coder2)
     })
 }
