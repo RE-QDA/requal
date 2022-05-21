@@ -160,7 +160,8 @@ mod_doc_manager_server <- function(id, project, user) {
       delete_db_documents(
         project()$project_db,
         project()$active_project,
-        input$doc_delete_list
+        input$doc_delete_list,
+        user()$user_id
       )
 
 
