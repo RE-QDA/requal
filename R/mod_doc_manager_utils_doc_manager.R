@@ -87,7 +87,7 @@ delete_db_documents <- function(project_db,
     params = list(delete_doc_id)
   )
   if (length(delete_doc_id)) {
-    log_delete_document_record(con, active_project, delete_doc_id, user_id = user()$user_id)
+    log_delete_document_record(con, active_project, delete_doc_id, user_id = user)
   }
 }
 
