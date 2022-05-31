@@ -191,6 +191,7 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
         )
       )
       
+      
       if (nrow(marked_segments_df) == 0) {
         NULL
       } else if (nrow(marked_segments_df) == 1) {

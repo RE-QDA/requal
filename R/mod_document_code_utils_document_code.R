@@ -418,12 +418,12 @@ load_segment_codes_db <- function(active_project,
                                ) %>%
             dplyr::filter(.data$project_id == as.integer(active_project) &
                           .data$doc_id == as.integer(active_doc) &
-                          .data$user_id == as.integer(user_id)) %>%
+                          .data$user_id == as.integer(.env$user_id)) %>%
             dplyr::filter(dplyr::between(marked_codes,
                                          .data$segment_start,
                                          .data$segment_end)) %>%
             dplyr::select(code_id, code_name, segment_id) %>%
-            dplyr::collect()
+            dplyr::collect() 
 }
 
 # Parse tag position -----------
