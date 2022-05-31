@@ -44,14 +44,9 @@ mod_reproducibility_server <- function(id, project){
                                            active_project = project()$active_project)
           
           overlap_df <- calculate_code_overlap_by_users(segments) %>% 
-            dplyr::summarise(w_total_overlap = weighted.mean(total_overlap, n_char), 
-                             n_char_coded = sum(n_char), 
-                             n_coders = length(unique(c(coder1_id, coder2_id))))
-          
-          # TODO: update function
-          # 1. kolik % segmentů má překryv a kolik ne → zobrazit prostý referenční překryv, tzn. číslo 
-          # (zohlednit nějak počet kodérů) a jeden dokument se všemi kódovanými texty pod sebou; dvěma 
-          # barvami vyznačené překrývající a nepřekrývající segmenty
+            dplyr::summarise(`Weighted total overlap` = weighted.mean(total_overlap, n_char), 
+                             `N characters coded` = sum(n_char), 
+                             `N coders` = length(unique(c(coder1_id, coder2_id))))
           
           output$overlap_documents <- NULL
           output$overlap_plot <- NULL
@@ -66,9 +61,9 @@ mod_reproducibility_server <- function(id, project){
                                            active_project = project()$active_project)
           
           overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
-            dplyr::summarise(total_overlap = mean(is_overlap), 
-                             n_segments = length(unique(segment_id)), 
-                             n_coders = length(unique(c(coder1_id, coder2_id))))
+            dplyr::summarise(`Total Overlap` = mean(is_overlap), 
+                             `N segments` = length(unique(segment_id)), 
+                             `N coders` = length(unique(c(coder1_id, coder2_id))))
           
           output$overlap_documents <- NULL
           output$overlap_plot <- NULL
@@ -94,7 +89,11 @@ mod_reproducibility_server <- function(id, project){
             dplyr::left_join(., codes, by = "code_id") %>% 
             dplyr::select(code_name, w_total_overlap, 
                           n_char_coded, n_coders) %>% 
-            dplyr::arrange(dplyr::desc(w_total_overlap))
+            dplyr::arrange(dplyr::desc(w_total_overlap)) %>% 
+            dplyr::rename(`Code name` = code_name, 
+                          `Weighted total overlap` = w_total_overlap, 
+                          `N characters coded` = n_char_coded, 
+                          `N coders` = n_coders)
           
           output$overlap_documents <- NULL
           output$overlap_plot <- NULL
@@ -118,7 +117,11 @@ mod_reproducibility_server <- function(id, project){
             dplyr::left_join(., codes, by = "code_id") %>% 
             dplyr::select(code_name, total_overlap, 
                           n_segments, n_coders) %>% 
-            dplyr::arrange(dplyr::desc(total_overlap))
+            dplyr::arrange(dplyr::desc(total_overlap)) %>% 
+            dplyr::rename(`Code name` = code_name, 
+                          `Total overlap` = total_overlap, 
+                          `N segments` = n_segments, 
+                          `N coders` = n_coders)
           
           output$overlap_documents <- NULL
           output$overlap_plot <- NULL
@@ -166,7 +169,8 @@ mod_reproducibility_server <- function(id, project){
             ggplot2::labs(x = "Coder 1", 
                           y = "Coder 2", 
                           fill = "Overlap") + 
-            ggplot2::coord_fixed()
+            ggplot2::coord_fixed() + 
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
             
           output$overlap_documents <- NULL
           output$overlap_table <- NULL
@@ -214,7 +218,8 @@ mod_reproducibility_server <- function(id, project){
             ggplot2::labs(x = "Coder 1", 
                           y = "Coder 2", 
                           fill = "Overlap") + 
-            ggplot2::coord_fixed()
+            ggplot2::coord_fixed() + 
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
           
           output$overlap_documents <- NULL
           output$overlap_table <- NULL
@@ -261,7 +266,8 @@ mod_reproducibility_server <- function(id, project){
                           y = "Coder 2", 
                           fill = "Overlap") + 
             ggplot2::coord_fixed() + 
-            ggplot2::facet_wrap(ggplot2::vars(code_name))
+            ggplot2::facet_wrap(ggplot2::vars(code_name)) + 
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
           
           output$overlap_documents <- NULL
           output$overlap_table <- NULL
@@ -310,7 +316,8 @@ mod_reproducibility_server <- function(id, project){
                           y = "Coder 2", 
                           fill = "Overlap") + 
             ggplot2::coord_fixed() + 
-            ggplot2::facet_wrap(ggplot2::vars(code_name))
+            ggplot2::facet_wrap(ggplot2::vars(code_name)) + 
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
           
           output$overlap_documents <- NULL
           output$overlap_table <- NULL
