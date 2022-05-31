@@ -71,12 +71,15 @@ load_codes_names <- function(active_project, project_db){
 }
 
 calculate_code_overlap_by_users <- function(segments){
+    user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
+    segment_vector <- total_overlap <- n_char <- NULL
+    coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
     
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()
     
     # Create a combination of all coders who coded something
-    coders_grid <- as.data.frame(t(combn(unique_coders, m = 2))) %>% 
+    coders_grid <- as.data.frame(t(utils::combn(unique_coders, m = 2))) %>% 
         dplyr::rename(coder1_id = V1, coder2_id = V2)
     
     # Calculate overlap between coders by doc_id and code_id
@@ -116,11 +119,15 @@ calculate_code_overlap_by_users <- function(segments){
 }
 
 calculate_segment_overlap_by_users <- function(segments){
+    user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
+    segment_vector <- total_overlap <- n_char <- NULL
+    coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
+    
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()
     
     # Create a combination of all coders who coded something
-    coders_grid <- as.data.frame(t(combn(unique_coders, m = 2))) %>% 
+    coders_grid <- as.data.frame(t(utils::combn(unique_coders, m = 2))) %>% 
         dplyr::rename(coder1_id = V1, coder2_id = V2)
     
     purrr::map_df(seq_len(nrow(coders_grid)), function(x) {

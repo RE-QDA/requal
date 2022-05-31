@@ -44,7 +44,7 @@ mod_reproducibility_server <- function(id, project){
                                            active_project = project()$active_project)
           
           overlap_df <- calculate_code_overlap_by_users(segments) %>% 
-            dplyr::summarise(`Weighted total overlap` = weighted.mean(total_overlap, n_char), 
+            dplyr::summarise(`Weighted total overlap` = stats::weighted.mean(total_overlap, n_char), 
                              `N characters coded` = sum(n_char), 
                              `N coders` = length(unique(c(coder1_id, coder2_id))))
           
@@ -82,7 +82,7 @@ mod_reproducibility_server <- function(id, project){
           
           overlap_df <- calculate_code_overlap_by_users(segments) %>% 
             dplyr::group_by(code_id) %>% 
-            dplyr::summarise(w_total_overlap = weighted.mean(total_overlap, n_char), 
+            dplyr::summarise(w_total_overlap = stats::weighted.mean(total_overlap, n_char), 
                              n_char_coded = sum(n_char), 
                              n_coders = length(unique(c(coder1_id, coder2_id))), 
                              .groups = "drop") %>% 
@@ -143,7 +143,7 @@ mod_reproducibility_server <- function(id, project){
             dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
                              by = c("coder2_id"="user_id")) %>% 
             dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>% 
-            dplyr::summarise(w_total_overlap = weighted.mean(total_overlap, n_char), 
+            dplyr::summarise(w_total_overlap = stats::weighted.mean(total_overlap, n_char), 
                              .groups = "drop")
           
           # make it symmetrical
