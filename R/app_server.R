@@ -50,6 +50,7 @@ app_server <- function(input, output, session) {
   # reporting
 
   reporting <- mod_reporting_server("reporting_ui_1", project_observer, user)
+  mod_reproducibility_server("reproducibility_ui_1", project_observer)
 
     # about -----
 

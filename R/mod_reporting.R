@@ -15,6 +15,10 @@ mod_reporting_ui <- function(id){
                          id = ns("instructions"),
                          value = "instructions",
                          textOutput(ns("report_instructions"))),
+                tabPanel("Reproducibility", 
+                         id = ns("repro"), 
+                         value = "repro", 
+                         mod_reproducibility_ui("reproducibility_ui_1")),
                 tabPanel("Logs",
                          id = ns("logs"),
                          value = "logs",
@@ -22,9 +26,9 @@ mod_reporting_ui <- function(id){
                                       label = "",
                                       icon = icon("sync")) %>%
                            tagAppendAttributes(style = "float:right;"),
-                         DT::dataTableOutput(ns("report_logs")))
-    )
+                         DT::dataTableOutput(ns("report_logs"))) 
 
+    )
   )
 }
 
@@ -72,5 +76,6 @@ mod_reporting_server <- function(id, project, user){
       )
 
     })
+    
 
 })}
