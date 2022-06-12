@@ -60,9 +60,10 @@ mod_reproducibility_server <- function(id, project){
       
       if(input$metrics_select == "total_segment"){
         observeEvent(input$test, {
+            segments <- load_all_segments_db(project_db = project()$project_db, 
+                                             active_project = project()$active_project)
+            
             if(length(unique(segments$user_id)) > 1){
-                segments <- load_all_segments_db(project_db = project()$project_db, 
-                                                 active_project = project()$active_project)
                 
                 overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
                     dplyr::summarise(`Total Overlap` = mean(is_overlap), 
