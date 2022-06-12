@@ -53,7 +53,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_plot <- NULL
               output$overlap_table <- renderTable({overlap_df})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
       })
       }
@@ -74,7 +74,7 @@ mod_reproducibility_server <- function(id, project){
                 output$overlap_plot <- NULL
                 output$overlap_table <- renderTable({overlap_df})
             }else{
-                output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+                output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
             }
         })
       }
@@ -108,7 +108,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_plot <- NULL
               output$overlap_table <- renderTable({overlap_df})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -140,7 +140,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_plot <- NULL
               output$overlap_table <- renderTable({overlap_df})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -168,7 +168,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_table <- NULL
               output$overlap_plot <- renderPlot({overlap_heatmap})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -195,7 +195,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_table <- NULL
               output$overlap_plot <- renderPlot({overlap_heatmap})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -222,7 +222,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_table <- NULL
               output$overlap_plot <- renderPlot({overlap_heatmap})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -252,7 +252,7 @@ mod_reproducibility_server <- function(id, project){
               output$overlap_table <- NULL
               output$overlap_plot <- renderPlot({overlap_heatmap})
           }else{
-              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+              output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
           }
         })
       }
@@ -345,7 +345,7 @@ mod_reproducibility_server <- function(id, project){
                     output$overlap_table <- NULL
                     output$overlap_plot <- NULL
                 }else{
-                    output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures does not make sense.")   
+                    output$overlap_table <- renderText("Only one user coded texts. Reproducibility measures cannot be computed.")   
                 }
         })
         }
