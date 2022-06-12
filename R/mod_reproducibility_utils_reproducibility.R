@@ -182,3 +182,17 @@ calculate_segment_overlap_by_users <- function(segments){
                           coder2_id = coder2)
     })
 }
+
+make_overlap_df_symmetrical <- function(df){
+    dplyr::bind_rows(df, 
+                     df %>% 
+                         dplyr::rename(coder2_id2 = coder1_id, 
+                                       coder2_name2 = coder1_name, 
+                                       coder1_id2 = coder2_id, 
+                                       coder1_name2 = coder2_name) %>% 
+                         dplyr::rename(coder2_id = coder2_id2, 
+                                       coder1_id = coder1_id2, 
+                                       coder1_name = coder1_name2, 
+                                       coder2_name = coder2_name2)) %>% 
+        unique()
+}
