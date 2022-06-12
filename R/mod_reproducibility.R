@@ -155,29 +155,14 @@ mod_reproducibility_server <- function(id, project){
           
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                                   by = c("coder1_id"="user_id")) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                             by = c("coder2_id"="user_id")) %>% 
+                  join_user_names(., users) %>% 
                   dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>% 
                   dplyr::summarise(w_total_overlap = stats::weighted.mean(total_overlap, n_char), 
                                    .groups = "drop") %>% 
                   make_overlap_df_symmetrical()
           
               
-              overlap_heatmap <- ggplot2::ggplot(overlap_df, 
-                                                 ggplot2::aes(x = factor(coder1_name), 
-                                                              y = factor(coder2_name), 
-                                                              fill = w_total_overlap)) + 
-                  
-                  ggplot2::geom_tile() + 
-                  ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-                  ggplot2::theme_minimal() + 
-                  ggplot2::labs(x = "Coder 1", 
-                                y = "Coder 2", 
-                                fill = "Overlap") + 
-                  ggplot2::coord_fixed() + 
-                  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+              overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = w_total_overlap)
               
               output$overlap_documents <- NULL
               output$overlap_table <- NULL
@@ -198,27 +183,13 @@ mod_reproducibility_server <- function(id, project){
           
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                                   by = c("coder1_id"="user_id")) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                                   by = c("coder2_id"="user_id")) %>% 
+                  join_user_names(., users) %>% 
                   dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>% 
                   dplyr::summarise(total_overlap = mean(is_overlap), 
                                    .groups = "drop") %>% 
                   make_overlap_df_symmetrical()
               
-              overlap_heatmap <- ggplot2::ggplot(overlap_df, 
-                                                 ggplot2::aes(x = factor(coder1_name), 
-                                                              y = factor(coder2_name), 
-                                                              fill = total_overlap)) + 
-                  ggplot2::geom_tile() + 
-                  ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-                  ggplot2::theme_minimal() + 
-                  ggplot2::labs(x = "Coder 1", 
-                                y = "Coder 2", 
-                                fill = "Overlap") + 
-                  ggplot2::coord_fixed() + 
-                  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+              overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap)
           
               output$overlap_documents <- NULL
               output$overlap_table <- NULL
@@ -240,26 +211,12 @@ mod_reproducibility_server <- function(id, project){
           
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                                   by = c("coder1_id"="user_id")) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                                   by = c("coder2_id"="user_id")) %>% 
+                  join_user_names(., users) %>% 
                   dplyr::left_join(., codes, by = "code_id") %>% 
                   make_overlap_df_symmetrical()
               
-              overlap_heatmap <- ggplot2::ggplot(overlap_df, 
-                                                 ggplot2::aes(x = factor(coder1_name), 
-                                                              y = factor(coder2_name), 
-                                                              fill = total_overlap)) + 
-                  ggplot2::geom_tile() + 
-                  ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-                  ggplot2::theme_minimal() + 
-                  ggplot2::labs(x = "Coder 1", 
-                                y = "Coder 2", 
-                                fill = "Overlap") + 
-                  ggplot2::coord_fixed() + 
-                  ggplot2::facet_wrap(ggplot2::vars(code_name)) + 
-                  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+              overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) + 
+                  ggplot2::facet_wrap(ggplot2::vars(code_name))
               
               output$overlap_documents <- NULL
               output$overlap_table <- NULL
@@ -282,27 +239,14 @@ mod_reproducibility_server <- function(id, project){
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
                   dplyr::group_by(code_id, coder1_id, coder2_id) %>% 
-                  dplyr::summarise(total_overlap = mean(is_overlap)) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                                   by = c("coder1_id"="user_id")) %>% 
-                  dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                                   by = c("coder2_id"="user_id")) %>% 
+                  dplyr::summarise(total_overlap = mean(is_overlap), 
+                                   .groups = "drop") %>% 
+                  join_user_names(., users) %>% 
                   dplyr::left_join(., codes, by = "code_id") %>% 
                   make_overlap_df_symmetrical()
           
-              overlap_heatmap <- ggplot2::ggplot(overlap_df, 
-                                                 ggplot2::aes(x = factor(coder1_name), 
-                                                              y = factor(coder2_name), 
-                                                              fill = total_overlap)) + 
-                  ggplot2::geom_tile() + 
-                  ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-                  ggplot2::theme_minimal() + 
-                  ggplot2::labs(x = "Coder 1", 
-                                y = "Coder 2", 
-                                fill = "Overlap") + 
-                  ggplot2::coord_fixed() + 
-                  ggplot2::facet_wrap(ggplot2::vars(code_name)) + 
-                  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+              overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) + 
+                  ggplot2::facet_wrap(ggplot2::vars(code_name))
               
               output$overlap_documents <- NULL
               output$overlap_table <- NULL

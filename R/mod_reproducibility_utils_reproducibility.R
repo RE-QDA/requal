@@ -196,3 +196,27 @@ make_overlap_df_symmetrical <- function(df){
                                        coder2_name = coder2_name2)) %>% 
         unique()
 }
+
+join_user_names <- function(df, users){
+    df %>% 
+        dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
+                     by = c("coder1_id"="user_id")) %>% 
+        dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
+                         by = c("coder2_id"="user_id"))
+}
+
+create_overlap_heatmap <- function(df, fill){
+    ggplot2::ggplot(df, 
+                    ggplot2::aes(x = factor(coder1_name), 
+                                 y = factor(coder2_name), 
+                                 fill = {{fill}})) + 
+        
+        ggplot2::geom_tile() + 
+        ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
+        ggplot2::theme_minimal() + 
+        ggplot2::labs(x = "Coder 1", 
+                      y = "Coder 2", 
+                      fill = "Overlap") + 
+        ggplot2::coord_fixed() + 
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+}
