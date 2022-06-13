@@ -40,26 +40,13 @@ mod_about_server <- function(id, project, user){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    
-    read_version <-
-      function(project_db,
-               active_project) {
-        
-        con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        version <- dplyr::tbl(con, "requal_version") %>%
-          dplyr::pull(version) 
-      }
-    
     output$version_project <- renderText({
-      if (isTruthy(project()$active_project)) {
-        paste0(
+      paste0(
           "The current project was created with requal version ",
-          read_version(project()$project_db,
-                       project()$active_project), ". "
+          pool %>% dplyr::tbl("requal_version") %>%
+              dplyr::pull(version),
+          "."
         )
-      } else {""}
     })
     
     output$version_package <- renderText({
