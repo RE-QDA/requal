@@ -9,5 +9,4 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-(run_app())
-  
+(run_app(db_path = "~/Desktop/testreprotwo.requal"))
