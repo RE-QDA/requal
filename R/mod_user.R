@@ -85,7 +85,6 @@ mod_user_server <- function(id, pool, project){
     })
       
       observeEvent(input$save_close, {
-        
         update_user_db(pool, 
                        user_id = 1,
                        input$user_name,
