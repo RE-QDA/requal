@@ -36,14 +36,14 @@ mod_about_ui <- function(id){
 #' about Server Functions
 #'
 #' @noRd 
-mod_about_server <- function(id, project, user){
+mod_about_server <- function(id, pool, project, user){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
     output$version_project <- renderText({
       paste0(
           "The current project was created with requal version ",
-          pool %>% dplyr::tbl("requal_version") %>%
+          dplyr::tbl(pool, "requal_version") %>%
               dplyr::pull(version),
           "."
         )

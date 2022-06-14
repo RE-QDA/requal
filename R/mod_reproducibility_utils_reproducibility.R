@@ -1,12 +1,8 @@
-load_all_segments_db <- function(active_project, project_db) {
+load_all_segments_db <- function(active_project) {
     code_id <- segment_start <- segment_end <- segment_id <- NULL
     if (isTruthy(active_project)) {
         
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        segments <- dplyr::tbl(con, "segments") %>%
+        segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::select(user_id, 
                           code_id,
@@ -20,14 +16,10 @@ load_all_segments_db <- function(active_project, project_db) {
     } else {""}
 }
 
-load_all_docs_db <- function(active_project, project_db){
+load_all_docs_db <- function(active_project){
     if (isTruthy(active_project)) {
         
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        docs <- dplyr::tbl(con, "documents") %>%
+        docs <- dplyr::tbl(pool, "documents") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::collect()
         
@@ -35,15 +27,11 @@ load_all_docs_db <- function(active_project, project_db){
     } else {""}
 }
 
-load_users_names <- function(active_project, project_db){
+load_users_names <- function(active_project){
     user_id <- user_name <- NULL
     if (isTruthy(active_project)) {
         
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        users <- dplyr::tbl(con, "users") %>%
+        users <- dplyr::tbl(pool, "users") %>%
             dplyr::select(user_id, 
                           user_name) %>%
             dplyr::collect()
@@ -52,15 +40,11 @@ load_users_names <- function(active_project, project_db){
     } else {""}
 }
 
-load_codes_names <- function(active_project, project_db){
+load_codes_names <- function(active_project){
     code_id <- code_name <- NULL
     if (isTruthy(active_project)) {
         
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        codes <- dplyr::tbl(con, "codes") %>%
+        codes <- dplyr::tbl(pool, "codes") %>%
             dplyr::filter(.data$project_id == as.numeric(active_project)) %>% 
             dplyr::select(code_id, 
                           code_name) %>%
@@ -75,6 +59,7 @@ calculate_code_overlap_by_users <- function(segments){
     segment_vector <- total_overlap <- n_char <- NULL
     coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
     
+    browser()
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()
     

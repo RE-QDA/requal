@@ -35,7 +35,7 @@ mod_reporting_ui <- function(id){
 #' reporting Server Functions
 #'
 #' @noRd
-mod_reporting_server <- function(id, project, user){
+mod_reporting_server <- function(id, pool, project, user){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
@@ -45,10 +45,8 @@ mod_reporting_server <- function(id, project, user){
     )
 
     logs_df <- eventReactive(input$reporting_tabset == "logs" | input$logs_refresh, {
-
-      if(isTruthy(project()$active_project)){
-        load_logs_for_reporting(project()$project_db,
-                                project()$active_project) %>%
+      if(isTruthy(project())){
+        load_logs_for_reporting(project()) %>%
           dplyr::arrange(dplyr::desc(created_at)) %>%
           dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json))
       }else{""}
