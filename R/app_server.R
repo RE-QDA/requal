@@ -36,8 +36,12 @@ app_server <- function(input, output, session) {
     })
 
     # documents  ----
-    # mod_project_server("mod_project_ui_1", project_observer, user)
-    # documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer, user)
+    mod_project_server("mod_project_ui_1", pool, active_project, # project_observer, 
+                       user)
+    documents <- mod_doc_manager_server("doc_manager_ui_1", pool, active_project, 
+                                        #project_observer, 
+                                        user)
+
     # codebook  ----
     # codebook <- mod_codebook_server("codebook_ui_1", project_observer, user)
     # category <- mod_categories_server("categories_ui_1",

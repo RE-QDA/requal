@@ -41,15 +41,9 @@ create_project_db <- function(project_directory,
 }
 
 
-read_project_db_util <- function(db_file,
-                                 table = "projects"
-                                 ) {
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          db_file
-    )
-    on.exit(DBI::dbDisconnect(con))
-
-        active_project_df <- dplyr::tbl(con, table) %>% 
+read_project_db_util <- function(pool,
+                                 table = "projects") {
+    active_project_df <- dplyr::tbl(pool, table) %>% 
         dplyr::select(project_id, project_name) %>% 
         dplyr::collect()
                                  
@@ -63,25 +57,22 @@ read_project_db_util <- function(db_file,
 
 }
 
-read_project_db <- function(db_file, project_id) {
+read_project_db <- function(pool, project_id) {
     
     
-    if (!is.null(db_file)) {
-        
-   
-        
+    if (!is.null(pool)) {
         if (!is.null(project_id)) { # filter by id
             
             project_id <- as.integer(project_id)
             
-            active_project <- read_project_db_util(db_file)
+            active_project <- read_project_db_util(pool)
             active_project <- active_project[active_project == project_id]
             
             return(active_project)
             
         } else  { # no filter
             
-            active_project <- read_project_db_util(db_file)
+            active_project <- read_project_db_util(pool)
             
             return(active_project)
         }
@@ -96,16 +87,9 @@ read_project_db <- function(db_file, project_id) {
 # list projects
 
 #' @importFrom rlang .env
-list_db_projects <- function(project_db) {
+list_db_projects <- function(pool) {
 
-    
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db
-    )
-    on.exit(DBI::dbDisconnect(con))
-    
-    
-    project_name <-  read_project_db(.env$db_file)
+    project_name <-  read_project_db(pool)
     
     return(project_name)
 }
@@ -113,18 +97,13 @@ list_db_projects <- function(project_db) {
 
 # list_db_documents
 
-list_db_documents <- function(project_db, active_project) {
+list_db_documents <- function(pool, active_project) {
 
     doc_id <- doc_name <- NULL
     
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db
-                          )
-    on.exit(DBI::dbDisconnect(con))
-
     active_project <- as.integer(active_project)
 
-    project_documents <- dplyr::tbl(con, "documents") %>%
+    project_documents <- dplyr::tbl(pool, "documents") %>%
         dplyr::filter(.data$project_id == .env$active_project) %>%
         dplyr::select(.data$doc_id, .data$doc_name) %>%
         dplyr::collect() %>%
@@ -138,17 +117,11 @@ list_db_documents <- function(project_db, active_project) {
     
 }
 
-list_db_document_table <- function(project_db, active_project) {
-    
-
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db
-    )
-    on.exit(DBI::dbDisconnect(con))
+list_db_document_table <- function(pool, active_project) {
     
     active_project <- as.integer(active_project)
     
-    documents_table <- dplyr::tbl(con, "documents") %>%
+    documents_table <- dplyr::tbl(pool, "documents") %>%
         dplyr::filter(.data$project_id == .env$active_project) %>%
         dplyr::collect() %>% 
         dplyr::select(#"ID" = doc_id,
@@ -156,13 +129,11 @@ list_db_document_table <- function(project_db, active_project) {
                       "Description" = doc_description,
                       "Date added" = created_at)
 
-
-    
     return(documents_table)
     
 }
 
-make_doc_table <- function(connection, active_project, doc_list)
+make_doc_table <- function(pool, active_project, doc_list)
 renderTable(colnames = FALSE, {
     
     req(active_project)
@@ -170,7 +141,7 @@ renderTable(colnames = FALSE, {
     if (isTruthy(doc_list))
     {
         
-        list_db_document_table(project_db = connection,
+        list_db_document_table(pool,
                                active_project = active_project)
         
         
