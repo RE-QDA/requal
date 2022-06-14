@@ -46,7 +46,7 @@ mod_reporting_server <- function(id, pool, project, user){
 
     logs_df <- eventReactive(input$reporting_tabset == "logs" | input$logs_refresh, {
       if(isTruthy(project())){
-        load_logs_for_reporting(project()) %>%
+        load_logs_for_reporting(pool, project()) %>%
           dplyr::arrange(dplyr::desc(created_at)) %>%
           dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json))
       }else{""}

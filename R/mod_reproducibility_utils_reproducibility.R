@@ -1,4 +1,4 @@
-load_all_segments_db <- function(active_project) {
+load_all_segments_db <- function(pool, active_project) {
     code_id <- segment_start <- segment_end <- segment_id <- NULL
     if (isTruthy(active_project)) {
         
@@ -16,7 +16,7 @@ load_all_segments_db <- function(active_project) {
     } else {""}
 }
 
-load_all_docs_db <- function(active_project){
+load_all_docs_db <- function(pool, active_project){
     if (isTruthy(active_project)) {
         
         docs <- dplyr::tbl(pool, "documents") %>%
@@ -27,7 +27,7 @@ load_all_docs_db <- function(active_project){
     } else {""}
 }
 
-load_users_names <- function(active_project){
+load_users_names <- function(pool, active_project){
     user_id <- user_name <- NULL
     if (isTruthy(active_project)) {
         
@@ -40,7 +40,7 @@ load_users_names <- function(active_project){
     } else {""}
 }
 
-load_codes_names <- function(active_project){
+load_codes_names <- function(pool, active_project){
     code_id <- code_name <- NULL
     if (isTruthy(active_project)) {
         
@@ -59,7 +59,6 @@ calculate_code_overlap_by_users <- function(segments){
     segment_vector <- total_overlap <- n_char <- NULL
     coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
     
-    browser()
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()
     
