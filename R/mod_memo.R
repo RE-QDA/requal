@@ -26,15 +26,13 @@ mod_memo_server <- function(id, project, user) {
     ns <- session$ns
 
     memo_list <- reactiveVal()
-    observeEvent(project()$active_project, {
+    observeEvent(project(), {
      memo_list(list_memo_records(project))
      output$new_memo_btn <- renderUI({
         actionButton(ns("new_memo"), "New memo")
       })
     })
    
-
-
    output$memo <- DT::renderDataTable({
       
    DT::datatable(req(memo_list()) %>% 
@@ -95,7 +93,7 @@ mod_memo_server <- function(id, project, user) {
                            dplyr::pull(.data$memo_name)),
           
           textAreaInput(ns("displayed_memo_text"), "Text",
-                        value = read_memo_db(project, input$selected_memo), 
+                        value = read_memo_db(input$selected_memo), 
                         width = "100%", height = "100%",
                         placeholder = "First 50 characters of the first line will become a searchable title..."
           ) %>% tagAppendAttributes(style = "height: 50vh"),
@@ -130,10 +128,6 @@ mod_memo_server <- function(id, project, user) {
       
       removeModal()
     })
-    
-  
-    
-
     
   }) 
 

@@ -45,7 +45,7 @@ mod_user_server <- function(id, project){
           name = user_data()$user_name,
           image = "www/user_logo.jpg", 
           title = ifelse(is.na(user_data()$user_mail), "@", user_data()$user_mail),
-          subtitle = paste0("Project:", names(project())), 
+          subtitle = paste0("Project:", project()), 
           footer =  actionButton(ns("edit_user"),
                                  "Edit"),
           fluidRow(

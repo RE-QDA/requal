@@ -31,11 +31,13 @@ app_server <- function(input, output, session) {
  #      project_observer(project_creator())
  #    })
 
-  observeEvent(active_project(), {
-    updateControlbar("control_bar")
-  })
+    observeEvent(active_project(), {
+        updateControlbar("control_bar")
+    })
 
-  # documents  ----
+    # documents  ----
+    # mod_project_server("mod_project_ui_1", project_observer, user)
+    # documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer, user)
 
   # mod_project_server("mod_project_ui_1", project_observer, user)
   # documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer, user)
@@ -64,16 +66,12 @@ app_server <- function(input, output, session) {
   # mod_reproducibility_server("reproducibility_ui_1", project_observer)
 
     # about -----
-
-  mod_about_server("about_ui_1", project_observer, user)
-
-  # user
-  user <- mod_user_server("user_ui_1", active_project)
-  
-  # memo
-  
-  # mod_memo_server("memo_ui_1", project_observer, user)
-
-
+    mod_about_server("about_ui_1", project_observer, user)
+    
+    # user
+    user <- mod_user_server("user_ui_1", active_project)
+    
+    # memo
+    mod_memo_server("memo_ui_1", active_project, user)
 
 }

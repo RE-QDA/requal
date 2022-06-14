@@ -2,15 +2,8 @@
 list_memo_records <- function(project) {
     ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
     
-    con <- DBI::dbConnect(
-        RSQLite::SQLite(),
-        project()$project_db
-    )
-    active_project <- as.integer(project()$active_project)
-    on.exit(DBI::dbDisconnect(con))
-  
-    memos_df <- dplyr::tbl(con, "memos") %>%
-        dplyr::filter(.data$project_id == active_project) %>%
+    memos_df <- dplyr::tbl(pool, "memos") %>%
+        dplyr::filter(.data$project_id == as.integer(!!project())) %>%
         dplyr::select(
             memo_id,
             memo_name = text
@@ -26,19 +19,16 @@ list_memo_records <- function(project) {
 # write new free memo to db ------
 add_memo_record <- function(project, text, user_id) {
     
-    con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
-    on.exit(DBI::dbDisconnect(con))
-    
-    memo_df <- data.frame(project_id = project()$active_project,
+    memo_df <- data.frame(project_id = project(),
                           text = text)
     
-    res <- DBI::dbWriteTable(con, "memos", memo_df, append = TRUE)
+    res <- DBI::dbWriteTable(pool, "memos", memo_df, append = TRUE)
     if(res){
-      memo_id <- dplyr::tbl(con, "memos") %>% 
+      memo_id <- dplyr::tbl(pool, "memos") %>% 
         dplyr::filter(.data$project_id == !!memo_df$project_id, 
                       .data$text == !!memo_df$text) %>% 
         dplyr::pull(memo_id)
-      log_add_memo_record(con, memo_df$project_id, memo_df %>% 
+      log_add_memo_record(pool, memo_df$project_id, memo_df %>% 
                             dplyr::mutate(memo_id = memo_id), 
                           user_id = user_id)
     }
@@ -65,12 +55,9 @@ render_memos <- function(id, memo_df) {
 
 # read specific memo text from db ----
 
-read_memo_db <- function(project, memo_id) {
+read_memo_db <- function(memo_id) {
     
-    con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
-    on.exit(DBI::dbDisconnect(con))
-    
-    memo_text <- dplyr::tbl(con, "memos") %>%
+    memo_text <- dplyr::tbl(pool, "memos") %>%
         dplyr::filter(.data$memo_id == as.integer(.env$memo_id)) %>%
         dplyr::pull(text)
 }
@@ -80,21 +67,16 @@ read_memo_db <- function(project, memo_id) {
 update_memo_record <- function(project, memo_id, memo_text, user_id) {
     
     
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project()$project_db)
-    on.exit(DBI::dbDisconnect(con))
-    
     memo_id <- as.integer(memo_id)
     
     update_memo_sql <- glue::glue_sql("UPDATE memos
                  SET text = {memo_text}
-                 WHERE memo_id = {memo_id}", .con = con)
+                 WHERE memo_id = {memo_id}", .con = pool)
     
-    res <- DBI::dbSendStatement(con, update_memo_sql)
-    DBI::dbClearResult(res)
+    DBI::dbExecute(pool, update_memo_sql)
     
-    project_id <- project()$active_project
-    log_update_memo_record(con, project_id, 
+    project_id <- project()
+    log_update_memo_record(pool, project_id, 
                            data.frame(memo_id = memo_id, text = memo_text), 
                            user_id = user_id)
     
@@ -104,18 +86,13 @@ update_memo_record <- function(project, memo_id, memo_text, user_id) {
 
 delete_memo_record <- function(project, memo_id, user_id) {
     
-    con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
-    on.exit(DBI::dbDisconnect(con))
-    
     memo_id <- as.integer(memo_id)
     
     delete_memo_sql <- glue::glue_sql("DELETE from memos
-                   WHERE memo_id = {memo_id}", .con = con)
+                   WHERE memo_id = {memo_id}", .con = pool)
     
-    res <- DBI::dbSendStatement(con, delete_memo_sql)
-    DBI::dbClearResult(res)
-    
-    log_delete_memo_record(con, project()$active_project, memo_id, 
+    DBI::dbExecute(pool, delete_memo_sql)
+    log_delete_memo_record(pool, project(), memo_id, 
                            user_id = user_id)
     
 }
