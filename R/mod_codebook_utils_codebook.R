@@ -28,7 +28,7 @@ create_code_UI <- function(id) {
   )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
-merge_code_UI <- function(id, project) {
+merge_code_UI <- function(id, pool, project) {
   ns <- NS(id)
   tags$div(
     h4("Merge codes"),
@@ -36,8 +36,8 @@ merge_code_UI <- function(id, project) {
       ns("merge_from"),
       label = "Merge from",
       choices = c("", list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
+        pool,
+        project_id = project()
       ) %>%
         pair_code_id()),
       selected = "",
@@ -47,8 +47,8 @@ merge_code_UI <- function(id, project) {
       ns("merge_to"),
       label = "Merge into",
       choices = c("", list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
+        pool,
+        project_id = project()
       ) %>%
         pair_code_id()),
       selected = "",
@@ -62,7 +62,7 @@ merge_code_UI <- function(id, project) {
 }
 
 
-delete_code_UI <- function(id, project) {
+delete_code_UI <- function(id, pool, project) {
   ns <- NS(id)
   tags$div(
     h4("Delete codes"),
@@ -70,8 +70,8 @@ delete_code_UI <- function(id, project) {
       ns("code_to_del"),
       label = "Select codes to delete",
       choices = list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
+        pool,
+        project_id = project()
       ) %>%
         pair_code_id(),
       selected = "",
@@ -114,19 +114,12 @@ delete_code_UI <- function(id, project) {
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
-list_db_codes <- function(project_db, project_id) {
+list_db_codes <- function(pool, project_id) {
 
   ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
   code_id <- code_name <- code_description <- code_color <- NULL
 
-
-  con <- DBI::dbConnect(
-    RSQLite::SQLite(),
-    project_db
-  )
-  on.exit(DBI::dbDisconnect(con))
-
-  project_codes <- dplyr::tbl(con, "codes") %>%
+  project_codes <- dplyr::tbl(pool, "codes") %>%
     dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
     dplyr::select(
       code_id,
@@ -196,69 +189,60 @@ gen_codes_ui <- function(code_id,
 
 # Delete codes from project ------
 delete_db_codes <-
-  function(project_db,
+  function(pool, 
            active_project,
            delete_code_id, 
            user_id) {
-    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-    on.exit(DBI::dbDisconnect(con))
-
-    DBI::dbExecute(con,
+    
+    DBI::dbExecute(pool,
       "DELETE FROM codes
                        WHERE code_id IN (?);",
       params = list(delete_code_id)
     )
 
-    log_delete_code_record(con, active_project, delete_code_id, user_id)
+    log_delete_code_record(pool, active_project, delete_code_id, user_id)
   }
 
 
 # Render codes -----
 
-render_codes <- function(active_project,
-                         project_db) {
-  if (isTruthy(active_project)) {
-    project_codes <- list_db_codes(
-      project_db = project_db,
-      project_id = active_project
-    )
-
-
-    if (nrow(project_codes) == 0) {
-      "No codes have been created."
+render_codes <- function(pool, active_project) {
+    if (isTruthy(active_project)) {
+        project_codes <- list_db_codes(
+            pool = pool,
+            project_id = active_project
+        )
+        
+        if (nrow(project_codes) == 0) {
+            "No codes have been created."
+        } else {
+            purrr::pmap(project_codes, gen_codes_ui)
+        }
     } else {
-      purrr::pmap(project_codes, gen_codes_ui)
+        "No active project."
     }
-  } else {
-    "No active project."
-  }
 }
 
 
 # Merge codes ------
 
-merge_codes <- function(project_db,
+merge_codes <- function(pool,
                         active_project,
                         merge_from,
                         merge_to, 
                         user_id) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
   # should rewrite all merge from ids to the value of merge to in segments
   update_segments_sql <- glue::glue_sql("UPDATE segments
                  SET code_id = {merge_to}
-                 WHERE code_id = {merge_from}", .con = con)
-  res <- DBI::dbSendStatement(con, update_segments_sql)
-  DBI::dbClearResult(res)
-
+                 WHERE code_id = {merge_from}", .con = pool)
+  DBI::dbExecute(pool, update_segments_sql)
+  
   # should delete merge from row from codes
   delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}",
-    .con = con
+    .con = pool
   )
-  res2 <- DBI::dbSendStatement(con, delete_code_sql)
-  DBI::dbClearResult(res2)
-
+  DBI::dbExecute(pool, delete_code_sql)
+  
   # should log action with from-to ids
-  log_merge_code_record(con, project_id = active_project, merge_from, merge_to, user_id)
+  log_merge_code_record(pool, project_id = active_project, merge_from, merge_to, user_id)
 }
