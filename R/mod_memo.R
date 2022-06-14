@@ -21,13 +21,13 @@ div(
 #' memo Server Functions
 #'
 #' @noRd
-mod_memo_server <- function(id, project, user) {
+mod_memo_server <- function(id, pool, project, user) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     memo_list <- reactiveVal()
     observeEvent(project(), {
-     memo_list(list_memo_records(project))
+     memo_list(list_memo_records(pool, project))
      output$new_memo_btn <- renderUI({
         actionButton(ns("new_memo"), "New memo")
       })
@@ -75,9 +75,9 @@ mod_memo_server <- function(id, project, user) {
     
     observeEvent(input$save_close, {
       
-      add_memo_record(project, req(input$memo_text), user_id = user()$user_id)
+      add_memo_record(pool, project, req(input$memo_text), user_id = user()$user_id)
       
-      memo_list(list_memo_records(project))
+      memo_list(list_memo_records(pool, project))
                
       removeModal()
     })
@@ -93,7 +93,7 @@ mod_memo_server <- function(id, project, user) {
                            dplyr::pull(.data$memo_name)),
           
           textAreaInput(ns("displayed_memo_text"), "Text",
-                        value = read_memo_db(input$selected_memo), 
+                        value = read_memo_db(pool, input$selected_memo), 
                         width = "100%", height = "100%",
                         placeholder = "First 50 characters of the first line will become a searchable title..."
           ) %>% tagAppendAttributes(style = "height: 50vh"),
@@ -111,20 +111,20 @@ mod_memo_server <- function(id, project, user) {
     
     observeEvent(input$save_changes, {
       
-      update_memo_record(project, input$selected_memo, req(input$displayed_memo_text), 
+      update_memo_record(pool, project, input$selected_memo, req(input$displayed_memo_text), 
                          user_id = user()$user_id)
       
-      memo_list(list_memo_records(project))
+      memo_list(list_memo_records(pool, project))
       
       removeModal()
     })
     
     observeEvent(input$delete_memo, {
       
-      delete_memo_record(project, input$selected_memo, 
+      delete_memo_record(pool, project, input$selected_memo, 
                          user_id = user()$user_id)
       
-      memo_list(list_memo_records(project))
+      memo_list(list_memo_records(pool, project))
       
       removeModal()
     })

@@ -1,5 +1,5 @@
 # list existing memos ------
-list_memo_records <- function(project) {
+list_memo_records <- function(pool, project) {
     ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
     
     memos_df <- dplyr::tbl(pool, "memos") %>%
@@ -17,7 +17,7 @@ list_memo_records <- function(project) {
 
 
 # write new free memo to db ------
-add_memo_record <- function(project, text, user_id) {
+add_memo_record <- function(pool, project, text, user_id) {
     
     memo_df <- data.frame(project_id = project(),
                           text = text)
@@ -55,7 +55,7 @@ render_memos <- function(id, memo_df) {
 
 # read specific memo text from db ----
 
-read_memo_db <- function(memo_id) {
+read_memo_db <- function(pool, memo_id) {
     
     memo_text <- dplyr::tbl(pool, "memos") %>%
         dplyr::filter(.data$memo_id == as.integer(.env$memo_id)) %>%
@@ -64,7 +64,7 @@ read_memo_db <- function(memo_id) {
 
 # update memo record ------
 
-update_memo_record <- function(project, memo_id, memo_text, user_id) {
+update_memo_record <- function(pool, project, memo_id, memo_text, user_id) {
     
     
     memo_id <- as.integer(memo_id)
@@ -84,7 +84,7 @@ update_memo_record <- function(project, memo_id, memo_text, user_id) {
 
 # delete memo record -----
 
-delete_memo_record <- function(project, memo_id, user_id) {
+delete_memo_record <- function(pool, project, memo_id, user_id) {
     
     memo_id <- as.integer(memo_id)
     
