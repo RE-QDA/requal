@@ -52,16 +52,16 @@ app_server <- function(input, output, session) {
     # mod_download_handler_server("download_handler_ui_1", segments_df)
     
     # reporting
-    # reporting <- mod_reporting_server("reporting_ui_1", project_observer, user)
-    # mod_reproducibility_server("reproducibility_ui_1", project_observer)
+    # reporting <- mod_reporting_server("reporting_ui_1", pool, active_project, user)
+    # mod_reproducibility_server("reproducibility_ui_1", pool, active_project)
 
     # about -----
-    mod_about_server("about_ui_1", project_observer, user)
+    mod_about_server("about_ui_1", pool, active_project, user)
     
     # user
-    user <- mod_user_server("user_ui_1", active_project)
+    user <- mod_user_server("user_ui_1", pool, active_project)
     
     # memo
-    mod_memo_server("memo_ui_1", active_project, user)
+    mod_memo_server("memo_ui_1", pool, active_project, user)
 
 }

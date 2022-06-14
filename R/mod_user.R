@@ -17,14 +17,14 @@ mod_user_ui <- function(id){
 #' user Server Functions
 #'
 #' @noRd 
-mod_user_server <- function(id, project){
+mod_user_server <- function(id, pool, project){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
     user_data <- reactiveVal()
     
     observeEvent(project(), {
-      user_data(read_user_db(user_id = 1))
+      user_data(read_user_db(pool, user_id = 1))
     })
     
     output$user <- renderUser({
@@ -86,11 +86,12 @@ mod_user_server <- function(id, project){
       
       observeEvent(input$save_close, {
         
-        update_user_db(user_id = 1,
+        update_user_db(pool, 
+                       user_id = 1,
                        input$user_name,
                        input$user_email)
       
-        user_data(read_user_db(user_id = 1))
+        user_data(read_user_db(pool, user_id = 1))
         removeModal()
     })
     
