@@ -59,7 +59,6 @@ calculate_code_overlap_by_users <- function(segments){
     segment_vector <- total_overlap <- n_char <- NULL
     coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
     
-    browser()
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()
     

@@ -1,7 +1,6 @@
 # Load logs for reporting -------------------------------------------
 
 load_logs_for_reporting <- function(pool, active_project) {
-
     logs <- dplyr::tbl(pool, "logs") %>%
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
         dplyr::left_join(., dplyr::tbl(pool, "users") %>% 

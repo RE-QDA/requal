@@ -113,7 +113,7 @@ mod_reproducibility_server <- function(id, pool, project){
       if(input$metrics_select == "by_code_segment"){
         observeEvent(input$test, {
           segments <- load_all_segments_db(pool, active_project = project())
-          
+
           codes <- load_codes_names(pool, active_project = project())
 
           if(length(unique(segments$user_id)) > 1){
@@ -145,7 +145,7 @@ mod_reproducibility_server <- function(id, pool, project){
           segments <- load_all_segments_db(pool, active_project = project())
 
           users <- load_users_names(pool, active_project = project())
-          
+
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
                   join_user_names(., users) %>% 
