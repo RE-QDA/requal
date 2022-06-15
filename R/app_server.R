@@ -46,10 +46,9 @@ app_server <- function(input, output, session) {
     codebook <- mod_codebook_server("codebook_ui_1", pool, 
                                     active_project, #project_observer, 
                                     user)
-    # category <- mod_categories_server("categories_ui_1",
-    #                                   project_observer,
-    #                                   user,
-    #                                   codebook)
+    category <- mod_categories_server("categories_ui_1",
+                                      pool, active_project, # project_observer,
+                                      user, codebook)
     
     # workdesk ----
     # segments_observer <- mod_document_code_server("document_code_ui_1", project_observer, user, codebook, documents)
