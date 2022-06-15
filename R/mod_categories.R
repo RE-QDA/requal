@@ -41,7 +41,7 @@ mod_categories_ui <- function(id) {
 #' categories Server Functions
 #'
 #' @noRd
-mod_categories_server <- function(id, project, user, codebook) {
+mod_categories_server <- function(id, pool, project, user, codebook) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -50,10 +50,10 @@ mod_categories_server <- function(id, project, user, codebook) {
     category <- reactiveVal()
 
     # update return value
-    observeEvent(project()$active_project, {
+    observeEvent(project(), {
     category(read_db_categories(
-      project_db = project()$project_db,
-      active_project = project()$active_project))
+      pool, 
+      active_project = project()))
       })
 
     # List existing codes in code boxes --------
@@ -63,8 +63,7 @@ mod_categories_server <- function(id, project, user, codebook) {
           input_id = ns("code_list"),
           text = NULL,
           labels = render_codes(
-            active_project = project()$active_project,
-            project_db = project()$project_db
+              pool, active_project = project()
           ),
           class = "codes-rank-list",
           options = sortable::sortable_options(
@@ -83,9 +82,9 @@ mod_categories_server <- function(id, project, user, codebook) {
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({
       render_categories(
-        id = id,
-        active_project = project()$active_project,
-        project_db = project()$project_db
+          id = id,
+          pool, 
+          active_project = project(),
       )
     })
 
@@ -95,8 +94,8 @@ mod_categories_server <- function(id, project, user, codebook) {
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
-          active_project = project()$active_project,
-          project_db = project()$project_db
+          pool, 
+          active_project = project()
         )
       })
 
@@ -107,7 +106,7 @@ mod_categories_server <- function(id, project, user, codebook) {
 
 
     output$category_create <- renderUI({
-      req(project()$active_project)
+      req(project())
       create_new_category_UI(id)
     })
     outputOptions(output, "category_create", suspendWhenHidden = FALSE)
@@ -119,24 +118,21 @@ mod_categories_server <- function(id, project, user, codebook) {
       # check if code name is unique
       category_names <- list_db_categories(
         id = id,
-        project_db = project()$project_db,
-        project_id = project()$active_project
+        pool, 
+        project_id = project()
       )$category_name
 
       if (!input$category_name %in% category_names & input$category_name != "") {
-        con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
-        on.exit(DBI::dbDisconnect(con))
-
         categories_input_df <- data.frame(
-          project_id = project()$active_project,
+          project_id = project(),
           category_name = input$category_name,
           category_description = input$category_desc
         )
 
 
         add_category_record(
-          con = con,
-          project_id = project()$active_project,
+          pool, 
+          project_id = project(),
           user_id = user()$user_id,
           categories_df = categories_input_df
         )
@@ -146,8 +142,8 @@ mod_categories_server <- function(id, project, user, codebook) {
         output$categories_ui <- renderUI({
           render_categories(
             id = id,
-            active_project = project()$active_project,
-            project_db = project()$project_db
+            pool, 
+            active_project = project()
           )
         })
 
@@ -168,16 +164,16 @@ mod_categories_server <- function(id, project, user, codebook) {
           session = session,
           inputId = "categories_to_del",
           choices = c("", read_db_categories(
-            project_db = project()$project_db,
-            active_project = project()$active_project
+            pool, 
+            active_project = project()
           ))
         )
         
 
         # update return value
         category(read_db_categories(
-          project_db = project()$project_db,
-          active_project = project()$active_project
+          pool, 
+          active_project = project()
         ))
       } else {
         warn_user("Category name must be unique.")
@@ -187,10 +183,10 @@ mod_categories_server <- function(id, project, user, codebook) {
     # Delete categories ------
     # delete UI
     output$category_delete <- renderUI({
-      req(project()$active_project)
+      req(project())
       delete_category_UI(id,
-        project_db = project()$project_db,
-        active_project = project()$active_project
+        pool, 
+        active_project = project()
       )
     })
     outputOptions(output, "category_delete", suspendWhenHidden = FALSE)
@@ -201,8 +197,8 @@ mod_categories_server <- function(id, project, user, codebook) {
 
       # remove from db
       delete_db_category(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
+        pool, 
+        active_project = project(),
         user_id = user()$user_id,
         delete_cat_id = input$categories_to_del
       )
@@ -210,18 +206,19 @@ mod_categories_server <- function(id, project, user, codebook) {
       # remove from edges
       edge <- list()
       edge$category_id <- input$categories_to_del
-      delete_category_code_record(project_db = project()$project_db,
-                     active_project = project()$active_project,
-                     user_id = user()$user_id,
-                     edge = edge)
+      delete_category_code_record(
+          pool, 
+          active_project = project(),
+          user_id = user()$user_id,
+          edge = edge)
 
       # refresh delete UI
       updateSelectInput(
         session = session,
         inputId = "categories_to_del",
         choices = c("", read_db_categories(
-          project_db = project()$project_db,
-          active_project = project()$active_project
+          pool,
+          active_project = project()
         ))
       )
 
@@ -229,31 +226,33 @@ mod_categories_server <- function(id, project, user, codebook) {
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
-          active_project = project()$active_project,
-          project_db = project()$project_db
+          pool, 
+          active_project = project()
         )
       })
 
       # update return value
       category(read_db_categories(
-        project_db = project()$project_db,
-        active_project = project()$active_project
+        pool,
+        active_project = project()
       ))
     })
 
   # Create edge
     observeEvent(input$edges_category, {
-    add_category_code_record(project_db = project()$project_db,
-                    active_project = project()$active_project,
-                    user_id = user()$user_id,
-                    edge = input$edges_category)
+    add_category_code_record(
+        pool, 
+        active_project = project(),
+        user_id = user()$user_id,
+        edge = input$edges_category)
   })
   # Delete edge
     observeEvent(input$edges_category_delete, {
-    delete_category_code_record(project_db = project()$project_db,
-                               active_project = project()$active_project,
-                               user_id = user()$user_id,
-                               edge = input$edges_category_delete)
+    delete_category_code_record(
+        pool, 
+        active_project = project(),
+        user_id = user()$user_id,
+        edge = input$edges_category_delete)
     })
 
 
