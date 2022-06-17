@@ -51,12 +51,14 @@ app_server <- function(input, output, session) {
                                       user, codebook)
     
     # workdesk ----
-    # segments_observer <- mod_document_code_server("document_code_ui_1", project_observer, user, codebook, documents)
+    segments_observer <- mod_document_code_server("document_code_ui_1", 
+                                                  pool, active_project, # project_observer, 
+                                                  user, codebook, documents)
     
-  # analysis ----
-  mod_analysis_server("analysis_ui_1", active_project, user, glob, codebook, category, documents, segments_observer)
-  # segments_df <- mod_analysis_server("analysis_ui_1", active_project, user, codebook, category, documents, segments_observer)
-  
+    # analysis ----
+    mod_analysis_server("analysis_ui_1", pool, active_project, 
+                                       user, glob, codebook, category, documents, 
+                                       segments_observer)
   mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
     

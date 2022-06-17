@@ -1,6 +1,8 @@
 # Load segments for analysis -------------------------------------------
 
-load_segments_analysis <- function(selected_codes,
+load_segments_analysis <- function(pool, 
+                                   active_project, 
+                                   selected_codes,
                                   selected_categories,
                                   selected_docs) {
 

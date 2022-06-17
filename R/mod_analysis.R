@@ -51,7 +51,7 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, active_project, user, glob, codebook, category, documents, segments) {
+mod_analysis_server <- function(id, pool, active_project, user, glob, codebook, category, documents, segments) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -105,9 +105,11 @@ mod_analysis_server <- function(id, active_project, user, glob, codebook, catego
       },
       {
         temp_df <- load_segments_analysis(
-          selected_codes = input$code_filter,
-          selected_categories = input$category_filter,
-          selected_docs = input$document_filter
+            pool, 
+            active_project(),
+            selected_codes = input$code_filter,
+            selected_categories = input$category_filter,
+            selected_docs = input$document_filter
         )
 
         if (nrow(temp_df) > 0) {
