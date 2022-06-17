@@ -10,7 +10,6 @@
 mod_categories_ui <- function(id) {
   ns <- NS(id)
 
-
   fluidRow(
     column(
       width = 5,
