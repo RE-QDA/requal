@@ -43,7 +43,7 @@ mod_document_code_ui <- function(id){
 #' document_code Server Functions
 #'
 #' @noRd 
-mod_document_code_server <- function(id, project, user, codebook, documents){
+mod_document_code_server <- function(id, pool, project, user, codebook, documents){
   moduleServer(id, function(input, output, session){
     
     ns <- session$ns
@@ -55,7 +55,7 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
     
     # Refresh list of documents when documents are added/removed --------
     observe({ 
-      if (isTruthy(project()$active_project)) {
+      if (isTruthy(project())) {
         doc_choices(documents())
         
         updateSelectInput(session = session,
@@ -65,61 +65,50 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
       }
     })
 
-# Displayed text ----------------------------------------------------------
-
-    
+    # Displayed text ----------------------------------------------------------
     text <- reactiveVal("")
     
     # reset text on project change
-    
-    observeEvent(project()$active_project, {
-      
+    observeEvent(project(), {
       text("")
-      
     })
 
     observeEvent(input$doc_selector, {
     if (isTruthy(input$doc_selector)) {
 
-      display_text <- load_doc_to_display(project()$active_project, 
-                                          project()$project_db, 
+      display_text <- load_doc_to_display(pool, 
+                                          project(), 
                                           user_id = user()$user_id,
                                           input$doc_selector, 
                                           code_df$active_codebook,
                                           ns=NS(id))
       text(display_text)
-      segments_observer(segments_observer()+1)
+      segments_observer(segments_observer() + 1)
     } 
     })
     # Render selected text
     output$focal_text <- renderText({
-      
-     text()
-      
+        text()
     })
-    
 
-
-# List out available codes ------------------------------------------------
-
+    # List out available codes ------------------------------------------------
     code_df <- reactiveValues()
     
     output$code_list <- renderUI({
 
-      if (isTruthy(project()$active_project)) {
+      if (isTruthy(project())) {
         
         if (isTruthy(codebook())) {
           code_df$active_codebook <- codebook()
         } else {
           code_df$active_codebook <- list_db_codes(
-            project()$project_db,
-            project()$active_project
+            pool, 
+            project()
           )
         }
         
         if (isTruthy(req(input$doc_selector))) {
-          text(load_doc_to_display(project()$active_project, 
-                                   project()$project_db, 
+          text(load_doc_to_display(pool, project(), 
                                    user_id = user()$user_id,
                                    input$doc_selector, 
                                    code_df$active_codebook,
@@ -127,68 +116,57 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
         }
         
         purrr::pmap(
-          list(
-          code_df$active_codebook$code_id,
-          code_df$active_codebook$code_name,
-          code_df$active_codebook$code_color
-          ),
-          ~ generate_coding_tools(ns = ns, 
-                                  code_id = ..1, 
-                                  code_name = ..2,
-                                  code_color = ..3)
-        )
-        
-        
+            list(
+                code_df$active_codebook$code_id,
+                code_df$active_codebook$code_name,
+                code_df$active_codebook$code_color
+                ),
+            ~generate_coding_tools(ns = ns, 
+                                   code_id = ..1, 
+                                   code_name = ..2,
+                                   code_color = ..3)
+            )
       } else {
-        ""
-      }
+          ""
+          }
     })
 
-
-    
-  # Coding tools ------------------------------------------------------------
-
+    # Coding tools ------------------------------------------------------------
     observeEvent(input$selected_code, {
-      
-      req(input$selected_code, input$tag_position)
-
-      
-      startOff <- parse_tag_pos(input$tag_position, "start")
-      endOff <- parse_tag_pos(input$tag_position, "end")
-      
-      if (endOff - startOff > 1 & endOff > startOff) {
+        req(input$selected_code, input$tag_position)
         
-        write_segment_db(project()$active_project,
-                         project()$project_db,
-                         user_id = user()$user_id,
-                         doc_id = input$doc_selector,
-                         code_id = input$selected_code,
-                         startOff, 
-                         endOff)
+        startOff <- parse_tag_pos(input$tag_position, "start")
+        endOff <- parse_tag_pos(input$tag_position, "end")
         
-        text(load_doc_to_display(project()$active_project, 
-                                 project()$project_db, 
-                                 user_id = user()$user_id,
-                                 input$doc_selector,
-                                 code_df$active_codebook,
-                                 ns=NS(id)))
-        segments_observer(segments_observer()+1)
-        
+        if (endOff - startOff > 1 & endOff > startOff) {
+            write_segment_db(pool, project(),
+                             user_id = user()$user_id,
+                             doc_id = input$doc_selector,
+                             code_id = input$selected_code,
+                             startOff, endOff)
+            
+            text(load_doc_to_display(pool, project(), 
+                                     user_id = user()$user_id,
+                                     input$doc_selector,
+                                     code_df$active_codebook,
+                                     ns=NS(id)))
+            
+            segments_observer(segments_observer()+1)
         }
     })
     
     # Segment removal ----------
     observeEvent(input$remove_codes, {
-      req(project()$active_project)
+      req(project())
       marked_segments_df <- load_segment_codes_db(
-        active_project = project()$active_project,
-        project_db = project()$project_db,
-        user_id = user()$user_id,
-        active_doc = input$doc_selector,
-        marked_codes = parse_tag_pos(
-          input$tag_position,
-          "start"
-        )
+          pool, 
+          active_project = project(),
+          user_id = user()$user_id,
+          active_doc = input$doc_selector,
+          marked_codes = parse_tag_pos(
+              input$tag_position,
+              "start"
+              )
       )
       
       
@@ -196,19 +174,19 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
         NULL
       } else if (nrow(marked_segments_df) == 1) {
         delete_segment_codes_db(
-          project_db = project()$project_db,
-          active_project = project()$active_project,
+          pool, 
+          active_project = project(),
           user_id = user()$user_id,
           doc_id = input$doc_selector,
           segment_id = marked_segments_df$segment_id
         )
 
-        display_text <- load_doc_to_display(project()$active_project,
-          project()$project_db,
-          user_id = user()$user_id,
-          input$doc_selector,
-          code_df$active_codebook,
-          ns = NS(id)
+        display_text <- load_doc_to_display(
+            pool, project(),
+            user_id = user()$user_id,
+            input$doc_selector,
+            code_df$active_codebook,
+            ns = NS(id)
         )
         text(display_text)
         segments_observer(segments_observer()+1)
@@ -243,16 +221,15 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
       
       if (isTruthy(input$codes_to_remove)) {
         
-        delete_segment_codes_db(project_db =  project()$project_db,
-                                active_project = project()$active_project, 
+        delete_segment_codes_db(pool,
+                                active_project = project(), 
                                 user_id = user()$user_id,
                                 doc_id = input$doc_selector,
                                 segment_id = input$codes_to_remove
         )
         removeModal()
         
-        display_text <- load_doc_to_display(project()$active_project, 
-                                            project()$project_db, 
+        display_text <- load_doc_to_display(pool, project(), 
                                             user_id = user()$user_id,
                                             input$doc_selector,
                                             code_df$active_codebook,
