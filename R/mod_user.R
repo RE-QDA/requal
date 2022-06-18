@@ -18,13 +18,13 @@ mod_user_ui <- function(id){
 #'
 #' @noRd 
 mod_user_server <- function(id, pool, project){
-  moduleServer( id, function(input, output, session){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
  
     user_data <- reactiveVal()
     
     observeEvent(project(), {
-      user_data(read_user_db(pool, user_id = 1))
+        user_data(read_user_db(pool, user_id = 1, active_project = project()))
     })
     
     output$user <- renderUser({
