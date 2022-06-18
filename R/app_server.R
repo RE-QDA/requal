@@ -18,43 +18,42 @@ app_server <- function(input, output, session) {
 
     glob  <- reactiveValues()
 
-    project_observer <- reactiveVal()
- 
- # project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
- #    observeEvent(project_loader(), {
- #    project_observer(project_loader())
- # 
- #  })
- # 
- #  project_creator <- mod_launchpad_creator_server("launchpad_creator_ui_1")
- #    observeEvent(project_creator(), {
- #      project_observer(project_creator())
- #    })
+    # project_observer <- reactiveVal()
+
+    project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1", pool)
+    observeEvent(project_loader(), {
+        active_project(project_loader())
+    })
+    
+    project_creator <- mod_launchpad_creator_server("launchpad_creator_ui_1", pool)
+    observeEvent(project_creator(), {
+        active_project(project_creator())
+    })
 
     observeEvent(active_project(), {
         updateControlbar("control_bar")
     })
 
     # documents  ----
-    mod_project_server("mod_project_ui_1", pool, active_project, # project_observer, 
+    mod_project_server("mod_project_ui_1", pool, active_project, # project_observer,
                        user)
-    documents <- mod_doc_manager_server("doc_manager_ui_1", pool, active_project, 
-                                        #project_observer, 
+    documents <- mod_doc_manager_server("doc_manager_ui_1", pool, active_project,
+                                        #project_observer,
                                         user)
 
     # codebook  ----
-    codebook <- mod_codebook_server("codebook_ui_1", pool, 
-                                    active_project, #project_observer, 
+    codebook <- mod_codebook_server("codebook_ui_1", pool,
+                                    active_project, #project_observer,
                                     user)
     category <- mod_categories_server("categories_ui_1",
                                       pool, active_project, # project_observer,
                                       user, codebook)
-    
+
     # workdesk ----
-    segments_observer <- mod_document_code_server("document_code_ui_1", 
-                                                  pool, active_project, # project_observer, 
+    segments_observer <- mod_document_code_server("document_code_ui_1",
+                                                  pool, active_project, # project_observer,
                                                   user, codebook, documents)
-    
+
     # analysis ----
     mod_analysis_server("analysis_ui_1", pool, active_project, 
                                        user, glob, codebook, category, documents, 
@@ -68,10 +67,10 @@ app_server <- function(input, output, session) {
 
     # about -----
     mod_about_server("about_ui_1", pool, active_project, user)
-    
+
     # user
     user <- mod_user_server("user_ui_1", pool, active_project)
-    
+
     # memo
     mod_memo_server("memo_ui_1", pool, active_project, user)
 
