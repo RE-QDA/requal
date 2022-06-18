@@ -1,43 +1,32 @@
-create_project_db <- function(project_directory, 
+create_project_db <- function(pool, 
                               project_name,
                               project_description) {
-    
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          fs::path_join(c(
-                              project_directory,
-                              paste0(gsub(
-                                  "[^a-zA-Z]+",
-                                  "",
-                                  iconv(project_name, 
-                                        to = "ASCII//TRANSLIT")
-                              ), ".requal")
-                          )))
-    on.exit(DBI::dbDisconnect(con))
     
     project_df <- tibble::tibble(project_name, 
                                  project_description,
                                  created_at = as.character(Sys.time()))
     
 
-    if (!DBI::dbExistsTable(con, "projects")) {
+    if (!DBI::dbExistsTable(pool, "projects")) {
         # https://github.com/r-dbi/RSQLite/issues/59
-        create_db_schema(con)
+        create_db_schema(pool)
     }
 
-    create_project_record(con, project_df, user_id = 1)
+    create_project_record(pool, project_df, user_id = 1)
     
-    active_project_df <- dplyr::tbl(con, "projects") %>% 
+    active_project_df <- dplyr::tbl(pool, "projects") %>% 
         dplyr::select(project_id, project_name) %>% 
         dplyr::collect() %>% 
         dplyr::slice_max(project_id, n = 1)
     
-    active_project <- active_project_df %>% 
-        dplyr::pull(project_id)
+    project <- active_project_df %>% 
+        dplyr::pull(project_id) 
+        
     
-    names(active_project) <- active_project_df %>% 
-                                   dplyr::pull(project_name)
+    # names(active_project) <- active_project_df %>% 
+    #                                dplyr::pull(project_name)
     
-    return(active_project)
+    return(project)
 }
 
 

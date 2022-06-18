@@ -41,9 +41,11 @@ mod_about_server <- function(id, pool, project, user){
     ns <- session$ns
     
     output$version_project <- renderText({
+        active_project = project()
       paste0(
           "The current project was created with requal version ",
           dplyr::tbl(pool, "requal_version") %>%
+              dplyr::filter(.data$project_id == as.numeric(active_project)) %>% 
               dplyr::pull(version),
           "."
         )

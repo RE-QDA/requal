@@ -10,21 +10,19 @@
 mod_launchpad_loader_ui <- function(id){
   ns <- NS(id)
   tagList(
-    
-
       
-      h3("Project file"),
+      # h3("Project file"),
       
-      div(span(textOutput(
-        ns("project_path_load")
-      ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
+      # div(span(textOutput(
+      #   ns("project_path_load")
+      # ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
       
-      shinyFiles::shinyFilesButton(
-        ns("sel_file_load"),
-        "File select",
-        "Please select a project file",
-        multiple = FALSE
-      ),
+      # shinyFiles::shinyFilesButton(
+      #   ns("sel_file_load"),
+      #   "File select",
+      #   "Please select a project file",
+      #   multiple = FALSE
+      # ),
       
       selectInput(
         ns("project_selector_load"),
@@ -37,8 +35,6 @@ mod_launchpad_loader_ui <- function(id){
         label = "Load project",
         class = "btn-success"
       )
-    
-    
  
   )
 }
@@ -46,44 +42,43 @@ mod_launchpad_loader_ui <- function(id){
 #' launchpad_loader Server Functions
 #'
 #' @noRd 
-mod_launchpad_loader_server <- function(id){
+mod_launchpad_loader_server <- function(id, pool){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
     # module reactive vals ----
     
-    db_path <- reactiveVal(NULL)
+    # db_path <- reactiveVal(NULL)
     active_project <- reactiveVal(NULL)
     doc_list <- reactiveVal(NULL)
-    project <- reactiveValues()
+    #project <- reactiveValues()
     
     # file system prep ----
-    volumes <- c(Home = fs::path_home(), get_volume_paths())
+    # volumes <- c(Home = fs::path_home(), get_volume_paths())
+    
+    # shinyFiles::shinyFileChoose(
+    #   input,
+    #   "sel_file_load",
+    #   roots = volumes,
+    #   defaultRoot = "Home",
+    #   session = session,
+    #   restrictions = system.file(package = "base"),
+    #   pattern = c('\\.requal')
+    # )
     
     
-    shinyFiles::shinyFileChoose(
-      input,
-      "sel_file_load",
-      roots = volumes,
-      defaultRoot = "Home",
-      session = session,
-      restrictions = system.file(package = "base"),
-      pattern = c('\\.requal')
-    )
-    
-    
-    project_file_load <-
-      reactive({
-        normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
-      })
-    
-    output$project_path_load <- renderText({
-      if (is.integer(input$sel_file_load)) {
-        "No project file has been selected."
-      } else {
-        project_file_load()
-      }
-    })
+    # project_file_load <-
+    #   reactive({
+    #     normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
+    #   })
+    # 
+    # output$project_path_load <- renderText({
+    #   if (is.integer(input$sel_file_load)) {
+    #     "No project file has been selected."
+    #   } else {
+    #     project_file_load()
+    #   }
+    # })
     
     # set active project from load ----
     
@@ -96,12 +91,11 @@ mod_launchpad_loader_server <- function(id){
     
     observe({
       
-      if (length(project_file_load())>0 ) {
+      #if (length(project_file_load())>0 ) {
         updateSelectInput(session,
                           "project_selector_load",
-                          choices = read_project_db(project_file_load(),
-                                                    project_id = NULL))
-      }
+                          choices = c("", read_project_db(pool, project_id = NULL)))
+      #}
     })
     
     
@@ -110,24 +104,23 @@ mod_launchpad_loader_server <- function(id){
       req(input$project_selector_load)
       
       
-      db_path(project_file_load())
-      
-      active_project(isolate(
-        read_project_db(db_path(),
+      # db_path(project_file_load())
+        # browser()
+        
+      active_project(#isolate(
+        read_project_db(pool, # db_path(),
                         project_id = input$project_selector_load)
-      ))
+      )#)
       
-
-      
-      project$active_project <- active_project()
-      project$project_db <- db_path()
+      # project <- active_project()
+      # project$project_db <- db_path()
 
     })
     
 
     # return active project details
      
-    return(reactive(reactiveValuesToList(project)))
+    return(reactive(active_project()))
     
  
   })
