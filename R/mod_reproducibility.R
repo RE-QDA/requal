@@ -42,7 +42,7 @@ mod_reproducibility_server <- function(id, pool, project){
       if(input$metrics_select == "total"){
         observeEvent(input$test, {
           
-          segments <- load_all_segments_db(active_project = project())
+          segments <- load_all_segments_db(pool, active_project = project())
 
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
@@ -56,13 +56,12 @@ mod_reproducibility_server <- function(id, pool, project){
           }else{
               output$overlap_table <- renderText(reproducibility_message)   
           }
-
       })
       }
       
       if(input$metrics_select == "total_segment"){
         observeEvent(input$test, {
-            segments <- load_all_segments_db(active_project = project())
+            segments <- load_all_segments_db(pool, active_project = project())
             
             if(length(unique(segments$user_id)) > 1){
                 
@@ -84,7 +83,6 @@ mod_reproducibility_server <- function(id, pool, project){
       if(input$metrics_select == "by_code"){
         observeEvent(input$test, {
           segments <- load_all_segments_db(pool, active_project = project())
-          
           codes <- load_codes_names(pool, active_project = project())
           
           if(length(unique(segments$user_id)) > 1){
