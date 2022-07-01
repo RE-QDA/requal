@@ -29,17 +29,20 @@ mod_doc_manager_ui <- function(id) {
       menu_btn(
         uiOutput(ns("doc_create_ui")),
         label = "Create document",
-        icon = "plus"
+        icon = "plus", 
+        inputId = ns("add_doc_button")
       ),
       menu_btn(
         uiOutput(ns("doc_upload_ui")),
         label =  "Upload file",
-        icon = "upload"
+        icon = "upload", 
+        inputId = ns("upload_doc_button")
       ),
       menu_btn(
         uiOutput(ns("doc_delete_ui")),
         label =  "Delete document",
-        icon = "minus"
+        icon = "minus", 
+        inputId = ns("delete_doc_button")
       )
     )
   )

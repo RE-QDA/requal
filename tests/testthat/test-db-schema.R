@@ -31,4 +31,6 @@ test_that("Test project is recorded", {
                     dplyr::pull(action) == "Create project")
 })
 
+DBI::dbDisconnect(con)
+
 # create_project_record()

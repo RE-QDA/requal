@@ -9,4 +9,4 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-(run_app(db_path = "~/Desktop/testreprotwo.requal"))
+(run_app(db_path = "~/Desktop/testreprotwo.requal", options = list("launch.browser")))

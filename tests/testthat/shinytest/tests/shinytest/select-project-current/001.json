@@ -1,0 +1,211 @@
+{
+  "input": {
+    "analysis_ui_1-category_filter": null,
+    "analysis_ui_1-code_filter": "1",
+    "analysis_ui_1-document_filter": [
+      "1",
+      "5",
+      "6",
+      "7"
+    ],
+    "btn-462720873": 0,
+    "btn-619514182": 0,
+    "btn-711900461": 0,
+    "btn-812192780": 0,
+    "btn-883884643": 0,
+    "categories_ui_1-categories_to_del": null,
+    "categories_ui_1-category_add": 0,
+    "categories_ui_1-category_desc": "",
+    "categories_ui_1-category_name": "",
+    "categories_ui_1-category_remove": 0,
+    "codebook_ui_1-code_add": 0,
+    "codebook_ui_1-code_del_btn": 0,
+    "codebook_ui_1-code_desc": "",
+    "codebook_ui_1-code_merge": 0,
+    "codebook_ui_1-code_name": "",
+    "codebook_ui_1-code_to_del": null,
+    "codebook_ui_1-codebook_tabset": "codebook_tabset",
+    "codebook_ui_1-color_pick": "#FFFF00",
+    "codebook_ui_1-merge_from": "",
+    "codebook_ui_1-merge_to": "",
+    "document_code_ui_1-doc_selector": "",
+    "document_code_ui_1-remove_codes": 0,
+    "launchpad": "Load",
+    "launchpad_creator_ui_1-project_create": 0,
+    "launchpad_creator_ui_1-project_description": "",
+    "launchpad_creator_ui_1-project_name": "",
+    "launchpad_loader_ui_1-project_load": 1,
+    "launchpad_loader_ui_1-project_selector_load": "1",
+    "reporting_ui_1-logs_refresh": 0,
+    "reporting_ui_1-reporting_tabset": "instructions",
+    "reproducibility_ui_1-metrics_select": "",
+    "reproducibility_ui_1-test": 0,
+    "user_ui_1-edit_user": 0
+  },
+  "output": {
+    "categories_ui_1-category_create": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Create category<\/h4>\n  <div class=\"form-group shiny-input-container required\">\n    <label class=\"control-label\" id=\"categories_ui_1-category_name-label\" for=\"categories_ui_1-category_name\">Category name<\/label>\n    <input id=\"categories_ui_1-category_name\" type=\"text\" class=\"form-control\" value=\"\" placeholder=\"Short but informative name\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"categories_ui_1-category_desc-label\" for=\"categories_ui_1-category_desc\">Category description<\/label>\n    <textarea id=\"categories_ui_1-category_desc\" class=\"form-control\" placeholder=\"Description and instructions\"><\/textarea>\n  <\/div>\n  <button id=\"categories_ui_1-category_add\" type=\"button\" class=\"btn btn-default action-button\">Create<\/button>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "categories_ui_1-category_delete": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Delete category<\/h4>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"categories_ui_1-categories_to_del-label\" for=\"categories_ui_1-categories_to_del\">Select categories to delete<\/label>\n    <div>\n      <select id=\"categories_ui_1-categories_to_del\" multiple=\"multiple\"><option value=\"\" selected><\/option><\/select>\n      <script type=\"application/json\" data-for=\"categories_ui_1-categories_to_del\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <button class=\"btn btn-default action-button btn-danger\" id=\"categories_ui_1-category_remove\" type=\"button\">Remove<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.12.4",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": [
+            "js/selectize.min.js",
+            "accessibility/js/selectize-plugin-a11y.min.js"
+          ],
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "codebook_ui_1-code_create_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Create codes<\/h4>\n  <div class=\"form-group shiny-input-container required\">\n    <label class=\"control-label\" id=\"codebook_ui_1-code_name-label\" for=\"codebook_ui_1-code_name\">Code name<\/label>\n    <input id=\"codebook_ui_1-code_name\" type=\"text\" class=\"form-control\" value=\"\" placeholder=\"Short but informative name\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"codebook_ui_1-code_desc-label\" for=\"codebook_ui_1-code_desc\">Code description<\/label>\n    <textarea id=\"codebook_ui_1-code_desc\" class=\"form-control\" placeholder=\"Description and instructions\"><\/textarea>\n  <\/div>\n  <div class=\"form-group shiny-input-container\" data-shiny-input-type=\"colour\">\n    <label for=\"codebook_ui_1-color_pick\">Highlight<\/label>\n    <input id=\"codebook_ui_1-color_pick\" type=\"text\" class=\"form-control shiny-colour-input\" data-init-value=\"yellow\" data-show-colour=\"background\" data-palette=\"square\" data-close-on-click=\"true\"/>\n  <\/div>\n  <button id=\"codebook_ui_1-code_add\" type=\"button\" class=\"btn btn-default action-button\">Create<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "colourpicker-binding",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-binding"
+          },
+          "meta": null,
+          "script": "input_binding_colour.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "colourpicker-lib",
+          "version": "0.1.0",
+          "src": {
+            "href": "colourpicker-lib"
+          },
+          "meta": null,
+          "script": "js/colourpicker.min.js",
+          "stylesheet": "css/colourpicker.min.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "codebook_ui_1-code_delete_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Delete codes<\/h4>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"codebook_ui_1-code_to_del-label\" for=\"codebook_ui_1-code_to_del\">Select codes to delete<\/label>\n    <div>\n      <select id=\"codebook_ui_1-code_to_del\" multiple=\"multiple\"><option value=\"1\">test<\/option><\/select>\n      <script type=\"application/json\" data-for=\"codebook_ui_1-code_to_del\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <button class=\"btn btn-default action-button btn-danger\" id=\"codebook_ui_1-code_del_btn\" type=\"button\">Delete<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.12.4",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": [
+            "js/selectize.min.js",
+            "accessibility/js/selectize-plugin-a11y.min.js"
+          ],
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "codebook_ui_1-code_merge_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Merge codes<\/h4>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"codebook_ui_1-merge_from-label\" for=\"codebook_ui_1-merge_from\">Merge from<\/label>\n    <div>\n      <select id=\"codebook_ui_1-merge_from\"><option value=\"\" selected><\/option>\n<option value=\"1\">test<\/option><\/select>\n      <script type=\"application/json\" data-for=\"codebook_ui_1-merge_from\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"codebook_ui_1-merge_to-label\" for=\"codebook_ui_1-merge_to\">Merge into<\/label>\n    <div>\n      <select id=\"codebook_ui_1-merge_to\"><option value=\"\" selected><\/option>\n<option value=\"1\">test<\/option><\/select>\n      <script type=\"application/json\" data-for=\"codebook_ui_1-merge_to\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <button class=\"btn btn-default action-button btn-warning\" id=\"codebook_ui_1-code_merge\" type=\"button\">Merge<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.12.4",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": [
+            "js/selectize.min.js",
+            "accessibility/js/selectize-plugin-a11y.min.js"
+          ],
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "doc_manager_ui_1-doc_create_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Create document<\/h4>\n  <div class=\"form-group shiny-input-container required\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_name-label\" for=\"doc_manager_ui_1-doc_name\">Document name<\/label>\n    <input id=\"doc_manager_ui_1-doc_name\" type=\"text\" class=\"form-control\" value=\"\" placeholder=\"Short name\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_description-label\" for=\"doc_manager_ui_1-doc_description\">Document description<\/label>\n    <textarea id=\"doc_manager_ui_1-doc_description\" class=\"form-control\" placeholder=\"Description\"><\/textarea>\n  <\/div>\n  <div class=\"form-group shiny-input-container required\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_text-label\" for=\"doc_manager_ui_1-doc_text\">Document content<\/label>\n    <textarea id=\"doc_manager_ui_1-doc_text\" class=\"form-control\" placeholder=\"Paste the new document content here\"><\/textarea>\n  <\/div>\n  <button id=\"doc_manager_ui_1-doc_add\" type=\"button\" class=\"btn btn-default action-button\">Create document<\/button>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "doc_manager_ui_1-doc_delete_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Delete document<\/h4>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_delete_list-label\" for=\"doc_manager_ui_1-doc_delete_list\">Remove selected documents from project<\/label>\n    <div>\n      <select id=\"doc_manager_ui_1-doc_delete_list\" multiple=\"multiple\"><option value=\"1\">test<\/option>\n<option value=\"5\">Nový dokument<\/option>\n<option value=\"6\">dokument 1<\/option>\n<option value=\"7\">tst<\/option><\/select>\n      <script type=\"application/json\" data-for=\"doc_manager_ui_1-doc_delete_list\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <button class=\"btn btn-default action-button btn-danger\" id=\"doc_manager_ui_1-doc_remove\" type=\"button\">Remove<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.12.4",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": [
+            "js/selectize.min.js",
+            "accessibility/js/selectize-plugin-a11y.min.js"
+          ],
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "doc_manager_ui_1-doc_upload_ui": {
+      "html": "<div style=\"text-align: left\">\n  <h4>Upload file<\/h4>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_upload_name-label\" for=\"doc_manager_ui_1-doc_upload_name\">Document name<\/label>\n    <input id=\"doc_manager_ui_1-doc_upload_name\" type=\"text\" class=\"form-control\" value=\"\" placeholder=\"Optional filename replacement\"/>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-doc_upload_description-label\" for=\"doc_manager_ui_1-doc_upload_description\">Document description<\/label>\n    <textarea id=\"doc_manager_ui_1-doc_upload_description\" class=\"form-control\" placeholder=\"Description\"><\/textarea>\n  <\/div>\n  <div class=\"form-group shiny-input-container required\">\n    <label class=\"control-label shiny-label-null\" for=\"doc_manager_ui_1-doc_path\" id=\"doc_manager_ui_1-doc_path-label\"><\/label>\n    <div class=\"input-group\">\n      <label class=\"input-group-btn input-group-prepend\">\n        <span class=\"btn btn-default btn-file\">\n          Select file\n          <input id=\"doc_manager_ui_1-doc_path\" name=\"doc_manager_ui_1-doc_path\" type=\"file\" style=\"position: absolute !important; top: -99999px !important; left: -99999px !important;\" accept=\"text/plain,.txt\"/>\n        <\/span>\n      <\/label>\n      <input type=\"text\" class=\"form-control\" placeholder=\"No file selected\" readonly=\"readonly\"/>\n    <\/div>\n    <div id=\"doc_manager_ui_1-doc_path_progress\" class=\"progress active shiny-file-input-progress\">\n      <div class=\"progress-bar\"><\/div>\n    <\/div>\n  <\/div>\n  <div class=\"form-group shiny-input-container\">\n    <label class=\"control-label\" id=\"doc_manager_ui_1-encoding-label\" for=\"doc_manager_ui_1-encoding\">File encoding<\/label>\n    <div>\n      <select id=\"doc_manager_ui_1-encoding\"><option value=\"UTF-16\">all languages (utf_16)<\/option>\n<option value=\"UTF-32\">all languages (utf_32)<\/option>\n<option value=\"UTF-8\" selected>all languages (utf_8)<\/option>\n<option value=\"CP1256\">Arabic (cp1256)<\/option>\n<option value=\"CP720\">Arabic (cp720)<\/option>\n<option value=\"CP864\">Arabic (cp864)<\/option>\n<option value=\"ISO8859-6\">Arabic (iso8859_6)<\/option>\n<option value=\"CP1257\">Baltic languages (cp1257)<\/option>\n<option value=\"CP775\">Baltic languages (cp775)<\/option>\n<option value=\"ISO8859-13\">Baltic languages (iso8859_13)<\/option>\n<option value=\"ISO8859-4\">Baltic languages (iso8859_4)<\/option>\n<option value=\"CP1251\">Bulgarian, Byelorussian, Macedonian, Russian, Serbian (cp1251)<\/option>\n<option value=\"CP855\">Bulgarian, Byelorussian, Macedonian, Russian, Serbian (cp855)<\/option>\n<option value=\"ISO8859-5\">Bulgarian, Byelorussian, Macedonian, Russian, Serbian (iso8859_5)<\/option>\n<option value=\"MAC-CYRILLIC\">Bulgarian, Byelorussian, Macedonian, Russian, Serbian (mac_cyrillic)<\/option>\n<option value=\"CP863\">Canadian (cp863)<\/option>\n<option value=\"ISO8859-14\">Celtic languages (iso8859_14)<\/option>\n<option value=\"CP865\">Danish, Norwegian (cp865)<\/option>\n<option value=\"ASCII\">English (ascii)<\/option>\n<option value=\"CP037\">English (cp037)<\/option>\n<option value=\"CP437\">English (cp437)<\/option>\n<option value=\"ISO8859-3\">Esperanto, Maltese (iso8859_3)<\/option>\n<option value=\"CP1250\">Europe Central and Eastern (cp1250)<\/option>\n<option value=\"CP852\">Europe Central and Eastern (cp852)<\/option>\n<option value=\"ISO8859-2\">Europe Central and Eastern (iso8859_2)<\/option>\n<option value=\"MAC-LATIN2\">Europe Central and Eastern (mac_latin2)<\/option>\n<option value=\"ISO8859-16\">Europe South-Eastern (iso8859_16)<\/option>\n<option value=\"CP1140\">Europe Western (cp1140)<\/option>\n<option value=\"CP1252\">Europe Western (cp1252)<\/option>\n<option value=\"CP500\">Europe Western (cp500)<\/option>\n<option value=\"CP850\">Europe Western (cp850)<\/option>\n<option value=\"CP858\">Europe Western (cp858)<\/option>\n<option value=\"ISO8859-15\">Europe Western (iso8859_15)<\/option>\n<option value=\"LATIN-1\">Europe Western (latin_1)<\/option>\n<option value=\"MAC-ROMAN\">Europe Western (mac_roman)<\/option>\n<option value=\"CP273\">German (cp273)<\/option>\n<option value=\"CP1253\">Greek (cp1253)<\/option>\n<option value=\"CP737\">Greek (cp737)<\/option>\n<option value=\"CP869\">Greek (cp869)<\/option>\n<option value=\"CP875\">Greek (cp875)<\/option>\n<option value=\"ISO8859-7\">Greek (iso8859_7)<\/option>\n<option value=\"MAC-GREEK\">Greek (mac_greek)<\/option>\n<option value=\"CP1255\">Hebrew (cp1255)<\/option>\n<option value=\"CP424\">Hebrew (cp424)<\/option>\n<option value=\"CP856\">Hebrew (cp856)<\/option>\n<option value=\"CP862\">Hebrew (cp862)<\/option>\n<option value=\"ISO8859-8\">Hebrew (iso8859_8)<\/option>\n<option value=\"GB2312\">Chinese Simplified (gb2312)<\/option>\n<option value=\"HZ\">Chinese Simplified (hz)<\/option>\n<option value=\"BIG5\">Chinese Traditional (big5)<\/option>\n<option value=\"BIG5HKSCS\">Chinese Traditional (big5hkscs)<\/option>\n<option value=\"CP950\">Chinese Traditional (cp950)<\/option>\n<option value=\"GB18030\">Chinese Unified (gb18030)<\/option>\n<option value=\"GBK\">Chinese Unified (gbk)<\/option>\n<option value=\"CP861\">Icelandic (cp861)<\/option>\n<option value=\"MAC-ICELAND\">Icelandic (mac_iceland)<\/option>\n<option value=\"CP932\">Japanese (cp932)<\/option>\n<option value=\"EUC-JP\">Japanese (euc_jp)<\/option>\n<option value=\"ISO2022-JP\">Japanese (iso2022_jp)<\/option>\n<option value=\"SHIFT-JIS\">Japanese (shift_jis)<\/option>\n<option value=\"ISO2022-JP_2\">Japanese, Korean, Simplified Chinese, Western Europe, Greek (iso2022_jp_2)<\/option>\n<option value=\"PTCP154\">Kazakh (ptcp154)<\/option>\n<option value=\"KZ1048\">Kazakh (kz1048)<\/option>\n<option value=\"CP949\">Korean (cp949)<\/option>\n<option value=\"EUC-KR\">Korean (euc_kr)<\/option>\n<option value=\"ISO2022-KR\">Korean (iso2022_kr)<\/option>\n<option value=\"JOHAB\">Korean (johab)<\/option>\n<option value=\"ISO8859-10\">Nordic languages (iso8859_10)<\/option>\n<option value=\"CP860\">Portuguese (cp860)<\/option>\n<option value=\"CP866\">Russian (cp866)<\/option>\n<option value=\"KOI8-R\">Russian (koi8_r)<\/option>\n<option value=\"KOI8-T\">Tajik (koi8_t)<\/option>\n<option value=\"CP874\">Thai (cp874)<\/option>\n<option value=\"ISO8859-11\">Thai languages (iso8859_11)<\/option>\n<option value=\"CP1026\">Turkish (cp1026)<\/option>\n<option value=\"CP1254\">Turkish (cp1254)<\/option>\n<option value=\"CP857\">Turkish (cp857)<\/option>\n<option value=\"ISO8859-9\">Turkish (iso8859_9)<\/option>\n<option value=\"MAC-TURKISH\">Turkish (mac_turkish)<\/option>\n<option value=\"CP1125\">Ukrainian (cp1125)<\/option>\n<option value=\"KOI8-U\">Ukrainian (koi8_u)<\/option>\n<option value=\"CP1006\">Urdu (cp1006)<\/option>\n<option value=\"CP1258\">Vietnamese (cp1258)<\/option><\/select>\n      <script type=\"application/json\" data-for=\"doc_manager_ui_1-encoding\" data-nonempty=\"\">{\"plugins\":[\"selectize-plugin-a11y\"]}<\/script>\n    <\/div>\n  <\/div>\n  <button id=\"doc_manager_ui_1-doc_upload_add\" type=\"button\" class=\"btn btn-default action-button\">Add document<\/button>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.12.4",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": [
+            "js/selectize.min.js",
+            "accessibility/js/selectize-plugin-a11y.min.js"
+          ],
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "user_ui_1-user": {
+      "html": "<head>\n  <script>$(function() {\n          $('.dashboard-user').on('click', function(e){\n            e.stopPropagation();\n          });\n        });\n        <\/script>\n<\/head>\n<a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\">\n  <img src=\"www/user_logo.jpg\" class=\"user-image\" alt=\"User Image\"/>\n  <span class=\"hidden-xs\">skvrnami<\/span>\n<\/a>\n<ul class=\"dropdown-menu dashboard-user\">\n  <li class=\"user-header\">\n    <img src=\"www/user_logo.jpg\" class=\"img-circle\" alt=\"User Image\"/>\n    <p>\n      skvrnami - @\n      <small>Project:1<\/small>\n    <\/p>\n  <\/li>\n  <li class=\"user-body\">\n    <div class=\"row\">\n      <div align=\"center\" class=\"col-xs-12\">\n        <div style=\"text-align: left\">\n          <p>can_code<\/p>\n          <p>can_modify_codes<\/p>\n          <p>can_delete_codes<\/p>\n          <p>can_modify_documents<\/p>\n          <p>can_delete_documents<\/p>\n          <p>can_manage<\/p>\n        <\/div>\n      <\/div>\n    <\/div>\n  <\/li>\n  <li class=\"user-footer\">\n    <button id=\"user_ui_1-edit_user\" type=\"button\" class=\"btn btn-default action-button\">Edit<\/button>\n  <\/li>\n<\/ul>",
+      "deps": [
+
+      ]
+    }
+  },
+  "export": {
+
+  }
+}
