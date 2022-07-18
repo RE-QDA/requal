@@ -83,7 +83,7 @@ mod_categories_server <- function(id, pool, project, user, codebook) {
       render_categories(
           id = id,
           pool, 
-          active_project = project(),
+          active_project = project()
       )
     })
 

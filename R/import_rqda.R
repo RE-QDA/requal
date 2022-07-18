@@ -26,6 +26,7 @@ sample_colours <- function(n){
 #' @export
 #' @importFrom rlang .data
 rql_import_rqda <- function(rqda_file, requal_file){
+    
     memo <- databaseversion <- project_description <- NULL
     color <- fid <- cid <- selfirst <- selend <- NULL
     caseid <- catid <- NULL
@@ -176,10 +177,12 @@ rql_import_rqda <- function(rqda_file, requal_file){
     message("Importing category code mapping")
     category_code_map <- rqda_category_code_map %>% 
         dplyr::mutate(project_id = requal_project_id)
+    
+    # browser()
     purrr::walk(seq_len(nrow(category_code_map)), function(x) {
-        add_category_code_record(requal_file, requal_project_id, 
-                                 category_code_map[x, ], 
-                                 user_id = USER_ID)
+        add_category_code_record(requal_connection, requal_project_id, 
+                                          user_id = USER_ID, 
+                                          category_code_map[x, ])
     })
     
     message("Importing segments")
