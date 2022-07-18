@@ -11,19 +11,6 @@ mod_launchpad_loader_ui <- function(id){
   ns <- NS(id)
   tagList(
       
-      # h3("Project file"),
-      
-      # div(span(textOutput(
-      #   ns("project_path_load")
-      # ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
-      
-      # shinyFiles::shinyFilesButton(
-      #   ns("sel_file_load"),
-      #   "File select",
-      #   "Please select a project file",
-      #   multiple = FALSE
-      # ),
-      
       selectInput(
         ns("project_selector_load"),
         "Select project",
@@ -48,37 +35,8 @@ mod_launchpad_loader_server <- function(id, pool){
     
     # module reactive vals ----
     
-    # db_path <- reactiveVal(NULL)
     active_project <- reactiveVal(NULL)
     doc_list <- reactiveVal(NULL)
-    #project <- reactiveValues()
-    
-    # file system prep ----
-    # volumes <- c(Home = fs::path_home(), get_volume_paths())
-    
-    # shinyFiles::shinyFileChoose(
-    #   input,
-    #   "sel_file_load",
-    #   roots = volumes,
-    #   defaultRoot = "Home",
-    #   session = session,
-    #   restrictions = system.file(package = "base"),
-    #   pattern = c('\\.requal')
-    # )
-    
-    
-    # project_file_load <-
-    #   reactive({
-    #     normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
-    #   })
-    # 
-    # output$project_path_load <- renderText({
-    #   if (is.integer(input$sel_file_load)) {
-    #     "No project file has been selected."
-    #   } else {
-    #     project_file_load()
-    #   }
-    # })
     
     # set active project from load ----
     
@@ -88,14 +46,10 @@ mod_launchpad_loader_server <- function(id, pool){
       }
     })
     
-    
     observe({
-      
-      #if (length(project_file_load())>0 ) {
         updateSelectInput(session,
                           "project_selector_load",
                           choices = c("", read_project_db(pool, project_id = NULL)))
-      #}
     })
     
     
@@ -103,25 +57,15 @@ mod_launchpad_loader_server <- function(id, pool){
       
       req(input$project_selector_load)
       
-      
-      # db_path(project_file_load())
-        # browser()
-        
       active_project(#isolate(
-        read_project_db(pool, # db_path(),
+        read_project_db(pool, 
                         project_id = input$project_selector_load)
       )#)
       
-      # project <- active_project()
-      # project$project_db <- db_path()
-
     })
     
-
     # return active project details
-     
     return(reactive(active_project()))
-    
  
   })
 }
