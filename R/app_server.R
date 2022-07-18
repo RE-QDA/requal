@@ -13,6 +13,10 @@ app_server <- function(input, output, session) {
         dbname = golem::get_golem_options("db_path")
     )
     
+    if (!DBI::dbExistsTable(pool, "projects")) {
+        create_db_schema(pool)
+    }
+    
     # project_observer <- reactiveVal()
  
     project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1", pool)
