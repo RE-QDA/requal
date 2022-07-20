@@ -1,12 +1,8 @@
-read_doc_db <- function(active_project, project_db) {
+read_doc_db <- function(pool, active_project) {
     doc_name <- NULL
     if (isTruthy(active_project)) {
 
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-
-        db_docs_df <- dplyr::tbl(con, "documents") %>%
+        db_docs_df <- dplyr::tbl(pool, "documents") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::select(doc_name, doc_id) %>%
             dplyr::collect() %>%
@@ -33,32 +29,25 @@ read_doc_db <- function(active_project, project_db) {
 
 # Load documents to display -----------------------------
 
-load_doc_db <- function(active_project, project_db, doc_id) {
+load_doc_db <- function(pool, active_project, doc_id) {
 
     if (isTruthy(active_project)) {
 
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-
-        doc_text <- dplyr::tbl(con, "documents") %>%
+        doc_text <- dplyr::tbl(pool, "documents") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
             dplyr::pull(doc_text)
 
-
-
         return(doc_text)
-
 
     } else {""}
 
 }
 
-load_doc <- function(con, project_id, doc_id){
+load_doc <- function(pool, project_id, doc_id){
     doc_text <- NULL
 
-    dplyr::tbl(con, "documents") %>%
+    dplyr::tbl(pool, "documents") %>%
       dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
       dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
       dplyr::pull(doc_text)
@@ -66,15 +55,11 @@ load_doc <- function(con, project_id, doc_id){
 
 # Load segments for document display  -------------------------------------------
 
-load_segments_db <- function(active_project, project_db, user_id, doc_id) {
+load_segments_db <- function(pool, active_project, user_id, doc_id) {
     code_id <- segment_start <- segment_end <- NULL
     if (isTruthy(active_project)) {
 
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-
-        segments <- dplyr::tbl(con, "segments") %>%
+        segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
             dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
@@ -83,12 +68,9 @@ load_segments_db <- function(active_project, project_db, user_id, doc_id) {
                           segment_end) %>%
             dplyr::collect()
 
-
         return(segments)
 
-
     } else {""}
-
 }
 
 # Check overlap between already coded segments and newly coded segment
@@ -129,8 +111,8 @@ get_segment_text <- function(con, project_id, doc_id, start, end){
 # Write document segments to DB -------------------------------------------
 
 write_segment_db <- function(
+    pool, 
     active_project,
-    project_db,
     user_id,
     doc_id,
     code_id,
@@ -138,13 +120,9 @@ write_segment_db <- function(
     endOff
 ) {
 
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db)
-    on.exit(DBI::dbDisconnect(con))
-
     # Check overlap
     # - return segments with the same document ID and code ID from the DB
-    coded_segments <- dplyr::tbl(con, "segments") %>%
+    coded_segments <- dplyr::tbl(pool, "segments") %>%
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
         dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
         dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
@@ -175,14 +153,14 @@ write_segment_db <- function(
                        AND code_id = {code_id}
                        AND user_id = {user_id}
                        AND segment_start = {overlap$segment_start}
-                       AND segment_end = {overlap$segment_end}", .con = con)
+                       AND segment_end = {overlap$segment_end}", .con = pool)
 
         purrr::walk(query, function(x) {
-            DBI::dbExecute(con, x)
-            log_delete_segment_record(con, active_project, overlap$segment_id, user_id)
+            DBI::dbExecute(pool, x)
+            log_delete_segment_record(pool, active_project, overlap$segment_id, user_id)
         })
 
-        res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE)
 
     }else{
         # in case of no overlap write in DB directly
@@ -192,18 +170,18 @@ write_segment_db <- function(
                                  code_id = code_id,
                                  segment_start = startOff,
                                  segment_end = endOff,
-                                 segment_text = get_segment_text(con,
+                                 segment_text = get_segment_text(pool, 
                                                                  project_id = active_project,
                                                                  doc_id,
                                                                  startOff,
                                                                  endOff)
         )
 
-        res <- DBI::dbWriteTable(con, "segments", segment_df, append = TRUE)
+        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE)
     }
 
     if(res){
-      written_segment_id <- dplyr::tbl(con, "segments") %>% 
+      written_segment_id <- dplyr::tbl(pool, "segments") %>% 
         dplyr::filter(.data$project_id == !!segment_df$project_id & 
                       .data$doc_id == !!segment_df$doc_id &
                       .data$code_id == !!segment_df$code_id &
@@ -212,7 +190,7 @@ write_segment_db <- function(
                       .data$user_id == !!segment_df$user_id) %>% 
         dplyr::pull(segment_id)
       
-      log_add_segment_record(con, project_id = active_project, segment_df %>% 
+      log_add_segment_record(pool, project_id = active_project, segment_df %>% 
                                dplyr::mutate(segment_id = written_segment_id), 
                              user_id = user_id)
     }else{
@@ -280,18 +258,18 @@ calculate_code_overlap <- function(raw_segments) {
 
 # Generate text to be displayed -----
 
-load_doc_to_display <- function(active_project,
-                                project_db,
+load_doc_to_display <- function(pool, 
+                                active_project,
                                 user_id,
                                 doc_selector,
                                 codebook,
                                 ns){
 
     position_type <- position_start <- tag_start <- tag_end <- NULL
-    raw_text <- load_doc_db(active_project, project_db, doc_selector)
+    raw_text <- load_doc_db(pool, active_project, doc_selector)
 
-    coded_segments <- load_segments_db(active_project,
-                                       project_db,
+    coded_segments <- load_segments_db(pool, 
+                                       active_project,
                                        user_id,
                                        doc_selector) %>% 
         calculate_code_overlap()
@@ -302,8 +280,6 @@ load_doc_to_display <- function(active_project,
         dplyr::mutate(code_id = as.character(code_id))
 
     if(nrow(coded_segments)){
-
-
 
         distinct_code_ids <- as.character(
             coded_segments %>%
@@ -327,8 +303,7 @@ load_doc_to_display <- function(active_project,
             tidyr::pivot_longer(cols = c(segment_start, segment_end),
                                 values_to = "position_start", 
                                 names_to = "position_type",
-                                values_drop_na = TRUE
-                                    ) %>% 
+                                values_drop_na = TRUE) %>% 
             dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
             dplyr::mutate(tag_end = "</b>",
                           tag_start = paste0('<b id="',
@@ -343,10 +318,8 @@ load_doc_to_display <- function(active_project,
                 tibble::tibble(position_start = 0,
                                position_type =  "segment_start",
                                tag_start = "<article><p class='docpar'>"),
-                
                 # content
                 .,
-                
                 # end doc
                 tibble::tibble(position_start = nchar(raw_text),
                                position_type = "segment_end",
@@ -399,18 +372,14 @@ load_doc_to_display <- function(active_project,
 
 # Load codes for a segment -------------------------------------------
 
-load_segment_codes_db <- function(active_project, 
-                                  project_db,
+load_segment_codes_db <- function(pool, 
+                                  active_project, 
                                   user_id,
                                   active_doc,
                                   marked_codes) {
 
-        con <- DBI::dbConnect(RSQLite::SQLite(),
-                              project_db)
-        on.exit(DBI::dbDisconnect(con))
-
-        segment_codes_df <- dplyr::tbl(con, "segments") %>%
-            dplyr::inner_join( dplyr::tbl(con, "codes") %>%
+        segment_codes_df <- dplyr::tbl(pool, "segments") %>%
+            dplyr::inner_join(dplyr::tbl(pool, "codes") %>%
                                    dplyr::select(code_id, 
                                                  code_name
                                                  ),
@@ -430,7 +399,6 @@ load_segment_codes_db <- function(active_project,
 
 parse_tag_pos <- function(tag_postion, which_part) {
 
-
     startOff <- as.integer(unlist(strsplit(tag_postion, "-")))[1]
     endOff <- as.integer(unlist(strsplit(tag_postion, "-")))[2]
 
@@ -439,35 +407,28 @@ parse_tag_pos <- function(tag_postion, which_part) {
            "end" = endOff,
            "both" = c(startOff, endOff)
                )
-
-
-
 }
 
 
 
 # Remove codes from a document ----------------
 
-delete_segment_codes_db <- function(project_db,
+delete_segment_codes_db <- function(pool, 
                                     active_project,
                                     user_id,
                                     doc_id,
                                     segment_id) {
-
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db)
-    on.exit(DBI::dbDisconnect(con))
 
     # delete code from a segment
     query <- glue::glue_sql("DELETE FROM segments
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
                        AND user_id = {user_id}
-                       AND segment_id = {segment_id}", .con = con)
+                       AND segment_id = {segment_id}", .con = pool)
 
-    purrr::walk(query, function(x) {DBI::dbExecute(con, x)})
+    purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
     
-    log_delete_segment_record(con, project_id = active_project, segment_id, user_id)
+    log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)
 }
 
 

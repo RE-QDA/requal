@@ -36,30 +36,19 @@ mod_about_ui <- function(id){
 #' about Server Functions
 #'
 #' @noRd 
-mod_about_server <- function(id, project, user){
+mod_about_server <- function(id, pool, project, user){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    
-    read_version <-
-      function(project_db,
-               active_project) {
-        
-        con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-        on.exit(DBI::dbDisconnect(con))
-        
-        version <- dplyr::tbl(con, "requal_version") %>%
-          dplyr::pull(version) 
-      }
-    
     output$version_project <- renderText({
-      if (isTruthy(project()$active_project)) {
-        paste0(
+        active_project = project()
+      paste0(
           "The current project was created with requal version ",
-          read_version(project()$project_db,
-                       project()$active_project), ". "
+          dplyr::tbl(pool, "requal_version") %>%
+              dplyr::filter(.data$project_id == as.numeric(active_project)) %>% 
+              dplyr::pull(version),
+          "."
         )
-      } else {""}
     })
     
     output$version_package <- renderText({

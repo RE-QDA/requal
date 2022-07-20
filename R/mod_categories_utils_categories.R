@@ -1,6 +1,6 @@
 # Generate boxes of categories -----
 gen_categories_ui <- function(id,
-                              project_db,
+                              pool,
                               active_project,
                               category_id,
                               category_name,
@@ -21,7 +21,7 @@ gen_categories_ui <- function(id,
         input_id = glue::glue(ns("category_list_{category_id}")),
         text = NULL,
         labels = render_category_edges(
-          project_db = project_db,
+          pool, 
           active_project = active_project,
           category_id = category_id
         ),
@@ -47,25 +47,30 @@ gen_categories_ui <- function(id,
 
 # Render categories -----
 
-render_categories <- function(id,
-                              active_project,
-                              project_db) {
+render_categories <- function(id, pool, 
+                              active_project) {
   if (isTruthy(active_project)) {
     project_categories <- list_db_categories(
       id = id,
-      project_db = project_db,
+      pool, 
       project_id = active_project
-    ) %>%
-      dplyr::mutate(
-        project_db = project_db,
-        active_project = active_project
-      )
-
+    ) # %>%
+      # dplyr::mutate(
+      #   project_db = project_db,
+      #   active_project = active_project
+      # )
 
     if (nrow(project_categories) == 0) {
       "No categories have been created."
     } else {
-      purrr::pmap(project_categories, gen_categories_ui)
+        purrr::transpose(project_categories) %>% 
+            purrr::map(., ~gen_categories_ui(
+                id = id, pool = pool, 
+                active_project = active_project, 
+                category_id = .x$category_id, 
+                category_name = .x$category_name, 
+                category_description = .x$category_description)
+            )
     }
   } else {
     "No active project."
@@ -74,16 +79,10 @@ render_categories <- function(id,
 
 # Read categories--------------------------------------------------------
 
-read_db_categories <- function(project_db, active_project) {
+read_db_categories <- function(pool, active_project) {
   category_id <- category_description <- category_name <- NULL
 
-  con <- DBI::dbConnect(
-    RSQLite::SQLite(),
-    project_db
-  )
-  on.exit(DBI::dbDisconnect(con))
-
-  project_categories_df <- dplyr::tbl(con, "categories") %>%
+  project_categories_df <- dplyr::tbl(pool, "categories") %>%
     dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
     dplyr::select(
       category_id,
@@ -104,19 +103,12 @@ read_db_categories <- function(project_db, active_project) {
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
-list_db_categories <- function(id, project_db, project_id) {
+list_db_categories <- function(id, pool, project_id) {
 
   ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
   category_id <- category_name <- category_description <- NULL
 
-
-  con <- DBI::dbConnect(
-    RSQLite::SQLite(),
-    project_db
-  )
-  on.exit(DBI::dbDisconnect(con))
-
-  project_categories <- dplyr::tbl(con, "categories") %>%
+  project_categories <- dplyr::tbl(pool, "categories") %>%
     dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
     dplyr::select(
       category_id,
@@ -153,7 +145,7 @@ create_new_category_UI <- function(id) {
 
 # delete category UI -----
 
-delete_category_UI <- function(id, project_db, active_project) {
+delete_category_UI <- function(id, pool, active_project) {
   ns <- NS(id)
   tags$div(
     h4("Delete category"),
@@ -161,8 +153,7 @@ delete_category_UI <- function(id, project_db, active_project) {
       ns("categories_to_del"),
       label = "Select categories to delete",
       choices = c("", read_db_categories(
-        project_db = project_db,
-        active_project = active_project
+        pool, active_project = active_project
       )),
       selected = "",
       multiple = TRUE
@@ -176,31 +167,27 @@ delete_category_UI <- function(id, project_db, active_project) {
 
 # delete category  -----
 
-delete_db_category <- function(project_db, active_project, user_id, delete_cat_id) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
-
-  res <- DBI::dbExecute(con,
+delete_db_category <- function(pool, active_project, user_id, delete_cat_id) {
+  res <- DBI::dbExecute(pool,
     "DELETE from categories
                    WHERE category_id IN (?)",
     params = list(delete_cat_id)
   )
 
   if(res & length(delete_cat_id)){
-    log_delete_category_record(con, active_project, delete_cat_id, user_id)
+    log_delete_category_record(pool, active_project, delete_cat_id, user_id)
   }
 }
 
 # add category record -----
-add_category_record <- function(con, project_id, user_id, categories_df) {
-  res <- DBI::dbWriteTable(con, "categories", categories_df, append = TRUE)
+add_category_record <- function(pool, project_id, user_id, categories_df) {
+  res <- DBI::dbWriteTable(pool, "categories", categories_df, append = TRUE)
 
   if (res) {
-    written_category_id <- dplyr::tbl(con, "categories") %>%
+    written_category_id <- dplyr::tbl(pool, "categories") %>%
       dplyr::filter(.data$category_name == !!categories_df$category_name) %>%
       dplyr::pull(.data$category_id)
-    log_add_category_record(con, project_id, categories_df %>%
+    log_add_category_record(pool, project_id, categories_df %>%
                               dplyr::mutate(category_id = written_category_id), 
                             user_id = user_id)
   } else {
@@ -210,20 +197,17 @@ add_category_record <- function(con, project_id, user_id, categories_df) {
 }
 
 # add code to category -----
-add_category_code_record <- function(project_db,
+add_category_code_record <- function(pool,
                             active_project,
                             user_id,
                             edge) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
   edge_df <- as.data.frame(edge)
   edge_df$project_id <- active_project
 
-  res <- DBI::dbWriteTable(con, "categories_codes_map", edge_df, append = TRUE)
+  res <- DBI::dbWriteTable(pool, "categories_codes_map", edge_df, append = TRUE)
 
   if (res) {
-    log_add_category_code_record(con, active_project, edge_df, user_id)
+    log_add_category_code_record(pool, active_project, edge_df, user_id)
   } else {
     warning("category not added")
   }
@@ -232,54 +216,48 @@ add_category_code_record <- function(project_db,
 
 # delete edge record -----
 
-delete_category_code_record <- function(project_db,
+delete_category_code_record <- function(pool,
                            active_project,
                            edge, 
                            user_id) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
   # delete edge
   # delete edges based on codes and categories
   if (!is.null(edge$category_id) & !is.null(edge$code_id) ) {
-  res <- DBI::dbExecute(con,
+  res <- DBI::dbExecute(pool,
                  glue::glue_sql("DELETE FROM categories_codes_map
                        WHERE category_id = {edge$category_id}
-                       AND code_id = {edge$code_id};", .con = con))
+                       AND code_id = {edge$code_id};", .con = pool))
   } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
     # delete edges based on categories
-    res <- DBI::dbExecute(con,
+    res <- DBI::dbExecute(pool,
                    "DELETE FROM categories_codes_map
                        WHERE category_id IN (?);",
                    params = list(edge$category_id))
 
   } else {
     # delete edges based on codebook
-    res <- DBI::dbExecute(con,
+    res <- DBI::dbExecute(pool,
                    "DELETE FROM categories_codes_map
                        WHERE code_id IN (?);",
                    params = list(edge$code_id))
   }
 
   if(res){
-    log_delete_category_code_record(con, active_project, edge, user_id)
+    log_delete_category_code_record(pool, active_project, edge, user_id)
   }
 }
 
 # render existing edges -----
 
-render_category_edges <- function(project_db,
+render_category_edges <- function(pool,
                                   active_project,
                                   category_id) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
-  category_edges <- dplyr::tbl(con, "categories_codes_map") %>%
+  category_edges <- dplyr::tbl(pool, "categories_codes_map") %>%
     dplyr::filter(.data$category_id == .env$category_id) %>%
     dplyr::pull(code_id)
 
   project_codes <- list_db_codes(
-    project_db = project_db,
-    project_id = active_project
+    pool, project_id = active_project
   ) %>%
     dplyr::filter(code_id %in% category_edges)
 

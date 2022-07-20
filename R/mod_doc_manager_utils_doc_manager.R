@@ -52,15 +52,15 @@ upload_doc_UI <- function(id) {
 
 # delete doc UI -----
 
-delete_doc_UI <- function(id, project) {
+delete_doc_UI <- function(id, pool, project) {
   ns <- NS(id)
   tags$div(
     h4("Delete document"),
     selectInput(ns("doc_delete_list"),
       label = "Remove selected documents from project",
       choices = list_db_documents(
-          project_db = project()$project_db,
-          active_project = project()$active_project
+          pool,
+          active_project = project()
       ),
       multiple = TRUE,
       selected = NULL
@@ -73,34 +73,23 @@ delete_doc_UI <- function(id, project) {
 }
 
 # delete documents from project ----
-delete_db_documents <- function(project_db,
+delete_db_documents <- function(pool,
                                 active_project,
                                 delete_doc_id, 
                                 user) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
-
-  DBI::dbExecute(con,
+  DBI::dbExecute(pool,
     "DELETE from documents
                    WHERE doc_id IN (?)",
     params = list(delete_doc_id)
   )
   if (length(delete_doc_id)) {
-    log_delete_document_record(con, active_project, delete_doc_id, user_id = user)
+    log_delete_document_record(pool, active_project, delete_doc_id, user_id = user)
   }
 }
 
 
 # add input document ----
-add_input_document <- function(connection, project, doc_name, doc_text, doc_description, user_id) {
-  con <- DBI::dbConnect(
-    RSQLite::SQLite(),
-    connection
-  )
-
-  on.exit(DBI::dbDisconnect(con))
-
+add_input_document <- function(pool, project, doc_name, doc_text, doc_description, user_id) {
   text_df <- tibble::tibble(
     project_id = project,
     doc_name = .env$doc_name,
@@ -108,7 +97,7 @@ add_input_document <- function(connection, project, doc_name, doc_text, doc_desc
     doc_text = .env$doc_text
   )
 
-  add_documents_record(con, project, text_df, user_id = user_id)
+  add_documents_record(pool, project, text_df, user_id = user_id)
 }
 
 # encodings -----

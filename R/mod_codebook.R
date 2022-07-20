@@ -62,46 +62,46 @@ mod_codebook_ui <- function(id) {
 #' codebook Server Functions
 #'
 #' @noRd
-mod_codebook_server <- function(id, project, user) {
+mod_codebook_server <- function(id, pool, project, user) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     # codebook observer ----
     codebook <- reactiveVal()
 
-    observeEvent(project()$active_project, {
+    observeEvent(project(), {
       # update codebook return values
 
       codebook(
         list_db_codes(
-          project()$project_db,
-          project()$active_project
+          pool,
+          project()
         )
       )
     })
 
     # List existing codes in codes boxes ----
     output$codes_ui <- renderUI({
-      render_codes(
-        active_project = project()$active_project,
-        project_db = project()$project_db
-      )
+        render_codes(
+            pool = pool,
+            active_project = project()
+        )
     })
-    
-    #---Generate codes UI (if there is an active project)--------------
+
+    # #---Generate codes UI (if there is an active project)--------------
     output$codes_manager <- renderUI({
-      if (isTruthy(project()$active_project)) {
-        codebook_manager_UI(id,
-          project_db = project()$project_db,
-          project_id = project()$active_project
+      if (isTruthy(project())) {
+        codebook_manager_UI(
+            id,
+            pool,
+            project_id = project()
         )
       }
     })
 
     #---Create code UI --------------
-
     output$code_create_ui <- renderUI({
-      req(project()$active_project)
+      req(project())
       create_code_UI(id)
     })
     outputOptions(output, "code_create_ui", suspendWhenHidden = FALSE)
@@ -112,16 +112,14 @@ mod_codebook_server <- function(id, project, user) {
 
       # check if code name is unique
       code_names <- list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
+        pool,
+        project_id = project()
       )$code_name
 
       if (!input$code_name %in% code_names & input$code_name != "") {
-        con <- DBI::dbConnect(RSQLite::SQLite(), project()$project_db)
-        on.exit(DBI::dbDisconnect(con))
 
         codes_input_df <- data.frame(
-          project_id = project()$active_project,
+          project_id = project(),
           code_name = input$code_name,
           code_description = input$code_desc,
           code_color = paste0(
@@ -139,16 +137,16 @@ mod_codebook_server <- function(id, project, user) {
         )
 
         add_codes_record(
-          con = con,
-          project_id = project()$active_project,
-          codes_df = codes_input_df, 
+          pool,
+          project_id = project(),
+          codes_df = codes_input_df,
           user_id = user()$user_id
         )
 
         output$codes_ui <- renderUI({
           render_codes(
-            active_project = project()$active_project,
-            project_db = project()$project_db
+              pool = pool,
+              active_project = project()
           )
         })
 
@@ -157,10 +155,10 @@ mod_codebook_server <- function(id, project, user) {
           create_code_UI(id)
         })
         output$code_merge_ui <- renderUI({
-          merge_code_UI(id, project)
+          merge_code_UI(id, pool, project)
         })
         output$code_delete_ui <- renderUI({
-          delete_code_UI(id, project)
+          delete_code_UI(id, pool, project)
         })
       } else {
         showModal(modalDialog(
@@ -173,8 +171,8 @@ mod_codebook_server <- function(id, project, user) {
       # update codebook return value
       codebook(
         list_db_codes(
-          project()$project_db,
-          project()$active_project
+          pool,
+          project()
         )
       )
     })
@@ -182,23 +180,20 @@ mod_codebook_server <- function(id, project, user) {
     #---Delete code UI --------------
 
     output$code_delete_ui <- renderUI({
-      req(project()$active_project)
-      delete_code_UI(id, project)
+      req(project())
+      delete_code_UI(id, pool, project)
     })
     outputOptions(output, "code_delete_ui", suspendWhenHidden = FALSE)
 
     #---Delete existing code-------------------------------------
-
-
     observeEvent(input$code_del_btn, {
       req(input$code_to_del)
 
-
       # delete code
       delete_db_codes(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
-        delete_code_id = input$code_to_del, 
+        pool,
+        active_project = project(),
+        delete_code_id = input$code_to_del,
         user_id = user()$user_id
       )
 
@@ -206,8 +201,8 @@ mod_codebook_server <- function(id, project, user) {
       edge <- list()
       edge$code_id <- input$code_to_del
       delete_category_code_record(
-        project_db = project()$project_db,
-        active_project = project()$active_project,
+        pool,
+        active_project = project(),
         user_id = user()$user_id,
         edge = edge
       )
@@ -215,17 +210,17 @@ mod_codebook_server <- function(id, project, user) {
       # re-render UI
 
       output$code_merge_ui <- renderUI({
-        merge_code_UI(id, project)
+        merge_code_UI(id, pool, project)
       })
       output$code_delete_ui <- renderUI({
-        delete_code_UI(id, project)
+        delete_code_UI(id, pool, project)
       })
 
       # relist remaining codes
       output$codes_ui <- renderUI({
         render_codes(
-          active_project = project()$active_project,
-          project_db = project()$project_db
+          pool = pool,
+          active_project = project()
         )
       })
 
@@ -233,17 +228,16 @@ mod_codebook_server <- function(id, project, user) {
       # update codebook return value
       codebook(
         list_db_codes(
-          project()$project_db,
-          project()$active_project
+            pool,
+            project()
         )
       )
     })
 
-    #---Merge code UI --------------
-
+    # #---Merge code UI --------------
     output$code_merge_ui <- renderUI({
-      req(project()$active_project)
-      merge_code_UI(id, project)
+      req(project())
+      merge_code_UI(id, pool, project)
     })
     outputOptions(output, "code_merge_ui", suspendWhenHidden = FALSE)
 
@@ -255,36 +249,36 @@ mod_codebook_server <- function(id, project, user) {
           warn_user("Cannot merge a code into itself.")
         } else {
           merge_codes(
-            project()$project_db,
-            project()$active_project,
+            pool,
+            project(),
             input$merge_from,
-            input$merge_to, 
+            input$merge_to,
             user_id = user()$user_id
           )
 
           # update codebook return value
           codebook(
             list_db_codes(
-              project()$project_db,
-              project()$active_project
+              pool,
+              project()
             )
           )
 
           # relist remaining codes
           output$codes_ui <- renderUI({
             render_codes(
-              active_project = project()$active_project,
-              project_db = project()$project_db
+              pool = pool,
+              active_project = project()
             )
           })
 
           # re-render UI
 
           output$code_merge_ui <- renderUI({
-            merge_code_UI(id, project)
+            merge_code_UI(id, pool, project)
           })
           output$code_delete_ui <- renderUI({
-            delete_code_UI(id, project)
+            delete_code_UI(id, pool, project)
           })
         }
       } else {

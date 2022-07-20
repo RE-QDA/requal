@@ -17,23 +17,19 @@ mod_user_ui <- function(id){
 #' user Server Functions
 #'
 #' @noRd 
-mod_user_server <- function(id, project){
-  moduleServer( id, function(input, output, session){
+mod_user_server <- function(id, pool, project){
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
  
     user_data <- reactiveVal()
     
-
-    observeEvent(project()$active_project, {
-      
-    user_data(read_user_db(project()$project_db,
-                           project()$active_project,
-                           user_id = 1))
+    observeEvent(project(), {
+        user_data(read_user_db(pool, user_id = 1, active_project = project()))
     })
     
     output$user <- renderUser({
       
-      req(project()$active_project)
+      req(project())
 
       permissions_list <- user_data() %>% 
         dplyr::select(dplyr::starts_with("can_")) %>% 
@@ -44,12 +40,12 @@ mod_user_server <- function(id, project){
         dplyr::pull(.data$permissions) 
       
       
-      if (isTruthy( project()$active_project)) {
+      if (isTruthy(project())) {
         dashboardUser(
           name = user_data()$user_name,
           image = "www/user_logo.jpg", 
           title = ifelse(is.na(user_data()$user_mail), "@", user_data()$user_mail),
-          subtitle = paste0("Project:", names(project()$active_project)), 
+          subtitle = paste0("Project:", project()), 
           footer =  actionButton(ns("edit_user"),
                                  "Edit"),
           fluidRow(
@@ -90,14 +86,12 @@ mod_user_server <- function(id, project){
       
       observeEvent(input$save_close, {
         
-        update_user_db(project()$project_db,
+        update_user_db(pool, 
                        user_id = 1,
                        input$user_name,
                        input$user_email)
       
-        user_data(read_user_db(project()$project_db,
-                               project()$active_project,
-                               user_id = 1))
+        user_data(read_user_db(pool, user_id = 1))
         removeModal()
     })
     

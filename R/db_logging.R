@@ -8,26 +8,13 @@ create_log_df <- function(project_id, action, payload, user_id){
     )
 }
 
-log_action <- function(con, action, project_id, data, user_id){
-    UseMethod("log_action")
-}
-
-log_action.SQLiteConnection <- function(con, action, project_id, data, user_id){
+log_action <- function(pool, action, project_id, data, user_id){
     log_record_df <- create_log_df(project_id, 
                                    user_id = user_id, 
                                    action = action, 
                                    payload = data)
-    DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
+    DBI::dbWriteTable(pool, "logs", log_record_df, append = TRUE)
 }
-
-log_action.PqConnection <- function(con, action, project_id, data, user_id){
-    log_record_df <- create_log_df(project_id, 
-                                   user_id = user_id, 
-                                   action = action, 
-                                   payload = data)
-    DBI::dbWriteTable(con, "logs", log_record_df, append = TRUE)
-}
-
 
 log_create_project_record <- function(con, project_id, project_df, user_id){
     log_action(con, 

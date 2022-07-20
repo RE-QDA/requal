@@ -51,7 +51,7 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, project, user, codebook, category, documents, segments) {
+mod_analysis_server <- function(id, pool, active_project, user, codebook, category, documents, segments) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -78,6 +78,7 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
         selected = documents()
       )
     })
+    
     observeEvent(category(), {
       updateSelectInput(
         session = session,
@@ -100,15 +101,15 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
         codebook()
         category()
         documents()
-        project()$active_project
+        active_project()
       },
       {
         temp_df <- load_segments_analysis(
-          project_db = project()$project_db,
-          active_project = project()$active_project,
-          selected_codes = input$code_filter,
-          selected_categories = input$category_filter,
-          selected_docs = input$document_filter
+            pool, 
+            active_project(),
+            selected_codes = input$code_filter,
+            selected_categories = input$category_filter,
+            selected_docs = input$document_filter
         )
 
         if (nrow(temp_df) > 0) {
