@@ -54,16 +54,13 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
     doc_choices <- reactiveVal()
     
     # Refresh list of documents when documents are added/removed --------
-    observe({ 
-      if (isTruthy(project()$active_project)) {
-        doc_choices(documents())
-        
-        updateSelectInput(session = session,
-                          "doc_selector",
-                          choices = c("", doc_choices())
-                          )
-      }
-    })
+    observeEvent(documents(), { 
+        if (isTruthy(project()$active_project)) {
+            updateSelectInput(session = session,
+                              "doc_selector",
+                              choices = c("", documents())
+            )
+        }
 
 # Displayed text ----------------------------------------------------------
 
