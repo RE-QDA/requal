@@ -61,6 +61,7 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
                               choices = c("", documents())
             )
         }
+    })
 
 # Displayed text ----------------------------------------------------------
 
