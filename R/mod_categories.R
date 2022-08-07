@@ -159,7 +159,7 @@ mod_categories_server <- function(id, project, user, codebook) {
         )
         updateTextAreaInput(
           session = session,
-          inputId = "category_description",
+          inputId = "category_desc",
           value = ""
         )
         
