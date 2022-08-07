@@ -157,15 +157,18 @@ delete_category_UI <- function(id, project_db, active_project) {
   ns <- NS(id)
   tags$div(
     h4("Delete category"),
-    selectInput(
+    selectizeInput(
       ns("categories_to_del"),
       label = "Select categories to delete",
       choices = c("", read_db_categories(
         project_db = project_db,
         active_project = active_project
       )),
-      selected = "",
-      multiple = TRUE
+      selected = NULL,
+      multiple = TRUE,
+      options = list(
+          closeAfterSelect = "true"
+      )
     ),
     actionButton(ns("category_remove"),
       label = "Remove",

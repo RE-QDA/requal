@@ -74,7 +74,7 @@ delete_code_UI <- function(id, project) {
         project_id = project()$active_project
       ) %>%
         pair_code_id(),
-      selected = "",
+      selected = NULL,
       multiple = TRUE,
       options = list(
           closeAfterSelect = "true"
