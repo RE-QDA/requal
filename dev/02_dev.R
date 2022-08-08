@@ -35,6 +35,7 @@ usethis::use_package( "shinyWidgets" )
 
 
 
+
 ## Add modules ----
 ## Create a module infrastructure in R/
 golem::add_module( name = "launchpad_loader" ) # Name of the module
@@ -57,6 +58,8 @@ golem::add_module( name = "document_code" ) # Name of the module
 # Analysis
 golem::add_module( name = "analysis" ) # Name of the module
 golem::add_module( name = "download_handler" ) # Name of the module
+golem::add_module( name = "download_html" ) # Name of the module
+
 
 golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
