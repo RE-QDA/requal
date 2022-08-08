@@ -130,12 +130,14 @@ mod_document_code_server <- function(id, project, user, codebook, documents){
           list(
           code_df$active_codebook$code_id,
           code_df$active_codebook$code_name,
-          code_df$active_codebook$code_color
+          code_df$active_codebook$code_color,
+          code_df$active_codebook$code_description
           ),
           ~ generate_coding_tools(ns = ns, 
                                   code_id = ..1, 
                                   code_name = ..2,
-                                  code_color = ..3)
+                                  code_color = ..3,
+                                  code_desc = ..4)
         )
         
         

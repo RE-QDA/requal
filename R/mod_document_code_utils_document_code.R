@@ -474,13 +474,13 @@ delete_segment_codes_db <- function(project_db,
 # Generate coding tools -------------------------------------------------
 
 
-generate_coding_tools <- function(ns, code_id, code_name, code_color) {
+generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc) {
 
     actionButton(inputId = ns(code_id),
                label = code_name,
                name = code_id,
                class = "code-button",
-               title = code_name,
+               title = paste(code_name, code_desc),
                style = paste0("background: none;
                        width: 100%;
                        border-left: 5px solid ", code_color, ";"),
