@@ -66,7 +66,7 @@ delete_code_UI <- function(id, project) {
   ns <- NS(id)
   tags$div(
     h4("Delete codes"),
-    selectInput(
+    selectizeInput(
       ns("code_to_del"),
       label = "Select codes to delete",
       choices = list_db_codes(
@@ -74,8 +74,11 @@ delete_code_UI <- function(id, project) {
         project_id = project()$active_project
       ) %>%
         pair_code_id(),
-      selected = "",
-      multiple = TRUE
+      selected = NULL,
+      multiple = TRUE,
+      options = list(
+          closeAfterSelect = "true"
+  )
     ),
     actionButton(ns("code_del_btn"),
       label = "Delete",

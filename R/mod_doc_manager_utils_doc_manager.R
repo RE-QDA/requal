@@ -56,14 +56,17 @@ delete_doc_UI <- function(id, project) {
   ns <- NS(id)
   tags$div(
     h4("Delete document"),
-    selectInput(ns("doc_delete_list"),
+    selectizeInput(ns("doc_delete_list"),
       label = "Remove selected documents from project",
       choices = list_db_documents(
           project_db = project()$project_db,
           active_project = project()$active_project
       ),
       multiple = TRUE,
-      selected = NULL
+      selected = NULL,
+      options = list(
+          closeAfterSelect = "true"
+      )
     ),
     actionButton(ns("doc_remove"),
       "Remove",
