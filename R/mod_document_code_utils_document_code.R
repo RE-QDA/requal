@@ -480,7 +480,7 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
                label = code_name,
                name = code_id,
                class = "code-button",
-               title = paste(code_name, code_desc),
+               title = paste(code_desc),
                style = paste0("background: none;
                        width: 100%;
                        border-left: 5px solid ", code_color, ";"),
