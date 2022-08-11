@@ -56,10 +56,6 @@ render_memos <- function(id, memo_df) {
 # read specific memo text from db ----
 
 read_memo_db <- function(pool, memo_id) {
-<<<<<<< HEAD
-=======
-    
->>>>>>> 3881a6f474e22eed4ec27e4fc88849e950a91517
     memo_text <- dplyr::tbl(pool, "memos") %>%
         dplyr::filter(.data$memo_id == as.integer(.env$memo_id)) %>%
         dplyr::pull(text)
