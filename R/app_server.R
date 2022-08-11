@@ -7,6 +7,8 @@
 app_server <- function(input, output, session) {
   # Your application server logic
 
+glob  <- reactiveValues()
+
  project_observer <- reactiveVal()
 
  project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
@@ -43,10 +45,10 @@ app_server <- function(input, output, session) {
 
   # analysis ----
 
-  segments_df <- mod_analysis_server("analysis_ui_1", project_observer, user, codebook, category, documents, segments_observer)
+mod_analysis_server("analysis_ui_1", project_observer, user, glob, codebook, category, documents, segments_observer)
 
-  mod_download_handler_server("download_handler_ui_1", segments_df)
-
+  mod_download_handler_server("download_handler_ui_1", glob)
+  mod_download_html_server("download_html_ui_1", glob)
   # reporting
 
   reporting <- mod_reporting_server("reporting_ui_1", project_observer, user)

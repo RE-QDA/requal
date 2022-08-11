@@ -51,7 +51,7 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, project, user, codebook, category, documents, segments) {
+mod_analysis_server <- function(id, project, user, glob, codebook, category, documents, segments) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -160,19 +160,22 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
 
     output$download <- renderUI({
       if (nrow(req(segments_df())) > 0) {
-        mod_download_handler_ui("download_handler_ui_1")
+          tagList(
+        mod_download_handler_ui("download_handler_ui_1"),
+        mod_download_html_ui("download_html_ui_1")
+          )
       } else {
         ""
       }
     })
 
+observeEvent({segments_df()
+              segments_taglist()},
+              {
+        glob$segments_df <- segments_df() %>% 
+            dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
+        glob$segments_taglist <- segments_taglist() 
+})
 
-    return(reactive({
-      if (nrow(req(segments_df())) > 0) {
-        segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
-      } else {
-        as.data.frame(NULL)
-      }
-    }))
   })
 }
