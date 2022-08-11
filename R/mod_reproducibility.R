@@ -42,7 +42,8 @@ mod_reproducibility_server <- function(id, pool, project){
       if(input$metrics_select == "total"){
         observeEvent(input$test, {
           
-          segments <- load_all_segments_db(active_project = project())
+          segments <- load_all_segments_db(pool, active_project = project())
+
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
                   dplyr::summarise(`Weighted total overlap` = stats::weighted.mean(total_overlap, n_char), 
@@ -60,8 +61,8 @@ mod_reproducibility_server <- function(id, pool, project){
       
       if(input$metrics_select == "total_segment"){
         observeEvent(input$test, {
-            segments <- load_all_segments_db(active_project = project())
-            
+            segments <- load_all_segments_db(pool, active_project = project())
+
             if(length(unique(segments$user_id)) > 1){
                 
                 overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
@@ -82,7 +83,6 @@ mod_reproducibility_server <- function(id, pool, project){
       if(input$metrics_select == "by_code"){
         observeEvent(input$test, {
           segments <- load_all_segments_db(pool, active_project = project())
-
           codes <- load_codes_names(pool, active_project = project())
           
           if(length(unique(segments$user_id)) > 1){
@@ -115,7 +115,7 @@ mod_reproducibility_server <- function(id, pool, project){
           segments <- load_all_segments_db(pool, active_project = project())
 
           codes <- load_codes_names(pool, active_project = project())
-
+          
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_segment_overlap_by_users(segments) %>% 
                   dplyr::group_by(code_id) %>% 
@@ -145,7 +145,7 @@ mod_reproducibility_server <- function(id, pool, project){
           segments <- load_all_segments_db(pool, active_project = project())
 
           users <- load_users_names(pool, active_project = project())
-
+          
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
                   join_user_names(., users) %>% 
@@ -196,7 +196,6 @@ mod_reproducibility_server <- function(id, pool, project){
           segments <- load_all_segments_db(pool, active_project = project())
           users <- load_users_names(pool, active_project = project())
           codes <- load_codes_names(pool, active_project = project())
-
           if(length(unique(segments$user_id)) > 1){
               overlap_df <- calculate_code_overlap_by_users(segments) %>% 
                   join_user_names(., users) %>% 
