@@ -16,9 +16,7 @@ app_server <- function(input, output, session) {
     if (!DBI::dbExistsTable(pool, "projects")) {
         create_db_schema(pool)
     }
-    active_project(dplyr::tbl(pool, "projects") %>% 
-        dplyr::pull(project_id) %>% head(1))
-
+    
     glob  <- reactiveValues()
 
     # project_observer <- reactiveVal()
