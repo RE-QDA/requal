@@ -45,15 +45,14 @@ mod_categories_server <- function(id, pool, project, user, codebook) {
     ns <- session$ns
 
     # set up return value object
-
     category <- reactiveVal()
 
     # update return value
     observeEvent(project(), {
-    category(read_db_categories(
-      pool, 
-      active_project = project()))
-      })
+        category(read_db_categories(
+          pool, 
+          active_project = project()))
+    })
 
     # List existing codes in code boxes --------
     observeEvent(codebook(), {

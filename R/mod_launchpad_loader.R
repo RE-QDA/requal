@@ -11,6 +11,8 @@ mod_launchpad_loader_ui <- function(id){
   ns <- NS(id)
   tagList(
       
+      uiOutput(ns("db_path_selector")),
+      
       selectInput(
         ns("project_selector_load"),
         "Select project",

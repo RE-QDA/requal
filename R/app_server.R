@@ -8,18 +8,19 @@ app_server <- function(input, output, session) {
   # Your application server logic
     
     active_project <- reactiveVal()
+    
+    db_path <- golem::get_golem_options("db_path")
+    
+    glob  <- reactiveValues()
+    
     pool <- pool::dbPool(
         drv = RSQLite::SQLite(),
-        dbname = golem::get_golem_options("db_path")
+        dbname = db_path
     )
     
     if (!DBI::dbExistsTable(pool, "projects")) {
         create_db_schema(pool)
     }
-    
-    glob  <- reactiveValues()
-
-    # project_observer <- reactiveVal()
 
     project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1", pool)
     observeEvent(project_loader(), {
@@ -36,28 +37,23 @@ app_server <- function(input, output, session) {
     })
 
     # documents  ----
-    mod_project_server("mod_project_ui_1", pool, active_project, # project_observer,
-                       user)
+    mod_project_server("mod_project_ui_1", pool, active_project, user)
     documents <- mod_doc_manager_server("doc_manager_ui_1", pool, active_project,
-                                        #project_observer,
                                         user)
 
     # codebook  ----
-    codebook <- mod_codebook_server("codebook_ui_1", pool,
-                                    active_project, #project_observer,
-                                    user)
+    codebook <- mod_codebook_server("codebook_ui_1", pool, active_project, user)
     category <- mod_categories_server("categories_ui_1",
-                                      pool, active_project, # project_observer,
+                                      pool, active_project,
                                       user, codebook)
     # workdesk ----
     segments_observer <- mod_document_code_server("document_code_ui_1",
-                                                  pool, active_project, # project_observer,
+                                                  pool, active_project,
                                                   user, codebook, documents)
 
     # analysis ----
-    mod_analysis_server("analysis_ui_1", pool, active_project, 
-                                       user, glob, codebook, category, documents, 
-                                       segments_observer)
+    mod_analysis_server("analysis_ui_1", pool, active_project, user, glob,
+                        codebook, category, documents, segments_observer)
     mod_download_handler_server("download_handler_ui_1", glob)
     mod_download_html_server("download_html_ui_1", glob)
 

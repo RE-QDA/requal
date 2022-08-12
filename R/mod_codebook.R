@@ -10,8 +10,6 @@
 mod_codebook_ui <- function(id) {
   ns <- NS(id)
 
-
-
   tagList(
     tabsetPanel(
       type = "tabs",

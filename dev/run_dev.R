@@ -10,4 +10,4 @@ golem::document_and_reload()
 
 # Run the application
 # (run_app(db_path = "~/Desktop/testreprotwo.requal", options = list("launch.browser")))
-(run_app(db_path = "~/Desktop/create_db3.requal", options = list("launch.browser")))
+(run_app(db_path = NULL, options = list("launch.browser")))
