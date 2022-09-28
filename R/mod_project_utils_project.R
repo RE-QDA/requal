@@ -1,17 +1,9 @@
-create_project_db <- function(project_directory, 
+create_project_db <- function(db_path, 
                               project_name,
                               project_description) {
     
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          fs::path_join(c(
-                              project_directory,
-                              paste0(gsub(
-                                  "[^a-zA-Z]+",
-                                  "",
-                                  iconv(project_name, 
-                                        to = "ASCII//TRANSLIT")
-                              ), ".requal")
-                          )))
+    con <- DBI::dbConnect(RSQLite::SQLite(), db_path)
+    
     on.exit(DBI::dbDisconnect(con))
     
     project_df <- tibble::tibble(project_name, 

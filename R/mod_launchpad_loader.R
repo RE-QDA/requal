@@ -123,14 +123,7 @@ mod_launchpad_loader_server <- function(id, glob){
         
         glob$active_project <- active_project()
         
-        project$active_project <- active_project()
-        project$project_db <- glob$pool
     })
-
-    # return active project details
-     
-    return(reactive(reactiveValuesToList(project)))
-    
  
   })
 }

@@ -51,17 +51,17 @@ mod_launchpad_creator_ui <- function(id){
 #' launchpad_creator Server Functions
 #'
 #' @noRd 
-mod_launchpad_creator_server <- function(id){
+mod_launchpad_creator_server <- function(id, glob){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
     
     # module reactive vals ----
     
-    db_path <- reactiveVal(NULL)
-    active_project <- reactiveVal(NULL)
-    doc_list <- reactiveVal(NULL)
-    project <- reactiveValues()
+    loc <- reactiveValues()
+    loc$db_path <- NULL
+    loc$active_project <- NULL
+    loc$doc_list <- NULL
     
    # file system prep -----
     volumes <- c(Home = fs::path_home(), get_volume_paths())
@@ -81,51 +81,53 @@ mod_launchpad_creator_server <- function(id){
       if (is.integer(input$sel_directory)) {
         "No project directory has been selected."
       } else {
-        project_directory()
+        loc$project_directory
       }
     })
     
-    project_directory <-
-      reactive({
-        normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
+    observeEvent(input$sel_directory, {
+        loc$project_directory <- normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
       })
     
+   
     # set active project from create ----
     
     observeEvent(input$project_create, {
       req(input$project_name, input$sel_directory)
-      db_path(paste0(
-        project_directory(),
+
+      loc$db_path <- paste0(
+        loc$project_directory,
         .Platform$file.sep,
         paste0(gsub(
-          "[^a-zA-Z]+",
+          "[^a-zA-Z0-9]+",
           "",
           iconv(input$project_name,
                 to = "ASCII//TRANSLIT")
         ), ".requal")
-      ))
+      )
       
       # create project event - DB set up ----
       
-      active_project(
-        create_project_db(
-          project_directory = project_directory(),
+      loc$active_project <- create_project_db(
+          db_path = loc$db_path,
           project_name = input$project_name,
           project_description = input$project_description
-        ))
+        )
       
       # write active project details ----
+      mode <- golem::get_golem_options("mode")
       
-      project$active_project <- active_project()
-      project$project_db <- db_path()
+      glob$active_project <- loc$active_project
+      glob$pool <- pool::dbPool(
+          drv = switch(mode,
+                       "local" = RSQLite::SQLite(), 
+                       "server" = "todo"),
+          dbname = switch(mode,
+                          "local" = loc$db_path, 
+                          "server" = "todo") #todo
+      )
 
     })
-    
-    # return active project details ----
-    
-    
-    return(reactive(reactiveValuesToList(project)))
-    
     
   })
 }

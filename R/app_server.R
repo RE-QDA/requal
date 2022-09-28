@@ -9,19 +9,12 @@ app_server <- function(input, output, session) {
 
   glob <- reactiveValues()
 
-  project_observer <- reactiveVal()
+  mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
 
-  project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
-  observeEvent(project_loader(), {
-    project_observer(project_loader())
-  })
+  mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
 
-  project_creator <- mod_launchpad_creator_server("launchpad_creator_ui_1")
-  observeEvent(project_creator(), {
-    project_observer(project_creator())
-  })
 
-  observeEvent(project_observer()$active_project, {
+  observeEvent(glob$active_project, {
     updateControlbar("control_bar")
   })
 
