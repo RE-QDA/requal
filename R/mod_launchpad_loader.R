@@ -121,6 +121,8 @@ mod_launchpad_loader_server <- function(id, glob){
                           project_id = input$project_selector_load)
         ))
         
+        glob$active_project <- active_project()
+        
         project$active_project <- active_project()
         project$project_db <- glob$pool
     })
