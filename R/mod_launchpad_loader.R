@@ -46,12 +46,13 @@ mod_launchpad_loader_ui <- function(id){
 #' launchpad_loader Server Functions
 #'
 #' @noRd 
-mod_launchpad_loader_server <- function(id){
+mod_launchpad_loader_server <- function(id, glob){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
     # module reactive vals ----
-    
+
+    # ahoj
     db_path <- reactiveVal(NULL)
     active_project <- reactiveVal(NULL)
     doc_list <- reactiveVal(NULL)
@@ -109,18 +110,32 @@ mod_launchpad_loader_server <- function(id){
       
       req(input$project_selector_load)
       
+        
+        browser()
+        
+        mode <- golem::get_golem_options("mode")
       
-      db_path(project_file_load())
+        glob$pool <- pool::dbPool(
+            drv = switch(mode,
+                         "local" = RSQLite::SQLite(), 
+                         "server" = "todo"),
+            dbname = switch(mode,
+                            "local" = project_file_load(), 
+                            "server" = "todo") #todo
+        )
+        
+       print(glob$pool)
       
+       
       active_project(isolate(
-        read_project_db(db_path(),
+        read_project_db(pool = glob$pool,
                         project_id = input$project_selector_load)
       ))
       
 
       
       project$active_project <- active_project()
-      project$project_db <- db_path()
+      project$project_db <- glob$pool
 
     })
     

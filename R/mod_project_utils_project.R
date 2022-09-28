@@ -40,16 +40,10 @@ create_project_db <- function(project_directory,
     return(active_project)
 }
 
-
-read_project_db_util <- function(db_file,
-                                 table = "projects"
-                                 ) {
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          db_file
-    )
-    on.exit(DBI::dbDisconnect(con))
-
-        active_project_df <- dplyr::tbl(con, table) %>% 
+read_project_db_util <- function(pool,
+                                 table = "projects") {
+    
+    active_project_df <- dplyr::tbl(pool, table) %>% 
         dplyr::select(project_id, project_name) %>% 
         dplyr::collect()
                                  
@@ -63,25 +57,21 @@ read_project_db_util <- function(db_file,
 
 }
 
-read_project_db <- function(db_file, project_id) {
+read_project_db <- function(pool, project_id) {
     
-    
-    if (!is.null(db_file)) {
-        
-   
-        
+    if (!is.null(pool)) {
         if (!is.null(project_id)) { # filter by id
             
             project_id <- as.integer(project_id)
             
-            active_project <- read_project_db_util(db_file)
+            active_project <- read_project_db_util(pool)
             active_project <- active_project[active_project == project_id]
             
             return(active_project)
             
         } else  { # no filter
             
-            active_project <- read_project_db_util(db_file)
+            active_project <- read_project_db_util(pool)
             
             return(active_project)
         }
