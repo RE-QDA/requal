@@ -17,19 +17,11 @@ mod_user_ui <- function(id){
 #' user Server Functions
 #'
 #' @noRd 
-mod_user_server <- function(id, glob, project){
+mod_user_server <- function(id, glob){
     moduleServer(id, function(input, output, session){
         ns <- session$ns
         
         user_data <- reactiveVal()
-        
-        observeEvent(project(), {
-            if(!is.null(glob$pool)){
-                user_data(read_user_db(glob$pool, 
-                                       user_id = 1, 
-                                       active_project = glob$active_project))    
-            }
-        })
         
         output$user <- renderUser({
             

@@ -18,7 +18,5 @@ update_user_db <- function(pool,
                  SET user_name = {user_name}, user_mail = {user_email}
                  WHERE user_id = {user_id}", .con = pool)
     
-    res <- DBI::dbSendStatement(pool, update_user_sql)
-    DBI::dbClearResult(res)
-    
+    DBI::dbExecute(pool, update_user_sql)
 }
