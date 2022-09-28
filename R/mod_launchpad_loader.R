@@ -52,7 +52,6 @@ mod_launchpad_loader_server <- function(id, glob){
     
     # module reactive vals ----
 
-    # ahoj
     db_path <- reactiveVal(NULL)
     active_project <- reactiveVal(NULL)
     doc_list <- reactiveVal(NULL)
@@ -95,50 +94,36 @@ mod_launchpad_loader_server <- function(id, glob){
     })
     
     
-    observe({
-      
-      if (length(project_file_load())>0 ) {
-        updateSelectInput(session,
-                          "project_selector_load",
-                          choices = read_project_db(project_file_load(),
-                                                    project_id = NULL))
+    observeEvent(input$sel_file_load, {
+      if(length(project_file_load() > 0)){
+          mode <- golem::get_golem_options("mode")
+          
+          glob$pool <- pool::dbPool(
+              drv = switch(mode,
+                           "local" = RSQLite::SQLite(), 
+                           "server" = "todo"),
+              dbname = switch(mode,
+                              "local" = project_file_load(), 
+                              "server" = "todo") #todo
+          )
+          
+          updateSelectInput(session,
+                            "project_selector_load",
+                            choices = read_project_db(glob$pool,
+                                                      project_id = NULL))
       }
+      
     })
-    
     
     observeEvent(input$project_load, {
-      
-      req(input$project_selector_load)
-      
+        active_project(isolate(
+          read_project_db(pool = glob$pool,
+                          project_id = input$project_selector_load)
+        ))
         
-        browser()
-        
-        mode <- golem::get_golem_options("mode")
-      
-        glob$pool <- pool::dbPool(
-            drv = switch(mode,
-                         "local" = RSQLite::SQLite(), 
-                         "server" = "todo"),
-            dbname = switch(mode,
-                            "local" = project_file_load(), 
-                            "server" = "todo") #todo
-        )
-        
-       print(glob$pool)
-      
-       
-      active_project(isolate(
-        read_project_db(pool = glob$pool,
-                        project_id = input$project_selector_load)
-      ))
-      
-
-      
-      project$active_project <- active_project()
-      project$project_db <- glob$pool
-
+        project$active_project <- active_project()
+        project$project_db <- glob$pool
     })
-    
 
     # return active project details
      
