@@ -217,7 +217,7 @@ mod_doc_manager_server <- function(id, glob, user) {
           )
 
           doc_list(list_db_documents(
-            project_db = glob$pool,
+            pool = glob$pool,
             active_project = glob$active_project
           ))
 

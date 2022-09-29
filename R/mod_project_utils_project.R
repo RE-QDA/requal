@@ -6,7 +6,6 @@ create_project_db <- function(pool,
     created_at = as.character(Sys.time())
   )
 
-
   if (!DBI::dbExistsTable(pool, "projects")) {
     # https://github.com/r-dbi/RSQLite/issues/59
     create_db_schema(pool)

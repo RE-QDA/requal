@@ -45,6 +45,7 @@ Imports:
     htmlwidgets,
     jsonlite,
     magrittr,
+    pool,
     processx,
     purrr,
     rlang,

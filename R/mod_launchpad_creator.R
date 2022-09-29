@@ -107,17 +107,8 @@ mod_launchpad_creator_server <- function(id, glob){
       )
       
       # create project event - DB set up ----
-      
-      loc$active_project <- create_project_db(
-          db_path = loc$db_path,
-          project_name = input$project_name,
-          project_description = input$project_description
-        )
-      
-      # write active project details ----
       mode <- golem::get_golem_options("mode")
       
-      glob$active_project <- loc$active_project
       glob$pool <- pool::dbPool(
           drv = switch(mode,
                        "local" = RSQLite::SQLite(), 
@@ -126,7 +117,16 @@ mod_launchpad_creator_server <- function(id, glob){
                           "local" = loc$db_path, 
                           "server" = "todo") #todo
       )
-
+      
+      loc$active_project <- create_project_db(
+          pool = glob$pool,
+          project_name = input$project_name,
+          project_description = input$project_description
+        )
+      
+      # write active project details ----
+      glob$active_project <- loc$active_project
+      
     })
     
   })
