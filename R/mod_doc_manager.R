@@ -48,48 +48,46 @@ mod_doc_manager_ui <- function(id) {
 #' doc_manager Server Functions
 #'
 #' @noRd
-mod_doc_manager_server <- function(id, project, user) {
+mod_doc_manager_server <- function(id, glob, user) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
     doc_list <- reactiveVal()
     
-    
     #---Create doc UI --------------
-    
     output$doc_create_ui <- renderUI({
       create_doc_UI(id)
     })
     outputOptions(output, "doc_create_ui", suspendWhenHidden = FALSE)
-    #---Upload doc UI --------------
     
+    #---Upload doc UI --------------
     output$doc_upload_ui <- renderUI({
       upload_doc_UI(id)
     })
     outputOptions(output, "doc_upload_ui", suspendWhenHidden = FALSE)
-    #---Delete doc UI --------------
     
+    #---Delete doc UI --------------
     output$doc_delete_ui <- renderUI({
-      req(project()$active_project)
-      delete_doc_UI(id, project)
+      req(glob$active_project)
+      delete_doc_UI(id, glob$pool, glob$active_project)
     })
     outputOptions(output, "doc_delete_ui", suspendWhenHidden = FALSE)
     
 # list documents initially ----
-    observeEvent(project()$active_project, {
+    observeEvent(glob$active_project, {
       output$project_name <- renderText({
-        paste(tags$b("Active project:"), names(project()$active_project))
+        paste(tags$b("Active project:"), names(glob$active_project))
       })
 
       doc_startup <- list_db_documents(
-        project_db = project()$project_db,
-        active_project = project()$active_project
+        pool = glob$pool,
+        active_project = glob$active_project
       )
       doc_list(doc_startup)
 
       output$doc_list_table <- make_doc_table(
-        project()$project_db,
-        project()$active_project,
+        glob$pool,
+        glob$active_project,
         doc_list()
       )
 
@@ -100,20 +98,15 @@ mod_doc_manager_server <- function(id, project, user) {
       )
     })
 
-
-
     # observe documents actions ----
-
     # document input ----
-
-
     observeEvent(input$doc_add, {
       
       if ((!req(input$doc_name) %in% c("", names(doc_list()))) &
         isTruthy(input$doc_text)) {
         add_input_document(
-          connection = project()$project_db,
-          project = project()$active_project,
+          pool = glob$pool,
+          project = glob$active_project,
           doc_name = input$doc_name,
           doc_text = input$doc_text,
           doc_description = input$doc_description, 
@@ -121,14 +114,14 @@ mod_doc_manager_server <- function(id, project, user) {
         )
 
         output$doc_list_table <- make_doc_table(
-          project()$project_db,
-          project()$active_project,
+          glob$pool,
+          glob$active_project,
           doc_list()
         )
 
         doc_list(list_db_documents(
-          project_db = project()$project_db,
-          active_project = project()$active_project
+          pool = glob$pool,
+          active_project = glob$active_project
         ))
 
         updateTextInput(
@@ -158,8 +151,8 @@ mod_doc_manager_server <- function(id, project, user) {
       req(input$doc_delete_list)
 
       delete_db_documents(
-        project()$project_db,
-        project()$active_project,
+        glob$pool,
+        glob$active_project,
         input$doc_delete_list,
         user()$user_id
       )
@@ -167,13 +160,13 @@ mod_doc_manager_server <- function(id, project, user) {
 
       # update reactive value containing project documents
       doc_list(list_db_documents(
-        project_db = project()$project_db,
-        active_project = project()$active_project
+        pool = glob$pool,
+        active_project = glob$active_project
       ))
 
       output$doc_list_table <- make_doc_table(
-        project()$project_db,
-        project()$active_project,
+        glob$pool,
+        glob$active_project,
         doc_list()
       )
 
@@ -209,8 +202,8 @@ mod_doc_manager_server <- function(id, project, user) {
 
 
           add_input_document(
-            connection = project()$project_db,
-            project = project()$active_project,
+            pool = glob$pool,
+            project = glob$active_project,
             doc_name = doc_name_parsed,
             doc_text = doc_upload_text,
             doc_description = input$doc_upload_description, 
@@ -218,14 +211,14 @@ mod_doc_manager_server <- function(id, project, user) {
           )
 
           output$doc_list_table <- make_doc_table(
-            project()$project_db,
-            project()$active_project,
+            glob$pool,
+            glob$active_project,
             doc_list()
           )
 
           doc_list(list_db_documents(
-            project_db = project()$project_db,
-            active_project = project()$active_project
+            project_db = glob$pool,
+            active_project = glob$active_project
           ))
 
           updateSelectInput(
@@ -254,7 +247,6 @@ mod_doc_manager_server <- function(id, project, user) {
         shinyjs::reset("doc_path")
       }
     })
-
 
     return(reactive(doc_list()))
   })
