@@ -13,7 +13,6 @@ app_server <- function(input, output, session) {
 
   mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
 
-
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
   })
@@ -53,5 +52,5 @@ app_server <- function(input, output, session) {
   user <- mod_user_server("user_ui_1", glob)
 
   # memo
-  # mod_memo_server("memo_ui_1", project_observer, user)
+  mod_memo_server("memo_ui_1", glob, user)
 }
