@@ -23,7 +23,7 @@ app_server <- function(input, output, session) {
 
   # codebook  ----
 
-  # codebook <- mod_codebook_server("codebook_ui_1", project_observer, user)
+  codebook <- mod_codebook_server("codebook_ui_1", glob, user)
   # category <- mod_categories_server("categories_ui_1",
   #                                   project_observer,
   #                                   user,
