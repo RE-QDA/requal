@@ -103,8 +103,8 @@ summarise_new_segment_range <- function(overlap_df, startOff, endOff){
         dplyr::ungroup()
 }
 
-get_segment_text <- function(con, project_id, doc_id, start, end){
-    load_doc(con, project_id, doc_id) %>%
+get_segment_text <- function(pool, project_id, doc_id, start, end){
+    load_doc(pool, project_id, doc_id) %>%
         substr(start = start, stop = end)
 }
 
@@ -138,7 +138,7 @@ write_segment_db <- function(
         # update existing record(s)
         segment_df <- overlap %>%
             summarise_new_segment_range(startOff, endOff) %>%
-            dplyr::mutate(segment_text = get_segment_text(con,
+            dplyr::mutate(segment_text = get_segment_text(pool,
                                                           project_id = active_project,
                                                           doc_id,
                                                           .data$segment_start,
