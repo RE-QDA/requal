@@ -66,17 +66,6 @@ mod_codebook_server <- function(id, glob, user) {
     # codebook observer ----
     codebook <- reactiveVal()
 
-    # observeEvent(glob$active_project, {
-    #   # update codebook return values
-    # 
-    #   codebook(
-    #     list_db_codes(
-    #       glob$pool,
-    #       glob$active_project
-    #     )
-    #   )
-    # })
-
     # List existing codes in codes boxes ----
     output$codes_ui <- renderUI({
       render_codes(
@@ -96,7 +85,6 @@ mod_codebook_server <- function(id, glob, user) {
     })
 
     #---Create code UI --------------
-
     output$code_create_ui <- renderUI({
       req(glob$active_project)
       create_code_UI(id)
@@ -104,7 +92,6 @@ mod_codebook_server <- function(id, glob, user) {
     outputOptions(output, "code_create_ui", suspendWhenHidden = FALSE)
 
     #---Create new code------------------------------------------------------
-
     observeEvent(input$code_add, {
 
       # check if code name is unique
@@ -164,7 +151,6 @@ mod_codebook_server <- function(id, glob, user) {
         ))
       }
 
-
       # update codebook return value
       codebook(
         list_db_codes(
@@ -175,11 +161,9 @@ mod_codebook_server <- function(id, glob, user) {
     })
 
     #---Delete code UI --------------
-
     output$code_delete_ui <- renderUI({
-      if(isTruthy(glob$active_project)){
-        delete_code_UI(id, glob$pool, glob$active_project)   
-      }
+      req(glob$active_project)
+      delete_code_UI(id, glob$pool, glob$active_project)
     })
     outputOptions(output, "code_delete_ui", suspendWhenHidden = FALSE)
 

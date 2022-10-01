@@ -45,8 +45,29 @@ gen_categories_ui <- function(id,
 }
 
 
-# Render categories -----
+render_codes_ui <- function(id, pool, active_project){
+    ns <- NS(id)
+    sortable::rank_list(
+        input_id = ns("code_list"),
+        text = NULL,
+        labels = render_codes(
+            pool = pool,
+            active_project = active_project
+        ),
+        class = "codes-rank-list",
+        options = sortable::sortable_options(
+            sort = TRUE,
+            group = list(
+                name = "categories",
+                pull = "clone",
+                put = TRUE
+            ),
+            onAdd = htmlwidgets::JS("function (evt) {  this.el.removeChild(evt.item); }")
+        )
+    )
+}
 
+# Render categories -----
 render_categories <- function(id, pool, 
                               active_project) {
     if (isTruthy(active_project)) {
