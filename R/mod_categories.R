@@ -40,20 +40,18 @@ mod_categories_ui <- function(id) {
 #' categories Server Functions
 #'
 #' @noRd
-mod_categories_server <- function(id, glob, user, codebook) {
+mod_categories_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # initialize categories upon load
+    observeEvent(glob$active_project, {
+        glob$category <- read_db_categories(
+            pool = glob$pool,
+            active_project = glob$active_project
+        )
+        })
 
-    # set up return value object
-
-    category <- reactiveVal()
-
-    # update return value
-    # observeEvent(project()$active_project, {
-    # category(read_db_categories(
-    #   project_db = project()$project_db,
-    #   active_project = project()$active_project))
-    # })
 
     # List existing codes in code boxes --------
     output$uncategorized <- renderUI({
@@ -61,7 +59,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
     })
     
     # Re-render list of codes on code change
-    observeEvent(codebook(), {
+    observeEvent(glob$codebook, {
         render_codes_ui(id, glob$pool, glob$active_project)
     })
 
@@ -75,7 +73,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
     })
 
     # Relist categories on codebook changes
-    observeEvent(codebook(), {
+    observeEvent(glob$codebook, {
 
       output$categories_ui <- renderUI({
         render_categories(
@@ -96,7 +94,6 @@ mod_categories_server <- function(id, glob, user, codebook) {
 
     # Create categories ------
     observeEvent(input$category_add, {
-
       # check if code name is unique
       category_names <- list_db_categories(
         id = id,
@@ -115,7 +112,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
         add_category_record(
           pool = glob$pool,
           project_id = glob$active_project,
-          user_id = user()$user_id,
+          user_id = glob$user$user_id,
           categories_df = categories_input_df
         )
         
@@ -151,10 +148,10 @@ mod_categories_server <- function(id, glob, user, codebook) {
         )
         
         # update return value
-        category(read_db_categories(
+        glob$category <- read_db_categories(
           pool = glob$pool,
           active_project = glob$active_project
-        ))
+        )
       } else {
         warn_user("Category name must be unique.")
       }
@@ -178,7 +175,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
       delete_db_category(
         pool = glob$pool,
         active_project = glob$active_project,
-        user_id = user()$user_id,
+        user_id = glob$user_id,
         delete_cat_id = input$categories_to_del
       )
 
@@ -188,7 +185,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
       delete_category_code_record(
           pool = glob$pool,
           active_project = glob$active_project,
-          user_id = user()$user_id,
+          user_id = glob$user$user_id,
           edge = edge)
 
       # refresh delete UI
@@ -211,10 +208,10 @@ mod_categories_server <- function(id, glob, user, codebook) {
       })
 
       # update return value
-      category(read_db_categories(
+      glob$category <- read_db_categories(
         pool = glob$pool,
         active_project = glob$active_project
-      ))
+      )
     })
 
     # Create edge
@@ -222,7 +219,7 @@ mod_categories_server <- function(id, glob, user, codebook) {
         add_category_code_record(
             pool = glob$pool,
             active_project = glob$active_project,
-            user_id = user()$user_id,
+            user_id = glob$user$user_id,
             edge = input$edges_category)
     })
     
@@ -231,12 +228,12 @@ mod_categories_server <- function(id, glob, user, codebook) {
         delete_category_code_record(
             pool = glob$pool,
             active_project = glob$active_project,
-            user_id = user()$user_id,
+            user_id = glob$user$user_id,
             edge = input$edges_category_delete)
     })
 
-    # return active categories details ----
-    return(reactive(category()))
+    # return active categories details in glob$category ----
+
 
   })
 }

@@ -21,17 +21,21 @@ mod_user_server <- function(id, glob){
     moduleServer(id, function(input, output, session){
         ns <- session$ns
         
-        user_data <- reactiveVal()
+        loc <- reactiveValues()
         
         output$user <- renderUser({
             
             if (isTruthy(glob$active_project)) {
-                user_data(read_user_db(
-                    glob$pool,
-                    user_id = 1,
-                    active_project = glob$active_project))
                 
-                permissions_list <- user_data() %>% 
+        loc$user_data <- read_user_db(
+            glob$pool,
+            user_id = 1,
+            active_project = glob$active_project
+          )
+        
+        glob$user <- loc$user_data
+                
+                permissions_list <- loc$user_data %>% 
                     dplyr::select(dplyr::starts_with("can_")) %>% 
                     tidyr::pivot_longer(dplyr::everything(),
                                         names_to = "permissions",
@@ -40,9 +44,9 @@ mod_user_server <- function(id, glob){
                     dplyr::pull(.data$permissions) 
                 
                 dashboardUser(
-                    name = user_data()$user_name,
+                    name = loc$user_data$user_name,
                     image = "www/user_logo.jpg", 
-                    title = ifelse(is.na(user_data()$user_mail), "@", user_data()$user_mail),
+                    title = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail),
                     subtitle = paste0("Project:", glob$active_project), 
                     footer =  actionButton(ns("edit_user"),
                                            "Edit"),
@@ -65,11 +69,11 @@ mod_user_server <- function(id, glob){
                     title = "User details",
                     
                     textInput(ns("user_name"), "User name",
-                              value = user_data()$user_name
+                              value = loc$user_data$user_name
                     ),
                     
                     textInput(ns("user_email"), "Email",
-                              value = ifelse(is.na(user_data()$user_mail), "@", user_data()$user_mail)
+                              value = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail)
                     ),
                     
                     footer = tagList(
@@ -88,12 +92,13 @@ mod_user_server <- function(id, glob){
                            input$user_name,
                            input$user_email)
             
-            user_data(read_user_db(glob$pool, user_id = 1, glob$active_project))
+            loc$user_data <- read_user_db(glob$pool, user_id = 1, glob$active_project)
             removeModal()
+            
+            glob$user <- loc$user_data
         })
         
         
-        return(reactive(user_data()))
         
     })
 }

@@ -627,7 +627,7 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "0.15.5",
+      "Version": "0.12.5",
       "Source": "Repository"
     },
     "rlang": {

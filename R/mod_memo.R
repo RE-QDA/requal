@@ -21,7 +21,7 @@ mod_memo_ui <- function(id) {
 #' memo Server Functions
 #'
 #' @noRd
-mod_memo_server <- function(id, glob, user) {
+mod_memo_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -68,7 +68,7 @@ mod_memo_server <- function(id, glob, user) {
 
     observeEvent(input$save_close, {
       add_memo_record(glob$pool, glob$active_project, 
-                      req(input$memo_text), user_id = user()$user_id)
+                      req(input$memo_text), user_id = glob$user$user_id)
 
       memo_list(list_memo_records(glob$pool, glob$active_project))
 
@@ -100,7 +100,7 @@ mod_memo_server <- function(id, glob, user) {
     observeEvent(input$save_changes, {
       update_memo_record(glob$pool, glob$project, 
                          input$selected_memo, req(input$displayed_memo_text),
-        user_id = user()$user_id
+        user_id = glob$user$user_id
       )
 
       memo_list(list_memo_records(glob$pool, glob$active_project))
@@ -110,7 +110,7 @@ mod_memo_server <- function(id, glob, user) {
 
     observeEvent(input$delete_memo, {
       delete_memo_record(glob$pool, glob$active_project, input$selected_memo,
-        user_id = user()$user_id
+        user_id = glob$user$user_id
       )
 
       memo_list(list_memo_records(glob$pool, glob$active_project))

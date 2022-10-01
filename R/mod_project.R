@@ -19,7 +19,7 @@ mod_project_ui <- function(id) {
 #' project Server Functions
 #'
 #' @noRd
-mod_project_server <- function(id, glob, user) {
+mod_project_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 

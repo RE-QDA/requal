@@ -59,12 +59,17 @@ mod_codebook_ui <- function(id) {
 #' codebook Server Functions
 #'
 #' @noRd
-mod_codebook_server <- function(id, glob, user) {
+mod_codebook_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # codebook observer ----
-    codebook <- reactiveVal()
+   # initialize codebook upon load
+    observeEvent(glob$active_project, {
+        glob$codebook <- list_db_codes(
+            glob$pool,
+            glob$active_project
+        )
+    })
 
     # List existing codes in codes boxes ----
     output$codes_ui <- renderUI({
@@ -124,7 +129,7 @@ mod_codebook_server <- function(id, glob, user) {
           pool = glob$pool,
           project_id = glob$active_project,
           codes_df = codes_input_df, 
-          user_id = user()$user_id
+          user_id = glob$user$user_id
         )
 
         output$codes_ui <- renderUI({
@@ -152,12 +157,10 @@ mod_codebook_server <- function(id, glob, user) {
       }
 
       # update codebook return value
-      codebook(
-        list_db_codes(
+      glob$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
-      )
     })
 
     #---Delete code UI --------------
@@ -178,7 +181,7 @@ mod_codebook_server <- function(id, glob, user) {
         pool = glob$pool,
         active_project = glob$active_project,
         delete_code_id = input$code_to_del, 
-        user_id = user()$user_id
+        user_id = glob$user$user_id
       )
 
       # delete edges
@@ -187,7 +190,7 @@ mod_codebook_server <- function(id, glob, user) {
       delete_category_code_record(
         pool = glob$pool,
         active_project = glob$active_project,
-        user_id = user()$user_id,
+        user_id = glob$user$user_id,
         edge = edge
       )
 
@@ -209,12 +212,10 @@ mod_codebook_server <- function(id, glob, user) {
       })
 
       # update codebook return value
-      codebook(
-        list_db_codes(
+      glob$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
-      )
     })
 
     #---Merge code UI --------------
@@ -235,16 +236,14 @@ mod_codebook_server <- function(id, glob, user) {
             glob$active_project,
             input$merge_from,
             input$merge_to, 
-            user_id = user()$user_id
+            user_id = glob$user$user_id
           )
 
           # update codebook return value
-          codebook(
-            list_db_codes(
+          glob$codebook <- list_db_codes(
               glob$pool,
               glob$active_project
             )
-          )
 
           # relist remaining codes
           output$codes_ui <- renderUI({
@@ -269,8 +268,7 @@ mod_codebook_server <- function(id, glob, user) {
       }
     })
 
-    # return active codebook details ----
-    return(reactive(codebook()))
+    # returns glob$codebook ----
 
 
     # end of server module function
