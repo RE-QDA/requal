@@ -33,18 +33,17 @@ app_server <- function(input, output, session) {
 
   # analysis ----
   mod_analysis_server("analysis_ui_1", glob)
-    mod_download_handler_server("download_handler_ui_1", glob)
-    mod_download_html_server("download_html_ui_1", glob)
+  mod_download_handler_server("download_handler_ui_1", glob)
+  mod_download_html_server("download_html_ui_1", glob)
+  
   # reporting
-
-  # reporting <- mod_reporting_server("reporting_ui_1", project_observer, user)
-  # mod_reproducibility_server("reproducibility_ui_1", project_observer)
+  reporting <- mod_reporting_server("reporting_ui_1", glob)
+  mod_reproducibility_server("reproducibility_ui_1", glob)
 
   # about -----
   mod_about_server("about_ui_1", glob)
 
   # user
-  # output: glob$user
   mod_user_server("user_ui_1", glob)
 
   # memo
