@@ -24,7 +24,7 @@ mod_reproducibility_ui <- function(id) {
         "Browse documents" = "docs"
       )
     ),
-    actionButton(ns("test"), "Calculate"),
+    actionButton(ns("calculate"), "Calculate"),
     uiOutput(ns("overlap_table")),
     uiOutput(ns("overlap_documents")),
     plotOutput(ns("overlap_plot"))
@@ -40,9 +40,10 @@ mod_reproducibility_server <- function(id, glob) {
 
     reproducibility_message <- "Reproducibility measures cannot be computed for projects with one active coder."
 
-    observe({
-      if (input$metrics_select == "total") {
-        observeEvent(input$test, {
+        
+    # total ----
+        observeEvent({req(input$metrics_select == "total") 
+                      input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -65,10 +66,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "total_segment") {
-        observeEvent(input$test, {
+    # total_segment ----
+        observeEvent({req(input$metrics_select == "total_segment")
+                    input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -91,11 +93,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
-
+      
       # 2. stejný výpočet a vizualizaci pro každý kód
-      if (input$metrics_select == "by_code") {
-        observeEvent(input$test, {
+    
+        observeEvent({req(input$metrics_select == "by_code") 
+                    input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -137,10 +139,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "by_code_segment") {
-        observeEvent(input$test, {
+   # by_code_segment ----
+        observeEvent({req(input$metrics_select == "by_code_segment") 
+                    input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -181,10 +184,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "by_user") {
-        observeEvent(input$test, {
+    # by_user ----
+        observeEvent({req(input$metrics_select == "by_user")
+                input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -216,10 +220,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "by_user_segment") {
-        observeEvent(input$test, {
+    # by_user_segment ----
+        observeEvent({req(input$metrics_select == "by_user_segment")
+                    input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -251,10 +256,11 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "by_user_code") {
-        observeEvent(input$test, {
+   # by_user_code ----
+        observeEvent({req(input$metrics_select == "by_user_code")
+                          input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -286,10 +292,10 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
-
-      if (input$metrics_select == "by_user_code_segment") {
-        observeEvent(input$test, {
+      
+    # by_user_code_segment ----
+        observeEvent({req(input$metrics_select == "by_user_code_segment")
+                input$calculate}, {
           segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
@@ -326,11 +332,12 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
 
-      if (input$metrics_select == "docs") {
+   # docs ----
         # TODO: select doc_id and code_id
-        observeEvent(input$test, {
+        observeEvent({req(input$metrics_select == "docs")
+                input$calculate}, {
           DOC_ID <- 2
           docs <- load_all_docs_db(
             pool = glob$pool,
@@ -455,7 +462,7 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- renderText(reproducibility_message)
           }
         })
-      }
+      
     })
-  })
+
 }

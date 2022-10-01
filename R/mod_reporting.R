@@ -42,15 +42,17 @@ mod_reporting_ui <- function(id) {
 mod_reporting_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    loc <- reactiveValues()
 
     # instructions ------------
     output$report_instructions <- renderText(
       "Instructions for using this module..."
     )
 
-    logs_df <- eventReactive(input$reporting_tabset == "logs" | input$logs_refresh, {
+     observeEvent( {req(input$reporting_tabset == "logs") | input$logs_refresh}, {
       if (isTruthy(glob$active_project)) {
-        load_logs_for_reporting(
+        loc$logs_df <- load_logs_for_reporting(
           glob$pool,
           glob$active_project
         ) %>%
@@ -65,7 +67,7 @@ mod_reporting_server <- function(id, glob) {
 
     output$report_logs <- DT::renderDataTable(server = FALSE, {
       DT::datatable(
-        req(logs_df()),
+        req(loc$logs_df),
         filter = "top",
         extensions = c("Buttons"),
         options = list(

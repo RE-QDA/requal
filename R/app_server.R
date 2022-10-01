@@ -37,7 +37,7 @@ app_server <- function(input, output, session) {
   mod_download_html_server("download_html_ui_1", glob)
   
   # reporting
-  reporting <- mod_reporting_server("reporting_ui_1", glob)
+  mod_reporting_server("reporting_ui_1", glob)
   mod_reproducibility_server("reproducibility_ui_1", glob)
 
   # about -----
