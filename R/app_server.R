@@ -13,7 +13,7 @@ app_server <- function(input, output, session) {
   auth <- shinymanager::secure_server(
       check_credentials = shinymanager::check_credentials(
           Sys.getenv("access"),
-          passphrase = keyring::key_get("requal-access-key", "requal")
+          passphrase = "test"
       )
   )  
   observeEvent(auth, {
