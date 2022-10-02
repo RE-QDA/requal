@@ -106,6 +106,7 @@ calculate_segment_overlap_by_users <- function(segments){
     user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
     segment_vector <- total_overlap <- n_char <- NULL
     coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
+    coder1_segment_id <- coder2_segment_id <- NULL
     
     unique_coders <- segments %>% 
         dplyr::pull(user_id) %>% unique()

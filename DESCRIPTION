@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-Assisted Qualitative Data Analysis
-Version: 0.6.3
+Version: 0.6.4
 Authors@R:
     c(
      person(given = "Radim",
@@ -30,7 +30,6 @@ Authors@R:
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports:
-    attempt,
     colourpicker,
     config (>= 0.3.1),
     DBI,
@@ -46,7 +45,6 @@ Imports:
     jsonlite,
     magrittr,
     pool,
-    processx,
     purrr,
     rlang,
     RSQLite,
