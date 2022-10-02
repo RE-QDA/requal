@@ -26,6 +26,7 @@ sample_colours <- function(n){
 #' @export
 #' @importFrom rlang .data
 rql_import_rqda <- function(rqda_file, requal_file){
+    
     memo <- databaseversion <- project_description <- NULL
     color <- fid <- cid <- selfirst <- selend <- NULL
     caseid <- catid <- NULL
@@ -36,7 +37,10 @@ rql_import_rqda <- function(rqda_file, requal_file){
                         " parameter so that it links to a file does not exist yet."))
     }
     
-    requal_connection <- DBI::dbConnect(RSQLite::SQLite(), requal_file)
+    requal_pool <- pool::dbPool(
+        RSQLite::SQLite(), 
+        dbname = requal_file
+    )
     
     message("Loading data from RQDA")
     # Load Data from RQDA
@@ -114,13 +118,13 @@ rql_import_rqda <- function(rqda_file, requal_file){
     
     # Create requal schema
     message("Creating Requal scheme")
-    create_db_schema(requal_connection)
+    create_db_schema(requal_pool)
 
     # Import to requal
     USER_ID = 1
-    create_project_record(requal_connection, project_df, user_id = USER_ID)
+    create_project_record(requal_pool, project_df, user_id = USER_ID)
     
-    requal_project_id <- dplyr::tbl(requal_connection, "projects") %>% 
+    requal_project_id <- dplyr::tbl(requal_pool, "projects") %>% 
         dplyr::collect() %>% 
         dplyr::pull(project_id) %>% 
         utils::tail(1)
@@ -129,7 +133,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     documents_df <- rqda_documents %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(documents_df)), function(x) {
-        add_documents_record(requal_connection, requal_project_id, documents_df[x, ], 
+        add_documents_record(requal_pool, requal_project_id, documents_df[x, ], 
                              user_id = USER_ID)
     })
     
@@ -137,7 +141,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     cases_df <- rqda_cases %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(cases_df)), function(x) {
-        add_cases_record(requal_connection, requal_project_id, cases_df[x, ], 
+        add_cases_record(requal_pool, requal_project_id, cases_df[x, ], 
                          user_id = USER_ID)
     })
     
@@ -145,7 +149,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     case_doc_map <- rqda_case_doc_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(case_doc_map)), function(x) {
-        add_case_doc_record(requal_connection, requal_project_id, case_doc_map[x, ], 
+        add_case_doc_record(requal_pool, requal_project_id, case_doc_map[x, ], 
                             user_id = USER_ID)
     })
     
@@ -160,7 +164,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                                           sample_colours(n = n_colours), 
                                           code_color))
     purrr::walk(seq_len(nrow(codes_df)), function(x) {
-        add_codes_record(requal_connection, requal_project_id, codes_df[x, ], 
+        add_codes_record(requal_pool, requal_project_id, codes_df[x, ], 
                          user_id = USER_ID)    
     })
     
@@ -168,7 +172,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     categories_df <- rqda_categories %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(categories_df)), function(x) {
-        add_category_record(requal_connection, requal_project_id, 
+        add_category_record(requal_pool, requal_project_id, 
                             categories_df[x, ], 
                             user_id = USER_ID)
     })
@@ -177,7 +181,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
     category_code_map <- rqda_category_code_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(category_code_map)), function(x) {
-        add_category_code_record(requal_file, requal_project_id, 
+        add_category_code_record(requal_pool, requal_project_id, 
                                  category_code_map[x, ], 
                                  user_id = USER_ID)
     })
@@ -188,25 +192,25 @@ rql_import_rqda <- function(rqda_file, requal_file){
                       segment_text = purrr::pmap_chr(
                           list(doc_id, segment_start, segment_end), 
                           function(doc, start, end) {
-                              get_segment_text(requal_connection, requal_project_id, 
+                              get_segment_text(requal_pool, requal_project_id, 
                                                doc, start, end)
                               }), 
                       user_id = USER_ID) %>% 
         dplyr::select(-memo)
     
     purrr::walk(seq_len(nrow(segments_df)), function(x) {
-        DBI::dbWriteTable(requal_connection, "segments", segments_df[x, ], append = TRUE)
-        log_add_segment_record(requal_connection, requal_project_id, segments_df[x, ], 
+        DBI::dbWriteTable(requal_pool, "segments", segments_df[x, ], append = TRUE)
+        log_add_segment_record(requal_pool, requal_project_id, segments_df[x, ], 
                                user_id = USER_ID)    
     })
     
     message("Importing memos")
     if(!all(is.na(rqda_segments$memo))){
-        DBI::dbWriteTable(requal_connection, "memos", memos_df %>% dplyr::select(memo_id, text), 
+        DBI::dbWriteTable(requal_pool, "memos", memos_df %>% dplyr::select(memo_id, text), 
                           append = TRUE)
-        DBI::dbWriteTable(requal_connection, "memos_segments_map", memos_segments_map_df, append = TRUE)
+        DBI::dbWriteTable(requal_pool, "memos_segments_map", memos_segments_map_df, append = TRUE)
     }
     
     DBI::dbDisconnect(rqda_con)
-    DBI::dbDisconnect(requal_connection)
+    pool::poolClose(requal_pool)
 }

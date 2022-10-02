@@ -46,12 +46,12 @@ mod_launchpad_loader_ui <- function(id){
 #' launchpad_loader Server Functions
 #'
 #' @noRd 
-mod_launchpad_loader_server <- function(id){
+mod_launchpad_loader_server <- function(id, glob, setup){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
     # module reactive vals ----
-    
+
     db_path <- reactiveVal(NULL)
     active_project <- reactiveVal(NULL)
     doc_list <- reactiveVal(NULL)
@@ -94,41 +94,35 @@ mod_launchpad_loader_server <- function(id){
     })
     
     
-    observe({
-      
-      if (length(project_file_load())>0 ) {
-        updateSelectInput(session,
-                          "project_selector_load",
-                          choices = read_project_db(project_file_load(),
-                                                    project_id = NULL))
+    observeEvent(input$sel_file_load, {
+      if(length(project_file_load() > 0)){
+
+            glob$pool <- pool::dbPool(
+              drv = switch(setup$mode,
+                           "local" = RSQLite::SQLite(), 
+                           "server" = RSQLite::SQLite()), #todo
+              dbname = switch(setup$mode,
+                              "local" = project_file_load(), 
+                              "server" = project_file_load()) #todo
+          )
+          
+          updateSelectInput(session,
+                            "project_selector_load",
+                            choices = read_project_db(glob$pool,
+                                                      project_id = NULL))
       }
+      
     })
-    
     
     observeEvent(input$project_load, {
-      
-      req(input$project_selector_load)
-      
-      
-      db_path(project_file_load())
-      
-      active_project(isolate(
-        read_project_db(db_path(),
-                        project_id = input$project_selector_load)
-      ))
-      
-
-      
-      project$active_project <- active_project()
-      project$project_db <- db_path()
-
+        active_project(isolate(
+          read_project_db(pool = glob$pool,
+                          project_id = input$project_selector_load)
+        ))
+        
+        glob$active_project <- active_project()
+        
     })
-    
-
-    # return active project details
-     
-    return(reactive(reactiveValuesToList(project)))
-    
  
   })
 }

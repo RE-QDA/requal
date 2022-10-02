@@ -6,65 +6,55 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
-
-glob  <- reactiveValues()
-
- project_observer <- reactiveVal()
-
- project_loader <- mod_launchpad_loader_server("launchpad_loader_ui_1")
-    observeEvent(project_loader(), {
-    project_observer(project_loader())
-
+  setup <- reactiveValues()
+  setup$mode <- get_golem_config("mode")
+  # check_credentials returns a function to authenticate users
+  auth <- shinymanager::secure_server(
+      check_credentials = shinymanager::check_credentials(credentials)
+  )  
+  observeEvent(auth, {
+      setup$auth <- reactiveValuesToList(auth)
   })
+        
+  glob <- reactiveValues()
 
-  project_creator <- mod_launchpad_creator_server("launchpad_creator_ui_1")
-    observeEvent(project_creator(), {
-      project_observer(project_creator())
-    })
+  mod_launchpad_loader_server("launchpad_loader_ui_1", glob, setup)
 
-  observeEvent(project_observer()$active_project, {
-  updateControlbar("control_bar")
+  mod_launchpad_creator_server("launchpad_creator_ui_1", glob, setup)
+
+  observeEvent(glob$active_project, {
+    updateControlbar("control_bar")
   })
 
   # documents  ----
-
-  mod_project_server("mod_project_ui_1", project_observer, user)
-  documents <- mod_doc_manager_server("doc_manager_ui_1", project_observer, user)
+  mod_project_server("mod_project_ui_1", glob)
+  # output: glob$documents
+  mod_doc_manager_server("doc_manager_ui_1", glob)
 
   # codebook  ----
-
-  codebook <- mod_codebook_server("codebook_ui_1", project_observer, user)
-  category <- mod_categories_server("categories_ui_1",
-                                    project_observer,
-                                    user,
-                                    codebook)
-
+  # output: glob$codebook
+  mod_codebook_server("codebook_ui_1", glob)
+  # output: glob$category
+  mod_categories_server("categories_ui_1", glob)
   # workdesk ----
-
-  segments_observer <- mod_document_code_server("document_code_ui_1", project_observer, user, codebook, documents)
+  # output: glob$segments
+  mod_document_code_server("document_code_ui_1", glob)
 
   # analysis ----
-
-mod_analysis_server("analysis_ui_1", project_observer, user, glob, codebook, category, documents, segments_observer)
-
+  mod_analysis_server("analysis_ui_1", glob)
   mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
+  
   # reporting
+  mod_reporting_server("reporting_ui_1", glob)
+  mod_reproducibility_server("reproducibility_ui_1", glob)
 
-  reporting <- mod_reporting_server("reporting_ui_1", project_observer, user)
-  mod_reproducibility_server("reproducibility_ui_1", project_observer)
-
-    # about -----
-
-  mod_about_server("about_ui_1", project_observer, user)
+  # about -----
+  mod_about_server("about_ui_1", glob)
 
   # user
-  user <- mod_user_server("user_ui_1", project_observer)
-  
+  mod_user_server("user_ui_1", glob)
+
   # memo
-  
-  mod_memo_server("memo_ui_1", project_observer, user)
-
-
-
+  mod_memo_server("memo_ui_1", glob)
 }
