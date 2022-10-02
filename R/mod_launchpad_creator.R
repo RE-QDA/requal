@@ -51,7 +51,7 @@ mod_launchpad_creator_ui <- function(id){
 #' launchpad_creator Server Functions
 #'
 #' @noRd 
-mod_launchpad_creator_server <- function(id, glob){
+mod_launchpad_creator_server <- function(id, glob, mode){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -110,10 +110,10 @@ mod_launchpad_creator_server <- function(id, glob){
       mode <- golem::get_golem_options("mode")
       
       glob$pool <- pool::dbPool(
-          drv = switch(mode,
+          drv = switch(mode$mode,
                        "local" = RSQLite::SQLite(), 
                        "server" = "todo"),
-          dbname = switch(mode,
+          dbname = switch(mode$mode,
                           "local" = loc$db_path, 
                           "server" = "todo") #todo
       )

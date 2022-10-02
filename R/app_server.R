@@ -7,11 +7,14 @@
 app_server <- function(input, output, session) {
   # Your application server logic
 
+  mode <- reactiveValues()
+  mode$mode <- golem::get_golem_options("mode")
+        
   glob <- reactiveValues()
 
-  mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
+  mod_launchpad_loader_server("launchpad_loader_ui_1", glob, mode)
 
-  mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
+  mod_launchpad_creator_server("launchpad_creator_ui_1", glob, mode)
 
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")

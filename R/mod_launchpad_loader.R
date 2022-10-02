@@ -46,7 +46,7 @@ mod_launchpad_loader_ui <- function(id){
 #' launchpad_loader Server Functions
 #'
 #' @noRd 
-mod_launchpad_loader_server <- function(id, glob){
+mod_launchpad_loader_server <- function(id, glob, mode){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -96,13 +96,12 @@ mod_launchpad_loader_server <- function(id, glob){
     
     observeEvent(input$sel_file_load, {
       if(length(project_file_load() > 0)){
-          mode <- golem::get_golem_options("mode")
-          
+          print(mode$mode)
           glob$pool <- pool::dbPool(
-              drv = switch(mode,
+              drv = switch(mode$mode,
                            "local" = RSQLite::SQLite(), 
                            "server" = "todo"),
-              dbname = switch(mode,
+              dbname = switch(mode$mode,
                               "local" = project_file_load(), 
                               "server" = "todo") #todo
           )

@@ -6,7 +6,7 @@
 \usage{
 run_app(
   onStart = NULL,
-  options = list(),
+  options = list(mode = "local"),
   enableBookmarking = NULL,
   uiPattern = "/",
   ...
