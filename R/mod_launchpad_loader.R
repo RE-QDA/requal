@@ -96,14 +96,14 @@ mod_launchpad_loader_server <- function(id, glob, mode){
     
     observeEvent(input$sel_file_load, {
       if(length(project_file_load() > 0)){
-          print(mode$mode)
+          print(mode$mode) #toremove after dev
           glob$pool <- pool::dbPool(
-              drv = switch(mode$mode,
+              drv = switch(setup$mode,
                            "local" = RSQLite::SQLite(), 
-                           "server" = "todo"),
-              dbname = switch(mode$mode,
+                           "server" = RSQLite::SQLite()), #todo
+              dbname = switch(setup$mode,
                               "local" = project_file_load(), 
-                              "server" = "todo") #todo
+                              "server" = project_file_load()) #todo
           )
           
           updateSelectInput(session,

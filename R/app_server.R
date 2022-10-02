@@ -6,9 +6,17 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
-
-  mode <- reactiveValues()
+  setup <- reactiveValues()
   mode$mode <- golem::get_golem_options("mode")
+  
+  observeEvent(req(setup$mode == "server") {
+      # call the server part
+      # check_credentials returns a function to authenticate users
+      setup$auth <- secure_server(
+          check_credentials = check_credentials(credentials)
+      )
+      print(setup$auth)
+  })
         
   glob <- reactiveValues()
 
