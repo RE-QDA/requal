@@ -46,7 +46,8 @@ utils::globalVariables(c("project_name",
                          "position_type", 
                          "position_start", 
                          "tag_start", 
-                         "tag_end"
+                         "tag_end", 
+                         "credentials"
                          ))
 
 

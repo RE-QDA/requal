@@ -53,6 +53,7 @@ Imports:
     shinydashboardPlus,
     shinyFiles,
     shinyjs,
+    shinymanager,
     shinyWidgets,
     sortable,
     stringr,
