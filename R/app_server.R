@@ -7,11 +7,12 @@
 app_server <- function(input, output, session) {
   # Your application server logic
   setup <- reactiveValues()
-  setup$mode <- get_golem_config("mode")
+  setup$mode <- mode
+
   # check_credentials returns a function to authenticate users
   auth <- shinymanager::secure_server(
       check_credentials = shinymanager::check_credentials(
-          get_golem_config("access"),
+          access_path,
           passphrase = keyring::key_get("requal-access-key", "requal")
       )
   )  

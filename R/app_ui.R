@@ -8,6 +8,8 @@
 
 app_ui_setup <- function(request) {
     
+
+    
     tagList(
         # Leave this function for adding external resources
         golem_add_external_resources(),
@@ -34,11 +36,29 @@ app_ui_setup <- function(request) {
     )
 }
 
-if (get_golem_config("mode") == "local") {
-  app_ui <- app_ui_setup
-} else {
+if (file.exists("requal.yml")) {
+mode <- config::get(
+    "mode",
+     file = "requal.yml"
+)
 
-    if (!file.exists(get_golem_config("access"))) {
+access_path <<- config::get(
+    "access",
+    file = "requal.yml"
+)
+} else{
+    
+    mode <-  "local"
+    access_path <- NULL
+}
+
+if ( mode == "local" )  {
+  app_ui <- app_ui_setup
+} else if ( mode == "server" ) {
+    
+
+
+    if (!file.exists(access_path)) {
     # define some credentials
     # Init DB using credentials data
     credentials <- data.frame(
@@ -56,7 +76,7 @@ if (get_golem_config("mode") == "local") {
     # Init the database
     shinymanager::create_db(
         credentials_data = credentials,
-        sqlite_path = get_golem_config("access"), # will be created
+        sqlite_path = access_path, # will be created
         passphrase = keyring::key_get("requal-access-key", "requal")
         # passphrase = "passphrase_wihtout_keyring"
     ) 
