@@ -8,7 +8,7 @@
 
 app_ui_setup <- function(request) {
     
-
+print(getwd())
     
     tagList(
         # Leave this function for adding external resources
