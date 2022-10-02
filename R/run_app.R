@@ -13,7 +13,6 @@ run_app <- function(
   options = list(mode = "local"), 
   enableBookmarking = NULL,
   uiPattern = "/",
-  mode = "local",
   ...
 ) {
   with_golem_options(
@@ -25,6 +24,6 @@ run_app <- function(
       enableBookmarking = enableBookmarking, 
       uiPattern = uiPattern
     ), 
-    golem_opts = list(..., mode = mode)
+    golem_opts = list(...)
   )
 }
