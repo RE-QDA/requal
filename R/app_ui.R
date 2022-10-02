@@ -51,7 +51,7 @@ if (get_golem_config("mode") == "local") {
     )
     
     # use keyring package to set database key
-    keyring::key_set("requal-access-key", "requal", prompt = "Set password for users' database:")
+    keyring::key_set("requal-access-key", "requal", prompt = "Set password for user database:")
     
     # Init the database
     shinymanager::create_db(
