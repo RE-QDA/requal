@@ -37,8 +37,7 @@ app_ui_setup <- function(request) {
 if (get_golem_config("mode") == "local") {
   app_ui <- app_ui_setup
 } else {
-    print(get_golem_config("mode"))
-    print(get_golem_config("access"))
+
     if (!file.exists(get_golem_config("access"))) {
     # define some credentials
     # Init DB using credentials data
