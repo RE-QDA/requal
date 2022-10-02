@@ -33,30 +33,12 @@ app_ui_setup <- function(request) {
     )
 }
 
-if (file.exists("requal.yml")) {
-    browser()
-mode <- config::get(
-    "mode",
-     file = "requal.yml"
-)
 
-access_path <<- config::get(
-    "access",
-    file = "requal.yml"
-)
-} else{
-    
-    mode <-  "local"
-    access_path <- NULL
-}
-
-if ( mode == "local" )  {
+if ( Sys.getenv("mode") == "")  {
   app_ui <- app_ui_setup
-} else if ( mode == "server" ) {
+} else if ( Sys.getenv("mode") == "server" ){
     
-
-
-    if (!file.exists(access_path)) {
+    if (!file.exists(Sys.getenv("access"))) {
     # define some credentials
     # Init DB using credentials data
     credentials <- data.frame(
@@ -74,11 +56,12 @@ if ( mode == "local" )  {
     # Init the database
     shinymanager::create_db(
         credentials_data = credentials,
-        sqlite_path = access_path, # will be created
+        sqlite_path = Sys.getenv("access"), # will be created
         passphrase = keyring::key_get("requal-access-key", "requal")
         # passphrase = "passphrase_wihtout_keyring"
     ) 
-    }
+}
+    
     app_ui <- shinymanager::secure_app(app_ui_setup, 
                                        tags_top = tags$img(src="www/requal_logo.png", 
                                                            height="30%", style = "margin-right: 20px"),
