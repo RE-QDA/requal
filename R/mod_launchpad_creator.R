@@ -51,7 +51,7 @@ mod_launchpad_creator_ui <- function(id){
 #' launchpad_creator Server Functions
 #'
 #' @noRd 
-mod_launchpad_creator_server <- function(id, glob, mode){
+mod_launchpad_creator_server <- function(id, glob, setup){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     

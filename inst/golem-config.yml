@@ -2,6 +2,7 @@ default:
   golem_name: requal
   golem_version: 0.0.0.9000
   app_prod: no
+  mode: server
 production:
   app_prod: yes
 dev:

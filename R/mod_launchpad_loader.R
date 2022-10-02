@@ -46,7 +46,7 @@ mod_launchpad_loader_ui <- function(id){
 #' launchpad_loader Server Functions
 #'
 #' @noRd 
-mod_launchpad_loader_server <- function(id, glob, mode){
+mod_launchpad_loader_server <- function(id, glob, setup){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
@@ -96,8 +96,8 @@ mod_launchpad_loader_server <- function(id, glob, mode){
     
     observeEvent(input$sel_file_load, {
       if(length(project_file_load() > 0)){
-          print(mode$mode) #toremove after dev
-          glob$pool <- pool::dbPool(
+
+            glob$pool <- pool::dbPool(
               drv = switch(setup$mode,
                            "local" = RSQLite::SQLite(), 
                            "server" = RSQLite::SQLite()), #todo

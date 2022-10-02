@@ -7,22 +7,20 @@
 app_server <- function(input, output, session) {
   # Your application server logic
   setup <- reactiveValues()
-  mode$mode <- golem::get_golem_options("mode")
-  
-  observeEvent(req(setup$mode == "server") {
-      # call the server part
-      # check_credentials returns a function to authenticate users
-      setup$auth <- secure_server(
-          check_credentials = check_credentials(credentials)
-      )
-      print(setup$auth)
+  setup$mode <- get_golem_config("mode")
+  # check_credentials returns a function to authenticate users
+  auth <- shinymanager::secure_server(
+      check_credentials = shinymanager::check_credentials(credentials)
+  )  
+  observeEvent(auth, {
+      setup$auth <- reactiveValuesToList(auth)
   })
         
   glob <- reactiveValues()
 
-  mod_launchpad_loader_server("launchpad_loader_ui_1", glob, mode)
+  mod_launchpad_loader_server("launchpad_loader_ui_1", glob, setup)
 
-  mod_launchpad_creator_server("launchpad_creator_ui_1", glob, mode)
+  mod_launchpad_creator_server("launchpad_creator_ui_1", glob, setup)
 
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
