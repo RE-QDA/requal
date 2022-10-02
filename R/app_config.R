@@ -32,11 +32,13 @@ get_golem_config <- function(
   ), 
   use_parent = TRUE
 ){
+    golem_config_yml <- ifelse(!file.exists("requal.yml"), app_sys("golem-config.yml"), "requal.yml")
+        
   config::get(
     value = value, 
     config = config, 
     # Modify this if your config file is somewhere else:
-    file = app_sys("golem-config.yml"), 
+    file = golem_config_yml, 
     use_parent = use_parent
   )
 }

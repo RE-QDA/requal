@@ -10,7 +10,10 @@ app_server <- function(input, output, session) {
   setup$mode <- get_golem_config("mode")
   # check_credentials returns a function to authenticate users
   auth <- shinymanager::secure_server(
-      check_credentials = shinymanager::check_credentials(credentials)
+      check_credentials = shinymanager::check_credentials(
+          get_golem_config("access"),
+          passphrase = keyring::key_get("requal-access-key", "requal")
+      )
   )  
   observeEvent(auth, {
       setup$auth <- reactiveValuesToList(auth)

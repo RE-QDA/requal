@@ -7,6 +7,7 @@
 #' @noRd
 
 app_ui_setup <- function(request) {
+<<<<<<< Updated upstream
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -34,6 +35,32 @@ app_ui_setup <- function(request) {
       sidebar = set_left_menu(),
       body = set_dashboard_body(),
       controlbar = set_controlbar()
+=======
+    
+    tagList(
+        # Leave this function for adding external resources
+        golem_add_external_resources(),
+        # Your application UI logic
+        dashboardPage(title = "ReQual",
+                      options = list(sidebarExpandOnHover = FALSE),
+                      header = dashboardHeader(title = tags$span(
+                          tags$img(src="www/requal_logo.png", 
+                                   height="70%", style = "margin-right: 20px"), "reQual"),
+                          tags$li(mod_user_ui("user_ui_1")) %>% 
+                              tagAppendAttributes(class = "dropdown"),
+                          controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
+                          dropdownBlock2(
+                              id = "btn-memo",
+                              badgeStatus = NULL,
+                              icon = shiny::icon("sticky-note-o", verify_fa = FALSE),
+                              mod_memo_ui("memo_ui_1")
+                          ) %>% tagAppendAttributes(class = "memo") 
+                      ),
+                      sidebar = set_left_menu(),
+                      body = set_dashboard_body(),
+                      controlbar = set_controlbar()
+        )
+>>>>>>> Stashed changes
     )
   )
 }
@@ -41,6 +68,7 @@ app_ui_setup <- function(request) {
 if (get_golem_config("mode") == "local") {
   app_ui <- app_ui_setup
 } else {
+<<<<<<< Updated upstream
   # define some credentials
   credentials <- data.frame(
     user = c("admin", "requal"), # mandatory
@@ -54,6 +82,38 @@ if (get_golem_config("mode") == "local") {
   )
 
   app_ui <- shinymanager::secure_app(app_ui_setup)
+=======
+    print(get_golem_config("mode"))
+    print(get_golem_config("access"))
+    if (!file.exists(get_golem_config("access"))) {
+    # define some credentials
+    # Init DB using credentials data
+    credentials <- data.frame(
+        user = c("admin", "user"),
+        password = c("admin", "user"),
+        # password will automatically be hashed
+        admin = c(TRUE, FALSE),
+        stringsAsFactors = FALSE
+    )
+    
+    # you can use keyring package to set database key
+    keyring::key_set("requal-access-key", "requal")
+    
+    # Init the database
+    shinymanager::create_db(
+        credentials_data = credentials,
+        sqlite_path = get_golem_config("access"), # will be created
+        passphrase = keyring::key_get("requal-access-key", "requal")
+        # passphrase = "passphrase_wihtout_keyring"
+    ) 
+    }
+    app_ui <- shinymanager::secure_app(app_ui_setup, 
+                                       tags_top = tags$img(src="www/requal_logo.png", 
+                                                           height="30%", style = "margin-right: 20px"),
+                                       enable_admin = TRUE, 
+                                       fab_position = "bottom-left"
+                                       )
+>>>>>>> Stashed changes
 }
 
 #' Add external Resources to the Application
