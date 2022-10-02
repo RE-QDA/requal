@@ -17,6 +17,7 @@ app_server <- function(input, output, session) {
   )  
   observeEvent(auth, {
       setup$auth <- reactiveValuesToList(auth)
+      glob$user <- as.integer(setup$auth$user_id)
   })
         
   glob <- reactiveValues()
