@@ -14,7 +14,7 @@ mod_download_html_ui <- function(id){
           downloadButton(ns("report"), "HTML")
       }else{
           list(downloadButton(ns("report"), "HTML", class = "disabled"), 
-               HTML("Install <a href='https://bookdown.org/yihui/rmarkdown-cookbook/install-pandoc.html'>pandoc</a> to enable HTML export"))
+               htmltools::HTML("Install <a href='https://bookdown.org/yihui/rmarkdown-cookbook/install-pandoc.html'>pandoc</a> to enable HTML export"))
       }
   )
 }
