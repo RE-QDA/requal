@@ -10,7 +10,12 @@
 mod_download_html_ui <- function(id){
   ns <- NS(id)
   tagList(
-      downloadButton(ns("report"), "HTML")
+      if(rmarkdown::pandoc_available()){
+          downloadButton(ns("report"), "HTML")
+      }else{
+          list(downloadButton(ns("report"), "HTML", class = "disabled"), 
+               htmltools::HTML("Install <a href='https://bookdown.org/yihui/rmarkdown-cookbook/install-pandoc.html'>pandoc</a> to enable HTML export"))
+      }
   )
 }
     
