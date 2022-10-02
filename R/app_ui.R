@@ -5,10 +5,7 @@
 #' @import shiny
 #' @import shinydashboardPlus
 #' @noRd
-
 app_ui_setup <- function(request) {
-    
-print(getwd())
     
     tagList(
         # Leave this function for adding external resources
@@ -37,6 +34,7 @@ print(getwd())
 }
 
 if (file.exists("requal.yml")) {
+    browser()
 mode <- config::get(
     "mode",
      file = "requal.yml"
@@ -106,7 +104,7 @@ golem_add_external_resources <- function() {
     favicon(),
     bundle_resources(
       path = app_sys("app/www"),
-      app_title = "ReQual"
+      app_title = "reQual"
     ),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
