@@ -6,10 +6,9 @@
 \usage{
 run_app(
   onStart = NULL,
-  options = list(mode = "local"),
+  options = list(...),
   enableBookmarking = NULL,
   uiPattern = "/",
-  mode = "local",
   ...
 )
 }
@@ -34,10 +33,10 @@ request to determine whether the \code{ui} should be used to handle the
 request. Note that the entire request path must match the regular
 expression in order for the match to be considered successful.}
 
+\item{...}{arguments to pass to golem_opts.}
+
 \item{mode}{Mode of the application ("local" or "server" options are acceptable)
 See `?golem::get_golem_options` for more details.}
-
-\item{...}{arguments to pass to golem_opts.}
 }
 \description{
 Run the Shiny Application

@@ -10,7 +10,7 @@
 #' @importFrom golem with_golem_options 
 run_app <- function(
   onStart = NULL,
-  options = list(mode = "local"), 
+  options = list(), 
   enableBookmarking = NULL,
   uiPattern = "/",
   ...
