@@ -47,16 +47,29 @@ mod_reproducibility_server <- function(id, glob) {
       input$calculate
     }, {
       output$docs_select <- renderUI({
+        # browser()
+        if(isTruthy(input$docs_select)){
+          selected_doc <- input$docs_select
+        }else{
+          selected_doc <- NULL
+        }
         selectInput(ns("docs_select"), "Select document", 
-                    choices = c("", glob$documents))  
+                    choices = c("", glob$documents), 
+                    selected = selected_doc)  
       })
       
       output$code_select <- renderUI({
+        if(isTruthy(input$code_select)){
+          selected_code <- input$code_select
+        }else{
+          selected_code <- NULL
+        }
         selectInput(ns("code_select"), "Select code", 
                     choices = c("", stats::setNames(
                       glob$codebook$code_id,
                       glob$codebook$code_name
-                    )))  
+                    )),
+                    selected = selected_code)  
       })
     })    
     # total ----
