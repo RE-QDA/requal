@@ -1,7 +1,6 @@
 #' Run the Shiny Application
 #'
 #' @param ... arguments to pass to golem_opts. 
-#' @param mode Mode of the application ("local" or "server" options are acceptable)
 #' See `?golem::get_golem_options` for more details.
 #' @inheritParams shiny::shinyApp
 #'
