@@ -7,7 +7,8 @@ golem::detach_all_attached()
 
 # Document and reload your package
 golem::document_and_reload()
-Sys.setenv("mode" = "server", "access" = "requal_users.sqlite")
+
 # Run the application
 (run_app())
+
   

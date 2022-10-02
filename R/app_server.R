@@ -12,7 +12,7 @@ app_server <- function(input, output, session) {
   # check_credentials returns a function to authenticate users
   auth <- shinymanager::secure_server(
       check_credentials = shinymanager::check_credentials(
-          Sys.getenv("access"),
+          "requal_users.sqlite",
           passphrase = keyring::key_get("requal-access-key", "requal")
       )
   )  

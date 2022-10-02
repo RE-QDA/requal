@@ -5,13 +5,13 @@
 #' @import shiny
 #' @import shinydashboardPlus
 #' @noRd
-app_ui_setup <- function(request) {
+app_ui <- function(request, mode = NULL, access = NULL) {
     
     tagList(
         # Leave this function for adding external resources
         golem_add_external_resources(),
         # Your application UI logic
-        dashboardPage(title = "ReQual",
+        dashboardPage(title = "reQual",
                       options = list(sidebarExpandOnHover = FALSE),
                       header = dashboardHeader(title = tags$span(
                           tags$img(src="www/requal_logo.png", 
@@ -33,42 +33,14 @@ app_ui_setup <- function(request) {
     )
 }
 
-
-if ( Sys.getenv("mode") == "")  {
-  app_ui <- app_ui_setup
-} else if ( Sys.getenv("mode") == "server" ){
     
-    if (!file.exists(Sys.getenv("access"))) {
-    # define some credentials
-    # Init DB using credentials data
-    credentials <- data.frame(
-        user = c("admin", "user"),
-        password = c("admin", "user"),
-        # password will automatically be hashed
-        admin = c(TRUE, FALSE),
-        user_id = c(1,2),
-        stringsAsFactors = FALSE
-    )
-    
-    # use keyring package to set database key
-    keyring::key_set("requal-access-key", "requal", prompt = "Set password for user database:")
-    
-    # Init the database
-    shinymanager::create_db(
-        credentials_data = credentials,
-        sqlite_path = Sys.getenv("access"), # will be created
-        passphrase = keyring::key_get("requal-access-key", "requal")
-        # passphrase = "passphrase_wihtout_keyring"
-    ) 
-}
-    
-    app_ui <- shinymanager::secure_app(app_ui_setup, 
+    app_ui_server <- shinymanager::secure_app(app_ui, 
                                        tags_top = tags$img(src="www/requal_logo.png", 
                                                            height="30%", style = "margin-right: 20px"),
                                        enable_admin = TRUE, 
                                        fab_position = "bottom-left"
                                        )
-}
+
 
 #' Add external Resources to the Application
 #'
