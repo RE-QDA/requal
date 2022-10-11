@@ -91,7 +91,8 @@ mod_launchpad_creator_server <- function(id, glob, setup){
     
    
     # set active project from create ----
-    
+    observeEvent(req(setup$mode == "local"), {
+        
     observeEvent(input$project_create, {
       req(input$project_name, input$sel_directory)
 
@@ -106,8 +107,6 @@ mod_launchpad_creator_server <- function(id, glob, setup){
         ), ".requal")
       )
       
-      # create project event - DB set up ----
-      mode <- golem::get_golem_options("mode")
       
       glob$pool <- pool::dbPool(
           drv = switch(setup$mode,
@@ -128,7 +127,34 @@ mod_launchpad_creator_server <- function(id, glob, setup){
       glob$active_project <- loc$active_project
       
     })
+    })
     
+    observeEvent(req(setup$mode == "server"), {
+        
+        
+        observeEvent(input$project_create, {
+            req(input$project_name)
+          
+            
+            glob$pool <- pool::dbPool(
+                drv = RPostgreSQL::PostgreSQL(),
+                dbname = "requal",
+                user = "radimhladik",
+                password = "test"
+            )
+            
+            loc$active_project <- create_project_db(
+                pool = glob$pool,
+                project_name = input$project_name,
+                project_description = input$project_description
+            )
+            
+            # write active project details ----
+            glob$active_project <- loc$active_project
+            
+        })
+        
+    })
   })
 }
     

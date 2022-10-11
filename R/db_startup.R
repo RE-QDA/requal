@@ -1,6 +1,6 @@
 CREATE_PROJECT_SQL <- "
 CREATE TABLE projects (
-     project_id INTEGER PRIMARY KEY AUTOINCREMENT
+     project_id SERIAL PRIMARY KEY
 ,    project_name TEXT
 ,    project_description TEXT
 ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP

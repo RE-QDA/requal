@@ -51,11 +51,14 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     ns <- session$ns
     
     # module reactive vals ----
-
-    db_path <- reactiveVal(NULL)
-    active_project <- reactiveVal(NULL)
-    doc_list <- reactiveVal(NULL)
-    project <- reactiveValues()
+    loc <- reactiveValues()
+    loc$db_path <- NULL
+    loc$active_project <- NULL
+    loc$doc_list <- NULL
+    loc$project <- ""
+    
+    observeEvent(req(setup$mode == "local"), {
+  
     
     # file system prep ----
     volumes <- c(Home = fs::path_home(), get_volume_paths())
@@ -71,58 +74,90 @@ mod_launchpad_loader_server <- function(id, glob, setup){
       pattern = c('\\.requal')
     )
     
-    
-    project_file_load <-
-      reactive({
-        normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
-      })
+     observeEvent(input$sel_file_load, {
+         loc$project_file_load <- normalizePath(shinyFiles::parseFilePaths(volumes, input$sel_file_load)$datapath)
+         
+         if(length(loc$project_file_load > 0)){
+             
+             glob$pool <- pool::dbPool(
+                 drv = RSQLite::SQLite(), 
+                 dbname = loc$project_file_load
+             )
+             
+             reactive({ 
+                 onStop(function(){
+                 pool::poolClose(glob$pool) 
+                     }
+                 )
+            })
+             
+
+             updateSelectInput(session,
+                               "project_selector_load",
+                               choices = read_project_db(glob$pool,
+                                                         project_id = NULL))
+         }
+    })
+  
     
     output$project_path_load <- renderText({
       if (is.integer(input$sel_file_load)) {
         "No project file has been selected."
       } else {
-        project_file_load()
+        loc$project_file_load
       }
     })
     
     # set active project from load ----
     
     output$project_active <- renderUI({
-      if (is.null(active_project())) {
+      if (is.null(loc$active_project)) {
         "No active project."
       }
     })
     
     
-    observeEvent(input$sel_file_load, {
-      if(length(project_file_load() > 0)){
+   
+        
 
-            glob$pool <- pool::dbPool(
-              drv = switch(setup$mode,
-                           "local" = RSQLite::SQLite(), 
-                           "server" = RSQLite::SQLite()), #todo
-              dbname = switch(setup$mode,
-                              "local" = project_file_load(), 
-                              "server" = project_file_load()) #todo
-          )
-          
-          updateSelectInput(session,
-                            "project_selector_load",
-                            choices = read_project_db(glob$pool,
-                                                      project_id = NULL))
-      }
       
-    })
     
     observeEvent(input$project_load, {
-        active_project(isolate(
+        loc$active_project <- isolate(
           read_project_db(pool = glob$pool,
                           project_id = input$project_selector_load)
-        ))
+        )
         
-        glob$active_project <- active_project()
+        glob$active_project <- loc$active_project
         
     })
  
+   
+    })
+    
+    observeEvent(req(setup$mode == "server"), {
+        
+        pool <- pool::dbPool(
+            drv = RPostgreSQL::PostgreSQL(),
+            dbname = "requal",
+            user = "radimhladik",
+            password = "test"
+        )
+        
+        
+        onStop(reactive({function(){
+            pool::poolClose(glob$pool) }})
+        )
+        
+        
+        updateSelectInput(session,
+                          "project_selector_load",
+                          choices = read_project_db(glob$pool,
+                                                    project_id = NULL))
+    
+        
+        
+        
+        })
   })
-}
+    }
