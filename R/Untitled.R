@@ -4,3 +4,5 @@ pool <- pool::dbPool(
     user = "radimhladik",
     password = "test"
 )
+
+pool::dbGetInfo(pool)

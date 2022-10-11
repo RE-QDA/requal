@@ -1,12 +1,19 @@
 CREATE_PROJECT_SQL <- "
 CREATE TABLE projects (
-     project_id SERIAL PRIMARY KEY
+     project_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,    project_name TEXT
 ,    project_description TEXT
 ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 "
-
+CREATE_PROJECT_SQL_POSTGRES <- "
+CREATE TABLE projects (
+    project_id SERIAL PRIMARY KEY
+    ,    project_name TEXT
+    ,    project_description TEXT
+    ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"
 CREATE_REQUAL_INFO_SQL <- "
 CREATE TABLE if not exists requal_version (
     project_id INTEGER
@@ -14,11 +21,11 @@ CREATE TABLE if not exists requal_version (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
-
 # TODO: user_attributes
 CREATE_USERS_SQL <- "
 CREATE TABLE if not exists users (
     user_id INTEGER PRIMARY KEY
+,   user_login TEXT UNIQUE
 ,   user_name TEXT
 ,   user_mail TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -64,10 +71,33 @@ CREATE TABLE if not exists documents (
 );
 "
 
+CREATE_DOCUMENTS_SQL_POSTGRES <- "
+CREATE TABLE if not exists documents (
+    doc_id SERIAL PRIMARY KEY
+,   project_id INTEGER
+,   doc_name TEXT
+,   doc_description TEXT
+,   doc_text TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
 CREATE_CODES_SQL <- "
 CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   code_name TEXT UNIQUE
+,   code_description TEXT
+,   code_color TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CODES_SQL_POSTGRES <- "
+CREATE TABLE if not exists codes (
+    project_id INTEGER
+,   code_id SERIAL PRIMARY KEY 
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
@@ -92,10 +122,37 @@ CREATE TABLE if not exists segments (
 );
 "
 
+CREATE_SEGMENTS_SQL_POSTGRES <- "
+CREATE TABLE if not exists segments (
+    project_id INTEGER
+,   user_id INTEGER
+,   doc_id INTEGER
+,   code_id INTEGER
+,   segment_id SERIAL PRIMARY KEY
+,   segment_start INTEGER
+,   segment_end INTEGER
+,   segment_text TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+"
+
 CREATE_CATEGORIES_SQL <- "
 CREATE TABLE if not exists categories (
     project_id INTEGER
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   category_name TEXT
+,   category_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CATEGORIES_SQL_POSTGRES <- "
+CREATE TABLE if not exists categories (
+    project_id INTEGER
+,   category_id SERIAL PRIMARY KEY
 ,   category_name TEXT
 ,   category_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
@@ -109,7 +166,7 @@ CREATE TABLE if not exists categories_codes_map (
 ,   code_id INTEGER
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 ,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(codes_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
 );
 "
 
@@ -117,6 +174,16 @@ CREATE_CASES_SQL <- "
 CREATE TABLE if not exists cases (
     project_id INTEGER
 ,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   case_name TEXT
+,   case_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CASES_SQL_POSTGRES <- "
+CREATE TABLE if not exists cases (
+    project_id INTEGER
+,   case_id SERIAL PRIMARY KEY
 ,   case_name TEXT
 ,   case_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
@@ -172,23 +239,41 @@ CREATE TABLE if not exists memos_segments_map (
 
 create_db_schema <- function(pool){
     # TODO: Full DB structure
-    DBI::dbExecute(pool, CREATE_PROJECT_SQL)
-    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-    DBI::dbExecute(pool, CREATE_USERS_SQL)
-    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-    DBI::dbExecute(pool, CREATE_LOG_SQL)
-    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
-    DBI::dbExecute(pool, CREATE_CODES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_CASES_SQL)
-    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
+    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass  != "SQLiteConnection"
+    if (db_postgres) {
+        DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
+        DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
+        DBI::dbExecute(pool, CREATE_USERS_SQL)
+        DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
+        DBI::dbExecute(pool, CREATE_LOG_SQL)
+        DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
+        DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
+        DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
+        DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
+        DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
+        DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
+        DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
+        
+    } else {
+        DBI::dbExecute(pool, CREATE_PROJECT_SQL)
+        DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
+        DBI::dbExecute(pool, CREATE_USERS_SQL)
+        DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
+        DBI::dbExecute(pool, CREATE_LOG_SQL)
+        DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
+        DBI::dbExecute(pool, CREATE_CODES_SQL)
+        DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
+        DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
+        DBI::dbExecute(pool, CREATE_CASES_SQL)
+        DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
+        DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
+    }
+
     DBI::dbExecute(pool, CREATE_MEMO_SQL)
     DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
     DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
     DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
-}
+} 
 
 create_default_user <- function(pool, project_id){
     user_df <- tibble::tibble(
