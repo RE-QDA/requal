@@ -44,7 +44,7 @@ mod_reproducibility_server <- function(id, glob) {
 
     observeEvent({
       req(input$metrics_select == "docs")
-      input$calculate
+      # input$calculate
     }, {
       output$docs_select <- renderUI({
         # browser()
@@ -382,11 +382,12 @@ mod_reproducibility_server <- function(id, glob) {
             dplyr::filter(doc_id == DOC_ID) %>%
             dplyr::pull(doc_text)
 
-          segments <- load_all_segments_db(
+          all_segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
-          ) %>%
-            dplyr::filter(doc_id == DOC_ID) %>% 
+          ) %>% dplyr::filter(doc_id == DOC_ID)
+          
+          segments <- all_segments %>%
             dplyr::filter(code_id == CODE_ID)
 
           if (length(unique(segments$user_id)) > 1) {
@@ -395,7 +396,6 @@ mod_reproducibility_server <- function(id, glob) {
             palette <- viridisLite::viridis(max_n)
             font_colour <- c(rep("white", times = floor(max_n / 2)), 
                              rep("black", times = ceiling(max_n / 2)))
-            # browser()
             
             overlap_df <- overlap %>%
               dplyr::rename(
@@ -502,7 +502,12 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- NULL
             output$overlap_plot <- NULL
           } else {
-            output$overlap_documents <- renderText(reproducibility_message)
+            if(!(length(unique(all_segments$user_id)) > 1)){
+              warning_message <- "Selected document was not coded by multiple coders"
+            }else{
+              warning_message <- "Selected code was not used in the selected document"
+            }
+            output$overlap_documents <- renderText(warning_message)
             output$overlap_table <- NULL
             output$overlap_plot <- NULL
           }
