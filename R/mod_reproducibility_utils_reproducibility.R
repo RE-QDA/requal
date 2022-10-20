@@ -1,6 +1,31 @@
+calculate_coders_overlap <- function(segments){
+    segments %>% 
+        dplyr::mutate(marked = purrr::map2(
+            segment_start, segment_end,
+            function(x, y) seq(from = x, to = y, by = 1)
+        )) %>% 
+        tidyr::unnest(., marked) %>% 
+        dplyr::group_by(marked) %>% 
+        dplyr::summarise(n = dplyr::n(), 
+                         coders = paste0(user_name, collapse = " | ")) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::mutate(segment_break = marked != dplyr::lag(marked) + 1 | n != dplyr::lag(n)) %>%
+        dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
+        dplyr::mutate(segment_id = cumsum(segment_break)) %>%
+        dplyr::group_by(segment_id, n, coders) %>% 
+        dplyr::summarise(
+            min_intersect = min(marked),
+            max_intersect = max(marked),
+            intersect_length = max_intersect - min_intersect + 1
+        )
+}
+
 load_all_segments_db <- function(pool, active_project) {
     code_id <- segment_start <- segment_end <- segment_id <- NULL
     if (isTruthy(active_project)) {
+        
+        users <- dplyr::tbl(pool, "users") %>% 
+            dplyr::select(user_id, user_name)
         
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
@@ -10,6 +35,7 @@ load_all_segments_db <- function(pool, active_project) {
                           segment_id, 
                           segment_start,
                           segment_end) %>%
+            dplyr::left_join(., users, by = "user_id") %>% 
             dplyr::collect()
         
         return(segments)

@@ -13,10 +13,6 @@ mod_reproducibility_ui <- function(id) {
     selectInput(ns("metrics_select"),
       "Select metrics",
       choices = c("",
-        "Total overlap [character]" = "total",
-        "Overlap by code [character]" = "by_code",
-        "Overlap by coder [character]" = "by_user",
-        "Overlap by coder and code [character]" = "by_user_code",
         "Total overlap [segments]" = "total_segment",
         "Overlap by code [segments]" = "by_code_segment",
         "Overlap by coder [segments]" = "by_user_segment",
@@ -24,6 +20,8 @@ mod_reproducibility_ui <- function(id) {
         "Browse documents" = "docs"
       )
     ),
+    uiOutput(ns("docs_select")),
+    uiOutput(ns("code_select")),
     actionButton(ns("calculate"), "Calculate"),
     uiOutput(ns("overlap_table")),
     uiOutput(ns("overlap_documents")),
@@ -40,34 +38,37 @@ mod_reproducibility_server <- function(id, glob) {
 
     reproducibility_message <- "Reproducibility measures cannot be computed for projects with one active coder."
 
-        
-    # total ----
-        observeEvent({req(input$metrics_select == "total") 
-                      input$calculate}, {
-          segments <- load_all_segments_db(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-
-          if (length(unique(segments$user_id)) > 1) {
-            overlap_df <- calculate_code_overlap_by_users(segments) %>%
-              dplyr::summarise(
-                `Weighted total overlap` = stats::weighted.mean(total_overlap, n_char),
-                `N characters coded` = sum(n_char),
-                `N coders` = length(unique(c(coder1_id, coder2_id)))
-              )
-
-            output$overlap_documents <- NULL
-            output$overlap_plot <- NULL
-            output$overlap_table <- renderTable({
-              overlap_df
-            })
-          } else {
-            output$overlap_table <- renderText(reproducibility_message)
-          }
-        })
+    observeEvent({
+      req(input$metrics_select == "docs")
+      # input$calculate
+    }, {
+      output$docs_select <- renderUI({
+        # browser()
+        if(isTruthy(input$docs_select)){
+          selected_doc <- input$docs_select
+        }else{
+          selected_doc <- NULL
+        }
+        selectInput(ns("docs_select"), "Select document", 
+                    choices = c("", glob$documents), 
+                    selected = selected_doc)  
+      })
       
-
+      output$code_select <- renderUI({
+        if(isTruthy(input$code_select)){
+          selected_code <- input$code_select
+        }else{
+          selected_code <- NULL
+        }
+        selectInput(ns("code_select"), "Select code", 
+                    choices = c("", stats::setNames(
+                      glob$codebook$code_id,
+                      glob$codebook$code_name
+                    )),
+                    selected = selected_code)  
+      })
+    })    
+    
     # total_segment ----
         observeEvent({req(input$metrics_select == "total_segment")
                     input$calculate}, {
@@ -94,53 +95,6 @@ mod_reproducibility_server <- function(id, glob) {
           }
         })
       
-      # 2. stejný výpočet a vizualizaci pro každý kód
-    
-        observeEvent({req(input$metrics_select == "by_code") 
-                    input$calculate}, {
-          segments <- load_all_segments_db(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-
-          codes <- load_codes_names(
-            active_project = glob$active_project,
-            pool = glob$pool
-          )
-
-          if (length(unique(segments$user_id)) > 1) {
-            overlap_df <- calculate_code_overlap_by_users(segments) %>%
-              dplyr::group_by(code_id) %>%
-              dplyr::summarise(
-                w_total_overlap = stats::weighted.mean(total_overlap, n_char),
-                n_char_coded = sum(n_char),
-                n_coders = length(unique(c(coder1_id, coder2_id))),
-                .groups = "drop"
-              ) %>%
-              dplyr::left_join(., codes, by = "code_id") %>%
-              dplyr::select(
-                code_name, w_total_overlap,
-                n_char_coded, n_coders
-              ) %>%
-              dplyr::arrange(dplyr::desc(w_total_overlap)) %>%
-              dplyr::rename(
-                `Code name` = code_name,
-                `Weighted total overlap` = w_total_overlap,
-                `N characters coded` = n_char_coded,
-                `N coders` = n_coders
-              )
-
-            output$overlap_documents <- NULL
-            output$overlap_plot <- NULL
-            output$overlap_table <- renderTable({
-              overlap_df
-            })
-          } else {
-            output$overlap_table <- renderText(reproducibility_message)
-          }
-        })
-      
-
    # by_code_segment ----
         observeEvent({req(input$metrics_select == "by_code_segment") 
                     input$calculate}, {
@@ -185,43 +139,6 @@ mod_reproducibility_server <- function(id, glob) {
           }
         })
       
-
-    # by_user ----
-        observeEvent({req(input$metrics_select == "by_user")
-                input$calculate}, {
-          segments <- load_all_segments_db(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-
-          users <- load_users_names(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-
-          if (length(unique(segments$user_id)) > 1) {
-            overlap_df <- calculate_code_overlap_by_users(segments) %>%
-              join_user_names(., users) %>%
-              dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>%
-              dplyr::summarise(
-                w_total_overlap = stats::weighted.mean(total_overlap, n_char),
-                .groups = "drop"
-              ) %>%
-              make_overlap_df_symmetrical()
-
-            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = w_total_overlap)
-
-            output$overlap_documents <- NULL
-            output$overlap_table <- NULL
-            output$overlap_plot <- renderPlot({
-              overlap_heatmap
-            })
-          } else {
-            output$overlap_table <- renderText(reproducibility_message)
-          }
-        })
-      
-
     # by_user_segment ----
         observeEvent({req(input$metrics_select == "by_user_segment")
                     input$calculate}, {
@@ -246,42 +163,6 @@ mod_reproducibility_server <- function(id, glob) {
               make_overlap_df_symmetrical()
 
             overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap)
-
-            output$overlap_documents <- NULL
-            output$overlap_table <- NULL
-            output$overlap_plot <- renderPlot({
-              overlap_heatmap
-            })
-          } else {
-            output$overlap_table <- renderText(reproducibility_message)
-          }
-        })
-      
-
-   # by_user_code ----
-        observeEvent({req(input$metrics_select == "by_user_code")
-                          input$calculate}, {
-          segments <- load_all_segments_db(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-          users <- load_users_names(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-          codes <- load_codes_names(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
-
-          if (length(unique(segments$user_id)) > 1) {
-            overlap_df <- calculate_code_overlap_by_users(segments) %>%
-              join_user_names(., users) %>%
-              dplyr::left_join(., codes, by = "code_id") %>%
-              make_overlap_df_symmetrical()
-
-            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
-              ggplot2::facet_wrap(ggplot2::vars(code_name))
 
             output$overlap_documents <- NULL
             output$overlap_table <- NULL
@@ -335,46 +216,37 @@ mod_reproducibility_server <- function(id, glob) {
       
 
    # docs ----
-        # TODO: select doc_id and code_id
         observeEvent({req(input$metrics_select == "docs")
                 input$calculate}, {
-          DOC_ID <- 2
+          
+          req(input$docs_select)          
           docs <- load_all_docs_db(
-            pool = glob$pool,
-            active_project = glob$active_project
-          )
+                    pool = glob$pool,
+                    active_project = glob$active_project
+                  )
+          
+          DOC_ID <- input$docs_select
+          CODE_ID <- input$code_select
+          
           doc_to_display <- docs %>%
             dplyr::filter(doc_id == DOC_ID) %>%
             dplyr::pull(doc_text)
 
-          segments <- load_all_segments_db(
+          all_segments <- load_all_segments_db(
             pool = glob$pool,
             active_project = glob$active_project
-          ) %>%
-            dplyr::filter(doc_id == DOC_ID)
+          ) %>% dplyr::filter(doc_id == DOC_ID)
+          
+          segments <- all_segments %>%
+            dplyr::filter(code_id == CODE_ID)
 
           if (length(unique(segments$user_id)) > 1) {
-            overlap <- segments %>%
-              dplyr::filter(code_id == 5) %>%
-              dplyr::mutate(marked = purrr::map2(
-                segment_start, segment_end,
-                function(x, y) seq(from = x, to = y, by = 1)
-              )) %>%
-              tidyr::unnest(., marked) %>%
-              dplyr::count(marked) %>%
-              dplyr::mutate(segment_break = marked != dplyr::lag(marked) + 1 | n != dplyr::lag(n)) %>%
-              dplyr::mutate(segment_break = ifelse(is.na(segment_break), FALSE, segment_break)) %>%
-              dplyr::mutate(segment_id = cumsum(segment_break)) %>%
-              dplyr::group_by(segment_id, n) %>%
-              dplyr::summarise(
-                min_intersect = min(marked),
-                max_intersect = max(marked),
-                intersect_length = max_intersect - min_intersect + 1
-              )
-
+            overlap <- calculate_coders_overlap(segments)
             max_n <- max(overlap$n)
             palette <- viridisLite::viridis(max_n)
-
+            font_colour <- c(rep("white", times = floor(max_n / 2)), 
+                             rep("black", times = ceiling(max_n / 2)))
+            
             overlap_df <- overlap %>%
               dplyr::rename(
                 segment_start = min_intersect,
@@ -391,8 +263,12 @@ mod_reproducibility_server <- function(id, glob) {
                 tag_start = paste0(
                   '<b id="consensus_',
                   as.character(n),
+                  '" title="', 
+                  coders,
                   '" class="segment" style="padding:0; background-color:',
                   palette[n],
+                  '; color:', 
+                  font_colour[n],
                   '">'
                 )
               ) %>%
@@ -431,7 +307,20 @@ mod_reproducibility_server <- function(id, glob) {
               dplyr::ungroup() %>%
               dplyr::mutate(position_end = dplyr::lead(position_start - 1, default = max(position_start)))
 
-            html_content <- paste0(purrr::pmap_chr(
+            legend <- purrr::map_chr(1:max_n, function(x) {
+              paste0('<li><b id="consensus_',
+                     as.character(x),
+                     '" class="segment" style="padding:0; background-color:',
+                     palette[x],
+                     '; color:', 
+                     font_colour[x],
+                     '">Segment coded by ', 
+                     as.character(x), ifelse(x == 1, " coder", " coders"), 
+                     '</b></li>')
+            }) %>% paste0(., collapse = "")
+            
+            html_content <- paste0(
+              purrr::pmap_chr(
               list(
                 overlap_df$position_start,
                 overlap_df$position_end,
@@ -451,7 +340,11 @@ mod_reproducibility_server <- function(id, glob) {
               stringr::str_replace_all(
                 "[\\n\\r]",
                 "<span class='br'>\\&#8203</span></p><p class='docpar'>"
-              )
+              ) %>% 
+              paste0("<h2>Colour guide</h2><p>Overlap between coders is highlighted as follows:<ul>", 
+                     legend, 
+                     "</ul></p><h2>Coded document</h2>", 
+                     .)
 
             output$overlap_documents <- renderText({
               html_content
@@ -459,7 +352,14 @@ mod_reproducibility_server <- function(id, glob) {
             output$overlap_table <- NULL
             output$overlap_plot <- NULL
           } else {
-            output$overlap_table <- renderText(reproducibility_message)
+            if(!(length(unique(all_segments$user_id)) > 1)){
+              warning_message <- "Selected document was not coded by multiple coders"
+            }else{
+              warning_message <- "Selected code was not used in the selected document"
+            }
+            output$overlap_documents <- renderText(warning_message)
+            output$overlap_table <- NULL
+            output$overlap_plot <- NULL
           }
         })
       
