@@ -22,6 +22,11 @@ mod_reporting_ui <- function(id) {
         value = "repro",
         mod_reproducibility_ui("reproducibility_ui_1")
       ),
+      tabPanel("User attributes", 
+         id = ns("user_attributes"), 
+         value = "user_attributes", 
+         mod_user_attributes_ui("user_attributes_ui_1")
+      ), 
       tabPanel("Logs",
         id = ns("logs"),
         value = "logs",
