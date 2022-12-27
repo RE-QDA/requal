@@ -57,7 +57,7 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     loc$doc_list <- NULL
     loc$project <- ""
     
-    observeEvent(req(setup$mode == "local"), {
+    observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
   
     
     # file system prep ----
@@ -117,11 +117,6 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     })
     
     
-   
-        
-
-      
-    
     observeEvent(input$project_load, {
         loc$active_project <- isolate(
           read_project_db(pool = glob$pool,
@@ -135,29 +130,6 @@ mod_launchpad_loader_server <- function(id, glob, setup){
    
     })
     
-    observeEvent(req(setup$mode == "server"), {
-        
-        pool <- pool::dbPool(
-            drv = RPostgreSQL::PostgreSQL(),
-            dbname = "requal",
-            user = "radimhladik",
-            password = "test"
-        )
-        
-        
-        onStop(reactive({function(){
-            pool::poolClose(glob$pool) }})
-        )
-        
-        
-        updateSelectInput(session,
-                          "project_selector_load",
-                          choices = read_project_db(glob$pool,
-                                                    project_id = NULL))
-    
-        
-        
-        
-        })
+  
   })
     }

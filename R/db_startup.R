@@ -275,6 +275,8 @@ create_db_schema <- function(pool){
     DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
 } 
 
+# Database functions ####
+
 create_default_user <- function(pool, project_id){
     user_df <- tibble::tibble(
         user_name = Sys.info()["user"]
@@ -372,3 +374,26 @@ add_case_doc_record <- function(pool, project_id, case_doc_df, user_id){
         warning("code document map not added")
     }
 }
+
+# Globals ####
+
+make_globals <- quote({
+
+    mode <- golem::get_golem_options(which = "mode")
+
+    if (mode == "server") {
+
+        pool <- pool::dbPool(
+            drv = RPostgreSQL::PostgreSQL(),
+            dbname = golem::get_golem_options(which = "dbname"),
+            user = golem::get_golem_options(which = "dbusername"),
+            password = golem::get_golem_options(which = "dbpassword")
+        )
+
+        shiny::onStop(function() {
+            pool::poolClose(pool)
+            })
+
+        }
+
+})

@@ -12,10 +12,11 @@ app_server <- function(input, output, session) {
   # check_credentials returns a function to authenticate users
   auth <- shinymanager::secure_server(
       check_credentials = shinymanager::check_credentials(
-          Sys.getenv("access"),
-          passphrase = "test"
-      )
+          db = golem::get_golem_options(which = "credentials_path"),
+          passphrase = golem::get_golem_options(which = "credentials_pass")),
+      timeout = 60
   )  
+  
   observeEvent(auth, {
       setup$auth <- reactiveValuesToList(auth)
       glob$user <- as.integer(setup$auth$user_id)
