@@ -1,3 +1,5 @@
+utils::globalVariables(c("attribute_id", "attribute_name", "attribute_value_id")) 
+
 add_attribute <- function(pool, attribute_name, type = "categorical", object){
     new_attribute <- data.frame(
         attribute_name = attribute_name, 
