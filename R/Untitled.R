@@ -6,3 +6,7 @@ pool <- pool::dbPool(
 )
 
 pool::dbGetInfo(pool)
+
+DBI::dbListTables(pool)
+
+dplyr::tbl(pool, "projects")

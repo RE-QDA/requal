@@ -237,163 +237,162 @@ CREATE TABLE if not exists memos_segments_map (
 )"
 
 
-create_db_schema <- function(pool){
-    # TODO: Full DB structure
-    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass  != "SQLiteConnection"
-    if (db_postgres) {
-        DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
-        DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-        DBI::dbExecute(pool, CREATE_USERS_SQL)
-        DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-        DBI::dbExecute(pool, CREATE_LOG_SQL)
-        DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
-        DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
-        DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
-        DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-        DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
-        DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-        DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
-        
-    } else {
-        DBI::dbExecute(pool, CREATE_PROJECT_SQL)
-        DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-        DBI::dbExecute(pool, CREATE_USERS_SQL)
-        DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-        DBI::dbExecute(pool, CREATE_LOG_SQL)
-        DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
-        DBI::dbExecute(pool, CREATE_CODES_SQL)
-        DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
-        DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-        DBI::dbExecute(pool, CREATE_CASES_SQL)
-        DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-        DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
-    }
+create_db_schema <- function(pool) {
+  # TODO: Full DB structure
+  db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+  if (db_postgres) {
+    DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(pool, CREATE_USERS_SQL)
+    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
+    DBI::dbExecute(pool, CREATE_LOG_SQL)
+    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
+  } else {
+    DBI::dbExecute(pool, CREATE_PROJECT_SQL)
+    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(pool, CREATE_USERS_SQL)
+    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
+    DBI::dbExecute(pool, CREATE_LOG_SQL)
+    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
+    DBI::dbExecute(pool, CREATE_CODES_SQL)
+    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
+    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_CASES_SQL)
+    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
+  }
 
-    DBI::dbExecute(pool, CREATE_MEMO_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
-} 
+  DBI::dbExecute(pool, CREATE_MEMO_SQL)
+  DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
+  DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
+  DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
+}
 
 # Database functions ####
 
-create_default_user <- function(pool, project_id){
-    user_df <- tibble::tibble(
-        user_name = Sys.info()["user"]
+create_default_user <- function(pool, project_id) {
+  user_df <- tibble::tibble(
+    user_name = Sys.info()["user"]
+  )
+
+  DBI::dbWriteTable(pool, "users", user_df, append = TRUE)
+  user_df_stored <- dplyr::tbl(pool, "users") %>%
+    dplyr::filter(.data$user_name == !!user_df$user_name) %>%
+    dplyr::collect()
+
+  user_permission_df <- tibble::tibble(
+    user_id = user_df_stored$user_id,
+    project_id = project_id,
+    can_code = 1,
+    can_modify_codes = 1,
+    can_delete_codes = 1,
+    can_modify_documents = 1,
+    can_delete_documents = 1,
+    can_manage = 1
+  )
+
+  DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE)
+}
+
+create_project_record <- function(pool, project_df, user_id) {
+
+  res <- DBI::dbWriteTable(pool, "projects", project_df, append = TRUE)
+  project_id <- dplyr::tbl(pool, "projects") %>%
+    dplyr::filter(project_name == !!project_df$project_name) %>%
+    dplyr::pull(project_id)
+
+  if (res) {
+    log_create_project_record(pool, project_id, project_df, user_id)
+  }
+
+  requal_version_df <- data.frame(
+    project_id = project_id,
+    version = as.character(packageVersion("requal"))
+  )
+  res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE)
+
+  create_default_user(pool, project_id)
+}
+
+add_documents_record <- function(pool, project_id, document_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE)
+  if (res) {
+    written_document_id <- dplyr::tbl(pool, "documents") %>%
+      dplyr::filter(.data$doc_name == !!document_df$doc_name &
+        .data$doc_text == !!document_df$doc_text &
+        .data$project_id == project_id) %>%
+      dplyr::pull(doc_id)
+    log_add_document_record(pool, project_id, document_df %>%
+      dplyr::mutate(doc_id = written_document_id),
+    user_id = user_id
     )
-    
-    DBI::dbWriteTable(pool, "users", user_df, append = TRUE)
-    user_df_stored <- dplyr::tbl(pool, "users") %>%
-        dplyr::filter(.data$user_name == !!user_df$user_name) %>%
-        dplyr::collect()
-    
-    user_permission_df <- tibble::tibble(
-        user_id = user_df_stored$user_id,
-        project_id = project_id,
-        can_code = 1,
-        can_modify_codes = 1,
-        can_delete_codes = 1,
-        can_modify_documents = 1,
-        can_delete_documents = 1,
-        can_manage = 1
+  } else {
+    warning("document not added")
+  }
+}
+
+add_cases_record <- function(pool, project_id, case_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE)
+  if (res) {
+    written_case_id <- dplyr::tbl(pool, "cases") %>%
+      dplyr::filter(.data$case_name == !!case_df$case_name &
+        .data$project_id == project_id) %>%
+      dplyr::pull(.data$case_id)
+    log_add_case_record(pool, project_id, case_df %>%
+      dplyr::mutate(case_id = written_case_id),
+    user_id = user_id
     )
-    
-    DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE)
+  } else {
+    warning("case not added")
+  }
 }
 
-create_project_record <- function(pool, project_df, user_id){
-    res <- DBI::dbWriteTable(pool, "projects", project_df, append = TRUE)
-    project_id <- dplyr::tbl(pool, "projects") %>%
-        dplyr::filter(project_name == !!project_df$project_name) %>%
-        dplyr::pull(project_id)
-    
-    if(res){
-        log_create_project_record(pool, project_id, project_df, user_id)
-    }
-    
-    requal_version_df <- data.frame(
-        project_id = project_id,
-        version = as.character(packageVersion("requal"))
+add_codes_record <- function(pool, project_id, codes_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE)
+  if (res) {
+    written_code_id <- dplyr::tbl(pool, "codes") %>%
+      dplyr::filter(.data$code_name == !!codes_df$code_name &
+        .data$project_id == project_id) %>%
+      dplyr::pull(code_id)
+    log_add_code_record(pool, project_id, codes_df %>%
+      dplyr::mutate(code_id = written_code_id),
+    user_id = user_id
     )
-    res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE)
-    
-    create_default_user(pool, project_id)
+  } else {
+    warning("code not added")
+  }
 }
 
-add_documents_record <- function(pool, project_id, document_df, user_id){
-    res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE)
-    if(res){
-        written_document_id <- dplyr::tbl(pool, "documents") %>%
-            dplyr::filter(.data$doc_name == !!document_df$doc_name &
-                              .data$doc_text == !!document_df$doc_text &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(doc_id)
-        log_add_document_record(pool, project_id, document_df %>%
-                                    dplyr::mutate(doc_id = written_document_id), 
-                                user_id = user_id)
-    }else{
-        warning("document not added")
-    }
-}
-
-add_cases_record <- function(pool, project_id, case_df, user_id){
-    res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE)
-    if(res){
-        written_case_id <- dplyr::tbl(pool, "cases") %>%
-            dplyr::filter(.data$case_name == !!case_df$case_name &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(.data$case_id)
-        log_add_case_record(pool, project_id, case_df %>%
-                                dplyr::mutate(case_id = written_case_id), 
-                            user_id = user_id)
-    }else{
-        warning("case not added")
-    }
-}
-
-add_codes_record <- function(pool, project_id, codes_df, user_id){
-    res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE)
-    if(res){
-        written_code_id <- dplyr::tbl(pool, "codes") %>%
-            dplyr::filter(.data$code_name == !!codes_df$code_name &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(code_id)
-        log_add_code_record(pool, project_id, codes_df %>%
-                                dplyr::mutate(code_id = written_code_id), 
-                            user_id = user_id)
-    }else{
-        warning("code not added")
-    }
-}
-
-add_case_doc_record <- function(pool, project_id, case_doc_df, user_id){
-    res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE)
-    if(res){
-        log_add_case_doc_record(pool, project_id, case_doc_df, user_id)
-    }else{
-        warning("code document map not added")
-    }
+add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE)
+  if (res) {
+    log_add_case_doc_record(pool, project_id, case_doc_df, user_id)
+  } else {
+    warning("code document map not added")
+  }
 }
 
 # Globals ####
 
 make_globals <- quote({
+  mode <- golem::get_golem_options(which = "mode")
 
-    mode <- golem::get_golem_options(which = "mode")
+  if (mode == "server") {
+    pool <- pool::dbPool(
+      drv = RPostgreSQL::PostgreSQL(),
+      dbname = golem::get_golem_options(which = "dbname"),
+      user = golem::get_golem_options(which = "dbusername"),
+      password = golem::get_golem_options(which = "dbpassword")
+    )
 
-    if (mode == "server") {
-
-        pool <- pool::dbPool(
-            drv = RPostgreSQL::PostgreSQL(),
-            dbname = golem::get_golem_options(which = "dbname"),
-            user = golem::get_golem_options(which = "dbusername"),
-            password = golem::get_golem_options(which = "dbpassword")
-        )
-
-        shiny::onStop(function() {
-            pool::poolClose(pool)
-            })
-
-        }
-
+    onStop(function() {
+      pool::poolClose(glob$pool)
+    })
+  }
 })
