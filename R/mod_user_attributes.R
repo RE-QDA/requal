@@ -49,7 +49,9 @@ mod_user_attributes_server <- function(id, glob){
       shinyjs::reset("attribute_name")
       shinyjs::reset("attribute_values")
       
-      user_attributes <- read_user_attributes(glob$pool)
+      user_attributes <- read_user_attributes(glob$pool) %>% 
+        dplyr::group_by(attribute_name) %>%
+        dplyr::summarise(values = paste0(value, collapse = ", "))
       
       output$user_attributes_table <- renderTable({user_attributes})
     })
@@ -59,7 +61,9 @@ mod_user_attributes_server <- function(id, glob){
     })
     
     output$user_attributes_table <- renderTable({
-      read_user_attributes(glob$pool)
+      read_user_attributes(glob$pool) %>% 
+        dplyr::group_by(attribute_name) %>%
+        dplyr::summarise(values = paste0(value, collapse = ", "))
     })  
   })
 }

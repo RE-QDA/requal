@@ -40,7 +40,5 @@ read_user_attributes <- function(pool){
         dplyr::select(attribute_id, attribute_name) %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"),
                          by = "attribute_id") %>%
-        dplyr::collect() %>%
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
+        dplyr::collect()
 }
