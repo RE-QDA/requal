@@ -9,38 +9,12 @@
 #' @importFrom shiny NS tagList 
 mod_launchpad_loader_ui <- function(id){
   ns <- NS(id)
-  tagList(
-    
-
-      
-      h3("Project file"),
-      
-      div(span(textOutput(
-        ns("project_path_load")
-      ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
-      
-      shinyFiles::shinyFilesButton(
-        ns("sel_file_load"),
-        "File select",
-        "Please select a project file",
-        multiple = FALSE
-      ),
-      
-      selectInput(
-        ns("project_selector_load"),
-        "Select project",
-        choices = NULL
-      ),
-      
-      actionButton(
-        ns("project_load"),
-        label = "Load project",
-        class = "btn-success"
-      )
-    
-    
- 
-  )
+  
+  if (golem::get_golem_options(which = "mode") == "local") {
+       loader_UI_local(ns)
+  } else if (golem::get_golem_options(which = "mode") == "server") {
+       loader_UI_server(ns)
+  }
 }
     
 #' launchpad_loader Server Functions
@@ -57,6 +31,9 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     loc$doc_list <- NULL
     loc$project <- ""
     
+    ###############
+    # Local setup #
+    ###############
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
   
     
@@ -107,7 +84,48 @@ mod_launchpad_loader_server <- function(id, glob, setup){
         loc$project_file_load
       }
     })
-    
+   
+    })
+
+    ################
+    # Server setup #
+    ################
+
+    observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
+  
+  # close start-up pool
+
+   #pool::poolClose(pool)
+
+   # create glob$pool
+
+            glob$pool <- pool::dbPool(
+            drv = RPostgreSQL::PostgreSQL(),
+            dbname = golem::get_golem_options(which = "dbname"),
+            user = golem::get_golem_options(which = "dbusername"),
+            password = golem::get_golem_options(which = "dbpassword")
+             )
+             
+             reactive({ 
+                 onStop(function(){
+                 pool::poolClose(glob$pool) 
+                     }
+                 )
+            })
+             
+
+             updateSelectInput(session,
+                               "project_selector_load",
+                               choices = read_project_db(glob$pool,
+                                                         project_id = NULL))
+         
+    })
+
+
+    #################
+    # General setup #
+    #################
+
     # set active project from load ----
     
     output$project_active <- renderUI({
@@ -116,8 +134,14 @@ mod_launchpad_loader_server <- function(id, glob, setup){
       }
     })
     
+
     
     observeEvent(input$project_load, {
+
+      if (!isTruthy(input$project_selector_load)) {warn_user("No project to load.")}
+
+      req(input$project_selector_load)
+
         loc$active_project <- isolate(
           read_project_db(pool = glob$pool,
                           project_id = input$project_selector_load)
@@ -125,9 +149,6 @@ mod_launchpad_loader_server <- function(id, glob, setup){
         
         glob$active_project <- loc$active_project
         
-    })
- 
-   
     })
     
   
