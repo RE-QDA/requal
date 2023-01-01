@@ -13,7 +13,7 @@ log_action <- function(pool, action, project_id, data, user_id){
                                    user_id = user_id, 
                                    action = action, 
                                    payload = data)
-    DBI::dbWriteTable(pool, "logs", log_record_df, append = TRUE)
+    DBI::dbWriteTable(pool, "logs", log_record_df, append = TRUE, row.names = FALSE)
 }
 
 log_create_project_record <- function(con, project_id, project_df, user_id){
