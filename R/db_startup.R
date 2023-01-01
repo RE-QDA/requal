@@ -302,7 +302,12 @@ create_default_user <- function(pool, project_id) {
 
 create_project_record <- function(pool, project_df, user_id) {
 
-  res <- DBI::dbWriteTable(pool, "projects", project_df, append = TRUE)
+  res <- pool::dbWriteTable(pool, 
+  "projects", 
+  project_df, 
+  append = TRUE,
+  row.names = FALSE)
+
   project_id <- dplyr::tbl(pool, "projects") %>%
     dplyr::filter(project_name == !!project_df$project_name) %>%
     dplyr::pull(project_id)
@@ -315,7 +320,7 @@ create_project_record <- function(pool, project_df, user_id) {
     project_id = project_id,
     version = as.character(packageVersion("requal"))
   )
-  res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE)
+  res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE, row.names = FALSE)
 
   create_default_user(pool, project_id)
 }
