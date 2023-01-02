@@ -151,3 +151,11 @@ log_delete_memo_record <- function(con, project_id, memo_id, user_id){
                action = "Delete memo", 
                data = list(memo_id = memo_id))
 }
+
+log_user_attribute_change <- function(con, project_id, user_attribute, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id, 
+               action = "Change user attribute", 
+               data = user_attribute)
+}

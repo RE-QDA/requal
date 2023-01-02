@@ -69,14 +69,12 @@ mod_user_server <- function(id, glob) {
 
     # edit user ----
     observeEvent(input$edit_user, {
-      # TODO: load user attributes
       user_attributes <- read_user_attributes(glob$pool) %>% 
           dplyr::group_by(attribute_name) %>% 
           dplyr::summarise(values = list(value))
       
       specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = 1)
       
-      # TODO: load user attributes of the current user
       showModal(
         modalDialog(
           title = "User details",
@@ -116,7 +114,7 @@ mod_user_server <- function(id, glob) {
       )
       
       user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
-      update_user_attributes(glob$pool, user_id = 1, user_attr_values_df)
+      update_user_attributes(glob$pool, glob$active_project, user_id = 1, user_attr_values_df)
       
       loc$user_data <- read_user_db(glob$pool, user_id = 1, glob$active_project)
       removeModal()

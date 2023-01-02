@@ -35,7 +35,7 @@ get_user_attributes_from_modal <- function(input, user_attributes){
     })
 }
 
-update_user_attributes <- function(pool, user_id, user_attributes_df){
+update_user_attributes <- function(pool, project_id, user_id, user_attributes_df){
     attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
         dplyr::select(attribute_id, attribute_name) %>% 
         dplyr::collect()
@@ -58,18 +58,28 @@ update_user_attributes <- function(pool, user_id, user_attributes_df){
         if(nrow(existing_attr)){
             attr_id <- user_attributes_df$attribute_id[x]
             attr_value <- user_attributes_df$attribute_value_id[x]
-            update_attributes_sql <- glue::glue_sql("UPDATE user_attribute_map
+            
+            if(existing_attr$attribute_value_id != attr_value){
+                update_attributes_sql <- glue::glue_sql("UPDATE user_attribute_map
                  SET attribute_value_id = {attr_value}
                  WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
-            
-            DBI::dbExecute(pool, update_attributes_sql)
-            # TODO: log
+                
+                DBI::dbExecute(pool, update_attributes_sql)
+                log_user_attribute_change(pool, local(project_id), 
+                                          data.frame(
+                                              attribute_id = attr_id, 
+                                              attribute_value_id = attr_value
+                                          ), 
+                                          user_id = user_id)   
+            }
         }else{
             values_df <- user_attributes_df[x,] %>% 
                 dplyr::select(user_id, attribute_id, attribute_value_id)
             DBI::dbWriteTable(pool, "user_attribute_map", 
                               values_df, append = TRUE)
-            # TODO: log
+            log_user_attribute_change(pool, local(project_id), 
+                                      values_df, 
+                                      user_id = user_id)
         }
     })
 }
