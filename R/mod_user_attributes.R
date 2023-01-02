@@ -32,20 +32,31 @@ mod_user_attributes_server <- function(id, glob){
     
     observeEvent(input$add_attribute, {
       
-      add_attribute(pool = glob$pool, input$attribute_name,
-                    type = "category", object = "user")
-      
-      new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
-        dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
+      existing_attributes <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(.data$attribute_object == "user") %>% 
-        dplyr::collect() %>% 
-        dplyr::pull(attribute_id)
+        dplyr::collect()
       
-      add_attribute_values(pool = glob$pool, 
-                           attribute_id = new_attribute_id, 
-                           attribute_values = input$attribute_values)
+      if(!input$attribute_name %in% existing_attributes$attribute_name){
+        add_attribute(pool = glob$pool, input$attribute_name,
+                      type = "category", object = "user")
+        
+        new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
+          dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
+          dplyr::filter(.data$attribute_object == "user") %>% 
+          dplyr::collect() %>% 
+          dplyr::pull(attribute_id)
+        
+        add_attribute_values(pool = glob$pool, 
+                             attribute_id = new_attribute_id, 
+                             attribute_values = input$attribute_values)
+        
+        log_create_user_attribute(glob$pool, glob$active_project, user_id = 1, 
+                                  attribute_data = list(
+                                    attribute_name = input$attribute_name,
+                                    attribute_id = new_attribute_id, 
+                                    attribute_values = input$attribute_values)) 
+      }
       
-      # user_attributes <- rbind(user_attributes, new)
       shinyjs::reset("attribute_name")
       shinyjs::reset("attribute_values")
       

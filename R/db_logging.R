@@ -152,10 +152,18 @@ log_delete_memo_record <- function(con, project_id, memo_id, user_id){
                data = list(memo_id = memo_id))
 }
 
-log_user_attribute_change <- function(con, project_id, user_attribute, user_id){
+log_change_user_attribute <- function(con, project_id, user_attribute, user_id){
     log_action(con, 
                user_id = user_id, 
                project_id, 
                action = "Change user attribute", 
                data = user_attribute)
+}
+
+log_create_user_attribute <- function(con, project_id, attribute_data, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id, 
+               action = "Create user attribute", 
+               data = attribute_data)
 }

@@ -65,7 +65,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
                  WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
                 
                 DBI::dbExecute(pool, update_attributes_sql)
-                log_user_attribute_change(pool, local(project_id), 
+                log_change_user_attribute(pool, local(project_id), 
                                           data.frame(
                                               attribute_id = attr_id, 
                                               attribute_value_id = attr_value
@@ -77,7 +77,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
                 dplyr::select(user_id, attribute_id, attribute_value_id)
             DBI::dbWriteTable(pool, "user_attribute_map", 
                               values_df, append = TRUE)
-            log_user_attribute_change(pool, local(project_id), 
+            log_change_user_attribute(pool, local(project_id), 
                                       values_df, 
                                       user_id = user_id)
         }
