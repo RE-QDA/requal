@@ -55,9 +55,7 @@ mod_launchpad_creator_server <- function(id, glob, setup){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    
     # module reactive vals ----
-    
     loc <- reactiveValues()
     loc$db_path <- NULL
     loc$active_project <- NULL
@@ -65,7 +63,6 @@ mod_launchpad_creator_server <- function(id, glob, setup){
     
    # file system prep -----
     volumes <- c(Home = fs::path_home(), get_volume_paths())
-    
     
     shinyFiles::shinyDirChoose(
       input,
@@ -89,9 +86,7 @@ mod_launchpad_creator_server <- function(id, glob, setup){
         loc$project_directory <- normalizePath(shinyFiles::parseDirPath(volumes, input$sel_directory))
       })
     
-   
     # set active project from create ----
-    
     observeEvent(input$project_create, {
       req(input$project_name, input$sel_directory)
 
@@ -106,26 +101,37 @@ mod_launchpad_creator_server <- function(id, glob, setup){
         ), ".requal")
       )
       
-      # create project event - DB set up ----
-      mode <- golem::get_golem_options("mode")
-      
-      glob$pool <- pool::dbPool(
-          drv = switch(setup$mode,
-                       "local" = RSQLite::SQLite(), 
-                       "server" = RSQLite::SQLite()), # todo
-          dbname = switch(setup$mode,
-                          "local" = loc$db_path, 
-                          "server" = loc$db_path) #todo
-      )
-      
-      loc$active_project <- create_project_db(
-          pool = glob$pool,
-          project_name = input$project_name,
-          project_description = input$project_description
+      if(file.exists(loc$db_path)){
+        shinyjs::addClass("project_name", "invalid")
+        updateTextInput(
+          session = session,
+          inputId = "project_name", 
+          value = paste("project", input$project_name, "already exists"), 
+          placeholder = paste("project", input$project_name, "already exists"))
+      }else{
+        shinyjs::removeClass("project_name", "invalid")
+        # create project event - DB set up ----
+        mode <- golem::get_golem_options("mode")
+        
+        glob$pool <- pool::dbPool(
+            drv = switch(setup$mode,
+                         "local" = RSQLite::SQLite(), 
+                         "server" = RSQLite::SQLite()), # todo
+            dbname = switch(setup$mode,
+                            "local" = loc$db_path, 
+                            "server" = loc$db_path) #todo
         )
-      
-      # write active project details ----
-      glob$active_project <- loc$active_project
+        
+        loc$active_project <- create_project_db(
+            pool = glob$pool,
+            project_name = input$project_name,
+            project_description = input$project_description
+          )
+        
+        # write active project details ----
+        glob$active_project <- loc$active_project
+        
+      }
       
     })
     

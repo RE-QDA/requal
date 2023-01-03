@@ -84,13 +84,6 @@ golem::add_utils( "memo", module = "memo" )
 golem::add_utils( "reproducibility", module = "reproducibility" )
 golem::add_utils( "text_stats", module = "reproducibility" )
 
-
-
-
-
-
-
-
 ## External resources
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file( "document_code_js" )

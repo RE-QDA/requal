@@ -111,3 +111,12 @@ margin-left: -20px !important;
 margin-right: auto !important; 
 width: 100% !important;  
 } 
+
+.form-control {
+  border: 2px solid #ccc;
+}
+
+.invalid {
+  border-color: red; 
+  color: red;
+}
