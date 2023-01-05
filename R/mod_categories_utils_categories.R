@@ -205,7 +205,7 @@ delete_db_category <- function(pool, active_project, user_id, delete_cat_id) {
 
 # add category record -----
 add_category_record <- function(pool, project_id, user_id, categories_df) {
-    res <- DBI::dbWriteTable(pool, "categories", categories_df, append = TRUE)
+    res <- DBI::dbWriteTable(pool, "categories", categories_df, append = TRUE, row.names = FALSE)
     
     if (res) {
         written_category_id <- dplyr::tbl(pool, "categories") %>%
@@ -228,7 +228,7 @@ add_category_code_record <- function(pool,
     edge_df <- as.data.frame(edge)
     edge_df$project_id <- active_project
     
-    res <- DBI::dbWriteTable(pool, "categories_codes_map", edge_df, append = TRUE)
+    res <- DBI::dbWriteTable(pool, "categories_codes_map", edge_df, append = TRUE, row.names = FALSE)
     
     if (res) {
         log_add_category_code_record(pool, active_project, edge_df, user_id)

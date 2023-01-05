@@ -276,28 +276,43 @@ create_db_schema <- function(pool) {
 
 # Database functions ####
 
-create_default_user <- function(pool, project_id) {
-  user_df <- tibble::tibble(
-    user_name = Sys.info()["user"]
-  )
+create_default_user <- function(pool, project_id, user_id) {
 
-  DBI::dbWriteTable(pool, "users", user_df, append = TRUE)
-  user_df_stored <- dplyr::tbl(pool, "users") %>%
-    dplyr::filter(.data$user_name == !!user_df$user_name) %>%
-    dplyr::collect()
 
-  user_permission_df <- tibble::tibble(
-    user_id = user_df_stored$user_id,
-    project_id = project_id,
-    can_code = 1,
-    can_modify_codes = 1,
-    can_delete_codes = 1,
-    can_modify_documents = 1,
-    can_delete_documents = 1,
-    can_manage = 1
-  )
+  if (golem::get_golem_options("mode") == "local") {
+    user_df <- tibble::tibble(
+      user_name = Sys.info()["user"]
+    )
+    DBI::dbWriteTable(pool, "users", user_df, append = TRUE, row.names = FALSE)
 
-  DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE)
+    user_df_stored <- dplyr::tbl(pool, "users") %>%
+      dplyr::filter(.data$user_name == !!user_df$user_name) %>%
+      dplyr::collect()
+    user_permission_df <- tibble::tibble(
+      user_id = user_df_stored$user_id,
+      project_id = project_id,
+      can_code = 1,
+      can_modify_codes = 1,
+      can_delete_codes = 1,
+      can_modify_documents = 1,
+      can_delete_documents = 1,
+      can_manage = 1
+    )
+  }else{
+    user_permission_df <- tibble::tibble(
+      user_id = user_id,
+      project_id = project_id,
+      can_code = 1,
+      can_modify_codes = 1,
+      can_delete_codes = 1,
+      can_modify_documents = 1,
+      can_delete_documents = 1,
+      can_manage = 1
+    )
+  }
+
+
+  DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE, row.names = FALSE)
 }
 
 create_project_record <- function(pool, project_df, user_id) {
@@ -308,9 +323,13 @@ create_project_record <- function(pool, project_df, user_id) {
   append = TRUE,
   row.names = FALSE)
 
+  
   project_id <- dplyr::tbl(pool, "projects") %>%
     dplyr::filter(project_name == !!project_df$project_name) %>%
-    dplyr::pull(project_id)
+    dplyr::pull(project_id)  
+
+  # to delete later after we check for unique project names
+  project_id <- max(project_id) 
 
   if (res) {
     log_create_project_record(pool, project_id, project_df, user_id)
@@ -322,11 +341,11 @@ create_project_record <- function(pool, project_df, user_id) {
   )
   res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE, row.names = FALSE)
 
-  create_default_user(pool, project_id)
+  create_default_user(pool, project_id, user_id = user_id)
 }
 
 add_documents_record <- function(pool, project_id, document_df, user_id) {
-  res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE)
+  res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_document_id <- dplyr::tbl(pool, "documents") %>%
       dplyr::filter(.data$doc_name == !!document_df$doc_name &
@@ -343,7 +362,7 @@ add_documents_record <- function(pool, project_id, document_df, user_id) {
 }
 
 add_cases_record <- function(pool, project_id, case_df, user_id) {
-  res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE)
+  res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_case_id <- dplyr::tbl(pool, "cases") %>%
       dplyr::filter(.data$case_name == !!case_df$case_name &
@@ -359,7 +378,7 @@ add_cases_record <- function(pool, project_id, case_df, user_id) {
 }
 
 add_codes_record <- function(pool, project_id, codes_df, user_id) {
-  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE)
+  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(.data$code_name == !!codes_df$code_name &
@@ -375,7 +394,7 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
 }
 
 add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
-  res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE)
+  res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE, row.names = FALSE)
   if (res) {
     log_add_case_doc_record(pool, project_id, case_doc_df, user_id)
   } else {
@@ -387,7 +406,6 @@ add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
 
 make_globals <- quote({
   mode <- golem::get_golem_options(which = "mode")
-
   if (mode == "server") {
     pool <- pool::dbPool(
       drv = RPostgreSQL::PostgreSQL(),
@@ -399,5 +417,6 @@ make_globals <- quote({
     onStop(function() {
       pool::poolClose(glob$pool)
     })
+
   }
 })
