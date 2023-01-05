@@ -1,17 +1,24 @@
 create_project_db <- function(pool,
                               project_name,
-                              project_description) {
+                              project_description,
+                              user_id) {
   project_df <- tibble::tibble(project_name,
     project_description,
     created_at = as.character(Sys.time())
   )
-browser()
+
   if (!DBI::dbExistsTable(pool, "projects")) {
     # https://github.com/r-dbi/RSQLite/issues/59
     create_db_schema(pool)
   }
 
-  create_project_record(pool, project_df, user_id = 1)
+
+  if (golem::get_golem_options("mode") == "local") {
+    create_project_record(pool, project_df, user_id = 1)
+  } else if (golem::get_golem_options("mode") == "server") {
+    create_project_record(pool, project_df, user_id = as.integer(user_id))
+  }
+
 
   active_project_df <- dplyr::tbl(pool, "projects") %>%
     dplyr::select(project_id, project_name) %>%

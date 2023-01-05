@@ -93,7 +93,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         loc$active_project <- create_project_db(
           pool = glob$pool,
           project_name = input$project_name,
-          project_description = input$project_description
+          project_description = input$project_description,
+          user_id = 1
         )
 
         # write active project details ----
@@ -109,12 +110,14 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
       observeEvent(input$project_create, {
         req(input$project_name)
 
-        glob$pool <- pool::dbPool(
+                
+          glob$pool <- pool::dbPool(
           drv = RPostgreSQL::PostgreSQL(),
           dbname = golem::get_golem_options(which = "dbname"),
           user = golem::get_golem_options(which = "dbusername"),
           password = golem::get_golem_options(which = "dbpassword")
         )
+        
         reactive({ 
                  onStop(function(){
                  pool::poolClose(glob$pool) 
@@ -122,12 +125,31 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
                  )
             })
 
+        # user control
+
+        existing_user <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::collect()
+
+        if(!nrow(existing_user)){
+          # zkopčit usery
+          users_df <- data.frame(
+            user_id = setup$auth$user_id, 
+            user_name = setup$auth$user,
+            user_mail = "TODO"
+          )
+          DBI::dbWriteTable(pool, "users", users_df,
+          append = TRUE, row.names = FALSE)
+        }
+
+        # if user control ok, create project
+
         loc$active_project <- create_project_db(
           pool = glob$pool,
           project_name = input$project_name,
-          project_description = input$project_description
+          project_description = input$project_description,
+          user_id = setup$auth$user_id
         )
-
+    
         # write active project details ----
         glob$active_project <- loc$active_project
       })
