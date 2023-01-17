@@ -11,7 +11,7 @@ golem::document_and_reload()
 # Run the application
 (run_app(
   mode = "server",
-  dbname = "requal3",
+  dbname = "requal",
   dbusername = "requal_admin",
   dbpassword = "test",
   credentials_path = "requal_users.sqlite",
