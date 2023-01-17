@@ -127,19 +127,23 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
 
         # user control
 
-        existing_user <- dplyr::tbl(glob$pool, "users") %>%
-          dplyr::collect()
-
-        if(!nrow(existing_user)){
-          # zkopčit usery
+        existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::pull(user_id)
+        
+        if(!(glob$user$id %in% existing_user_id) && glob$user$is_admin) {
+          # create user in db if an uknown admin logs in
           users_df <- data.frame(
-            user_id = setup$auth$user_id, 
-            user_name = setup$auth$user,
-            user_mail = "TODO"
+            user_id = glob$user$id, 
+            user_name = glob$user$name,
+            user_mail = glob$user$mail
           )
           DBI::dbWriteTable(pool, "users", users_df,
           append = TRUE, row.names = FALSE)
-        }
+        } else if (!glob$user$is_admin) {
+           # abort project creation if user is not admin
+          warn_user("Only administrators can create new projects.")
+          req(glob$user$is_admin)
+        } else {
 
         # if user control ok, create project
 
@@ -147,9 +151,9 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           pool = glob$pool,
           project_name = input$project_name,
           project_description = input$project_description,
-          user_id = setup$auth$user_id
+          user_id = glob$user$user_id
         )
-    
+    }
         # write active project details ----
         glob$active_project <- loc$active_project
       })
