@@ -135,7 +135,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         if(glob$user$is_admin && !(glob$user$id %in% existing_user_id)) {
           # create user in db if an uknown admin logs in
           users_df <- data.frame(
-            user_id = glob$user$id, 
+            user_id = glob$user$user_id, 
             user_name = glob$user$name,
             user_mail = glob$user$mail
           )

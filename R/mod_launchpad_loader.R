@@ -112,7 +112,6 @@ mod_launchpad_loader_server <- function(id, glob, setup){
                      }
                  )
             })
-             
 
              updateSelectInput(session,
                                "project_selector_load",
@@ -131,6 +130,8 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     output$project_active <- renderUI({
       if (is.null(loc$active_project)) {
         "No active project."
+      } else {
+         loc$active_project
       }
     })
     
@@ -141,6 +142,22 @@ mod_launchpad_loader_server <- function(id, glob, setup){
       if (!isTruthy(input$project_selector_load)) {warn_user("No project to load.")}
 
       req(input$project_selector_load)
+
+      # user control
+
+        existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::pull(user_id)
+       
+        if(!(glob$user$user_id %in% existing_user_id)) {
+          # create user in db if an uknown user logs in
+          users_df <- data.frame(
+            user_id = glob$user$user_id, 
+            user_name = glob$user$name,
+            user_mail = glob$user$mail
+          )
+          DBI::dbWriteTable(pool, "users", users_df,
+          append = TRUE, row.names = FALSE)
+        } 
 
         loc$active_project <- isolate(
           read_project_db(pool = glob$pool,
