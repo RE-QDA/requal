@@ -33,7 +33,7 @@ mod_user_server <- function(id, glob){
             active_project = glob$active_project
           )
         
-        glob$user <- loc$user_data
+        glob$user$data <- loc$user_data
                 
                 permissions_list <- loc$user_data %>% 
                     dplyr::select(dplyr::starts_with("can_")) %>% 
@@ -95,7 +95,7 @@ mod_user_server <- function(id, glob){
             loc$user_data <- read_user_db(glob$pool, user_id = 1, glob$active_project)
             removeModal()
             
-            glob$user <- loc$user_data
+            glob$user$data <- loc$user_data
         })
         
         
