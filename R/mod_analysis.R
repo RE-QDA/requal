@@ -103,10 +103,10 @@ mod_analysis_server <- function(id, glob) {
       {
         loc$temp_df <- load_segments_analysis(
           pool = glob$pool,
-          active_project = glob$active_project,
-          selected_codes = input$code_filter,
-          selected_categories = input$category_filter,
-          selected_docs = input$document_filter
+          active_project = as.integer(glob$active_project),
+          selected_codes = as.integer(input$code_filter),
+          selected_categories = as.integer(input$category_filter),
+          selected_docs = as.integer(input$document_filter)
         )
 
         if (nrow(loc$temp_df) > 0) {
