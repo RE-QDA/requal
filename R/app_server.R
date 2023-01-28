@@ -18,7 +18,7 @@ app_server <- function(input, output, session) {
   
   observeEvent(auth, {
       glob$user$name <- auth$user
-      glob$user$id <- as.integer(auth$user_id)
+      glob$user$user_id <- as.integer(auth$user_id)
       glob$user$is_admin <- as.logical(auth$admin)
       glob$user$mail <- "mailadress" #TODO
   })
