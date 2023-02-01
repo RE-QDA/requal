@@ -206,11 +206,20 @@ CREATE TABLE if not exists cases_documents_map (
 # memos
 CREATE_MEMO_SQL <- "
 CREATE TABLE if not exists memos (
-    project_id INTEGER,
-    memo_id INTEGER PRIMARY KEY
+    project_id INTEGER
+,   memo_id INTEGER PRIMARY KEY
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 )"
+
+CREATE_MEMO_SQL_POSTGRES <- "
+CREATE TABLE if not exists memos (
+    project_id INTEGER
+,   memo_id SERIAL PRIMARY KEY
+,   text TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+)"
+
 
 CREATE_MEMO_DOCUMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_documents_map (
@@ -253,6 +262,8 @@ create_db_schema <- function(pool) {
     DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
     DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_MEMO_SQL_POSTGRES)
+
   } else {
     DBI::dbExecute(pool, CREATE_PROJECT_SQL)
     DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
@@ -266,9 +277,10 @@ create_db_schema <- function(pool) {
     DBI::dbExecute(pool, CREATE_CASES_SQL)
     DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
+    DBI::dbExecute(pool, CREATE_MEMO_SQL)
+
   }
 
-  DBI::dbExecute(pool, CREATE_MEMO_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)

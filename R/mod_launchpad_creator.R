@@ -131,7 +131,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
 
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-      browser()
+      
         if(glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
           # create user in db if an uknown admin logs in
           users_df <- data.frame(
@@ -156,7 +156,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           user_id = glob$user$user_id
         )
     }
-        # write active project details ----
+        # pass active project details info to glob ----
         glob$active_project <- loc$active_project
       })
     })
