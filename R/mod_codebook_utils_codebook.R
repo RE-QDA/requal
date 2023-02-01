@@ -198,14 +198,32 @@ delete_db_codes <-
              user_id) {
         
         DBI::dbExecute(pool,
-                       "DELETE FROM codes
-                       WHERE code_id IN (?);",
-                       params = list(delete_code_id)
-        )
+                   glue::glue_sql("DELETE from codes
+                   WHERE code_id IN ({delete_code_id})",
+                   .con = pool)
+                   )
+
         
         log_delete_code_record(pool, active_project, delete_code_id, user_id)
     }
+# Delete codes from segments table 
 
+
+delete_codes_segment_db <- function(pool, 
+                                    active_project,
+                                    user_id,
+                                    code_id) {
+    
+    # delete code from a segment
+    query <- glue::glue_sql("DELETE FROM segments
+                       WHERE project_id = {active_project}
+                       AND code_id = {code_id}", 
+                       .con = pool)
+    
+    purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
+    
+   #todo log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)
+}
 
 # Render codes -----
 

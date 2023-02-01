@@ -176,15 +176,7 @@ mod_codebook_server <- function(id, glob) {
     observeEvent(input$code_del_btn, {
       req(input$code_to_del)
 
-      # delete code
-      delete_db_codes(
-        pool = glob$pool,
-        active_project = glob$active_project,
-        delete_code_id = input$code_to_del, 
-        user_id = glob$user$user_id
-      )
-
-      # delete edges
+      # delete edges - must precede deleting of codes
       edge <- list()
       edge$code_id <- input$code_to_del
       delete_category_code_record(
@@ -192,6 +184,21 @@ mod_codebook_server <- function(id, glob) {
         active_project = glob$active_project,
         user_id = glob$user$user_id,
         edge = edge
+      )
+
+      delete_codes_segment_db(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        code_id = input$code_to_del
+        )
+
+      # delete code
+      delete_db_codes(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        delete_code_id = input$code_to_del, 
+        user_id = glob$user$user_id
       )
 
       # re-render UI
@@ -269,7 +276,6 @@ mod_codebook_server <- function(id, glob) {
     })
 
     # returns glob$codebook ----
-
 
     # end of server module function
   })

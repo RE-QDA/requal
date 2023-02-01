@@ -171,15 +171,7 @@ mod_categories_server <- function(id, glob) {
     # delete action
     observeEvent(input$category_remove, {
 
-      # remove from db
-      delete_db_category(
-        pool = glob$pool,
-        active_project = glob$active_project,
-        user_id = glob$user_id,
-        delete_cat_id = input$categories_to_del
-      )
-
-      # remove from edges
+        # remove from edges
       edge <- list()
       edge$category_id <- input$categories_to_del
       delete_category_code_record(
@@ -188,6 +180,14 @@ mod_categories_server <- function(id, glob) {
           user_id = glob$user$user_id,
           edge = edge)
 
+    # remove from db
+      delete_db_category(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user_id,
+        delete_cat_id = input$categories_to_del
+      )
+      
       # refresh delete UI
       updateSelectInput(
         session = session,

@@ -193,10 +193,10 @@ delete_category_UI <- function(id, pool, active_project) {
 
 delete_db_category <- function(pool, active_project, user_id, delete_cat_id) {
     res <- DBI::dbExecute(pool,
-                          "DELETE from categories
-                   WHERE category_id IN (?)",
-                          params = list(delete_cat_id)
-    )
+                   glue::glue_sql("DELETE from categories
+                   WHERE category_id IN ({delete_cat_id})",
+                   .con = pool)
+                   )
     
     if(res & length(delete_cat_id)){
         log_delete_category_record(pool, active_project, delete_cat_id, user_id)
@@ -254,17 +254,19 @@ delete_category_code_record <- function(pool,
     } else if (!is.null(edge$category_id) & is.null(edge$code_id) ) {
         # delete edges based on categories
         res <- DBI::dbExecute(pool,
-                              "DELETE FROM categories_codes_map
-                       WHERE category_id IN (?);",
-                              params = list(edge$category_id))
-        
+                   glue::glue_sql("DELETE from categories_codes_map
+                   WHERE category_id IN ({edge$category_id})",
+                   .con = pool)
+                   )
+   
     } else {
         # delete edges based on codebook
         res <- DBI::dbExecute(pool,
-                              "DELETE FROM categories_codes_map
-                       WHERE code_id IN (?);",
-                              params = list(edge$code_id))
-    }
+                   glue::glue_sql("DELETE from categories_codes_map
+                   WHERE code_id IN ({edge$code_id})",
+                   .con = pool)
+                   )
+    }        
     
     if(res){
         log_delete_category_code_record(pool, active_project, edge, user_id)
