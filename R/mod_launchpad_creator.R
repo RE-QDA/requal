@@ -131,8 +131,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
 
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-      
-        if(glob$user$is_admin && !(glob$user$id %in% existing_user_id)) {
+      browser()
+        if(glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
           # create user in db if an uknown admin logs in
           users_df <- data.frame(
             user_id = glob$user$user_id, 
