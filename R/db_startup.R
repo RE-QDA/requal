@@ -210,7 +210,8 @@ CREATE TABLE if not exists memos (
 ,   memo_id INTEGER PRIMARY KEY
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-)"
+);
+"
 
 CREATE_MEMO_SQL_POSTGRES <- "
 CREATE TABLE if not exists memos (
@@ -218,7 +219,8 @@ CREATE TABLE if not exists memos (
 ,   memo_id SERIAL PRIMARY KEY
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-)"
+);
+"
 
 
 CREATE_MEMO_DOCUMENT_MAP_SQL <- "
@@ -229,21 +231,26 @@ CREATE TABLE if not exists memos_documents_map (
     ,   memo_end INTEGER
     ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
+
 CREATE_MEMO_CODE_MAP_SQL <- "
 CREATE TABLE if not exists memos_codes_map (
     memo_id INTEGER
     ,   code_id INTEGER
     ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
+
 CREATE_MEMO_SEGMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
     ,   segment_id INTEGER
     ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
 
 
 create_db_schema <- function(pool) {
@@ -421,6 +428,8 @@ make_globals <- quote({
   if (mode == "server") {
     pool <- pool::dbPool(
       drv = RPostgreSQL::PostgreSQL(),
+      host = golem::get_golem_options(which = "dbhost"),
+      port = golem::get_golem_options(which = "dbport"),
       dbname = golem::get_golem_options(which = "dbname"),
       user = golem::get_golem_options(which = "dbusername"),
       password = golem::get_golem_options(which = "dbpassword")

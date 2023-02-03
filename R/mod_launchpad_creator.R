@@ -114,6 +114,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
                 
           glob$pool <- pool::dbPool(
           drv = RPostgreSQL::PostgreSQL(),
+          host = golem::get_golem_options(which = "dbhost"),
+          port = golem::get_golem_options(which = "dbport"),
           dbname = golem::get_golem_options(which = "dbname"),
           user = golem::get_golem_options(which = "dbusername"),
           password = golem::get_golem_options(which = "dbpassword")

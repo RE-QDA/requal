@@ -100,11 +100,13 @@ mod_launchpad_loader_server <- function(id, glob, setup){
    # create glob$pool
 
             glob$pool <- pool::dbPool(
-            drv = RPostgreSQL::PostgreSQL(),
-            dbname = golem::get_golem_options(which = "dbname"),
-            user = golem::get_golem_options(which = "dbusername"),
-            password = golem::get_golem_options(which = "dbpassword")
-             )
+              drv = RPostgreSQL::PostgreSQL(),
+              host = golem::get_golem_options(which = "dbhost"), 
+              port = golem::get_golem_options(which = "dbport"),
+              dbname = golem::get_golem_options(which = "dbname"),
+              user = golem::get_golem_options(which = "dbusername"),
+              password = golem::get_golem_options(which = "dbpassword")
+            )
              
              reactive({ 
                  onStop(function(){

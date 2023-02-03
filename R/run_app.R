@@ -8,6 +8,8 @@
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
 run_app <- function(mode = "local",
+                    dbhost = "localhost",
+                    dbport = 5432,
                     dbname = NULL,
                     dbusername = NULL,
                     dbpassword = NULL,
@@ -33,6 +35,8 @@ run_app <- function(mode = "local",
       uiPattern = uiPattern
     ),
     golem_opts = list(mode = mode,
+                      dbhost = dbhost,
+                      dbport = dbport, 
                       dbname = dbname,
                       dbusername = dbusername,
                       dbpassword = dbpassword,
