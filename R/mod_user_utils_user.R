@@ -2,8 +2,8 @@
 read_user_db <- function(pool, user_id, active_project) {
     dplyr::tbl(pool, "users") %>% 
         dplyr::filter(.data$user_id == !!user_id) %>% 
-        dplyr::inner_join(., dplyr::tbl(pool, "user_permissions") %>% 
-                              dplyr::filter(.data$project_id == as.numeric(active_project)),
+        dplyr::left_join(., dplyr::tbl(pool, "user_permissions") %>% 
+                              dplyr::filter(.data$project_id == as.integer(active_project)),
                           by = c("user_id")) %>% 
         dplyr::collect()
 }

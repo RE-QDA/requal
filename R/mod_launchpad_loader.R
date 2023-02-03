@@ -157,6 +157,8 @@ mod_launchpad_loader_server <- function(id, glob, setup){
           )
           DBI::dbWriteTable(pool, "users", users_df,
           append = TRUE, row.names = FALSE)
+          
+          create_default_user(pool,input$project_selector_load,glob$user$user_id)
         } 
 
         loc$active_project <- isolate(
