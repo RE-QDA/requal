@@ -174,7 +174,7 @@ mod_analysis_server <- function(id, glob) {
       {
         if (nrow(loc$segments_df) > 0) {
           glob$segments_df <- loc$segments_df %>%
-            dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
+            dplyr::select(doc_name, doc_id, code_name, code_id, segment_text, user_name)
           glob$segments_taglist <- loc$segments_taglist
         }
       }
