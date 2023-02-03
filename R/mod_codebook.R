@@ -186,6 +186,7 @@ mod_codebook_server <- function(id, glob) {
         edge = edge
       )
 
+      # if a code gets deleted, the corresponding segments should be deleted too
       delete_codes_segment_db(
         pool = glob$pool,
         active_project = glob$active_project,

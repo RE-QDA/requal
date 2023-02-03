@@ -29,7 +29,7 @@ mod_user_server <- function(id, glob){
                 
         loc$user_data <- read_user_db(
             glob$pool,
-            user_id = 1,
+            user_id = glob$user$user_id,
             active_project = glob$active_project
           )
         
@@ -88,11 +88,11 @@ mod_user_server <- function(id, glob){
         
         observeEvent(input$save_close, {
             update_user_db(glob$pool, 
-                           user_id = 1,
+                           user_id = glob$user$user_id,
                            input$user_name,
                            input$user_email)
             
-            loc$user_data <- read_user_db(glob$pool, user_id = 1, glob$active_project)
+            loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
             removeModal()
             
             glob$user$data <- loc$user_data

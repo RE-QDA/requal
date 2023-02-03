@@ -94,7 +94,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           pool = glob$pool,
           project_name = input$project_name,
           project_description = input$project_description,
-          user_id = 1
+          user_id = glob$user$user_id
         )
 
         # write active project details ----
