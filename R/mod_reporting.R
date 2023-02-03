@@ -22,6 +22,11 @@ mod_reporting_ui <- function(id) {
         value = "repro",
         mod_reproducibility_ui("reproducibility_ui_1")
       ),
+      tabPanel("Browse coded docs", 
+        id = ns("browser"), 
+        value = "browser", 
+        mod_browser_ui("browser_ui_1")
+      ),
       tabPanel("Logs",
         id = ns("logs"),
         value = "logs",
