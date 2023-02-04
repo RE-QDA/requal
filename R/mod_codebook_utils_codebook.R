@@ -259,6 +259,11 @@ merge_codes <- function(pool,
     DBI::dbExecute(pool, update_segments_sql)
     
     # should delete merge from row from codes
+    delete_code_category_sql <- glue::glue_sql("DELETE FROM categories_codes_map WHERE code_id = {merge_from}",
+                                      .con = pool
+    )
+    DBI::dbExecute(pool, delete_code_category_sql)
+
     delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}",
                                       .con = pool
     )
