@@ -16,6 +16,8 @@ mod_browser_ui <- function(id){
     selectInput(ns("browser_code"), 
                 "Select code: ", 
                 choices = ""), 
+    checkboxGroupInput(ns("browser_coders"), "Select coders:", 
+                       choices = ""),
     actionButton(ns("calculate"), "Browse"),
     uiOutput(ns("document_viewer"))
   )
@@ -36,6 +38,21 @@ mod_browser_server <- function(id, glob){
           session = session,
           "browser_doc",
           choices = c("", glob$documents)
+        )
+        
+        users <- dplyr::tbl(glob$pool, "users") %>% 
+          dplyr::select(user_id, user_name) %>% 
+          dplyr::collect()
+        
+        updateCheckboxGroupInput(
+          session = session, 
+          "browser_coders", 
+          choices = c(
+            stats::setNames(
+              users$user_id,
+              users$user_name
+            )
+          )
         )
       }
     })
@@ -71,7 +88,8 @@ mod_browser_server <- function(id, glob){
         dplyr::filter(doc_id == input$browser_doc)
       
       coded_segments <- segments %>%
-        dplyr::filter(code_id == input$browser_code)
+        dplyr::filter(code_id == input$browser_code) %>% 
+        dplyr::filter(user_id %in% as.numeric(input$browser_coders))
     
       if (nrow(coded_segments) > 0) {
         
@@ -121,7 +139,7 @@ mod_browser_server <- function(id, glob){
               '<b id="consensus_',
               as.character(n),
               '" class="segment" style="padding:0; background-color:',
-              palette[n], dplyr::if_else(n <= (max_n / 2), "; color:white", ""),
+              palette[n], dplyr::if_else(n <= (max_n / 2) | max_n == 1, "; color:white", ""),
               '" title="coded by: ', 
               users, 
               '">'
