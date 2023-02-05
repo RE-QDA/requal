@@ -52,7 +52,8 @@ mod_browser_server <- function(id, glob){
               users$user_id,
               users$user_name
             )
-          )
+          ), 
+          selected = users$user_id
         )
       }
     })

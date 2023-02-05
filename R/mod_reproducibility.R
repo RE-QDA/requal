@@ -38,7 +38,7 @@ mod_reproducibility_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    reproducibility_message <- "Reproducibility measures cannot be computed for projects with one active coder."
+    reproducibility_message <- "Reproducibility measures cannot be computed for a single active coder."
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
@@ -54,7 +54,8 @@ mod_reproducibility_server <- function(id, glob) {
               users$user_id,
               users$user_name
             )
-          )
+          ), 
+          selected = users$user_id
         )
       }
     })
