@@ -37,7 +37,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
     # General setup ####
     ####################
 
-  
+
 
     ##################
     # Local setup ####
@@ -96,6 +96,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         )
 
 
+        glob$user$user_id <- as.integer(1)
 
         loc$active_project <- create_project_db(
           pool = glob$pool,
@@ -103,6 +104,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           project_description = input$project_description,
           user_id = glob$user$user_id
         )
+      names(loc$active_project) <- input$project_name
 
       })
     })
@@ -115,66 +117,60 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
       observeEvent(input$project_create, {
         req(input$project_name)
 
-        if (is.null(glob$active_project)) {  
-                
+        if (is.null(glob$active_project)) {
           glob$pool <- pool::dbPool(
-          drv = RPostgreSQL::PostgreSQL(),
-          host = golem::get_golem_options(which = "dbhost"),
-          port = golem::get_golem_options(which = "dbport"),
-          dbname = golem::get_golem_options(which = "dbname"),
-          user = golem::get_golem_options(which = "dbusername"),
-          password = golem::get_golem_options(which = "dbpassword")
-        )
-        
-        reactive({ 
-                 onStop(function(){
-                 pool::poolClose(glob$pool) 
-                     }
-                 )
+            drv = RPostgreSQL::PostgreSQL(),
+            host = golem::get_golem_options(which = "dbhost"),
+            port = golem::get_golem_options(which = "dbport"),
+            dbname = golem::get_golem_options(which = "dbname"),
+            user = golem::get_golem_options(which = "dbusername"),
+            password = golem::get_golem_options(which = "dbpassword")
+          )
+
+          reactive({
+            onStop(function() {
+              pool::poolClose(glob$pool)
             })
-            
-            }
+          })
+        }
         # user control ----
 
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-      
-        if(glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
+
+        if (glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
           # create user in db if an uknown admin logs in
           users_df <- data.frame(
-            user_id = glob$user$user_id, 
+            user_id = glob$user$user_id,
             user_name = glob$user$name,
             user_mail = glob$user$mail
           )
           DBI::dbWriteTable(pool, "users", users_df,
-          append = TRUE, row.names = FALSE)
+            append = TRUE, row.names = FALSE
+          )
         } else if (!glob$user$is_admin) {
-           # abort project creation if user is not admin
+          # abort project creation if user is not admin
           warn_user("Only administrators can create new projects.")
           req(glob$user$is_admin)
         } else {
 
-        # if user control ok, create project
+          # if user control ok, create project
 
-        loc$active_project <- create_project_db(
-          pool = glob$pool,
-          project_name = input$project_name,
-          project_description = input$project_description,
-          user_id = glob$user$user_id
-        )
-        names(loc$active_project) <- input$project_name
-    }
-      
+          loc$active_project <- create_project_db(
+            pool = glob$pool,
+            project_name = input$project_name,
+            project_description = input$project_description,
+            user_id = glob$user$user_id
+          )
+          names(loc$active_project) <- input$project_name
+        }
       })
     })
- 
-
-  # pass active project details info to glob ----
-  observeEvent(loc$active_project, {
-  glob$active_project <- loc$active_project
-  })
-        
 
 
+    # pass active project details info to glob ----
+    observeEvent(loc$active_project, {
+      glob$active_project <- loc$active_project
+    })
   })
 }

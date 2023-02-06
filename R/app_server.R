@@ -15,12 +15,12 @@ app_server <- function(input, output, session) {
           passphrase = golem::get_golem_options(which = "credentials_pass")),
       timeout = 60
   )  
-  
+
   observeEvent(auth, {
       glob$user$name <- auth$user
       glob$user$user_id <- as.integer(auth$user_id)
       glob$user$is_admin <- as.logical(auth$admin)
-      glob$user$mail <- "mailadress" #TODO
+      glob$user$mail <- "email@example.com" #TODO
   })
         
 

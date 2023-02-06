@@ -12,13 +12,7 @@ create_project_db <- function(pool,
     create_db_schema(pool)
   }
 
-
-  if (golem::get_golem_options("mode") == "local") {
-    create_project_record(pool, project_df, user_id = 1)
-  } else if (golem::get_golem_options("mode") == "server") {
-    create_project_record(pool, project_df, user_id = as.integer(user_id))
-  }
-
+  create_project_record(pool, project_df, user_id = as.integer(user_id))
 
   active_project_df <- dplyr::tbl(pool, "projects") %>%
     dplyr::select(project_id, project_name) %>%
