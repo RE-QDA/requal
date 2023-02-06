@@ -1,4 +1,4 @@
-#' reproducibility UI Function
+#' agreement UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_reproducibility_ui <- function(id) {
+mod_agreement_ui <- function(id) {
   ns <- NS(id)
   tagList(
     selectInput(ns("metrics_select"),
@@ -31,14 +31,14 @@ mod_reproducibility_ui <- function(id) {
   )
 }
 
-#' reproducibility Server Functions
+#' agreement Server Functions
 #'
 #' @noRd
-mod_reproducibility_server <- function(id, glob) {
+mod_agreement_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    reproducibility_message <- "Reproducibility measures cannot be computed for a single active coder."
+    agreement_message <- "Agreement measures cannot be computed for a single active coder."
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
@@ -81,7 +81,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_df
           })
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -106,7 +106,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_df
           })
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -151,7 +151,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_df
           })
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -195,7 +195,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_df
           })
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -230,7 +230,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_heatmap
           }, height = "auto", width = "auto")
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -265,7 +265,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_heatmap
           }, height = "auto", width = "auto")
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -307,7 +307,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_heatmap
           }, height = "auto", width = "auto")
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
@@ -356,7 +356,7 @@ mod_reproducibility_server <- function(id, glob) {
             overlap_heatmap
           }, height = height, width = "auto")
         } else {
-          output$overlap_table <- renderText(reproducibility_message)
+          output$overlap_table <- renderText(agreement_message)
         }
       })
     
