@@ -32,9 +32,16 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
     loc$active_project <- NULL
     loc$doc_list <- NULL
 
-    ###############
-    # Local setup #
-    ###############
+
+    ####################
+    # General setup ####
+    ####################
+
+  
+
+    ##################
+    # Local setup ####
+    ##################
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
 
@@ -97,14 +104,12 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           user_id = glob$user$user_id
         )
 
-        # write active project details ----
-        glob$active_project <- loc$active_project
       })
     })
 
-    ################
-    # Server setup #
-    ################
+    ###################
+    # Server setup ####
+    ###################
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
       observeEvent(input$project_create, {
@@ -129,7 +134,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             })
             
             }
-        # user control
+        # user control ----
 
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
@@ -157,10 +162,19 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           project_description = input$project_description,
           user_id = glob$user$user_id
         )
+        names(loc$active_project) <- input$project_name
     }
-        # pass active project details info to glob ----
-        glob$active_project <- loc$active_project
+      
       })
     })
+ 
+
+  # pass active project details info to glob ----
+  observeEvent(loc$active_project, {
+  glob$active_project <- loc$active_project
+  })
+        
+
+
   })
 }

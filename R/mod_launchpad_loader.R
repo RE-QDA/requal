@@ -31,9 +31,9 @@ mod_launchpad_loader_server <- function(id, glob, setup){
     loc$doc_list <- NULL
     loc$project <- ""
     
-    ###############
-    # Local setup #
-    ###############
+    ##################
+    # Local setup ####
+    ##################
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
   
     
@@ -87,9 +87,9 @@ mod_launchpad_loader_server <- function(id, glob, setup){
    
     })
 
-    ################
-    # Server setup #
-    ################
+    ###################
+    # Server setup ####
+    ###################
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
   
@@ -97,7 +97,8 @@ mod_launchpad_loader_server <- function(id, glob, setup){
 
    #pool::poolClose(pool)
 
-   # create glob$pool
+   # create glob$pool if it was not launched previously
+    if (is.null(glob$active_project)) {  
 
             glob$pool <- pool::dbPool(
               drv = RPostgreSQL::PostgreSQL(),
@@ -115,27 +116,32 @@ mod_launchpad_loader_server <- function(id, glob, setup){
                  )
             })
 
-             updateSelectInput(session,
+    }
+            updateSelectInput(session,
                                "project_selector_load",
                                choices = read_project_db(glob$pool,
                                                          project_id = NULL))
          
     })
+   
+   # observe newly created projects
+   observeEvent(glob$active_project, {                  
+updateSelectInput(session,
+                               "project_selector_load",
+                               choices = read_project_db(glob$pool,
+                                                         project_id = NULL))
+
+   })
 
 
-    #################
-    # General setup #
-    #################
+
+    ####################
+    # General setup ####
+    ####################
 
     # set active project from load ----
     
-    output$project_active <- renderUI({
-      if (is.null(loc$active_project)) {
-        "No active project."
-      } else {
-         loc$active_project
-      }
-    })
+   
     
 
     
