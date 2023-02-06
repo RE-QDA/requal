@@ -55,14 +55,10 @@ mod_categories_server <- function(id, glob) {
 
     # List existing codes in code boxes --------
     output$uncategorized <- renderUI({
+        glob$codebook
         render_codes_ui(id, glob$pool, glob$active_project)
     })
     
-    # Re-render list of codes on code change
-    observeEvent(glob$codebook, {
-        render_codes_ui(id, glob$pool, glob$active_project)
-    })
-
     # List existing categories in category boxes ----
     output$categories_ui <- renderUI({
       render_categories(
