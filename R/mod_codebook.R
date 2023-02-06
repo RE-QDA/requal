@@ -62,10 +62,11 @@ mod_codebook_ui <- function(id) {
 mod_codebook_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    loc <- reactiveValues()
 
    # initialize codebook upon load
     observeEvent(glob$active_project, {
-        glob$codebook <- list_db_codes(
+        loc$codebook <- list_db_codes(
             glob$pool,
             glob$active_project
         )
@@ -157,7 +158,7 @@ mod_codebook_server <- function(id, glob) {
       }
 
       # update codebook return value
-      glob$codebook <- list_db_codes(
+      loc$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
@@ -220,7 +221,7 @@ mod_codebook_server <- function(id, glob) {
       })
 
       # update codebook return value
-      glob$codebook <- list_db_codes(
+      loc$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
@@ -248,7 +249,7 @@ mod_codebook_server <- function(id, glob) {
           )
 
           # update codebook return value
-          glob$codebook <- list_db_codes(
+          loc$codebook <- list_db_codes(
               glob$pool,
               glob$active_project
             )
@@ -276,7 +277,11 @@ mod_codebook_server <- function(id, glob) {
       }
     })
 
-    # returns glob$codebook ----
+    # returns loc$codebook ----
+
+    observeEvent(loc$codebook, {
+      glob$codebook <- loc$codebook
+    })
 
     # end of server module function
   })
