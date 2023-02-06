@@ -17,10 +17,10 @@ mod_reporting_ui <- function(id) {
         value = "instructions",
         textOutput(ns("report_instructions"))
       ),
-      tabPanel("Reproducibility",
-        id = ns("repro"),
-        value = "repro",
-        mod_reproducibility_ui("reproducibility_ui_1")
+      tabPanel("Agreement",
+        id = ns("agree"),
+        value = "agree",
+        mod_agreement_ui("agreement_ui_1")
       ),
       tabPanel("Browse coded docs", 
         id = ns("browser"), 

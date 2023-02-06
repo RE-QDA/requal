@@ -53,7 +53,7 @@ app_server <- function(input, output, session) {
   
   # reporting
   mod_reporting_server("reporting_ui_1", glob)
-  mod_reproducibility_server("reproducibility_ui_1", glob)
+  mod_agreement_server("agreement_ui_1", glob)
   mod_browser_server("browser_ui_1", glob)
 
   # about -----

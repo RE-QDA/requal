@@ -30,7 +30,7 @@ mod_browser_server <- function(id, glob){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     
-    reproducibility_message <- "Reproducibility measures cannot be computed for projects with one active coder."
+    agreement_message <- "Agreement measures cannot be computed for projects with one active coder."
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
@@ -210,7 +210,7 @@ mod_browser_server <- function(id, glob){
         })
       } else {
         output$document_viewer <- renderText("No segments were coded with the selected code.")
-        # output$overlap_table <- renderText(reproducibility_message)
+        # output$overlap_table <- renderText(agreement_message)
       }
         
     })
