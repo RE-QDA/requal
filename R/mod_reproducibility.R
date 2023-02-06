@@ -23,9 +23,11 @@ mod_reproducibility_ui <- function(id) {
                             "Overlap by coder and code [segments]" = "by_user_code_segment"
                 )
     ),
+    checkboxGroupInput(ns("repro_coders"), "Select coders:", 
+                       choices = ""),
     actionButton(ns("calculate"), "Calculate"),
     uiOutput(ns("overlap_table")),
-    plotOutput(ns("overlap_plot"))
+    plotOutput(ns("overlap_plot"), height = "600px")
   )
 }
 
@@ -36,7 +38,27 @@ mod_reproducibility_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    reproducibility_message <- "Reproducibility measures cannot be computed for projects with one active coder."
+    reproducibility_message <- "Reproducibility measures cannot be computed for a single active coder."
+    
+    observeEvent(glob$documents, {
+      if (isTruthy(glob$active_project)) {
+        users <- dplyr::tbl(glob$pool, "users") %>% 
+          dplyr::select(user_id, user_name) %>% 
+          dplyr::collect()
+        
+        updateCheckboxGroupInput(
+          session = session, 
+          "repro_coders", 
+          choices = c(
+            stats::setNames(
+              users$user_id,
+              users$user_name
+            )
+          ), 
+          selected = users$user_id
+        )
+      }
+    })
     
     # total ----
     observeEvent({req(input$metrics_select == "total") 
@@ -44,7 +66,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         if (length(unique(segments$user_id)) > 1) {
           overlap_df <- calculate_code_overlap_by_users(segments) %>%
@@ -69,7 +91,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         if (length(unique(segments$user_id)) > 1) {
           overlap_df <- calculate_segment_overlap_by_users(segments) %>%
@@ -95,7 +117,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         codes <- load_codes_names(
           active_project = glob$active_project,
@@ -140,7 +162,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         codes <- load_codes_names(
           active_project = glob$active_project,
@@ -184,7 +206,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -206,7 +228,7 @@ mod_reproducibility_server <- function(id, glob) {
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({
             overlap_heatmap
-          })
+          }, height = "auto", width = "auto")
         } else {
           output$overlap_table <- renderText(reproducibility_message)
         }
@@ -219,7 +241,7 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -241,7 +263,7 @@ mod_reproducibility_server <- function(id, glob) {
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({
             overlap_heatmap
-          })
+          }, height = "auto", width = "auto")
         } else {
           output$overlap_table <- renderText(reproducibility_message)
         }
@@ -254,7 +276,8 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        
         users <- load_users_names(
           pool = glob$pool,
           active_project = glob$active_project
@@ -270,13 +293,19 @@ mod_reproducibility_server <- function(id, glob) {
             dplyr::left_join(., codes, by = "code_id") %>%
             make_overlap_df_symmetrical()
           
-          overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
-            ggplot2::facet_wrap(ggplot2::vars(code_name))
+          n_codes <- length(unique(overlap_df$code_name))
           
+          if(n_codes > 6){
+            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name), ncol = 3)
+          }else{
+            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name))
+          }
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({
             overlap_heatmap
-          })
+          }, height = "auto", width = "auto")
         } else {
           output$overlap_table <- renderText(reproducibility_message)
         }
@@ -288,7 +317,8 @@ mod_reproducibility_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        )
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        
         users <- load_users_names(
           pool = glob$pool,
           active_project = glob$active_project
@@ -309,13 +339,22 @@ mod_reproducibility_server <- function(id, glob) {
             dplyr::left_join(., codes, by = "code_id") %>%
             make_overlap_df_symmetrical()
           
-          overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
-            ggplot2::facet_wrap(ggplot2::vars(code_name))
+          n_codes <- length(unique(overlap_df$code_name))
+          if(n_codes > 6){
+            nrows <- ceiling(n_codes / 3)
+            height <- 200 * nrows
+            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name), ncol = 3)
+          }else{
+            height <- "auto"
+            overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name))
+          }
           
           output$overlap_table <- NULL
           output$overlap_plot <- renderPlot({
             overlap_heatmap
-          })
+          }, height = height, width = "auto")
         } else {
           output$overlap_table <- renderText(reproducibility_message)
         }

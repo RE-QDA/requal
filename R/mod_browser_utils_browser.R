@@ -7,7 +7,7 @@ create_palette_legend <- function(max_n, palette){
                  as.character(.x),
                  '" class="segment" style="padding:0; background-color:',
                  palette[.x],
-                 dplyr::if_else(.x <= (max_n / 2), "; color:white", ""),
+                 dplyr::if_else(.x <= (max_n / 2) | max_n == 1, "; color:white", ""),
                  '">', 
                  "consensus of ", as.character(.x), 
                  dplyr::if_else(.x == 1, " coder", " coders"), 
