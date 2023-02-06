@@ -14,7 +14,7 @@ mod_codebook_ui <- function(id) {
     tabsetPanel(
       type = "tabs",
       id = ns("codebook_tabset"),
-      tabPanel("Codebook",
+      tabPanel("Codes",
         id = ns("codebook_tabset"),
         value = "codebook_tabset",
         fluidRow(
