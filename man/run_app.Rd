@@ -6,7 +6,7 @@
 \usage{
 run_app(
   mode = "local",
-  dbhost = "localhost",
+  dbhost = "",
   dbport = 5432,
   dbname = NULL,
   dbusername = NULL,

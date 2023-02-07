@@ -117,7 +117,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
       observeEvent(input$project_create, {
         req(input$project_name)
 
-        if (is.null(glob$active_project)) {
+        if (!isTruthy(glob$active_project)) {
           glob$pool <- pool::dbPool(
             drv = RPostgreSQL::PostgreSQL(),
             host = golem::get_golem_options(which = "dbhost"),
@@ -134,7 +134,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           })
         }
         # user control ----
-
+        
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
 
@@ -145,7 +145,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             user_name = glob$user$name,
             user_mail = glob$user$mail
           )
-          DBI::dbWriteTable(pool, "users", users_df,
+          DBI::dbWriteTable(glob$pool, "users", users_df,
             append = TRUE, row.names = FALSE
           )
         } else if (!glob$user$is_admin) {
@@ -162,7 +162,6 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             project_description = input$project_description,
             user_id = glob$user$user_id
           )
-          names(loc$active_project) <- input$project_name
         }
       })
     })
