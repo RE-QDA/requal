@@ -21,13 +21,7 @@ mod_use_manager_server <- function(id, glob){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    # observeEvent(glob$user$is_admin, {
 
-    #   if (req(glob$user$is_admin)) {
-    #     showTab(inputId = "project_tabs", target = "Manage users")
-    #   }
-
-    # })
  
   })
 }
