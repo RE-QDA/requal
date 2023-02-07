@@ -110,20 +110,16 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
 
-  
-         
+          # list existing projects in load selector
+          updateSelectInput(session,
+            "project_selector_load",
+            choices = existing_projects # global variable obtained on app start
+          )
+
       # create glob$pool if it was not launched previously
       if (!isTruthy(glob$active_project)) {
 
-          # use start-up pool to read existing projects
-          updateSelectInput(session,
-            "project_selector_load",
-            choices = read_project_db(pool_startup,
-              project_id = NULL
-            )
-          )
-
-        glob$pool <- pool::dbPool(
+          glob$pool <- pool::dbPool(
           drv = RPostgreSQL::PostgreSQL(),
           host = golem::get_golem_options(which = "dbhost"),
           port = golem::get_golem_options(which = "dbport"),
