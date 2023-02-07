@@ -8,7 +8,7 @@
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
 run_app <- function(mode = "local",
-                    dbhost = "localhost",
+                    dbhost = "",
                     dbport = 5432,
                     dbname = NULL,
                     dbusername = NULL,

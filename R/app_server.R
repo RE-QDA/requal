@@ -36,7 +36,9 @@ app_server <- function(input, output, session) {
   mod_project_server("mod_project_ui_1", glob)
   # output: glob$documents
   mod_doc_manager_server("doc_manager_ui_1", glob)
-
+  # output: no output, permissions and membership written to DB
+  mod_use_manager_server("use_manager_1", glob)
+  
   # codebook  ----
   # output: glob$codebook
   mod_codebook_server("codebook_ui_1", glob)

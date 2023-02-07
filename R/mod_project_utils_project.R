@@ -23,8 +23,8 @@ create_project_db <- function(pool,
     dplyr::pull(project_id)
 
 
-  # names(active_project) <- active_project_df %>%
-  #                                dplyr::pull(project_name)
+  names(project) <- active_project_df %>%
+                                 dplyr::pull(project_name)
 
   return(project)
 }
@@ -56,7 +56,7 @@ read_project_db <- function(pool, project_id) {
 
       return(active_project)
     } else { # no filter
-
+      
       active_project <- read_project_db_util(pool)
 
       return(active_project)

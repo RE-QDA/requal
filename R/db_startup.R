@@ -424,9 +424,10 @@ add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
 # Globals ####
 
 make_globals <- quote({
-  mode <- golem::get_golem_options(which = "mode")
-  if (mode == "server") {
-    pool <- pool::dbPool(
+
+  if (golem::get_golem_options(which = "mode") == "server") {
+
+    pool_startup <- pool::dbPool(
       drv = RPostgreSQL::PostgreSQL(),
       host = golem::get_golem_options(which = "dbhost"),
       port = golem::get_golem_options(which = "dbport"),
@@ -436,7 +437,7 @@ make_globals <- quote({
     )
 
     onStop(function() {
-      pool::poolClose(glob$pool)
+      pool::poolClose(pool_startup)
     })
 
   }

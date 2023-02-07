@@ -44,6 +44,8 @@ golem::add_module( name = "launchpad_creator" ) # Name of the module
 # Project menu
 golem::add_module( name = "project" ) # Name of the module
 golem::add_module( name = "doc_manager" ) # Name of the module
+golem::add_module( name = "use_manager" ) # Name of the module
+
 
 
 # Codebook menu
@@ -85,6 +87,8 @@ golem::add_utils( "memo", module = "memo" )
 golem::add_utils( "agreement", module = "agreement" )
 golem::add_utils( "text_stats", module = "agreement" )
 golem::add_utils( "browser", module = "browser" )
+golem::add_utils( "use_manager", module = "use_manager" )
+
 
 
 ## External resources
