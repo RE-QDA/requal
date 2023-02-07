@@ -427,7 +427,7 @@ make_globals <- quote({
 
   if (golem::get_golem_options(which = "mode") == "server") {
 
-    pool_startup <- pool::dbPool(
+    startup_con <- DBI::dbConnect(
       drv = RPostgreSQL::PostgreSQL(),
       host = golem::get_golem_options(which = "dbhost"),
       port = golem::get_golem_options(which = "dbport"),
@@ -436,9 +436,13 @@ make_globals <- quote({
       password = golem::get_golem_options(which = "dbpassword")
     )
 
-    onStop(function() {
-      pool::poolClose(pool_startup)
-    })
+     existing_projects <- dplyr::tbl(startup_con, "projects") %>%
+     dplyr::pull(project_id)
+     names(existing_projects) <- dplyr::tbl(startup_con, "projects") %>%
+     dplyr::pull(project_name)
+    
+    DBI::dbDisconnect(startup_con)
+    
 
   }
 })
