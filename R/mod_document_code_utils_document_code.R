@@ -160,7 +160,7 @@ write_segment_db <- function(
             log_delete_segment_record(pool, active_project, overlap$segment_id, user_id)
         })
         
-        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE)
+        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE, row.names = FALSE)
         
     }else{
         # in case of no overlap write in DB directly
@@ -177,7 +177,7 @@ write_segment_db <- function(
                                                                  endOff)
         )
         
-        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE)
+        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE, row.names = FALSE)
     }
     
     if(res){

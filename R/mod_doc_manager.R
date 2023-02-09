@@ -16,7 +16,7 @@ mod_doc_manager_ui <- function(id) {
       width = 10,
       br(),
       htmlOutput(ns("project_name")),
-      uiOutput(ns("project_active")),
+      uiOutput(ns("no_active_project")),
       tags$div(
         tableOutput(ns("doc_list_table"))
       ) %>%
@@ -52,6 +52,12 @@ mod_doc_manager_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    #---List active project  --------------
+    output$no_active_project <- renderUI({
+      if (is.null(glob$active_project)) {
+        "No active project."
+      } 
+    })
 
     #---Create doc UI --------------
     output$doc_create_ui <- renderUI({

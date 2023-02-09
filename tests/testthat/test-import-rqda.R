@@ -8,7 +8,8 @@ DBI::dbWriteTable(rqda_con, "project", data.frame(
     date = "", 
     memo = "test RQDA file", 
     about = "RQDA"
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "source", data.frame(
     name = "doc_name", 
@@ -16,20 +17,23 @@ DBI::dbWriteTable(rqda_con, "source", data.frame(
     file = "text text text", 
     memo = "document 1", 
     status = 1
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "caselinkage", data.frame(
     status = 1, 
     caseid = 1, 
     fid = 1
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "cases", data.frame(
     name = "case 1", 
     id = 1, 
     memo = "description", 
     status = 1
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "codecat", data.frame(
     name = "Category 1", 
@@ -37,7 +41,8 @@ DBI::dbWriteTable(rqda_con, "codecat", data.frame(
     cid = NA, 
     status = 1, 
     memo = "category description"
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "coding", data.frame(
     cid = 1, 
@@ -47,7 +52,8 @@ DBI::dbWriteTable(rqda_con, "coding", data.frame(
     selend = 5, 
     status = 1, 
     memo = "coding memo"
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "freecode", data.frame(
     name = "code 1", 
@@ -55,13 +61,15 @@ DBI::dbWriteTable(rqda_con, "freecode", data.frame(
     status = 1, 
     id = 1, 
     color = NA
-))
+),
+row.names = FALSE)
 
 DBI::dbWriteTable(rqda_con, "treecode", data.frame(
     cid = 1, 
     catid = 1, 
     status = 1
-))
+),
+row.names = FALSE)
 
 
 rql_import_rqda(import_rqda_test_file, import_requal_test_file)

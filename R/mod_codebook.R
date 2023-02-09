@@ -62,10 +62,11 @@ mod_codebook_ui <- function(id) {
 mod_codebook_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    loc <- reactiveValues()
 
    # initialize codebook upon load
     observeEvent(glob$active_project, {
-        glob$codebook <- list_db_codes(
+        loc$codebook <- list_db_codes(
             glob$pool,
             glob$active_project
         )
@@ -157,7 +158,7 @@ mod_codebook_server <- function(id, glob) {
       }
 
       # update codebook return value
-      glob$codebook <- list_db_codes(
+      loc$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
@@ -176,15 +177,7 @@ mod_codebook_server <- function(id, glob) {
     observeEvent(input$code_del_btn, {
       req(input$code_to_del)
 
-      # delete code
-      delete_db_codes(
-        pool = glob$pool,
-        active_project = glob$active_project,
-        delete_code_id = input$code_to_del, 
-        user_id = glob$user$user_id
-      )
-
-      # delete edges
+      # delete edges - must precede deleting of codes
       edge <- list()
       edge$code_id <- input$code_to_del
       delete_category_code_record(
@@ -192,6 +185,22 @@ mod_codebook_server <- function(id, glob) {
         active_project = glob$active_project,
         user_id = glob$user$user_id,
         edge = edge
+      )
+
+      # if a code gets deleted, the corresponding segments should be deleted too
+      delete_codes_segment_db(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        code_id = input$code_to_del
+        )
+
+      # delete code
+      delete_db_codes(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        delete_code_id = input$code_to_del, 
+        user_id = glob$user$user_id
       )
 
       # re-render UI
@@ -212,7 +221,7 @@ mod_codebook_server <- function(id, glob) {
       })
 
       # update codebook return value
-      glob$codebook <- list_db_codes(
+      loc$codebook <- list_db_codes(
           glob$pool,
           glob$active_project
         )
@@ -240,7 +249,7 @@ mod_codebook_server <- function(id, glob) {
           )
 
           # update codebook return value
-          glob$codebook <- list_db_codes(
+          loc$codebook <- list_db_codes(
               glob$pool,
               glob$active_project
             )
@@ -268,8 +277,11 @@ mod_codebook_server <- function(id, glob) {
       }
     })
 
-    # returns glob$codebook ----
+    # returns loc$codebook ----
 
+    observeEvent(loc$codebook, {
+      glob$codebook <- loc$codebook
+    })
 
     # end of server module function
   })
