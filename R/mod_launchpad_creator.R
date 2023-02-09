@@ -102,31 +102,39 @@ mod_launchpad_creator_server <- function(id, glob, setup){
           "[^a-zA-Z0-9]+",
           "",
           iconv(input$project_name,
-                to = "ASCII//TRANSLIT")
+            to = "ASCII//TRANSLIT"
+          )
         ), ".requal")
       )
-      
+
+      # require unique project path
+      if (file.exists(loc$db_path)) {
+        warn_user("Project with the same name already exists in the selected directory")
+      }
+      req(!file.exists(loc$db_path))
+
       # create project event - DB set up ----
       mode <- golem::get_golem_options("mode")
-      
+
       glob$pool <- pool::dbPool(
-          drv = switch(setup$mode,
-                       "local" = RSQLite::SQLite(), 
-                       "server" = RSQLite::SQLite()), # todo
-          dbname = switch(setup$mode,
-                          "local" = loc$db_path, 
-                          "server" = loc$db_path) #todo
+        drv = switch(setup$mode,
+          "local" = RSQLite::SQLite(),
+          "server" = RSQLite::SQLite()
+        ), # todo
+        dbname = switch(setup$mode,
+          "local" = loc$db_path,
+          "server" = loc$db_path
+        ) # todo
       )
-      
+
       loc$active_project <- create_project_db(
-          pool = glob$pool,
-          project_name = input$project_name,
-          project_description = input$project_description
-        )
-      
+        pool = glob$pool,
+        project_name = input$project_name,
+        project_description = input$project_description
+      )
+
       # write active project details ----
       glob$active_project <- loc$active_project
-      
     })
     
   })
