@@ -94,12 +94,7 @@ mod_browser_server <- function(id, glob){
     
       if (nrow(coded_segments) > 0) {
         
-        users <- dplyr::tbl(glob$pool, "users") %>% 
-          dplyr::select(user_id, user_name) %>% 
-          dplyr::collect()
-        
         overlap <- coded_segments %>%
-          dplyr::left_join(., users, by = "user_id") %>% 
           dplyr::mutate(marked = purrr::map2(
             segment_start, segment_end,
             function(x, y) seq(from = x, to = y, by = 1)
@@ -120,8 +115,6 @@ mod_browser_server <- function(id, glob){
         
         max_n <- max(overlap$n)
         palette <- viridisLite::viridis(max_n)
-        
-        # browser()
         
         overlap_df <- overlap %>%
           dplyr::rename(
