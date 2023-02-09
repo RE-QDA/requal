@@ -231,6 +231,108 @@ get_volume_paths <- function() {
   
 }
 
+# loader UI
+
+loader_UI_local <- function(ns){
+
+tagList(
+  h3("Project file"),
+  div(span(textOutput(
+    ns("project_path_load")
+  ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
+  shinyFiles::shinyFilesButton(
+    ns("sel_file_load"),
+    "File select",
+    "Please select a project file",
+    multiple = FALSE
+  ),
+  selectInput(
+    ns("project_selector_load"),
+    "Select project",
+    choices = NULL
+  ),
+  actionButton(
+    ns("project_load"),
+    label = "Load project",
+    class = "btn-success"
+  )
+)
+
+}
+
+loader_UI_server <- function(ns){
+
+tagList(
+  h3("Remote project"),
+  selectInput(
+    ns("project_selector_load"),
+    "Select project",
+    choices = NULL
+  ),
+  actionButton(
+    ns("project_load"),
+    label = "Load project",
+    class = "btn-success"
+  )
+)
+
+}
+
+# creator UI
+
+creator_UI_local <- function(ns) {
+  tagList(
+    h3("New project name"),
+    textInput(
+      ns("project_name"),
+      label = NULL,
+      placeholder = "The name of your project."
+    ),
+    h3("New project folder"),
+    div(span(textOutput(
+      ns("project_path")
+    ), class = "form-control"), class = "form-group shiny-input-container"),
+    shinyFiles::shinyDirButton(
+      ns("sel_directory"),
+      "Folder select",
+      "Please select a project folder"
+    ),
+    h3("New project description"),
+    textAreaInput(
+      ns("project_description"),
+      label = NULL,
+      placeholder = "Brief description of your project"
+    ),
+    actionButton(
+      ns("project_create"),
+      label = "Create project",
+      class = "btn-success"
+    )
+  )
+}
+
+creator_UI_server <- function(ns) {
+  tagList(
+    h3("New project name"),
+    textInput(
+      ns("project_name"),
+      label = NULL,
+      placeholder = "The name of your project."
+    ),
+    h3("New project description"),
+    textAreaInput(
+      ns("project_description"),
+      label = NULL,
+      placeholder = "Brief description of your project"
+    ),
+    actionButton(
+      ns("project_create"),
+      label = "Create project",
+      class = "btn-success"
+    )
+  )
+}
+
 # warnings ------
 
 warn_user <- function(warning) {

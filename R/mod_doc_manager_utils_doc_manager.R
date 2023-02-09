@@ -80,10 +80,11 @@ delete_db_documents <- function(pool,
                                 active_project,
                                 delete_doc_id, 
                                 user) {
+                                  
     DBI::dbExecute(pool,
-                   "DELETE from documents
-                   WHERE doc_id IN (?)",
-                   params = list(delete_doc_id)
+                   glue::glue_sql("DELETE from documents
+                   WHERE doc_id IN ({delete_doc_id})",
+                   .con = pool)
     )
     if (length(delete_doc_id)) {
         log_delete_document_record(pool, active_project, delete_doc_id, user_id = user)

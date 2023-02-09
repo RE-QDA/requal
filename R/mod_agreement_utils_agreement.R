@@ -225,9 +225,7 @@ create_overlap_heatmap <- function(df, fill){
         ggplot2::geom_tile() + 
         ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
         ggplot2::theme_minimal() + 
-        ggplot2::labs(x = "Coder 1", 
-                      y = "Coder 2", 
-                      fill = "Overlap") + 
+        ggplot2::labs(x = "", y = "", fill = "Overlap") + 
         ggplot2::coord_fixed() + 
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
 }

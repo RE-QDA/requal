@@ -199,7 +199,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
         dplyr::select(-memo)
     
     purrr::walk(seq_len(nrow(segments_df)), function(x) {
-        DBI::dbWriteTable(requal_pool, "segments", segments_df[x, ], append = TRUE)
+        DBI::dbWriteTable(requal_pool, "segments", segments_df[x, ], append = TRUE, row.names = FALSE)
         log_add_segment_record(requal_pool, requal_project_id, segments_df[x, ], 
                                user_id = USER_ID)    
     })
@@ -207,8 +207,9 @@ rql_import_rqda <- function(rqda_file, requal_file){
     message("Importing memos")
     if(!all(is.na(rqda_segments$memo))){
         DBI::dbWriteTable(requal_pool, "memos", memos_df %>% dplyr::select(memo_id, text), 
-                          append = TRUE)
-        DBI::dbWriteTable(requal_pool, "memos_segments_map", memos_segments_map_df, append = TRUE)
+                          append = TRUE, row.names = FALSE)
+        DBI::dbWriteTable(requal_pool, "memos_segments_map", memos_segments_map_df, append = TRUE, 
+                          row.names = FALSE)
     }
     
     DBI::dbDisconnect(rqda_con)
