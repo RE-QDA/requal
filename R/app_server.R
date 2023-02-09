@@ -6,21 +6,27 @@
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
-  setup <- reactiveValues()
-  setup$mode <- get_golem_config("mode")
-  # check_credentials returns a function to authenticate users
-  auth <- shinymanager::secure_server(
-      check_credentials = shinymanager::check_credentials(credentials)
-  )  
-  observeEvent(auth, {
-      setup$auth <- reactiveValuesToList(auth)
-  })
-        
   glob <- reactiveValues()
 
-  mod_launchpad_loader_server("launchpad_loader_ui_1", glob, setup)
+  # check_credentials returns a function to authenticate users
+  auth <- shinymanager::secure_server(
+      check_credentials = shinymanager::check_credentials(
+          db = golem::get_golem_options(which = "credentials_path"),
+          passphrase = golem::get_golem_options(which = "credentials_pass")),
+      timeout = 60
+  )  
 
-  mod_launchpad_creator_server("launchpad_creator_ui_1", glob, setup)
+  observeEvent(auth, {
+      glob$user$name <- auth$user
+      glob$user$user_id <- as.integer(auth$user_id)
+      glob$user$is_admin <- as.logical(auth$admin)
+      glob$user$mail <- "email@example.com" #TODO
+  })
+        
+
+  mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
+
+  mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
 
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
@@ -47,7 +53,8 @@ app_server <- function(input, output, session) {
   
   # reporting
   mod_reporting_server("reporting_ui_1", glob)
-  mod_reproducibility_server("reproducibility_ui_1", glob)
+  mod_agreement_server("agreement_ui_1", glob)
+  mod_browser_server("browser_ui_1", glob)
 
   # about -----
   mod_about_server("about_ui_1", glob)

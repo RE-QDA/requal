@@ -6,7 +6,14 @@ CREATE TABLE projects (
 ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 "
-
+CREATE_PROJECT_SQL_POSTGRES <- "
+CREATE TABLE projects (
+    project_id SERIAL PRIMARY KEY
+    ,    project_name TEXT
+    ,    project_description TEXT
+    ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+"
 CREATE_REQUAL_INFO_SQL <- "
 CREATE TABLE if not exists requal_version (
     project_id INTEGER
@@ -14,11 +21,11 @@ CREATE TABLE if not exists requal_version (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
-
 # TODO: user_attributes
 CREATE_USERS_SQL <- "
 CREATE TABLE if not exists users (
     user_id INTEGER PRIMARY KEY
+,   user_login TEXT UNIQUE
 ,   user_name TEXT
 ,   user_mail TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
@@ -64,10 +71,33 @@ CREATE TABLE if not exists documents (
 );
 "
 
+CREATE_DOCUMENTS_SQL_POSTGRES <- "
+CREATE TABLE if not exists documents (
+    doc_id SERIAL PRIMARY KEY
+,   project_id INTEGER
+,   doc_name TEXT
+,   doc_description TEXT
+,   doc_text TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
 CREATE_CODES_SQL <- "
 CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   code_name TEXT UNIQUE
+,   code_description TEXT
+,   code_color TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CODES_SQL_POSTGRES <- "
+CREATE TABLE if not exists codes (
+    project_id INTEGER
+,   code_id SERIAL PRIMARY KEY 
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
@@ -92,10 +122,37 @@ CREATE TABLE if not exists segments (
 );
 "
 
+CREATE_SEGMENTS_SQL_POSTGRES <- "
+CREATE TABLE if not exists segments (
+    project_id INTEGER
+,   user_id INTEGER
+,   doc_id INTEGER
+,   code_id INTEGER
+,   segment_id SERIAL PRIMARY KEY
+,   segment_start INTEGER
+,   segment_end INTEGER
+,   segment_text TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+);
+"
+
 CREATE_CATEGORIES_SQL <- "
 CREATE TABLE if not exists categories (
     project_id INTEGER
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   category_name TEXT
+,   category_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CATEGORIES_SQL_POSTGRES <- "
+CREATE TABLE if not exists categories (
+    project_id INTEGER
+,   category_id SERIAL PRIMARY KEY
 ,   category_name TEXT
 ,   category_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
@@ -109,7 +166,7 @@ CREATE TABLE if not exists categories_codes_map (
 ,   code_id INTEGER
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 ,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(codes_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
 );
 "
 
@@ -117,6 +174,16 @@ CREATE_CASES_SQL <- "
 CREATE TABLE if not exists cases (
     project_id INTEGER
 ,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   case_name TEXT
+,   case_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
+CREATE_CASES_SQL_POSTGRES <- "
+CREATE TABLE if not exists cases (
+    project_id INTEGER
+,   case_id SERIAL PRIMARY KEY
 ,   case_name TEXT
 ,   case_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
@@ -139,11 +206,22 @@ CREATE TABLE if not exists cases_documents_map (
 # memos
 CREATE_MEMO_SQL <- "
 CREATE TABLE if not exists memos (
-    project_id INTEGER,
-    memo_id INTEGER PRIMARY KEY
+    project_id INTEGER
+,   memo_id INTEGER PRIMARY KEY
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-)"
+);
+"
+
+CREATE_MEMO_SQL_POSTGRES <- "
+CREATE TABLE if not exists memos (
+    project_id INTEGER
+,   memo_id SERIAL PRIMARY KEY
+,   text TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+"
+
 
 CREATE_MEMO_DOCUMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_documents_map (
@@ -153,25 +231,47 @@ CREATE TABLE if not exists memos_documents_map (
     ,   memo_end INTEGER
     ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
+
 CREATE_MEMO_CODE_MAP_SQL <- "
 CREATE TABLE if not exists memos_codes_map (
     memo_id INTEGER
     ,   code_id INTEGER
     ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
+
 CREATE_MEMO_SEGMENT_MAP_SQL <- "
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
     ,   segment_id INTEGER
     ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
     ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-)"
+);
+"
 
 
-create_db_schema <- function(pool){
-    # TODO: Full DB structure
+create_db_schema <- function(pool) {
+  # TODO: Full DB structure
+  db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+  if (db_postgres) {
+    DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
+    DBI::dbExecute(pool, CREATE_USERS_SQL)
+    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
+    DBI::dbExecute(pool, CREATE_LOG_SQL)
+    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_MEMO_SQL_POSTGRES)
+
+  } else {
     DBI::dbExecute(pool, CREATE_PROJECT_SQL)
     DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
     DBI::dbExecute(pool, CREATE_USERS_SQL)
@@ -185,105 +285,159 @@ create_db_schema <- function(pool){
     DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
     DBI::dbExecute(pool, CREATE_MEMO_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
+
+  }
+
+  DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
+  DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
+  DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
 }
 
-create_default_user <- function(pool, project_id){
+# Database functions ####
+
+create_default_user <- function(pool, project_id, user_id) {
+
+
+  if (golem::get_golem_options("mode") == "local") {
     user_df <- tibble::tibble(
-        user_name = Sys.info()["user"]
+      user_name = Sys.info()["user"]
     )
-    
-    DBI::dbWriteTable(pool, "users", user_df, append = TRUE)
+    DBI::dbWriteTable(pool, "users", user_df, append = TRUE, row.names = FALSE)
+
     user_df_stored <- dplyr::tbl(pool, "users") %>%
-        dplyr::filter(.data$user_name == !!user_df$user_name) %>%
-        dplyr::collect()
-    
+      dplyr::filter(.data$user_name == !!user_df$user_name) %>%
+      dplyr::collect()
     user_permission_df <- tibble::tibble(
-        user_id = user_df_stored$user_id,
-        project_id = project_id,
-        can_code = 1,
-        can_modify_codes = 1,
-        can_delete_codes = 1,
-        can_modify_documents = 1,
-        can_delete_documents = 1,
-        can_manage = 1
+      user_id = user_df_stored$user_id,
+      project_id = project_id,
+      can_code = 1,
+      can_modify_codes = 1,
+      can_delete_codes = 1,
+      can_modify_documents = 1,
+      can_delete_documents = 1,
+      can_manage = 1
     )
-    
-    DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE)
-}
-
-create_project_record <- function(pool, project_df, user_id){
-    res <- DBI::dbWriteTable(pool, "projects", project_df, append = TRUE)
-    project_id <- dplyr::tbl(pool, "projects") %>%
-        dplyr::filter(project_name == !!project_df$project_name) %>%
-        dplyr::pull(project_id)
-    
-    if(res){
-        log_create_project_record(pool, project_id, project_df, user_id)
-    }
-    
-    requal_version_df <- data.frame(
-        project_id = project_id,
-        version = as.character(packageVersion("requal"))
+  }else{
+    user_permission_df <- tibble::tibble(
+      user_id = user_id,
+      project_id = project_id,
+      can_code = 1,
+      can_modify_codes = 1,
+      can_delete_codes = 1,
+      can_modify_documents = 1,
+      can_delete_documents = 1,
+      can_manage = 1
     )
-    res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE)
-    
-    create_default_user(pool, project_id)
+  }
+
+
+  DBI::dbWriteTable(pool, "user_permissions", user_permission_df, append = TRUE, row.names = FALSE)
 }
 
-add_documents_record <- function(pool, project_id, document_df, user_id){
-    res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE)
-    if(res){
-        written_document_id <- dplyr::tbl(pool, "documents") %>%
-            dplyr::filter(.data$doc_name == !!document_df$doc_name &
-                              .data$doc_text == !!document_df$doc_text &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(doc_id)
-        log_add_document_record(pool, project_id, document_df %>%
-                                    dplyr::mutate(doc_id = written_document_id), 
-                                user_id = user_id)
-    }else{
-        warning("document not added")
-    }
+create_project_record <- function(pool, project_df, user_id) {
+
+  res <- pool::dbWriteTable(pool, 
+  "projects", 
+  project_df, 
+  append = TRUE,
+  row.names = FALSE)
+
+  
+  project_id <- dplyr::tbl(pool, "projects") %>%
+    dplyr::filter(project_name == !!project_df$project_name) %>%
+    dplyr::pull(project_id)  
+
+  # to delete later after we check for unique project names
+  project_id <- max(project_id) 
+
+  if (res) {
+    log_create_project_record(pool, project_id, project_df, user_id)
+  }
+
+  requal_version_df <- data.frame(
+    project_id = project_id,
+    version = as.character(packageVersion("requal"))
+  )
+  res_v <- DBI::dbWriteTable(pool, "requal_version", requal_version_df, append = TRUE, row.names = FALSE)
+
+  create_default_user(pool, project_id, user_id = user_id)
 }
 
-add_cases_record <- function(pool, project_id, case_df, user_id){
-    res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE)
-    if(res){
-        written_case_id <- dplyr::tbl(pool, "cases") %>%
-            dplyr::filter(.data$case_name == !!case_df$case_name &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(.data$case_id)
-        log_add_case_record(pool, project_id, case_df %>%
-                                dplyr::mutate(case_id = written_case_id), 
-                            user_id = user_id)
-    }else{
-        warning("case not added")
-    }
+add_documents_record <- function(pool, project_id, document_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE, row.names = FALSE)
+  if (res) {
+    written_document_id <- dplyr::tbl(pool, "documents") %>%
+      dplyr::filter(.data$doc_name == !!document_df$doc_name &
+        .data$doc_text == !!document_df$doc_text &
+        .data$project_id == project_id) %>%
+      dplyr::pull(doc_id)
+    log_add_document_record(pool, project_id, document_df %>%
+      dplyr::mutate(doc_id = written_document_id),
+    user_id = user_id
+    )
+  } else {
+    warning("document not added")
+  }
 }
 
-add_codes_record <- function(pool, project_id, codes_df, user_id){
-    res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE)
-    if(res){
-        written_code_id <- dplyr::tbl(pool, "codes") %>%
-            dplyr::filter(.data$code_name == !!codes_df$code_name &
-                              .data$project_id == project_id) %>%
-            dplyr::pull(code_id)
-        log_add_code_record(pool, project_id, codes_df %>%
-                                dplyr::mutate(code_id = written_code_id), 
-                            user_id = user_id)
-    }else{
-        warning("code not added")
-    }
+add_cases_record <- function(pool, project_id, case_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE, row.names = FALSE)
+  if (res) {
+    written_case_id <- dplyr::tbl(pool, "cases") %>%
+      dplyr::filter(.data$case_name == !!case_df$case_name &
+        .data$project_id == project_id) %>%
+      dplyr::pull(.data$case_id)
+    log_add_case_record(pool, project_id, case_df %>%
+      dplyr::mutate(case_id = written_case_id),
+    user_id = user_id
+    )
+  } else {
+    warning("case not added")
+  }
 }
 
-add_case_doc_record <- function(pool, project_id, case_doc_df, user_id){
-    res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE)
-    if(res){
-        log_add_case_doc_record(pool, project_id, case_doc_df, user_id)
-    }else{
-        warning("code document map not added")
-    }
+add_codes_record <- function(pool, project_id, codes_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
+  if (res) {
+    written_code_id <- dplyr::tbl(pool, "codes") %>%
+      dplyr::filter(.data$code_name == !!codes_df$code_name &
+        .data$project_id == project_id) %>%
+      dplyr::pull(code_id)
+    log_add_code_record(pool, project_id, codes_df %>%
+      dplyr::mutate(code_id = written_code_id),
+    user_id = user_id
+    )
+  } else {
+    warning("code not added")
+  }
 }
+
+add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
+  res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE, row.names = FALSE)
+  if (res) {
+    log_add_case_doc_record(pool, project_id, case_doc_df, user_id)
+  } else {
+    warning("code document map not added")
+  }
+}
+
+# Globals ####
+
+make_globals <- quote({
+  mode <- golem::get_golem_options(which = "mode")
+  if (mode == "server") {
+    pool <- pool::dbPool(
+      drv = RPostgreSQL::PostgreSQL(),
+      host = golem::get_golem_options(which = "dbhost"),
+      port = golem::get_golem_options(which = "dbport"),
+      dbname = golem::get_golem_options(which = "dbname"),
+      user = golem::get_golem_options(which = "dbusername"),
+      password = golem::get_golem_options(which = "dbpassword")
+    )
+
+    onStop(function() {
+      pool::poolClose(glob$pool)
+    })
+
+  }
+})

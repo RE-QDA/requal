@@ -67,8 +67,12 @@ mod_memo_server <- function(id, glob) {
     })
 
     observeEvent(input$save_close, {
-      add_memo_record(glob$pool, glob$active_project, 
-                      req(input$memo_text), user_id = glob$user$user_id)
+      add_memo_record(
+        pool = glob$pool,
+        project = glob$active_project,
+        text = req(input$memo_text),
+        user_id = glob$user$user_id
+      )
 
       memo_list(list_memo_records(glob$pool, glob$active_project))
 
