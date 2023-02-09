@@ -131,6 +131,15 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
           })
         })
       }
+      
+      observeEvent(glob$pool, {
+        updateSelectInput(session,
+                          "project_selector_load",
+                          choices = read_project_db(glob$pool,
+                                                    project_id = NULL
+                          )
+        )
+      })
 
       observeEvent(input$project_load, {
         if (!isTruthy(input$project_selector_load)) {
