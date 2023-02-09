@@ -15,7 +15,9 @@ mod_use_manager_ui <- function(id) {
                 choices = "",
                 multiple = TRUE
   ),
-  actionButton(ns("assign"), "Assign")
+  actionButton(ns("assign"), "Assign"),
+  tags$br(),
+  uiOutput(ns("assigned_users"))
   )
 }
 
@@ -31,6 +33,41 @@ mod_use_manager_server <- function(id, glob) {
     updateSelectInput( session = session,
           "rql_users",
           choices = c("", all_users$user))
+})
+observeEvent(input$assign, {
+
+output$assigned_users <- renderUI({
+
+users_assigned_df <- dplyr::tbl(glob$pool, "user_permissions") %>%
+dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
+dplyr::collect()
+
+users_details_df <- dplyr::tbl(glob$pool, "users") %>%
+dplyr::filter(user_id %in% !!users_assigned_df$user_id) %>%
+dplyr::collect()
+
+users_permissions_df <- dplyr::inner_join(
+  users_assigned_df,
+  users_details_df,
+  by = "user_id"
+  )
+browser()
+  users_permissions_df2 <- users_permissions_df |>
+  dplyr::select(user_id, tidyselect::starts_with("can_")) |> 
+  tidyr::pivot_longer(
+    -user_id, 
+    names_to = "permission",
+    values_to = "initial_value"
+    )  |> 
+    tidyr::nest(permission = permission, initial_value = initial_value) |> 
+    dplyr::mutate(permission = purrr::map(permission, unlist),
+    initial_value = purrr::map(initial_value, unlist))
+
+purrr::pmap(users_permissions_df2 |> dplyr::group_by(user_id),
+.f = gen_permissions_ui
+)
+
+})
 })
     
   })
