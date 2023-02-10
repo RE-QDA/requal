@@ -15,6 +15,8 @@ mod_summary_ui <- function(id){
     
     actionButton(ns("calculate"), "Calculate"),
     # dataTableOutput(ns("summary_table"))
+    h2("Segment frequency"),
+    textOutput(ns("summary_message")),
     tableOutput(ns("summary_table"))
   )
 }
@@ -46,6 +48,8 @@ mod_summary_server <- function(id, glob){
       }
     })
     
+    output$summary_message <- renderText("Click 'calculate' to display table")
+    
     observeEvent({input$calculate}, {
       codes <- load_codes_names(pool = glob$pool, 
                                 active_project = glob$active_project)
@@ -72,10 +76,15 @@ mod_summary_server <- function(id, glob){
                              values_fill = 0) %>% 
           dplyr::rename(code = code_name)
         
-        output$summary_table <- renderTable(summary_df)
+        output$summary_message <- renderText("")
+        output$summary_table <- renderTable(
+          summary_df, 
+          caption = "The table displays the number of segments by code and document coded by the selected coders.")
         # output$summary_table <- renderDataTable(summary_df)
       }else{
+        output$summary_message <- renderText("No segments were coded by selected coders.")
         output$summary_table <- NULL
+        
       }
     })
     
