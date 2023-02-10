@@ -17,6 +17,11 @@ mod_reporting_ui <- function(id) {
         value = "instructions",
         textOutput(ns("report_instructions"))
       ),
+      tabPanel("Summary",
+        id = ns("summary"),
+        value = "summary",
+        mod_summary_ui("summary_ui_1")
+      ),
       tabPanel("Agreement",
         id = ns("agree"),
         value = "agree",

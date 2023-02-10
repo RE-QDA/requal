@@ -69,6 +69,7 @@ golem::add_module( name = "memo" ) # Name of the module
 golem::add_module( name = "agreement" )
 golem::add_module( name = "browser" )
 golem::add_module( name = "text_stats")
+golem::add_module( name = "summary" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
