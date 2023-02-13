@@ -12,11 +12,11 @@ mod_reporting_ui <- function(id) {
   tagList(
     tabsetPanel(
       type = "tabs", id = ns("reporting_tabset"),
-      tabPanel("Instructions",
-        id = ns("instructions"),
-        value = "instructions",
-        textOutput(ns("report_instructions"))
-      ),
+      # tabPanel("Instructions",
+      #   id = ns("instructions"),
+      #   value = "instructions",
+      #   textOutput(ns("report_instructions"))
+      # ),
       tabPanel("Summary",
         id = ns("summary"),
         value = "summary",
@@ -56,9 +56,9 @@ mod_reporting_server <- function(id, glob) {
     loc <- reactiveValues()
 
     # instructions ------------
-    output$report_instructions <- renderText(
-      "Instructions for using this module..."
-    )
+    # output$report_instructions <- renderText(
+    #   "Instructions for using this module..."
+    # )
 
      observeEvent( {req(input$reporting_tabset == "logs") | input$logs_refresh}, {
       if (isTruthy(glob$active_project)) {
