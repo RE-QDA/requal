@@ -37,7 +37,6 @@ get_user_attributes_from_modal <- function(input, user_attributes){
 }
 
 update_user_attributes <- function(pool, project_id, user_id, user_attributes_df){
-    
     attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
         dplyr::select(attribute_id, attribute_name) %>% 
         dplyr::collect()
