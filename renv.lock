@@ -72,6 +72,13 @@
       "Repository": "CRAN",
       "Hash": "45f0398006e83a5b10b72a90663d8d8c"
     },
+    "RPostgreSQL": {
+      "Package": "RPostgreSQL",
+      "Version": "0.7-4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "895cae73af25cb3770836d641511ad28"
+    },
     "RSQLite": {
       "Package": "RSQLite",
       "Version": "2.2.14",
@@ -345,13 +352,6 @@
       "Repository": "CRAN",
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8"
     },
-    "filelock": {
-      "Package": "filelock",
-      "Version": "1.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "38ec653c2613bed60052ba3787bd8a2c"
-    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.2.2",
@@ -505,13 +505,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d07e729b27b372429d42d24d503613a0"
-    },
-    "keyring": {
-      "Package": "keyring",
-      "Version": "1.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f97832aee679462739f7146fead53b11"
     },
     "knitr": {
       "Package": "knitr",
@@ -861,19 +854,12 @@
       "Version": "1.0.410",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
       "RemoteUsername": "datastorm-open",
       "RemoteRepo": "shinymanager",
       "RemoteRef": "master",
-      "RemoteSha": "1fd3d1a1cc4a2a9f041f1c9a6a8a47b4ea813061",
-      "Hash": "a4d0efde28ec5945888bfb9e7ae23586"
-    },
-    "sodium": {
-      "Package": "sodium",
-      "Version": "1.2.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "3606bb09e0914edd4fc8313b500dcd5e"
+      "RemoteSha": "0bfc8773d5333f52c98d967468b1d1f06eaae300",
+      "RemoteHost": "api.github.com",
+      "Hash": "ba99ce1c688d22342cfa87113b39409c"
     },
     "sortable": {
       "Package": "sortable",
