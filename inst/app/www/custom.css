@@ -111,3 +111,9 @@ margin-left: -20px !important;
 margin-right: auto !important; 
 width: 100% !important;  
 } 
+
+
+.dropdown-toggle[role="combobox"] {
+  background-color: white;
+  border: 1px solid #cccccc;
+}

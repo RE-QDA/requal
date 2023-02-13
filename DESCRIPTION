@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-Assisted Qualitative Data Analysis
-Version: 0.8.0
+Version: 0.8.1
 Authors@R:
     c(
      person(given = "Radim",
@@ -47,6 +47,7 @@ Imports:
     pool,
     purrr,
     rlang,
+    RPostgreSQL,
     RSQLite,
     shiny (>= 1.6.0),
     shinydashboard,
