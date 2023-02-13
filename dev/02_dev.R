@@ -31,9 +31,9 @@ usethis::use_package( "stringr" )
 usethis::use_package( "htmlwidgets" )
 usethis::use_package( "sortable" )
 usethis::use_package( "shinyWidgets" )
-
-
-
+usethis::use_package( "RPostgreSQL" )
+usethis::use_package( "shinymanager" )
+usethis::use_package( "pool" )
 
 
 ## Add modules ----
