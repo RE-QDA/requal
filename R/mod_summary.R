@@ -27,7 +27,7 @@ mod_summary_ui <- function(id) {
         `select-all-text` = "Select all",
         `deselect-all-text` = "Reset",
         `none-selected-text` = "Codes to include in summary"
-        )
+      )
     ),
     shinyWidgets::pickerInput(ns("summary_docs"), "Select documents:",
       choices = "", multiple = TRUE,
@@ -36,7 +36,7 @@ mod_summary_ui <- function(id) {
         `select-all-text` = "Select all",
         `deselect-all-text` = "Reset",
         `none-selected-text` = "Documents to include in summary"
-        )
+      )
     ),
     actionButton(ns("calculate"), "Calculate"),
     h2("Codes-documents frequency"),
@@ -55,12 +55,13 @@ mod_summary_server <- function(id, glob) {
 
     loc <- reactiveValues()
 
-    observeEvent(c(glob$active_project,
-    glob$codebook, glob$documents
-    ), {
-
+    observeEvent({
+      glob$active_project
+      glob$codebook
+      glob$documents
+    }, {
       if (isTruthy(glob$active_project)) {
-
+        # list users
         loc$users <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::select(user_id, user_name) %>%
           dplyr::collect()
@@ -75,7 +76,7 @@ mod_summary_server <- function(id, glob) {
           ),
           selected = loc$users$user_id
         )
-
+        # list codes
         loc$codes <- load_codes_names(
           pool = glob$pool,
           active_project = glob$active_project
@@ -91,8 +92,8 @@ mod_summary_server <- function(id, glob) {
           ),
           selected = loc$codes$code_id
         )
-      }
-
+      
+      # list docs
       loc$docs <- load_all_docs_db(
         pool = glob$pool,
         active_project = glob$active_project
@@ -109,6 +110,7 @@ mod_summary_server <- function(id, glob) {
         ),
         selected = loc$docs$doc_id
       )
+    }
     })
 
     output$summary_message <- renderText("Click 'Calculate' to display table")

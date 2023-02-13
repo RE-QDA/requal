@@ -113,7 +113,7 @@ width: 100% !important;
 } 
 
 
-.dropdown-toggle {
+.dropdown-toggle[role="combobox"] {
   background-color: white;
   border: 1px solid #cccccc;
 }
