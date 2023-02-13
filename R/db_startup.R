@@ -32,6 +32,53 @@ CREATE TABLE if not exists users (
 );
 "
 
+CREATE_ATTRIBUTES_SQL <- "
+CREATE TABLE if not exists attributes (
+    attribute_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   attribute_name TEXT
+,   attribute_object TEXT
+,   attribute_type TEXT
+);
+"
+CREATE_ATTRIBUTES_SQL_POSTGRES <- "
+CREATE TABLE if not exists attributes (
+    attribute_id SERIAL PRIMARY KEY
+,   attribute_name TEXT
+,   attribute_object TEXT
+,   attribute_type TEXT
+);
+"
+
+CREATE_ATTRIBUTE_VALUES_SQL <- "
+CREATE TABLE if not exists attribute_values (
+    attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   attribute_id INTEGER
+,   value TEXT
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+);
+"
+
+CREATE_ATTRIBUTE_VALUES_SQL_POSTGRES <- "
+CREATE TABLE if not exists attribute_values (
+    attribute_value_id SERIAL PRIMARY KEY 
+,   attribute_id INTEGER
+,   value TEXT
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+);
+"
+
+CREATE_ATTRIBUTE_USER_MAP_SQL <- "
+CREATE TABLE if not exists user_attribute_map (
+    user_id INTEGER
+,   attribute_id INTEGER
+,   attribute_value_id INTEGER 
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id)
+);
+"
+
+
 CREATE_USER_PERMISSIONS_SQL <- "
 CREATE TABLE if not exists user_permissions (
     user_id INTEGER
@@ -270,6 +317,8 @@ create_db_schema <- function(pool) {
     DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
     DBI::dbExecute(pool, CREATE_MEMO_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL_POSTGRES)
+    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL_POSTGRES)
 
   } else {
     DBI::dbExecute(pool, CREATE_PROJECT_SQL)
@@ -285,9 +334,14 @@ create_db_schema <- function(pool) {
     DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
     DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
     DBI::dbExecute(pool, CREATE_MEMO_SQL)
-
+    DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
+    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL)
+    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL)
   }
 
+  DBI::dbExecute(pool, CREATE_ATTRIBUTE_USER_MAP_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
   DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
