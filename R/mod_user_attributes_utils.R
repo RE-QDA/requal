@@ -7,7 +7,7 @@ add_attribute <- function(pool, attribute_name, type = "categorical", object){
         attribute_type = type
     )
     
-    res <- DBI::dbWriteTable(pool, "attributes", new_attribute, append = TRUE)
+    res <- DBI::dbWriteTable(pool, "attributes", new_attribute, append = TRUE, row.names = FALSE)
     
     if(res){
         # TODO: log
@@ -17,7 +17,7 @@ add_attribute <- function(pool, attribute_name, type = "categorical", object){
 }
 
 add_attribute_values <- function(pool, attribute_id, attribute_values){
-    # browser()
+  
     values <- strsplit(attribute_values, ",") %>% 
         unlist() %>% 
         trimws()
@@ -27,7 +27,7 @@ add_attribute_values <- function(pool, attribute_id, attribute_values){
         value = values
     )
     
-    res <- DBI::dbWriteTable(pool, "attribute_values", values_df, append = TRUE)
+    res <- DBI::dbWriteTable(pool, "attribute_values", values_df, append = TRUE, row.names = FALSE)
     
     if(res){
         # TODO: log
@@ -37,6 +37,7 @@ add_attribute_values <- function(pool, attribute_id, attribute_values){
 }
 
 read_user_attributes <- function(pool){
+   
     dplyr::tbl(pool, "attributes") %>%
         dplyr::filter(.data$attribute_object == "user") %>%
         dplyr::select(attribute_id, attribute_name) %>%

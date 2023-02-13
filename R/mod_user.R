@@ -21,7 +21,7 @@ mod_user_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    loc <- reactiveValues()
+    loc <- reactiveValues() 
 
     output$user <- renderUser({
       if (isTruthy(glob$active_project)) {
@@ -95,13 +95,11 @@ mod_user_server <- function(id, glob) {
             
             glob$user$data <- loc$user_data
         })
-        
-        
-        
-    })
+
 
     # edit user ----
     observeEvent(input$edit_user, {
+      
       user_attributes <- read_user_attributes(glob$pool) %>% 
           dplyr::group_by(attribute_name) %>% 
           dplyr::summarise(values = list(value))
@@ -140,6 +138,7 @@ mod_user_server <- function(id, glob) {
     })
 
     observeEvent(input$save_close, {
+    
       update_user_db(glob$pool,
         user_id = 1,
         input$user_name,

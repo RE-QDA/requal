@@ -34,7 +34,7 @@ CREATE TABLE if not exists users (
 
 CREATE_ATTRIBUTES_SQL <- "
 CREATE TABLE if not exists attributes (
-    attribute_id INTEGER PRIMARY KEY
+    attribute_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   attribute_name TEXT
 ,   attribute_object TEXT
 ,   attribute_type TEXT
@@ -51,7 +51,7 @@ CREATE TABLE if not exists attributes (
 
 CREATE_ATTRIBUTE_VALUES_SQL <- "
 CREATE TABLE if not exists attribute_values (
-    attribute_value_id INTEGER PRIMARY KEY 
+    attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   attribute_id INTEGER
 ,   value TEXT
 ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
@@ -73,7 +73,7 @@ CREATE TABLE if not exists user_attribute_map (
 ,   attribute_id INTEGER
 ,   attribute_value_id INTEGER 
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(attribute_id) REFERENCES user_attributes(attribute_id)
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
 ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id)
 );
 "

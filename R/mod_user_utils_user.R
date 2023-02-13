@@ -27,6 +27,7 @@ generate_user_attribute_select_ui <- function(id, attribute, values, user_value 
 }
 
 get_user_attributes_from_modal <- function(input, user_attributes){
+   
     purrr::map_df(user_attributes, function(x) {
         tibble::tibble(
             attribute_name = x, 
@@ -36,6 +37,7 @@ get_user_attributes_from_modal <- function(input, user_attributes){
 }
 
 update_user_attributes <- function(pool, project_id, user_id, user_attributes_df){
+    
     attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
         dplyr::select(attribute_id, attribute_name) %>% 
         dplyr::collect()
@@ -76,7 +78,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
             values_df <- user_attributes_df[x,] %>% 
                 dplyr::select(user_id, attribute_id, attribute_value_id)
             DBI::dbWriteTable(pool, "user_attribute_map", 
-                              values_df, append = TRUE)
+                              values_df, append = TRUE, row.names = FALSE)
             log_change_user_attribute(pool, local(project_id), 
                                       values_df, 
                                       user_id = user_id)
