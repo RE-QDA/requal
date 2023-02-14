@@ -299,15 +299,13 @@ update_db_schema <- function(pool) {
         )
       purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
     } else {
-      existing_tables <- pool::dbListTables(pool)
-      existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
-      missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+    
       to_create_tables <- db_call_df %>%
         dplyr::filter(table %in% missing_tables)
 
       purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
-      print("update schema")
     }
+    message("Updated reQual schema.")
   } else {
     NULL
   }
