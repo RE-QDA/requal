@@ -51,7 +51,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
     
     purrr::walk(seq_len(nrow(user_attributes_df)), function(x) {
         # Check if attribute has value
-        existing_attr <- dplyr::tbl(pool, "user_attribute_map") %>% 
+        existing_attr <- dplyr::tbl(pool, "attributes_users_map") %>% 
             dplyr::filter(.data$user_id == !!user_id & 
                               .data$attribute_id == !!user_attributes_df$attribute_id[x]) %>% 
             dplyr::collect()
@@ -61,7 +61,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
             attr_value <- user_attributes_df$attribute_value_id[x]
             
             if(existing_attr$attribute_value_id != attr_value){
-                update_attributes_sql <- glue::glue_sql("UPDATE user_attribute_map
+                update_attributes_sql <- glue::glue_sql("UPDATE attributes_users_map
                  SET attribute_value_id = {attr_value}
                  WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
                 
@@ -76,7 +76,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
         }else{
             values_df <- user_attributes_df[x,] %>% 
                 dplyr::select(user_id, attribute_id, attribute_value_id)
-            DBI::dbWriteTable(pool, "user_attribute_map", 
+            DBI::dbWriteTable(pool, "attributes_users_map", 
                               values_df, append = TRUE, row.names = FALSE)
             log_change_user_attribute(pool, local(project_id), 
                                       values_df, 
