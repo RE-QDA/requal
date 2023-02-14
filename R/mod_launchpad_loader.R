@@ -66,6 +66,8 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             })
           })
 
+        update_db_schema(glob$pool)
+
 
           updateSelectInput(session,
             "project_selector_load",
@@ -133,6 +135,8 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             pool::poolClose(glob$pool)
           })
         })
+
+        update_db_schema(glob$pool)
       }
       
       observeEvent(glob$pool, {

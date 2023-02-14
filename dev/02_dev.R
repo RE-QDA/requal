@@ -31,9 +31,9 @@ usethis::use_package( "stringr" )
 usethis::use_package( "htmlwidgets" )
 usethis::use_package( "sortable" )
 usethis::use_package( "shinyWidgets" )
-
-
-
+usethis::use_package( "RPostgreSQL" )
+usethis::use_package( "shinymanager" )
+usethis::use_package( "pool" )
 
 
 ## Add modules ----
@@ -71,6 +71,7 @@ golem::add_module( name = "memo" ) # Name of the module
 golem::add_module( name = "agreement" )
 golem::add_module( name = "browser" )
 golem::add_module( name = "text_stats")
+golem::add_module( name = "summary" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
