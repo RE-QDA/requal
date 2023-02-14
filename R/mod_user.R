@@ -4,103 +4,122 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
-mod_user_ui <- function(id){
-    ns <- NS(id)
-    tagList(
-        userOutput(ns("user"))
-    )
+#' @importFrom shiny NS tagList
+mod_user_ui <- function(id) {
+  ns <- NS(id)
+  tagList(
+    userOutput(ns("user"))
+  )
 }
 
 #' user Server Functions
 #'
-#' @noRd 
-mod_user_server <- function(id, glob){
-    moduleServer(id, function(input, output, session){
-        ns <- session$ns
-        
-        loc <- reactiveValues()
-        
-        output$user <- renderUser({
-            
-            if (isTruthy(glob$active_project)) {
-                
+#' @noRd
+mod_user_server <- function(id, glob) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
+    loc <- reactiveValues() 
+    
+    output$user <- renderUser({
+      if (isTruthy(glob$active_project)) {
         loc$user_data <- read_user_db(
-            glob$pool,
-            user_id = glob$user$user_id,
-            active_project = glob$active_project
-          )
+          glob$pool,
+          user_id = glob$user$user_id,
+          active_project = glob$active_project
+        )
         
         glob$user$data <- loc$user_data
-                
-                permissions_list <- loc$user_data %>% 
-                    dplyr::select(dplyr::starts_with("can_")) %>% 
-                    tidyr::pivot_longer(dplyr::everything(),
-                                        names_to = "permissions",
-                                        values_to = "granted") %>% 
-                    dplyr::filter(.data$granted == 1) %>% 
-                    dplyr::pull(.data$permissions) 
-                
-                dashboardUser(
-                    name = loc$user_data$user_name,
-                    image = "www/user_logo.jpg", 
-                    title = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail),
-                    subtitle = paste0("Project:", glob$active_project), 
-                    footer =  actionButton(ns("edit_user"),
-                                           "Edit"),
-                    fluidRow(
-                        dashboardUserItem(
-                            width = 12,
-                            tags$div(purrr::map(permissions_list, tags$p),
-                                     style = "text-align: left")
-                        )
-                    ))
-            }
-        })
         
-        # edit user ----
-        observeEvent(input$edit_user, {
-            
-            showModal(
-                
-                modalDialog(
-                    title = "User details",
-                    
-                    textInput(ns("user_name"), "User name",
-                              value = loc$user_data$user_name
-                    ),
-                    
-                    textInput(ns("user_email"), "Email",
-                              value = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail)
-                    ),
-                    
-                    footer = tagList(
-                        modalButton("Cancel"),
-                        actionButton(ns("save_close"), "Save & Close")
-                    )
-                    
-                )
-                
+        loc$user_attributes <- read_user_attributes(glob$pool) %>%
+          dplyr::group_by(attribute_name) %>% 	
+          dplyr::summarise(values = list(value))
+        
+        permissions_list <- loc$user_data %>% 
+          dplyr::select(dplyr::starts_with("can_")) %>% 
+          tidyr::pivot_longer(dplyr::everything(),
+                              names_to = "permissions",
+                              values_to = "granted") %>% 
+          dplyr::filter(.data$granted == 1) %>% 
+          dplyr::pull(.data$permissions) 
+        
+        dashboardUser(
+          name = loc$user_data$user_name,
+          image = "www/user_logo.jpg", 
+          title = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail),
+          subtitle = paste0("Project:", glob$active_project), 
+          footer =  actionButton(ns("edit_user"),
+                                 "Edit"),
+          fluidRow(
+            dashboardUserItem(
+              width = 12,
+              tags$div(purrr::map(permissions_list, tags$p),
+                       style = "text-align: left")
             )
-        })
-        
-        observeEvent(input$save_close, {
-            update_user_db(glob$pool, 
-                           user_id = glob$user$user_id,
-                           input$user_name,
-                           input$user_email)
-            
-            loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
-            removeModal()
-            
-            glob$user$data <- loc$user_data
-        })
-        
-        
-        
+          ))
+      }
     })
+    
+    # edit user ----
+    observeEvent(input$edit_user, {
+      
+      user_attributes <- read_user_attributes(glob$pool) %>% 
+        dplyr::group_by(attribute_name) %>% 
+        dplyr::summarise(values = list(value))
+      
+      specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = glob$user$user_id)
+      
+      showModal(
+        modalDialog(
+          title = "User details",
+          textInput(ns("user_name"), "User name",
+                    value = loc$user_data$user_name
+          ),
+          textInput(ns("user_email"), "Email",
+                    value = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail)
+          ),
+          
+          purrr::map2(user_attributes$attribute_name, user_attributes$values, function(x, y) {
+            values_df <- specific_user_attributes %>% 
+              dplyr::filter(.data$attribute_name == x)
+            
+            if(nrow(values_df)){
+              selected_value <- values_df %>% dplyr::pull(value)
+            }else{
+              selected_value <- ""
+            }
+            generate_user_attribute_select_ui(ns(paste0("user_attribute_", x)), x, y, 
+                                              selected_value)
+          }),
+          
+          footer = tagList(
+            modalButton("Cancel"),
+            actionButton(ns("save_close"), "Save & Close")
+          )
+        )
+      )
+    })
+    
+    observeEvent(input$save_close, {
+      update_user_db(glob$pool,
+                     user_id = 1,
+                     input$user_name,
+                     input$user_email
+      )
+      
+      loc$user_attributes <- read_user_attributes(glob$pool) %>%
+        dplyr::group_by(attribute_name) %>% 	
+        dplyr::summarise(values = list(value))
+      
+      user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
+      update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, user_attr_values_df)
+      
+      loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
+      removeModal()
+      
+      glob$user <- loc$user_data
+    })
+  })
 }
-
-

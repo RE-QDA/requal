@@ -20,3 +20,76 @@ update_user_db <- function(pool,
     
     DBI::dbExecute(pool, update_user_sql)
 }
+
+generate_user_attribute_select_ui <- function(id, attribute, values, user_value = ""){
+    selectInput(id, label = attribute, choices = c("", values), 
+                selected = user_value)
+}
+
+get_user_attributes_from_modal <- function(input, user_attributes){
+   
+    purrr::map_df(user_attributes, function(x) {
+        tibble::tibble(
+            attribute_name = x, 
+            attribute_value = input[[paste0("user_attribute_", x)]]
+        )
+    })
+}
+
+update_user_attributes <- function(pool, project_id, user_id, user_attributes_df){
+    attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
+        dplyr::select(attribute_id, attribute_name) %>% 
+        dplyr::collect()
+    attribute_values <- dplyr::tbl(pool, "attribute_values") %>% 
+        dplyr::select(attribute_id, attribute_value_id, value) %>% 
+        dplyr::collect()
+    
+    user_attributes_df <- user_attributes_df %>% 
+        dplyr::left_join(., attribute_ids, by = "attribute_name") %>% 
+        dplyr::left_join(., attribute_values, by = c("attribute_id", "attribute_value"="value")) %>% 
+        dplyr::mutate(user_id = user_id)
+    
+    purrr::walk(seq_len(nrow(user_attributes_df)), function(x) {
+        # Check if attribute has value
+        existing_attr <- dplyr::tbl(pool, "attributes_users_map") %>% 
+            dplyr::filter(.data$user_id == !!user_id & 
+                              .data$attribute_id == !!user_attributes_df$attribute_id[x]) %>% 
+            dplyr::collect()
+        
+        if(nrow(existing_attr)){
+            attr_id <- user_attributes_df$attribute_id[x]
+            attr_value <- user_attributes_df$attribute_value_id[x]
+            
+            if(existing_attr$attribute_value_id != attr_value){
+                update_attributes_sql <- glue::glue_sql("UPDATE attributes_users_map
+                 SET attribute_value_id = {attr_value}
+                 WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
+                
+                DBI::dbExecute(pool, update_attributes_sql)
+                log_change_user_attribute(pool, local(project_id), 
+                                          data.frame(
+                                              attribute_id = attr_id, 
+                                              attribute_value_id = attr_value
+                                          ), 
+                                          user_id = user_id)   
+            }
+        }else{
+            values_df <- user_attributes_df[x,] %>% 
+                dplyr::select(user_id, attribute_id, attribute_value_id)
+            DBI::dbWriteTable(pool, "attributes_users_map", 
+                              values_df, append = TRUE, row.names = FALSE)
+            log_change_user_attribute(pool, local(project_id), 
+                                      values_df, 
+                                      user_id = user_id)
+        }
+    })
+}
+
+read_user_attributes_by_id <- function(pool, user_id){
+    dplyr::tbl(pool, "attributes_users_map") %>% 
+        dplyr::filter(.data$user_id == !!user_id) %>% 
+        dplyr::left_join(., dplyr::tbl(pool, "attributes"), by = "attribute_id") %>%
+        dplyr::left_join(., dplyr::tbl(pool, "attribute_values"), 
+                         by = c("attribute_id", "attribute_value_id")) %>% 
+        dplyr::collect()
+}
