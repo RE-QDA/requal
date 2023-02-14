@@ -86,7 +86,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
 }
 
 read_user_attributes_by_id <- function(pool, user_id){
-    dplyr::tbl(pool, "user_attribute_map") %>% 
+    dplyr::tbl(pool, "attributes_users_map") %>% 
         dplyr::filter(.data$user_id == !!user_id) %>% 
         dplyr::left_join(., dplyr::tbl(pool, "attributes"), by = "attribute_id") %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"), 

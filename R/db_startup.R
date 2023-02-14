@@ -230,6 +230,7 @@ db_call_df_unordered <- tibble::tibble(
   sql = db_call
 )
 
+# Arrange by priority as required by postgres
 db_call_df_ordered <- tibble::tibble(
 table = c(
 "projects", 
@@ -258,52 +259,58 @@ db_call_df <- dplyr::full_join(
 
 
 create_db_schema <- function(pool) {
-  # TODO: Full DB structure
+
   db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
   if (db_postgres) {
 
+   psql <- db_call_df %>%
+      dplyr::mutate(
+        psql =
+          stringr::str_replace(
+            sql,
+            "INTEGER PRIMARY KEY AUTOINCREMENT",
+            "SERIAL PRIMARY KEY"
+          )
+      ) %>%
+      dplyr::pull(psql)
 
-    DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-    DBI::dbExecute(pool, CREATE_USERS_SQL)
-    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-    DBI::dbExecute(pool, CREATE_LOG_SQL)
-    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_MEMO_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL_POSTGRES)
-
+    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
   } else {
-    DBI::dbExecute(pool, CREATE_PROJECT_SQL)
-    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-    DBI::dbExecute(pool, CREATE_USERS_SQL)
-    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-    DBI::dbExecute(pool, CREATE_LOG_SQL)
-    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
-    DBI::dbExecute(pool, CREATE_CODES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_CASES_SQL)
-    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL)
+    purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
   }
+}
 
-  DBI::dbExecute(pool, CREATE_ATTRIBUTE_USER_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
+update_db_schema <- function(pool) {
+  existing_tables <- pool::dbListTables(pool)
+  existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
+  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+  if (length(missing_tables) > 0) {
+    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+    if (db_postgres) {
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables) %>%
+        dplyr::mutate(
+          psql =
+            stringr::str_replace(
+              sql,
+              "INTEGER PRIMARY KEY AUTOINCREMENT",
+              "SERIAL PRIMARY KEY"
+            )
+        )
+      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
+    } else {
+      existing_tables <- pool::dbListTables(pool)
+      existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
+      missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables)
+
+      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
+      print("update schema")
+    }
+  } else {
+    NULL
+  }
 }
 
 # Database functions ####
