@@ -25,6 +25,9 @@ mod_user_server <- function(id, glob) {
     
     output$user <- renderUser({
       if (isTruthy(glob$active_project)) {
+        
+        # user data ----
+
         loc$user_data <- read_user_db(
           glob$pool,
           user_id = glob$user$user_id,
@@ -33,12 +36,14 @@ mod_user_server <- function(id, glob) {
         
         glob$user$data <- loc$user_data
         
+        # user attributes ---- 
+
         loc$user_attributes <- read_user_attributes(glob$pool) %>%
           dplyr::group_by(attribute_name) %>% 	
           dplyr::summarise(values = list(value))
         
-        permissions_list <- loc$user_data %>% 
-          dplyr::select(dplyr::starts_with("can_")) %>% 
+        loc$permissions_list <- loc$user_data %>% 
+          dplyr::select(dplyr::matches("view|modify")) %>% 
           tidyr::pivot_longer(dplyr::everything(),
                               names_to = "permissions",
                               values_to = "granted") %>% 
@@ -55,7 +60,7 @@ mod_user_server <- function(id, glob) {
           fluidRow(
             dashboardUserItem(
               width = 12,
-              tags$div(purrr::map(permissions_list, tags$p),
+              tags$div(purrr::map(loc$permissions_list, tags$p),
                        style = "text-align: left")
             )
           ))
@@ -65,11 +70,11 @@ mod_user_server <- function(id, glob) {
     # edit user ----
     observeEvent(input$edit_user, {
       
-      user_attributes <- read_user_attributes(glob$pool) %>% 
+      loc$user_attributes <- read_user_attributes(glob$pool) %>% 
         dplyr::group_by(attribute_name) %>% 
         dplyr::summarise(values = list(value))
       
-      specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = glob$user$user_id)
+      loc$specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = glob$user$user_id)
       
       showModal(
         modalDialog(
@@ -81,12 +86,12 @@ mod_user_server <- function(id, glob) {
                     value = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail)
           ),
           
-          purrr::map2(user_attributes$attribute_name, user_attributes$values, function(x, y) {
-            values_df <- specific_user_attributes %>% 
+          purrr::map2(loc$user_attributes$attribute_name, loc$user_attributes$values, function(x, y) {
+            loc$values_df <- loc$specific_user_attributes %>% 
               dplyr::filter(.data$attribute_name == x)
             
-            if(nrow(values_df)){
-              selected_value <- values_df %>% dplyr::pull(value)
+            if(nrow(loc$values_df)){
+              selected_value <- loc$values_df %>% dplyr::pull(value)
             }else{
               selected_value <- ""
             }
@@ -104,7 +109,7 @@ mod_user_server <- function(id, glob) {
     
     observeEvent(input$save_close, {
       update_user_db(glob$pool,
-                     user_id = 1,
+                     user_id = glob$user$user_id,
                      input$user_name,
                      input$user_email
       )
@@ -113,7 +118,7 @@ mod_user_server <- function(id, glob) {
         dplyr::group_by(attribute_name) %>% 	
         dplyr::summarise(values = list(value))
       
-      user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
+      loc$user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
       update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, user_attr_values_df)
       
       loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
