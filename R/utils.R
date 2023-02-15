@@ -341,7 +341,12 @@ warn_user <- function(warning) {
                         warning))
 }
   
+# check priviledges ---
 
+check_permissions <- function(permission) {
 
-    
-
+if (!isTruthy(permission)) {
+  warn_user("Insufficent permissions.")
+}
+req(permission)
+}

@@ -216,8 +216,8 @@ CREATE TABLE if not exists user_permissions (
     user_id INTEGER
 ,   project_id INTEGER
 ,   data_modify INTEGER            
-,   data_modify_other INTEGER     
-,   data_view_other INTEGER       
+,   data_other_modify INTEGER     
+,   data_other_view INTEGER       
 ,   attributes_modify INTEGER      
 ,   attributes_other_modify INTEGER
 ,   attributes_other_view INTEGER  
@@ -340,8 +340,8 @@ create_default_user <- function(pool, project_id, user_id) {
       user_id = user_df_stored$user_id,
       project_id = project_id,
       data_modify                  = 1,
-      data_modify_other            = 1,
-      data_view_other              = 1,
+      data_other_modify            = 1,
+      data_other_view              = 1,
       attributes_modify            = 1,
       attributes_other_modify      = 1,
       attributes_other_view        = 1,
@@ -360,8 +360,8 @@ create_default_user <- function(pool, project_id, user_id) {
       user_id = user_id,
       project_id = project_id,
       data_modify                  = 1,
-      data_modify_other            = 1,
-      data_view_other              = 1,
+      data_other_modify            = 1,
+      data_other_view              = 1,
       attributes_modify            = 1,
       attributes_other_modify      = 1,
       attributes_other_view        = 1,
