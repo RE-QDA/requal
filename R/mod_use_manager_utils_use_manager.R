@@ -14,20 +14,34 @@ get_users <- function(credentials_path, credentials_pass) {
 
 # add user permissions to project ----
 
-add_permissions_record <- function(pool, project_id, codes_df, user_id) {
-  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
+add_permissions_record <- function(pool, project_id, user_id) {
+
+new_users_df <- tibble::tibble(
+  project_id = project_id,
+  user_id = user_id,
+  data_modify                  = 0,
+  data_other_modify            = 0,
+  data_other_view              = 0,
+  attributes_modify            = 0,
+  attributes_other_modify      = 0,
+  attributes_other_view        = 0,
+  codebook_modify              = 0,
+  codebook_other_modify        = 0,
+  codebook_other_view          = 0,
+  annotation_modify            = 0,
+  annotation_other_modify      = 0,
+  annotation_other_view        = 0,
+  analysis_other_view          = 0,
+  report_other_view            = 0,
+  permissions_modify           = 0
+)
+  res <- DBI::dbWriteTable(pool, "user_permissions", new_users_df, append = TRUE, row.names = FALSE)
+  
   if (res) {
-    written_code_id <- dplyr::tbl(pool, "codes") %>%
-      dplyr::filter(.data$code_name == !!codes_df$code_name &
-        .data$project_id == project_id) %>%
-      dplyr::pull(code_id)
-    log_add_code_record(pool, project_id, codes_df %>%
-      dplyr::mutate(code_id = written_code_id),
-    user_id = user_id
-    )
-  } else {
-    warning("code not added")
+  #TODO
+  # log
   }
+
 }
 
 # modify permissions for project
@@ -71,16 +85,20 @@ checkboxInput(
 gen_users_permissions_ui <- function(nested_df, id){
 
 
-purrr::map2(nested_df$user_id_copy, nested_df$data, 
-.f = function(x,y) {
+purrr::pmap(list(
+  user_id = nested_df$user_id_copy, 
+  user_name = nested_df$user_name,
+  user_data = nested_df$data
+  ), 
+.f = function(user_id, user_name, user_data) {
  box(
             tags$div(
-              purrr::pmap(y,
+              purrr::pmap(user_data,
 .f = gen_permissions_ui, id = id
 )
             ),
-            id = x,
-            title = x,
+            id = user_id,
+            title = user_name,
             closable = FALSE,
             width = NULL,
             collapsible = TRUE,
@@ -93,4 +111,56 @@ purrr::map2(nested_df$user_id_copy, nested_df$data,
 
 )
 
+}
+
+# add_user_UI ----
+add_user_UI <- function(id) {
+
+  ns <- NS(id)
+    tags$div(
+        h4("Add user to project"),
+        selectInput(ns("rql_users"),
+                label = "Assign selected users to project",
+                choices = "",
+                multiple = TRUE
+  ),
+  actionButton(ns("assign"), "Assign") %>% 
+  tagAppendAttributes(style = "text-align: left")
+    )
+}
+
+# add_user_UI ----
+remove_user_UI <- function(id) {
+
+  ns <- NS(id)
+    tags$div(
+        h4("Remove user from project"),
+        selectInput(ns("project_members"),
+                label = "Remove selected users from project",
+                choices = "",
+                multiple = TRUE
+  ),
+  actionButton(ns("remove_members"), "Remove") %>% 
+  tagAppendAttributes(style = "text-align: left")
+    )
+}
+
+# menu button 2 ----
+
+menu_btn2 <- function(..., label, icon) {
+  
+  shinyWidgets::dropdown(
+   ...,
+    label = NULL,
+    style = "material-circle",
+    tooltip = shinyWidgets::tooltipOptions(
+      placement = "right",
+      title = label,
+      html = FALSE
+    ),
+    size = "md", 
+    width = "370px",
+    icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
+    right = FALSE
+  ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }

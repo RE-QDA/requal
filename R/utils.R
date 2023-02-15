@@ -179,14 +179,14 @@ menu_btn <- function(..., label, icon) {
     label = NULL,
     style = "material-circle",
     tooltip = shinyWidgets::tooltipOptions(
-      placement = "left",
+      placement = "right",
       title = label,
       html = FALSE
     ),
     size = "md", 
     width = "370px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
-    right = TRUE
+    right = FALSE
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
