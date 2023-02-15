@@ -29,13 +29,19 @@ mod_use_manager_server <- function(id, glob) {
     ns <- session$ns
 
     observeEvent(glob$active_project, {
-    all_users <- get_users()
+    
+    all_users <- get_users() %>%
+    dplyr::filter(user_id != glob$user$user_id)
+
     updateSelectInput( session = session,
           "rql_users",
           choices = c("", all_users$user))
 })
-observeEvent(input$assign, {
 
+observeEvent(input$assign, {
+    validate(
+      need(glob$user$permissions_modify, 'Insufficent privileges.'),
+    )
 output$assigned_users <- renderUI({
 
 users_assigned_df <- dplyr::tbl(glob$pool, "user_permissions") %>%

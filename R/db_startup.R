@@ -215,12 +215,21 @@ CREATE TABLE if not exists users (
 CREATE TABLE if not exists user_permissions (
     user_id INTEGER
 ,   project_id INTEGER
-,   can_code INTEGER
-,   can_modify_codes INTEGER
-,   can_delete_codes INTEGER
-,   can_modify_documents INTEGER
-,   can_delete_documents INTEGER
-,   can_manage INTEGER
+,   data_modify INTEGER            
+,   data_modify_other INTEGER     
+,   data_view_other INTEGER       
+,   attributes_modify INTEGER      
+,   attributes_other_modify INTEGER
+,   attributes_other_view INTEGER  
+,   codebook_modify INTEGER        
+,   codebook_other_modify INTEGER  
+,   codebook_other_view INTEGER    
+,   annotation_modify INTEGER     
+,   annotation_other_modify INTEGER
+,   annotation_other_view INTEGER
+,   analysis_other_view INTEGER    
+,   report_other_view INTEGER      
+,   permissions_modify INTEGER     
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
@@ -330,23 +339,41 @@ create_default_user <- function(pool, project_id, user_id) {
     user_permission_df <- tibble::tibble(
       user_id = user_df_stored$user_id,
       project_id = project_id,
-      can_code = 1,
-      can_modify_codes = 1,
-      can_delete_codes = 1,
-      can_modify_documents = 1,
-      can_delete_documents = 1,
-      can_manage = 1
+      data_modify                  = 1,
+      data_modify_other            = 1,
+      data_view_other              = 1,
+      attributes_modify            = 1,
+      attributes_other_modify      = 1,
+      attributes_other_view        = 1,
+      codebook_modify              = 1,
+      codebook_other_modify        = 1,
+      codebook_other_view          = 1,
+      annotation_modify            = 1,
+      annotation_other_modify      = 1,
+      annotation_other_view        = 1,
+      analysis_other_view          = 1,
+      report_other_view            = 1,
+      permissions_modify           = 1
     )
   }else{
     user_permission_df <- tibble::tibble(
       user_id = user_id,
       project_id = project_id,
-      can_code = 1,
-      can_modify_codes = 1,
-      can_delete_codes = 1,
-      can_modify_documents = 1,
-      can_delete_documents = 1,
-      can_manage = 1
+      data_modify                  = 1,
+      data_modify_other            = 1,
+      data_view_other              = 1,
+      attributes_modify            = 1,
+      attributes_other_modify      = 1,
+      attributes_other_view        = 1,
+      codebook_modify              = 1,
+      codebook_other_modify        = 1,
+      codebook_other_view          = 1,
+      annotation_modify            = 1,
+      annotation_other_modify      = 1,
+      annotation_other_view        = 1,
+      analysis_other_view          = 1,
+      report_other_view            = 1,
+      permissions_modify           = 1
     )
   }
 
