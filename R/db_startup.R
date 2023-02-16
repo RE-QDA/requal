@@ -1,74 +1,21 @@
-CREATE_PROJECT_SQL <- "
-CREATE TABLE projects (
-     project_id INTEGER PRIMARY KEY AUTOINCREMENT
-,    project_name TEXT
-,    project_description TEXT
-,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-"
-CREATE_PROJECT_SQL_POSTGRES <- "
-CREATE TABLE projects (
-    project_id SERIAL PRIMARY KEY
-    ,    project_name TEXT
-    ,    project_description TEXT
-    ,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-"
-CREATE_REQUAL_INFO_SQL <- "
-CREATE TABLE if not exists requal_version (
-    project_id INTEGER
-,   version TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
-# TODO: user_attributes
-CREATE_USERS_SQL <- "
-CREATE TABLE if not exists users (
-    user_id INTEGER PRIMARY KEY
-,   user_login TEXT UNIQUE
-,   user_name TEXT
-,   user_mail TEXT
-,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-"
 
-CREATE_ATTRIBUTES_SQL <- "
+db_call <- c(
+
+"attributes" =
+"
 CREATE TABLE if not exists attributes (
     attribute_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   attribute_name TEXT
 ,   attribute_object TEXT
 ,   attribute_type TEXT
+,   user_id INTEGER
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
-"
-CREATE_ATTRIBUTES_SQL_POSTGRES <- "
-CREATE TABLE if not exists attributes (
-    attribute_id SERIAL PRIMARY KEY
-,   attribute_name TEXT
-,   attribute_object TEXT
-,   attribute_type TEXT
-);
-"
+",
 
-CREATE_ATTRIBUTE_VALUES_SQL <- "
-CREATE TABLE if not exists attribute_values (
-    attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   attribute_id INTEGER
-,   value TEXT
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
-);
+"attributes_users_map" =
 "
-
-CREATE_ATTRIBUTE_VALUES_SQL_POSTGRES <- "
-CREATE TABLE if not exists attribute_values (
-    attribute_value_id SERIAL PRIMARY KEY 
-,   attribute_id INTEGER
-,   value TEXT
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
-);
-"
-
-CREATE_ATTRIBUTE_USER_MAP_SQL <- "
-CREATE TABLE if not exists user_attribute_map (
+CREATE TABLE if not exists attributes_users_map (
     user_id INTEGER
 ,   attribute_id INTEGER
 ,   attribute_value_id INTEGER 
@@ -76,37 +23,79 @@ CREATE TABLE if not exists user_attribute_map (
 ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
 ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id)
 );
+",
+
+"attribute_values" =
 "
+CREATE TABLE if not exists attribute_values (
+    attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   attribute_id INTEGER
+,   value TEXT
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+);
+",
 
-
-CREATE_USER_PERMISSIONS_SQL <- "
-CREATE TABLE if not exists user_permissions (
-    user_id INTEGER
-,   project_id INTEGER
-,   can_code INTEGER
-,   can_modify_codes INTEGER
-,   can_delete_codes INTEGER
-,   can_modify_documents INTEGER
-,   can_delete_documents INTEGER
-,   can_manage INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+"cases" =
+"
+CREATE TABLE if not exists cases (
+    project_id INTEGER
+,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   case_name TEXT
+,   case_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
-"
+",
 
-CREATE_LOG_SQL <- "
-CREATE TABLE if not exists logs
-(   user_id INTEGER
-,   project_id INTEGER
-,   action TEXT
-,   payload JSON
-,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
+"cases_documents_map" =
+"
+CREATE TABLE if not exists cases_documents_map (
+    project_id INTEGER
+,   case_id INTEGER
+,   doc_id INTEGER
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
 );
-"
+",
 
-CREATE_DOCUMENTS_SQL <- "
+"categories" =
+"
+CREATE TABLE if not exists categories (
+    project_id INTEGER
+,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   category_name TEXT
+,   category_description TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+",
+
+"categories_codes_map" =
+"
+CREATE TABLE if not exists categories_codes_map (
+    project_id INTEGER
+,   category_id INTEGER
+,   code_id INTEGER
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+);
+",
+
+"codes" =
+"
+CREATE TABLE if not exists codes (
+    project_id INTEGER
+,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   code_name TEXT UNIQUE
+,   code_description TEXT
+,   code_color TEXT
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+);
+",
+
+"documents" =
+"
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   project_id INTEGER
@@ -116,43 +105,84 @@ CREATE TABLE if not exists documents (
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
-"
+",
 
-CREATE_DOCUMENTS_SQL_POSTGRES <- "
-CREATE TABLE if not exists documents (
-    doc_id SERIAL PRIMARY KEY
+"logs" =
+"
+CREATE TABLE if not exists logs
+(   user_id INTEGER
 ,   project_id INTEGER
-,   doc_name TEXT
-,   doc_description TEXT
-,   doc_text TEXT
+,   action TEXT
+,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
-"
+",
 
-CREATE_CODES_SQL <- "
-CREATE TABLE if not exists codes (
+"memos" =
+"
+CREATE TABLE if not exists memos (
     project_id INTEGER
-,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   code_name TEXT UNIQUE
-,   code_description TEXT
-,   code_color TEXT
+,   memo_id INTEGER PRIMARY KEY
+,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
-"
+",
 
-CREATE_CODES_SQL_POSTGRES <- "
-CREATE TABLE if not exists codes (
+"memos_codes_map" =
+"
+CREATE TABLE if not exists memos_codes_map (
+    memo_id INTEGER
+    ,   code_id INTEGER
+    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+);
+",
+
+"memos_documents_map" =
+"
+CREATE TABLE if not exists memos_documents_map (
+    memo_id INTEGER
+    ,   doc_id INTEGER
+    ,   memo_start INTEGER
+    ,   memo_end INTEGER
+    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+);
+",
+
+"memos_segments_map" =
+"
+CREATE TABLE if not exists memos_segments_map (
+    memo_id INTEGER
+    ,   segment_id INTEGER
+    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+);
+",
+
+"projects" =
+"
+CREATE TABLE projects (
+     project_id INTEGER PRIMARY KEY AUTOINCREMENT
+,    project_name TEXT
+,    project_description TEXT
+,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+",
+
+"requal_version" = 
+"
+CREATE TABLE if not exists requal_version (
     project_id INTEGER
-,   code_id SERIAL PRIMARY KEY 
-,   code_name TEXT UNIQUE
-,   code_description TEXT
-,   code_color TEXT
+,   version TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
-"
+",
 
-CREATE_SEGMENTS_SQL <- "
+"segments" =
+"
 CREATE TABLE if not exists segments (
     project_id INTEGER
 ,   user_id INTEGER
@@ -167,184 +197,120 @@ CREATE TABLE if not exists segments (
 ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
-"
+",
 
-CREATE_SEGMENTS_SQL_POSTGRES <- "
-CREATE TABLE if not exists segments (
-    project_id INTEGER
-,   user_id INTEGER
-,   doc_id INTEGER
-,   code_id INTEGER
-,   segment_id SERIAL PRIMARY KEY
-,   segment_start INTEGER
-,   segment_end INTEGER
-,   segment_text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+"users" =
+"
+CREATE TABLE if not exists users (
+    user_id INTEGER PRIMARY KEY
+,   user_login TEXT UNIQUE
+,   user_name TEXT
+,   user_mail TEXT
+,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+",
+
+"user_permissions" =
+"
+CREATE TABLE if not exists user_permissions (
+    user_id INTEGER
+,   project_id INTEGER
+,   can_code INTEGER
+,   can_modify_codes INTEGER
+,   can_delete_codes INTEGER
+,   can_modify_documents INTEGER
+,   can_delete_documents INTEGER
+,   can_manage INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-);
-"
-
-CREATE_CATEGORIES_SQL <- "
-CREATE TABLE if not exists categories (
-    project_id INTEGER
-,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   category_name TEXT
-,   category_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
 );
 "
+)
 
-CREATE_CATEGORIES_SQL_POSTGRES <- "
-CREATE TABLE if not exists categories (
-    project_id INTEGER
-,   category_id SERIAL PRIMARY KEY
-,   category_name TEXT
-,   category_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
+db_call_df_unordered <- tibble::tibble(
+  table = names(db_call),
+  sql = db_call
+)
 
-CREATE_CATEGORY_CODE_MAP_SQL <- "
-CREATE TABLE if not exists categories_codes_map (
-    project_id INTEGER
-,   category_id INTEGER
-,   code_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-);
-"
+# Arrange by priority as required by postgres
+db_call_df_ordered <- tibble::tibble(
+table = c(
+"projects", 
+"requal_version", 
+"users", 
+"user_permissions", 
+"logs",
+"documents", 
+"codes", 
+"categories", 
+"categories_codes_map", 
+"cases", 
+"cases_documents_map", 
+"segments", 
+"memos", 
+"attributes", 
+"attribute_values"
+))
 
-CREATE_CASES_SQL <- "
-CREATE TABLE if not exists cases (
-    project_id INTEGER
-,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   case_name TEXT
-,   case_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
+db_call_df <- dplyr::full_join(
+  db_call_df_ordered,
+  db_call_df_unordered,
+  by = "table"
+)
 
-CREATE_CASES_SQL_POSTGRES <- "
-CREATE TABLE if not exists cases (
-    project_id INTEGER
-,   case_id SERIAL PRIMARY KEY
-,   case_name TEXT
-,   case_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
-
-CREATE_CASE_DOC_MAP_SQL <- "
-CREATE TABLE if not exists cases_documents_map (
-    project_id INTEGER
-,   case_id INTEGER
-,   doc_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-);
-"
-
-# TODO: hierarchy between codes, cases, categories (code_code_map, case_case_map, category_category_map)
-
-# memos
-CREATE_MEMO_SQL <- "
-CREATE TABLE if not exists memos (
-    project_id INTEGER
-,   memo_id INTEGER PRIMARY KEY
-,   text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
-
-CREATE_MEMO_SQL_POSTGRES <- "
-CREATE TABLE if not exists memos (
-    project_id INTEGER
-,   memo_id SERIAL PRIMARY KEY
-,   text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-);
-"
-
-
-CREATE_MEMO_DOCUMENT_MAP_SQL <- "
-CREATE TABLE if not exists memos_documents_map (
-    memo_id INTEGER
-    ,   doc_id INTEGER
-    ,   memo_start INTEGER
-    ,   memo_end INTEGER
-    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-);
-"
-
-CREATE_MEMO_CODE_MAP_SQL <- "
-CREATE TABLE if not exists memos_codes_map (
-    memo_id INTEGER
-    ,   code_id INTEGER
-    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-);
-"
-
-CREATE_MEMO_SEGMENT_MAP_SQL <- "
-CREATE TABLE if not exists memos_segments_map (
-    memo_id INTEGER
-    ,   segment_id INTEGER
-    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
-);
-"
 
 
 create_db_schema <- function(pool) {
-  # TODO: Full DB structure
+
   db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
   if (db_postgres) {
-    DBI::dbExecute(pool, CREATE_PROJECT_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-    DBI::dbExecute(pool, CREATE_USERS_SQL)
-    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-    DBI::dbExecute(pool, CREATE_LOG_SQL)
-    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CODES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_CASES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_MEMO_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL_POSTGRES)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL_POSTGRES)
 
+   psql <- db_call_df %>%
+      dplyr::mutate(
+        psql =
+          stringr::str_replace(
+            sql,
+            "INTEGER PRIMARY KEY AUTOINCREMENT",
+            "SERIAL PRIMARY KEY"
+          )
+      ) %>%
+      dplyr::pull(psql)
+
+    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
   } else {
-    DBI::dbExecute(pool, CREATE_PROJECT_SQL)
-    DBI::dbExecute(pool, CREATE_REQUAL_INFO_SQL)
-    DBI::dbExecute(pool, CREATE_USERS_SQL)
-    DBI::dbExecute(pool, CREATE_USER_PERMISSIONS_SQL)
-    DBI::dbExecute(pool, CREATE_LOG_SQL)
-    DBI::dbExecute(pool, CREATE_DOCUMENTS_SQL)
-    DBI::dbExecute(pool, CREATE_CODES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORIES_SQL)
-    DBI::dbExecute(pool, CREATE_CATEGORY_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_CASES_SQL)
-    DBI::dbExecute(pool, CREATE_CASE_DOC_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_SEGMENTS_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTES_SQL)
-    DBI::dbExecute(pool, CREATE_ATTRIBUTE_VALUES_SQL)
+    purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
   }
+}
 
-  DBI::dbExecute(pool, CREATE_ATTRIBUTE_USER_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_DOCUMENT_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_CODE_MAP_SQL)
-  DBI::dbExecute(pool, CREATE_MEMO_SEGMENT_MAP_SQL)
+update_db_schema <- function(pool) {
+  existing_tables <- pool::dbListTables(pool)
+  existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
+  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+  if (length(missing_tables) > 0) {
+    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+    if (db_postgres) {
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables) %>%
+        dplyr::mutate(
+          psql =
+            stringr::str_replace(
+              sql,
+              "INTEGER PRIMARY KEY AUTOINCREMENT",
+              "SERIAL PRIMARY KEY"
+            )
+        )
+      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
+    } else {
+    
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables)
+
+      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
+    }
+    message("Updated reQual schema.")
+  } else {
+    NULL
+  }
 }
 
 # Database functions ####
