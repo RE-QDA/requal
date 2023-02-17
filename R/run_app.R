@@ -2,6 +2,14 @@
 #'
 #' @param ... arguments to pass to golem_opts.
 #' See `?golem::get_golem_options` for more details.
+#' @param mode Mode of application (local or server)
+#' @param dbhost Host of DB (for server use only)
+#' @param dbport Port of DB (for server use only)
+#' @param dbname Name of DB (for server use only)
+#' @param dbusername Username (for server use only)
+#' @param dbpassword Password to DB (for server use only)
+#' @param credentials_path Path to credentials DB (for server use only)
+#' @param credentials_pass Password to credentials DB (for server use only)
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
