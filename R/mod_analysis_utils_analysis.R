@@ -27,8 +27,10 @@ load_segments_analysis <- function(pool,
                           segment_end, 
                           user_id
                           ) %>%
-            dplyr::left_join(., dplyr::tbl(pool, "users") %>% dplyr::select(user_id, user_name), 
-                             by = "user_id") %>% 
+            dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
+                                 dplyr::select(user_id, user_name), 
+                             by = "user_id", 
+                             suffix = c(".x", ".y")) %>% 
             dplyr::collect()
 
 

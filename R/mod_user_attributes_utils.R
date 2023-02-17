@@ -42,6 +42,7 @@ read_user_attributes <- function(pool){
         dplyr::filter(.data$attribute_object == "user") %>%
         dplyr::select(attribute_id, attribute_name) %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"),
-                         by = "attribute_id") %>%
+                         by = "attribute_id", 
+                         suffix = c(".x", ".y")) %>%
         dplyr::collect()
 }
