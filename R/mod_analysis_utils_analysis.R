@@ -15,7 +15,7 @@ load_segments_analysis <- function(pool,
       code_filter <- as.integer(unique(c(category_edges[isTruthy(category_edges)], selected_codes[isTruthy(selected_codes)])))
 
 
-        segments <- dplyr::tbl(pool, "segments") %>%
+        segments_input <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(code_id  %in% !!code_filter) %>%
             dplyr::filter(doc_id  %in% !!as.integer(selected_docs)) %>%
@@ -27,11 +27,13 @@ load_segments_analysis <- function(pool,
                           segment_end, 
                           user_id
                           ) %>%
-            dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
-                                 dplyr::select(user_id, user_name), 
-                             by = "user_id", 
-                             suffix = c(".x", ".y")) %>% 
             dplyr::collect()
+
+            users <- dplyr::tbl(pool, "users") %>% 
+                     dplyr::select(user_id, user_name) %>% 
+                     dplyr::collect()
+
+            segments <- dplyr::left_join(segments_input, users, by = "user_id")
 
 
         return(segments)
