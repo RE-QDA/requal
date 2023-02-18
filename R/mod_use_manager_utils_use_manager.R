@@ -44,6 +44,21 @@ new_users_df <- tibble::tibble(
 
 }
 
+
+# remove user permissions from project ----
+
+remove_permissions_record <- function(pool, project_id, user_id) {
+
+  
+    remove_user_permissions_sql <- glue::glue_sql("DELETE FROM user_permissions
+                 WHERE user_id IN ({user_id})
+                 AND project_id = {project_id};", .con = pool)
+
+    DBI::dbExecute(pool, remove_user_permissions_sql)
+  #TODO
+  # log
+  }
+
 # modify permissions for project
 modify_permissions_record <- function(pool, project_id, permissions_df) {
 
@@ -53,6 +68,8 @@ modify_permissions_record <- function(pool, project_id, permissions_df) {
                  AND project_id = {project_id};", .con = pool)
 
     purrr::map(update_user_permissions_sql, ~DBI::dbExecute(pool, .x))
+      #TODO
+  # log
 }
 
 # Generate user permissions UI -----
@@ -129,13 +146,13 @@ add_user_UI <- function(id) {
     )
 }
 
-# add_user_UI ----
+# remove_user_UI ----
 remove_user_UI <- function(id) {
 
   ns <- NS(id)
     tags$div(
         h4("Remove user from project"),
-        selectInput(ns("project_members"),
+        selectInput(ns("members_to_remove"),
                 label = "Remove selected users from project",
                 choices = "",
                 multiple = TRUE

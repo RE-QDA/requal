@@ -38,7 +38,6 @@ mod_use_manager_server <- function(id, glob) {
 
       # get permissions of users for current project
       loc$users_assigned_df <- dplyr::tbl(glob$pool, "user_permissions") %>%
-        dplyr::select(-permissions_modify) %>%
         dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
         dplyr::collect()
 
@@ -49,22 +48,9 @@ mod_use_manager_server <- function(id, glob) {
       ) %>%
         dplyr::filter(!user_id %in% loc$users_assigned_df$user_id)
 
-      all_users_choices <- all_users$user_id
-      names(all_users_choices) <- all_users$user
+      loc$all_users_choices <- all_users$user_id
+      names(loc$all_users_choices) <- all_users$user
 
-      # display users to add
-      updateSelectInput(
-        session = session,
-        "rql_users",
-        choices = c("", all_users_choices)
-      )
-
-      # display users to remove
-      updateSelectInput(
-        session = session,
-        "project_members",
-        choices = c("", loc$users_assigned_df$user_id)
-      )
 
       # get details of users for current project
       loc$users_details_df <- dplyr::tbl(glob$pool, "users") %>%
@@ -78,8 +64,15 @@ mod_use_manager_server <- function(id, glob) {
         by = "user_id"
       )
 
+      loc$project_members <- loc$users_permissions_df  |> 
+      dplyr::filter(!permissions_modify) |> 
+      dplyr::mutate(user_id = stats::setNames(user_id, user_name)) |> 
+      dplyr::pull(user_id)
+
+
       # convert details and permissions into long format for dynamic UI
       loc$users_permissions_long <- loc$users_permissions_df |>
+        dplyr::select(-permissions_modify) |> 
         dplyr::select(user_id, tidyselect::matches("view|modify")) |>
         tidyr::pivot_longer(
           -user_id,
@@ -130,28 +123,44 @@ mod_use_manager_server <- function(id, glob) {
 
       # refresh permissions of users for current project
       loc$users_assigned_df <- dplyr::tbl(glob$pool, "user_permissions") %>%
-        dplyr::select(-permissions_modify) %>%
         dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
         dplyr::collect()
+
     })
 
       # remove users ----
     observeEvent(input$remove_members, {
 
-      browser()
-      add_permissions_record(
+      remove_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        user_id = req(input$rql_users)
+        user_id = req(input$members_to_remove)
       )
 
       # refresh permissions of users for current project
-      loc$users_assigned_df <- dplyr::tbl(glob$pool, "user_permissions") %>%
-        dplyr::select(-permissions_modify) %>%
-        dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
-        dplyr::collect()
+     loc$project_members <- loc$project_members[loc$project_members != as.integer(input$members_to_remove)]
+     loc$users_permissions_df <- loc$users_permissions_df |> 
+     dplyr::filter(!user_id %in% as.integer(input$members_to_remove))
+
     })
 
+observeEvent({req(glob$active_project)
+                  loc$all_users_choices
+                  loc$project_members},{
+      # display users to add
+      updateSelectInput(
+        session = session,
+        "rql_users",
+        choices = c("", loc$all_users_choices)
+      )
+
+      # display users to remove
+      updateSelectInput(
+        session = session,
+        "members_to_remove",
+        choices = c("", loc$project_members)
+      )
+})
   # Add user UI --------------
     output$add_user_ui <- renderUI({
       add_user_UI(id)
