@@ -35,7 +35,7 @@ load_all_segments_db <- function(pool, active_project) {
                           segment_id, 
                           segment_start,
                           segment_end) %>%
-            dplyr::left_join(., users, by = "user_id") %>% 
+            dplyr::left_join(., users, by = "user_id", suffix = c(".x", ".y")) %>% 
             dplyr::collect()
         
         return(segments)
@@ -211,9 +211,9 @@ make_overlap_df_symmetrical <- function(df){
 join_user_names <- function(df, users){
     df %>% 
         dplyr::left_join(., users %>% dplyr::rename(coder1_name = user_name), 
-                         by = c("coder1_id"="user_id")) %>% 
+                         by = c("coder1_id"="user_id"), suffix = c(".x", ".y")) %>% 
         dplyr::left_join(., users %>% dplyr::rename(coder2_name = user_name), 
-                         by = c("coder2_id"="user_id"))
+                         by = c("coder2_id"="user_id"), suffix = c(".x", ".y"))
 }
 
 create_overlap_heatmap <- function(df, fill){

@@ -4,7 +4,8 @@ load_logs_for_reporting <- function(pool, active_project) {
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
         dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
                              dplyr::select(.data$user_id, .data$user_name), 
-                         by = "user_id") %>% 
+                         by = "user_id", 
+                         suffix = c(".x", ".y")) %>% 
         dplyr::select(.data$action, 
                       user = .data$user_name, 
                       detail = .data$payload, 

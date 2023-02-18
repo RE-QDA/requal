@@ -18,6 +18,22 @@ run_app(
 )
 }
 \arguments{
+\item{mode}{Mode of application (local or server)}
+
+\item{dbhost}{Host of DB (for server use only)}
+
+\item{dbport}{Port of DB (for server use only)}
+
+\item{dbname}{Name of DB (for server use only)}
+
+\item{dbusername}{Username (for server use only)}
+
+\item{dbpassword}{Password to DB (for server use only)}
+
+\item{credentials_path}{Path to credentials DB (for server use only)}
+
+\item{credentials_pass}{Password to credentials DB (for server use only)}
+
 \item{uiPattern}{A regular expression that will be applied to each \code{GET}
 request to determine whether the \code{ui} should be used to handle the
 request. Note that the entire request path must match the regular
