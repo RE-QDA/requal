@@ -11,6 +11,7 @@ CREATE TABLE if not exists attributes (
 ,   user_id INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
+"
 ",
 
 "attributes_users_map" =
@@ -267,6 +268,39 @@ db_call_df <- dplyr::full_join(
   by = "table"
 )
 
+)
+
+db_call_df_unordered <- tibble::tibble(
+  table = names(db_call),
+  sql = db_call
+)
+
+# Arrange by priority as required by postgres
+db_call_df_ordered <- tibble::tibble(
+table = c(
+"projects", 
+"requal_version", 
+"users", 
+"user_permissions", 
+"logs",
+"documents", 
+"codes", 
+"categories", 
+"categories_codes_map", 
+"cases", 
+"cases_documents_map", 
+"segments", 
+"memos", 
+"attributes", 
+"attribute_values"
+))
+
+db_call_df <- dplyr::full_join(
+  db_call_df_ordered,
+  db_call_df_unordered,
+  by = "table"
+)
+
 
 
 create_db_schema <- function(pool) {
@@ -285,9 +319,53 @@ create_db_schema <- function(pool) {
       ) %>%
       dplyr::pull(psql)
 
+   psql <- db_call_df %>%
+      dplyr::mutate(
+        psql =
+          stringr::str_replace(
+            sql,
+            "INTEGER PRIMARY KEY AUTOINCREMENT",
+            "SERIAL PRIMARY KEY"
+          )
+      ) %>%
+      dplyr::pull(psql)
+
+    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
     purrr::walk(psql, ~DBI::dbExecute(pool, psql))
   } else {
     purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
+    purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
+  }
+}
+
+update_db_schema <- function(pool) {
+  existing_tables <- pool::dbListTables(pool)
+  existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
+  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+  if (length(missing_tables) > 0) {
+    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+    if (db_postgres) {
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables) %>%
+        dplyr::mutate(
+          psql =
+            stringr::str_replace(
+              sql,
+              "INTEGER PRIMARY KEY AUTOINCREMENT",
+              "SERIAL PRIMARY KEY"
+            )
+        )
+      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
+    } else {
+    
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables)
+
+      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
+    }
+    message("Updated reQual schema.")
+  } else {
+    NULL
   }
 }
 
