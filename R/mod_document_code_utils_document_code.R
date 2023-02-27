@@ -383,7 +383,8 @@ load_segment_codes_db <- function(pool,
                               dplyr::select(code_id, 
                                             code_name
                               ),
-                          by = "code_id"
+                          by = "code_id", 
+                          suffix = c(".x", ".y")
         ) %>%
         dplyr::filter(.data$project_id == as.integer(active_project) &
                           .data$doc_id == as.integer(active_doc) &
