@@ -110,7 +110,7 @@ mod_use_manager_server <- function(id, glob) {
         glob$pool, 
         glob$active_project
         )
-        
+
       showNotification("Changes to permissions were saved.")
     })
 
@@ -127,14 +127,14 @@ mod_use_manager_server <- function(id, glob) {
           # create user in db if an uknown user is assigned
           users_df <- loc$all_users |> 
           dplyr::filter(user_id %in% as.integer(input$rql_users))
-
+          
           purrr::map(users_df$user_id, .f = function(x) {
           users_df_filtered <- users_df |> 
-          dplyr::filter(user_id == x)
+          dplyr::filter(user_id == as.integer(x))
           DBI::dbWriteTable(glob$pool, "users", users_df_filtered,
             append = TRUE, row.names = FALSE)
-
-          })
+          }
+          )
 
 
       }
