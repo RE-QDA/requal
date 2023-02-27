@@ -12,6 +12,28 @@ get_users <- function(credentials_path, credentials_pass) {
   )[c("user", "user_id")]
 }
 
+get_user_permissions <- function(pool, project_id) {
+
+      # get permissions of users for current project
+      users_assigned_df <- dplyr::tbl(pool, "user_permissions") %>%
+        dplyr::filter(project_id == !!as.integer(project_id)) %>%
+        dplyr::collect()
+
+      # get details of users for current project
+      users_details_df <- dplyr::tbl(pool, "users") %>%
+        dplyr::filter(user_id %in% !!users_assigned_df$user_id) %>%
+        dplyr::collect()
+        
+      # join details and permissions of users for current project
+      users_permissions_df <- dplyr::inner_join(
+        users_assigned_df,
+        users_details_df,
+        by = "user_id"
+      )
+
+
+}
+
 # add user permissions to project ----
 
 add_permissions_record <- function(pool, project_id, user_id) {
@@ -176,8 +198,9 @@ menu_btn2 <- function(..., label, icon) {
       html = FALSE
     ),
     size = "md", 
-    width = "370px",
+    width = "400px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
     right = FALSE
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
+
