@@ -144,13 +144,16 @@ mod_use_manager_server <- function(id, glob) {
     })
 
 # update user selection inputs ----
-observeEvent({req(glob$active_project)
-                  loc$users_permissions_df}, {
+observeEvent(loc$users_permissions_df, {
+  
+
+      loc$users_to_add <- loc$all_users_choices[!loc$all_users_choices %in% as.integer(loc$users_permissions_df$user_id)]
+      if (length(loc$users_to_add) < 1) {loc$users_to_add <- "All registered users have been assigned."}
       # display users to add
       updateSelectInput(
         session = session,
         "rql_users",
-        choices = c("", loc$all_users_choices[loc$all_users_choices != as.integer(loc$users_permissions_df$user_id)])
+        choices = c("", loc$users_to_add)
       )
 
       # display users to remove
