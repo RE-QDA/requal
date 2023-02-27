@@ -38,22 +38,19 @@ mod_use_manager_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
 
-  observe(print(loc$project_members_ids))
-
   # initialize user management page on project load ----
     observeEvent(glob$active_project, {
 
 
 
       # on init, get a list of users in credentials
-      all_users <- get_users(
+      loc$all_users <- get_users(
         credentials_path = golem::get_golem_options(which = "credentials_path"),
         credentials_pass = golem::get_golem_options(which = "credentials_pass")
-      ) %>%
-        dplyr::filter(!user_id %in% loc$users_assigned_df$user_id)
+      ) 
 
-      loc$all_users_choices <- all_users$user_id
-      names(loc$all_users_choices) <- all_users$user
+      loc$all_users_choices <- loc$all_users$user_id
+      names(loc$all_users_choices) <- loc$all_users$user_login
 
 
       loc$users_permissions_df <- get_user_permissions(
@@ -71,18 +68,20 @@ mod_use_manager_server <- function(id, glob) {
   # render project members ----
   output$assigned_users <- renderUI({
 
-      # create nested df for nested UI
-      users_permissions_nested <- loc$users_permissions_df |>
+
+      loc$users_permissions_long <- loc$users_permissions_df |>
         dplyr::select(-permissions_modify) |> 
         dplyr::select(user_id, tidyselect::matches("view|modify")) |>
         tidyr::pivot_longer(
           -user_id,
           names_to = "permission",
           values_to = "value"
-        ) |>
+        ) 
+      # create nested df for nested UI
+      users_permissions_nested <- loc$users_permissions_long |> 
         dplyr::mutate(user_id_copy = user_id) |>
         tidyr::nest(data = -user_id_copy) |>
-        dplyr::left_join(loc$users_permissions_df,
+        dplyr::inner_join(loc$users_permissions_df,
           by = c("user_id_copy" = "user_id")
         ) |> 
         dplyr::filter(!duplicated(user_id_copy))
@@ -93,6 +92,7 @@ mod_use_manager_server <- function(id, glob) {
 
   # change permissions ----
     observeEvent(input$save_permissions, {
+
       loc$users_permissions_long <- loc$users_permissions_long |>
         dplyr::mutate(value = purrr::map2_int(user_id, permission,
           .f = function(user_id, permission) {
@@ -105,11 +105,40 @@ mod_use_manager_server <- function(id, glob) {
         project_id = glob$active_project,
         permissions_df = loc$users_permissions_long
       )
+
+      loc$users_permissions_df <- get_user_permissions(
+        glob$pool, 
+        glob$active_project
+        )
+        
       showNotification("Changes to permissions were saved.")
     })
 
   # add new users ----
     observeEvent(input$assign, {
+
+      # run check on existing users
+      existing_users <- dplyr::tbl(glob$pool, "users") %>%
+      dplyr::pull(user_id)
+
+      existing_users_check <- input$rql_users[!input$rql_users %in% existing_users]
+
+      if (length(existing_users_check) > 0) {
+          # create user in db if an uknown user is assigned
+          users_df <- loc$all_users |> 
+          dplyr::filter(user_id %in% as.integer(input$rql_users))
+
+          purrr::map(users_df$user_id, .f = function(x) {
+          users_df_filtered <- users_df |> 
+          dplyr::filter(user_id == x)
+          DBI::dbWriteTable(glob$pool, "users", users_df_filtered,
+            append = TRUE, row.names = FALSE)
+
+          })
+
+
+      }
+
       add_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,

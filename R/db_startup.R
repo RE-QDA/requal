@@ -11,7 +11,6 @@ CREATE TABLE if not exists attributes (
 ,   user_id INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
-"
 ",
 
 "attributes_users_map" =
@@ -266,8 +265,6 @@ db_call_df <- dplyr::full_join(
   db_call_df_ordered,
   db_call_df_unordered,
   by = "table"
-)
-
 )
 
 db_call_df_unordered <- tibble::tibble(
