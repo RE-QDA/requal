@@ -9,7 +9,11 @@ get_users <- function(credentials_path, credentials_pass) {
 
   shinymanager::read_db_decrypt(credentials_con,
     passphrase = credentials_pass
-  )[c("user", "user_id")]
+  ) |> 
+  dplyr::select(user_id, 
+              user_login = user,
+              user_name,
+              user_mail)
 }
 
 get_user_permissions <- function(pool, project_id) {

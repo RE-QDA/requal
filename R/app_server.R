@@ -37,6 +37,7 @@ app_server <- function(input, output, session) {
   # output: glob$documents
   mod_doc_manager_server("doc_manager_ui_1", glob)
   # output: no output, permissions and membership written to DB
+  # ---- to prevent manipulation via UI
   mod_use_manager_server("use_manager_1", glob)
   
   # codebook  ----

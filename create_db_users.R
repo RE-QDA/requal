@@ -4,6 +4,9 @@ credentials <- data.frame(
     # password will automatically be hashed
     admin = c(TRUE, FALSE),
     user_id = c(1,2),
+    user_name = c("Admin adminů", "Test Testerů"),
+    user_mail = c("mail@example.com", "mail@example.com"),
+    project_owner = c(TRUE, TRUE),
     stringsAsFactors = FALSE
 )
 
