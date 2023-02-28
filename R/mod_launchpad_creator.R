@@ -89,22 +89,36 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           ), ".requal")
         )
 
-
         glob$pool <- pool::dbPool(
           drv = RSQLite::SQLite(),
           dbname = loc$db_path
         )
 
-
         glob$user$user_id <- as.integer(1)
-
-        loc$active_project <- create_project_db(
-          pool = glob$pool,
-          project_name = input$project_name,
-          project_description = input$project_description,
-          user_id = glob$user$user_id
-        )
-      names(loc$active_project) <- input$project_name
+        
+        existing_tables <- pool::dbListTables(glob$pool)
+        db_exists <- "projects" %in% existing_tables
+        
+        if(db_exists){
+          existing_projects <- dplyr::tbl(glob$pool, "projects") %>%
+            dplyr::select(project_id, project_name) %>% 
+            dplyr::collect()
+          project_exists <- input$project_name %in% existing_projects$project_name
+        }else{
+          project_exists <- FALSE
+        }
+        
+        if(!db_exists | !project_exists){
+          loc$active_project <- create_project_db(
+            pool = glob$pool,
+            project_name = input$project_name,
+            project_description = input$project_description,
+            user_id = glob$user$user_id
+          )
+          names(loc$active_project) <- input$project_name
+        }else{
+          warn_user("Project with the same new already exists. Choose a different name.") 
+        }
 
       })
     })
