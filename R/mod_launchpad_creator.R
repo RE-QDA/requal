@@ -88,6 +88,11 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             )
           ), ".requal")
         )
+        
+        if (file.exists(loc$db_path)) {
+          warn_user("Project with the same name already exists in the selected directory. Choose a different name.")
+        }
+        req(!file.exists(loc$db_path))
 
         glob$pool <- pool::dbPool(
           drv = RSQLite::SQLite(),
@@ -96,29 +101,13 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
 
         glob$user$user_id <- as.integer(1)
         
-        existing_tables <- pool::dbListTables(glob$pool)
-        db_exists <- "projects" %in% existing_tables
-        
-        if(db_exists){
-          existing_projects <- dplyr::tbl(glob$pool, "projects") %>%
-            dplyr::select(project_id, project_name) %>% 
-            dplyr::collect()
-          project_exists <- input$project_name %in% existing_projects$project_name
-        }else{
-          project_exists <- FALSE
-        }
-        
-        if(!db_exists | !project_exists){
-          loc$active_project <- create_project_db(
-            pool = glob$pool,
-            project_name = input$project_name,
-            project_description = input$project_description,
-            user_id = glob$user$user_id
-          )
-          names(loc$active_project) <- input$project_name
-        }else{
-          warn_user("Project with the same new already exists. Choose a different name.") 
-        }
+        loc$active_project <- create_project_db(
+          pool = glob$pool,
+          project_name = input$project_name,
+          project_description = input$project_description,
+          user_id = glob$user$user_id
+        )
+        names(loc$active_project) <- input$project_name
 
       })
     })
