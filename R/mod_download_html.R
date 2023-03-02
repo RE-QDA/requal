@@ -35,10 +35,12 @@ mod_download_html_server <- function(id, glob){
             # case we don't have write permissions to the current working dir (which
             # can happen when deployed).
             
-            tempHTML <- normalizePath(file.path(tempdir(), "report_include.html"), winslash = "/")
+            tempHTML <- normalizePath(file.path(tempdir(), "report_include.html"), 
+                                      winslash = "/", mustWork = FALSE)
             cat(as.character(tagList(glob$segments_taglist)), file = tempHTML)
 
-            tempReport <- normalizePath(file.path(tempdir(), "report.Rmd"), winslash = "/")
+            tempReport <- normalizePath(file.path(tempdir(), "report.Rmd"), 
+                                        winslash = "/", mustWork = FALSE)
             fileConn<-file(tempReport)
             writeLines(c("---",
                          "title: 'reQual report'",
