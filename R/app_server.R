@@ -20,7 +20,9 @@ app_server <- function(input, output, session) {
       glob$user$name <- auth$user
       glob$user$user_id <- as.integer(auth$user_id)
       glob$user$is_admin <- as.logical(auth$admin)
-      glob$user$mail <- "email@example.com" #TODO
+      glob$user$name <- auth$user_name
+      glob$user$mail <- auth$user_mail
+      glob$user$project_owner <- as.logical(auth$project_owner)
   })
         
 
