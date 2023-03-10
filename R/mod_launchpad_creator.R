@@ -136,8 +136,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             })
           })
         }
-        # user control ----
         
+        # user control ----
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
 
@@ -149,7 +149,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
               user_name = glob$user$name,
               user_mail = glob$user$mail
             )
-          DBI::dbWriteTable(glob$pool, "users", users_df,
+          DBI::dbWriteTable(glob$pool, "users", user_df,
             append = TRUE, row.names = FALSE
           )
         } else if (!glob$user$project_owner) {
