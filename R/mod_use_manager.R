@@ -58,9 +58,9 @@ mod_use_manager_server <- function(id, glob) {
         glob$active_project
         )
 
-      loc$project_members_ids <- loc$users_permissions_df  |> 
-      dplyr::filter(!permissions_modify) |> 
-      dplyr::mutate(user_id = stats::setNames(user_id, user_name)) |> 
+      loc$project_members_ids <- loc$users_permissions_df  %>% 
+      dplyr::filter(!permissions_modify) %>% 
+      dplyr::mutate(user_id = stats::setNames(user_id, user_name)) %>% 
       dplyr::pull(user_id)
 
     })
@@ -69,21 +69,21 @@ mod_use_manager_server <- function(id, glob) {
   output$assigned_users <- renderUI({
 
 
-      loc$users_permissions_long <- loc$users_permissions_df |>
-        dplyr::select(-permissions_modify) |> 
-        dplyr::select(user_id, tidyselect::matches("view|modify")) |>
+      loc$users_permissions_long <- loc$users_permissions_df %>%
+        dplyr::select(-permissions_modify) %>% 
+        dplyr::select(user_id, tidyselect::matches("view|modify")) %>%
         tidyr::pivot_longer(
           -user_id,
           names_to = "permission",
           values_to = "value"
         ) 
       # create nested df for nested UI
-      users_permissions_nested <- loc$users_permissions_long |> 
-        dplyr::mutate(user_id_copy = user_id) |>
-        tidyr::nest(data = -user_id_copy) |>
+      users_permissions_nested <- loc$users_permissions_long %>% 
+        dplyr::mutate(user_id_copy = user_id) %>%
+        tidyr::nest(data = -user_id_copy) %>%
         dplyr::inner_join(loc$users_permissions_df,
           by = c("user_id_copy" = "user_id")
-        ) |> 
+        ) %>% 
         dplyr::filter(!duplicated(user_id_copy))
 
       # generated user boxes with nested permissions
@@ -93,7 +93,7 @@ mod_use_manager_server <- function(id, glob) {
   # change permissions ----
     observeEvent(input$save_permissions, {
 
-      loc$users_permissions_long <- loc$users_permissions_long |>
+      loc$users_permissions_long <- loc$users_permissions_long %>%
         dplyr::mutate(value = purrr::map2_int(user_id, permission,
           .f = function(user_id, permission) {
             input[[paste(user_id, permission, sep = "_")]]
@@ -125,11 +125,11 @@ mod_use_manager_server <- function(id, glob) {
 
       if (length(existing_users_check) > 0) {
           # create user in db if an uknown user is assigned
-          users_df <- loc$all_users |> 
+          users_df <- loc$all_users %>% 
           dplyr::filter(user_id %in% as.integer(input$rql_users))
           
           purrr::map(users_df$user_id, .f = function(x) {
-          users_df_filtered <- users_df |> 
+          users_df_filtered <- users_df %>% 
           dplyr::filter(user_id == as.integer(x))
           DBI::dbWriteTable(glob$pool, "users", users_df_filtered,
             append = TRUE, row.names = FALSE)
