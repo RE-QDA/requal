@@ -9,7 +9,7 @@ CREATE TABLE if not exists attributes (
 ,   attribute_object TEXT
 ,   attribute_type TEXT
 ,   user_id INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -19,9 +19,9 @@ CREATE TABLE if not exists attributes_users_map (
     user_id INTEGER
 ,   attribute_id INTEGER
 ,   attribute_value_id INTEGER 
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
-,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
 );
 ",
 
@@ -31,7 +31,7 @@ CREATE TABLE if not exists attribute_values (
     attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   attribute_id INTEGER
 ,   value TEXT
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
 );
 ",
 
@@ -42,7 +42,7 @@ CREATE TABLE if not exists cases (
 ,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   case_name TEXT
 ,   case_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -53,9 +53,9 @@ CREATE TABLE if not exists cases_documents_map (
     project_id INTEGER
 ,   case_id INTEGER
 ,   doc_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
 );
 ",
 
@@ -66,7 +66,7 @@ CREATE TABLE if not exists categories (
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   category_name TEXT
 ,   category_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -76,9 +76,9 @@ CREATE TABLE if not exists categories_codes_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
 );
 ",
 
@@ -90,7 +90,7 @@ CREATE TABLE if not exists codes (
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -103,7 +103,7 @@ CREATE TABLE if not exists documents (
 ,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -115,8 +115,8 @@ CREATE TABLE if not exists logs
 ,   action TEXT
 ,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -126,7 +126,7 @@ CREATE TABLE if not exists memos (
     project_id INTEGER
 ,   memo_id INTEGER PRIMARY KEY
 ,   text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -135,8 +135,8 @@ CREATE TABLE if not exists memos (
 CREATE TABLE if not exists memos_codes_map (
     memo_id INTEGER
     ,   code_id INTEGER
-    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -147,8 +147,8 @@ CREATE TABLE if not exists memos_documents_map (
     ,   doc_id INTEGER
     ,   memo_start INTEGER
     ,   memo_end INTEGER
-    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -157,8 +157,8 @@ CREATE TABLE if not exists memos_documents_map (
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
     ,   segment_id INTEGER
-    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -177,7 +177,7 @@ CREATE TABLE projects (
 CREATE TABLE if not exists requal_version (
     project_id INTEGER
 ,   version TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -192,10 +192,10 @@ CREATE TABLE if not exists segments (
 ,   segment_start INTEGER
 ,   segment_end INTEGER
 ,   segment_text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)ON DELETE CASCADE
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -230,8 +230,8 @@ CREATE TABLE if not exists user_permissions (
 ,   analysis_other_view INTEGER    
 ,   report_other_view INTEGER      
 ,   permissions_modify INTEGER     
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE;
 );
 "
 )
