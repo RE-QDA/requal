@@ -148,10 +148,10 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           DBI::dbWriteTable(glob$pool, "users", users_df,
             append = TRUE, row.names = FALSE
           )
-        } else if (!glob$user$is_admin) {
-          # abort project creation if user is not admin
-          warn_user("Only administrators can create new projects.")
-          req(glob$user$is_admin)
+        } else if (!glob$user$project_owner) {
+          # abort project creation if user is not project owner
+          warn_user("Only users with project administration privileges can create new projects.")
+          req(glob$user$project_owner)
         } else {
 
           # if user control ok, create project
