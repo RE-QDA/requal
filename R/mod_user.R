@@ -117,9 +117,9 @@ mod_user_server <- function(id, glob) {
       loc$user_attributes <- read_user_attributes(glob$pool) %>%
         dplyr::group_by(attribute_name) %>% 	
         dplyr::summarise(values = list(value))
-      
+     
       loc$user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
-      update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, user_attr_values_df)
+      update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, loc$user_attr_values_df)
       
       loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
       removeModal()
