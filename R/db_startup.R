@@ -431,6 +431,22 @@ create_default_user <- function(pool, project_id, user_id) {
       permissions_modify           = 1
     )
   }else{
+
+      existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::pull(user_id)
+
+          if (!user_id %in% existing_user_id) {
+            
+            user_df <- tibble::tibble(
+              user_id = glob$user$user_id,
+              user_login = glob$user$user_login,
+              user_name = glob$user$name,
+              user_mail = glob$user$mail
+            )
+
+    DBI::dbWriteTable(pool, "users", user_df, append = TRUE, row.names = FALSE)
+          }
+
     user_permission_df <- tibble::tibble(
       user_id = user_id,
       project_id = project_id,
