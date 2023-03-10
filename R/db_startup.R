@@ -558,10 +558,8 @@ make_globals <- quote({
       password = golem::get_golem_options(which = "dbpassword")
     )
 
-     existing_projects <- dplyr::tbl(startup_con, "projects") %>%
-     dplyr::pull(project_id)
-     names(existing_projects) <- dplyr::tbl(startup_con, "projects") %>%
-     dplyr::pull(project_name)
+     existing_projects <- dplyr::pull(dplyr::tbl(startup_con, "projects"), project_id)
+     names(existing_projects) <- dplyr::pull(dplyr::tbl(startup_con, "projects"), project_name)
     
     DBI::dbDisconnect(startup_con)
     
