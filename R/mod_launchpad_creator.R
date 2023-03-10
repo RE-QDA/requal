@@ -141,13 +141,14 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
 
-        if (glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
+        if (glob$user$project_owner && !(glob$user$user_id %in% existing_user_id)) {
           # create user in db if an uknown admin logs in
-          users_df <- data.frame(
-            user_id = glob$user$user_id,
-            user_name = glob$user$name,
-            user_mail = glob$user$mail
-          )
+           user_df <- tibble::tibble(
+              user_id = glob$user$user_id,
+              user_login = glob$user$user_login,
+              user_name = glob$user$name,
+              user_mail = glob$user$mail
+            )
           DBI::dbWriteTable(glob$pool, "users", users_df,
             append = TRUE, row.names = FALSE
           )
