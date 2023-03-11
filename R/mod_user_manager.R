@@ -28,24 +28,27 @@ mod_user_manager_server <- function(id, glob) {
     # initialize user management page on project load ----
     observeEvent(glob$active_project, {
       
-      # on init, get a list of users in credentials
-      loc$all_users <- get_users(
-        credentials_path = golem::get_golem_options(which = "credentials_path"),
-        credentials_pass = golem::get_golem_options(which = "credentials_pass")
-      ) 
-      
-      loc$all_users_choices <- loc$all_users$user_id
-      names(loc$all_users_choices) <- loc$all_users$user_login
-      
-      loc$users_permissions_df <- get_user_permissions(
-        glob$pool, 
-        glob$active_project
-      )
-      
-      loc$project_members_ids <- loc$users_permissions_df %>% 
-        dplyr::filter(!permissions_modify) %>% 
-        dplyr::mutate(user_id = stats::setNames(user_id, user_name)) %>% 
-        dplyr::pull(user_id)
+      if(golem::get_golem_options("mode") == "server"){
+        # on init, get a list of users in credentials
+        loc$all_users <- get_users(
+          credentials_path = golem::get_golem_options(which = "credentials_path"),
+          credentials_pass = golem::get_golem_options(which = "credentials_pass")
+        ) 
+        
+        loc$all_users_choices <- loc$all_users$user_id
+        names(loc$all_users_choices) <- loc$all_users$user_login
+        
+        loc$users_permissions_df <- get_user_permissions(
+          glob$pool, 
+          glob$active_project
+        )
+        
+        loc$project_members_ids <- loc$users_permissions_df %>% 
+          dplyr::filter(!permissions_modify) %>% 
+          dplyr::mutate(user_id = stats::setNames(user_id, user_name)) %>% 
+          dplyr::pull(user_id)
+        
+      }
       
       # add user permission to glob
       # glob$user$permissions <- loc$users_permissions_df %>% 
@@ -60,7 +63,8 @@ mod_user_manager_server <- function(id, glob) {
     })
     
     output$user_management_buttons_ui <- renderUI({
-      if(glob$user$data$permissions_modify == 1){
+      if(golem::get_golem_options("mode") == "server" && 
+         glob$user$data$permissions_modify == 1){
         div(
           menu_btn(
             uiOutput(ns("add_user_ui")),
@@ -77,35 +81,38 @@ mod_user_manager_server <- function(id, glob) {
     })
     
     output$user_save_permissions_ui <- renderUI({
-      if(glob$user$data$permissions_modify == 1){
+      if(golem::get_golem_options("mode") == "server" && 
+         glob$user$data$permissions_modify == 1){
         actionButton(ns("save_permissions"), "Save")
       }
     })
     
     # render project members ----
     output$assigned_users <- renderUI({
-      
-      loc$users_permissions_long <- loc$users_permissions_df %>%
-        # dplyr::select(-permissions_modify) %>% 
-        dplyr::select(user_id, tidyselect::matches("view|modify")) %>%
-        tidyr::pivot_longer(
-          -user_id,
-          names_to = "permission",
-          values_to = "value"
-        ) 
-      
-      # create nested df for nested UI
-      users_permissions_nested <- loc$users_permissions_long %>% 
-        dplyr::mutate(user_id_copy = user_id) %>%
-        tidyr::nest(data = -user_id_copy) %>%
-        dplyr::inner_join(loc$users_permissions_df,
-                          by = c("user_id_copy" = "user_id")
-        ) %>% 
-        dplyr::filter(!duplicated(user_id_copy))
-      
-      # generated user boxes with nested permissions
-      # browser()
-      gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
+      if(golem::get_golem_options("mode") == "server"){
+        
+        loc$users_permissions_long <- loc$users_permissions_df %>%
+          # dplyr::select(-permissions_modify) %>% 
+          dplyr::select(user_id, tidyselect::matches("view|modify")) %>%
+          tidyr::pivot_longer(
+            -user_id,
+            names_to = "permission",
+            values_to = "value"
+          ) 
+        
+        # create nested df for nested UI
+        users_permissions_nested <- loc$users_permissions_long %>% 
+          dplyr::mutate(user_id_copy = user_id) %>%
+          tidyr::nest(data = -user_id_copy) %>%
+          dplyr::inner_join(loc$users_permissions_df,
+                            by = c("user_id_copy" = "user_id")
+          ) %>% 
+          dplyr::filter(!duplicated(user_id_copy))
+        
+        # generated user boxes with nested permissions
+        # browser()
+        gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
+      }
     })
     
     # change permissions ----

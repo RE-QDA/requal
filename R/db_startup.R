@@ -231,7 +231,7 @@ CREATE TABLE if not exists user_permissions (
 ,   report_other_view INTEGER      
 ,   permissions_modify INTEGER     
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE;
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 "
 )
@@ -316,21 +316,8 @@ create_db_schema <- function(pool) {
       ) %>%
       dplyr::pull(psql)
 
-   psql <- db_call_df %>%
-      dplyr::mutate(
-        psql =
-          stringr::str_replace(
-            sql,
-            "INTEGER PRIMARY KEY AUTOINCREMENT",
-            "SERIAL PRIMARY KEY"
-          )
-      ) %>%
-      dplyr::pull(psql)
-
-    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
-    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
+    purrr::walk(psql, ~DBI::dbExecute(pool, .x))
   } else {
-    purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
     purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
   }
 }
