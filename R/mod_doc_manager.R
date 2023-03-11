@@ -24,24 +24,7 @@ mod_doc_manager_ui <- function(id) {
     ),
     # menu
     
-    menu_column(
-      width = 2,
-      menu_btn(
-        uiOutput(ns("doc_create_ui")),
-        label = "Create document",
-        icon = "plus"
-      ),
-      menu_btn(
-        uiOutput(ns("doc_upload_ui")),
-        label =  "Upload file",
-        icon = "upload"
-      ),
-      menu_btn(
-        uiOutput(ns("doc_delete_ui")),
-        label =  "Delete document",
-        icon = "minus"
-      )
-    )
+    uiOutput(ns("doc_mgmt_ui"))
   )
 }
 
@@ -59,9 +42,32 @@ mod_doc_manager_server <- function(id, glob) {
       } 
     })
 
+    output$doc_mgmt_ui <- renderUI({
+      if(glob$user$data$data_modify == 1){
+        menu_column(
+          width = 2,
+          menu_btn(
+            uiOutput(ns("doc_create_ui")),
+            label = "Create document",
+            icon = "plus"
+          ),
+          menu_btn(
+            uiOutput(ns("doc_upload_ui")),
+            label =  "Upload file",
+            icon = "upload"
+          ),
+          menu_btn(
+            uiOutput(ns("doc_delete_ui")),
+            label =  "Delete document",
+            icon = "minus"
+          )
+        )
+      }
+    })
+    
     #---Create doc UI --------------
     output$doc_create_ui <- renderUI({
-      create_doc_UI(id)
+      create_doc_UI(id) 
     })
     outputOptions(output, "doc_create_ui", suspendWhenHidden = FALSE)
     
