@@ -19,10 +19,10 @@ app_server <- function(input, output, session) {
   observeEvent(auth, {
       glob$user$user_login <- auth$user
       glob$user$user_id <- as.integer(auth$user_id)
-      glob$user$is_admin <- as.logical(auth$admin)
       glob$user$name <- auth$user_name
       glob$user$mail <- auth$user_mail
       glob$user$project_owner <- as.logical(auth$project_owner)
+      glob$user$is_admin <- as.logical(auth$admin)
   })
         
 
@@ -40,7 +40,7 @@ app_server <- function(input, output, session) {
   mod_doc_manager_server("doc_manager_ui_1", glob)
   # output: no output, permissions and membership written to DB
   # ---- to prevent manipulation via UI
-  mod_use_manager_server("use_manager_1", glob)
+  mod_user_manager_server("user_manager_1", glob)
   
   # codebook  ----
   # output: glob$codebook

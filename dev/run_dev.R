@@ -16,5 +16,6 @@ golem::document_and_reload()
   dbusername = "requal_admin",
   dbpassword = "test",
   credentials_path = "requal_users.sqlite",
-  credentials_pass = "test"
+  credentials_pass = "test", 
+  options = list("launch.browser")
 ))
