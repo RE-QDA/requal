@@ -46,6 +46,11 @@ mod_agreement_server <- function(id, glob) {
           dplyr::select(user_id, user_name) %>% 
           dplyr::collect()
         
+        if(!is.null(glob$user$data) && glob$user$data$report_other_view != 1){
+          users <- users %>% 
+            dplyr::filter(user_id == glob$user$user_id)
+        }
+        
         updateCheckboxGroupInput(
           session = session, 
           "repro_coders", 

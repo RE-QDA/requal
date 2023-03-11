@@ -18,34 +18,34 @@ mod_reporting_ui <- function(id) {
       #   textOutput(ns("report_instructions"))
       # ),
       tabPanel("Summary",
-        id = ns("summary"),
-        value = "summary",
-        mod_summary_ui("summary_ui_1")
+               id = ns("summary"),
+               value = "summary",
+               mod_summary_ui("summary_ui_1")
       ),
       tabPanel("Agreement",
-        id = ns("agree"),
-        value = "agree",
-        mod_agreement_ui("agreement_ui_1")
+               id = ns("agree"),
+               value = "agree",
+               mod_agreement_ui("agreement_ui_1")
       ),
       tabPanel("Browse coded docs", 
-        id = ns("browser"), 
-        value = "browser", 
-        mod_browser_ui("browser_ui_1")
+               id = ns("browser"), 
+               value = "browser", 
+               mod_browser_ui("browser_ui_1")
       ),
       tabPanel("User attributes", 
-         id = ns("user_attributes"), 
-         value = "user_attributes", 
-         mod_user_attributes_ui("user_attributes_ui_1")
+               id = ns("user_attributes"), 
+               value = "user_attributes", 
+               mod_user_attributes_ui("user_attributes_ui_1")
       ), 
       tabPanel("Logs",
-        id = ns("logs"),
-        value = "logs",
-        actionButton(ns("logs_refresh"),
-          label = "",
-          icon = icon("sync")
-        ) %>%
-          tagAppendAttributes(style = "float:right;"),
-        DT::dataTableOutput(ns("report_logs"))
+               id = ns("logs"),
+               value = "logs",
+               actionButton(ns("logs_refresh"),
+                            label = "",
+                            icon = icon("sync")
+               ) %>%
+                 tagAppendAttributes(style = "float:right;"),
+               DT::dataTableOutput(ns("report_logs"))
       )
     )
   )
@@ -59,13 +59,13 @@ mod_reporting_server <- function(id, glob) {
     ns <- session$ns
     
     loc <- reactiveValues()
-
+    
     # instructions ------------
     # output$report_instructions <- renderText(
     #   "Instructions for using this module..."
     # )
-
-     observeEvent( {req(input$reporting_tabset == "logs") | input$logs_refresh}, {
+    
+    observeEvent( {req(input$reporting_tabset == "logs") | input$logs_refresh}, {
       if (isTruthy(glob$active_project)) {
         loc$logs_df <- load_logs_for_reporting(
           glob$pool,
@@ -77,9 +77,9 @@ mod_reporting_server <- function(id, glob) {
         ""
       }
     })
-
+    
     # logs ------------
-
+    
     output$report_logs <- DT::renderDataTable(server = FALSE, {
       DT::datatable(
         req(loc$logs_df),
