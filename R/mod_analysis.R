@@ -110,7 +110,7 @@ mod_analysis_server <- function(id, glob) {
         )
         
         if (nrow(loc$temp_df) > 0) {
-          if (glob$user$permissions$analysis_other_view != 1){
+          if (glob$user$data$analysis_other_view != 1){
             loc$temp_df <- loc$temp_df %>% 
               dplyr::filter(user_id == glob$user$user_id)
           }

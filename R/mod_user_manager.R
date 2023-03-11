@@ -48,19 +48,19 @@ mod_user_manager_server <- function(id, glob) {
         dplyr::pull(user_id)
       
       # add user permission to glob
-      glob$user$permissions <- loc$users_permissions_df %>% 
-        dplyr::filter(user_id == glob$user$user_id) %>% 
-        dplyr::select(dplyr::any_of(
-          c("data_modify", "data_other_modify", "data_other_view", 
-            "attributes_modify", "attributes_other_modify", "attributes_other_view", 
-            "codebook_modify", "codebook_other_modify", 
-            "annotation_modify", "annotation_other_modify", "annotation_other_view", 
-            "analysis_other_view", "report_other_view", "permissions_modify"))) %>% 
-        as.list()
+      # glob$user$permissions <- loc$users_permissions_df %>% 
+      #   dplyr::filter(user_id == glob$user$user_id) %>% 
+      #   dplyr::select(dplyr::any_of(
+      #     c("data_modify", "data_other_modify", "data_other_view", 
+      #       "attributes_modify", "attributes_other_modify", "attributes_other_view", 
+      #       "codebook_modify", "codebook_other_modify", 
+      #       "annotation_modify", "annotation_other_modify", "annotation_other_view", 
+      #       "analysis_other_view", "report_other_view", "permissions_modify"))) %>% 
+      #   as.list()
     })
     
     output$user_management_buttons_ui <- renderUI({
-      if(glob$user$permissions$permissions_modify == 1){
+      if(glob$user$data$permissions_modify == 1){
         div(
           menu_btn(
             uiOutput(ns("add_user_ui")),
@@ -77,7 +77,7 @@ mod_user_manager_server <- function(id, glob) {
     })
     
     output$user_save_permissions_ui <- renderUI({
-      if(glob$user$permissions$permissions_modify == 1){
+      if(glob$user$data$permissions_modify == 1){
         actionButton(ns("save_permissions"), "Save")
       }
     })
@@ -105,7 +105,7 @@ mod_user_manager_server <- function(id, glob) {
       
       # generated user boxes with nested permissions
       # browser()
-      gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$permissions)
+      gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
     })
     
     # change permissions ----
