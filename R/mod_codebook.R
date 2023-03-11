@@ -27,24 +27,7 @@ mod_codebook_ui <- function(id) {
           ),
 
           # menu
-          menu_column(
-            width = 2,
-            menu_btn(
-              uiOutput(ns("code_create_ui")),
-              label = "Create code",
-              icon = "plus"
-            ),
-            menu_btn(
-              uiOutput(ns("code_merge_ui")),
-              label =  "Merge codes",
-              icon = "compress"
-            ),
-            menu_btn(
-              uiOutput(ns("code_delete_ui")),
-              label =  "Delete code",
-              icon = "minus"
-            )
-          )
+          uiOutput(ns("code_mgmt_ui"))
         )
       ),
       tabPanel("Categories",
@@ -78,6 +61,29 @@ mod_codebook_server <- function(id, glob) {
         active_project = glob$active_project,
         pool = glob$pool
       )
+    })
+    
+    output$code_mgmt_ui <- renderUI({
+      if(glob$user$data$codebook_modify == 1){
+        menu_column(
+          width = 2,
+          menu_btn(
+            uiOutput(ns("code_create_ui")),
+            label = "Create code",
+            icon = "plus"
+          ),
+          menu_btn(
+            uiOutput(ns("code_merge_ui")),
+            label =  "Merge codes",
+            icon = "compress"
+          ),
+          menu_btn(
+            uiOutput(ns("code_delete_ui")),
+            label =  "Delete code",
+            icon = "minus"
+          )
+        ) 
+      }
     })
     
     #---Generate codes UI (if there is an active project)--------------

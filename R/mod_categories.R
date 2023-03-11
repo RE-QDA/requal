@@ -23,17 +23,7 @@ mod_categories_ui <- function(id) {
     ),
 
     # menu
-    menu_column(
-      width = 2,
-      menu_btn(
-        uiOutput(ns("category_create")),
-        label = "Create category",
-        icon = "plus"),
-      menu_btn(
-        uiOutput(ns("category_delete")),
-        label =  "Delete category",
-        icon = "minus")
-      )
+    uiOutput(ns("category_mgmt_ui"))
   )
 }
 
@@ -51,8 +41,23 @@ mod_categories_server <- function(id, glob) {
             active_project = glob$active_project
         )
         })
-
-
+    
+    output$category_mgmt_ui <- renderUI({
+      if(glob$user$data$codebook_modify == 1){
+        menu_column(
+          width = 2,
+          menu_btn(
+            uiOutput(ns("category_create")),
+            label = "Create category",
+            icon = "plus"),
+          menu_btn(
+            uiOutput(ns("category_delete")),
+            label =  "Delete category",
+            icon = "minus")
+        ) 
+      }
+    })
+    
     # List existing codes in code boxes --------
     output$uncategorized <- renderUI({
         glob$codebook
