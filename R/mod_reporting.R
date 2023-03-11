@@ -71,8 +71,15 @@ mod_reporting_server <- function(id, glob) {
           glob$pool,
           glob$active_project
         ) %>%
-          dplyr::arrange(dplyr::desc(created_at)) %>%
-          dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json))
+          dplyr::arrange(dplyr::desc(created_at)) 
+        
+        if(!is.null(glob$user$data) && glob$user$data$report_other_view == 1){
+          loc$logs_df <- loc$logs_df %>%
+            dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json)) 
+        }else{
+          loc$logs_df <- loc$logs_df %>%
+            dplyr::mutate(detail = purrr::map_chr(.data$detail, function(x) possibly_parse_payload_json(x, sanitize = TRUE))) 
+        }
       } else {
         ""
       }
