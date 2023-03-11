@@ -27,7 +27,6 @@ mod_user_server <- function(id, glob) {
       if (isTruthy(glob$active_project)) {
         
         # user data ----
-
         loc$user_data <- read_user_db(
           glob$pool,
           user_id = glob$user$user_id,
@@ -37,7 +36,6 @@ mod_user_server <- function(id, glob) {
         glob$user$data <- loc$user_data
         
         # user attributes ---- 
-
         loc$user_attributes <- read_user_attributes(glob$pool) %>%
           dplyr::group_by(attribute_name) %>% 	
           dplyr::summarise(values = list(value))

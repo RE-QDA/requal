@@ -36,8 +36,8 @@ mod_project_server <- function(id, glob) {
               ),
               tabPanel(
                 "Manage users",
-                mod_use_manager_ui("use_manager_1"),
-                value = "use_manager_tab"
+                mod_user_manager_ui("user_manager_1"),
+                value = "user_manager_tab"
               )
             )
           )
