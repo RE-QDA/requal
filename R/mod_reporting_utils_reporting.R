@@ -31,8 +31,15 @@ shorten_value <- function(x){
     }
 }
 
-parse_payload_json <- function(x){
-    jsonlite::fromJSON(x) %>% 
+parse_payload_json <- function(x, sanitize = FALSE){
+    tmp <- jsonlite::fromJSON(x)
+    
+    if(sanitize){
+        tmp <- tmp %>% 
+            dplyr::select(-dplyr::any_of(c("segment_text", "segment_start", "segment_end")))
+    }
+    
+    tmp %>% 
         purrr::map2_chr(names(.), ., function(name, value) {
             paste0(toupper(name), ": ", shorten_value(collapse_array(value)))
         }) %>% 
