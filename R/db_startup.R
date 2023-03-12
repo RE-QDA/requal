@@ -482,7 +482,8 @@ add_documents_record <- function(pool, project_id, document_df, user_id) {
     written_document_id <- dplyr::tbl(pool, "documents") %>%
       dplyr::filter(.data$doc_name == !!document_df$doc_name &
         .data$doc_text == !!document_df$doc_text &
-        .data$project_id == project_id) %>%
+        .data$project_id == project_id &
+        .data$user_id == !!user_id) %>%
       dplyr::pull(doc_id)
     log_add_document_record(pool, project_id, document_df %>%
       dplyr::mutate(doc_id = written_document_id),

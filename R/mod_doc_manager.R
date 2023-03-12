@@ -210,7 +210,6 @@ mod_doc_manager_server <- function(id, glob) {
             doc_name_parsed <- input$doc_upload_name
           }
 
-
           add_input_document(
             pool = glob$pool,
             project = glob$active_project,
