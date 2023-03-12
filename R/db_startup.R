@@ -519,7 +519,8 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
       dplyr::pull(code_id)
     log_add_code_record(pool, project_id, codes_df %>%
       dplyr::mutate(
-        code_id = written_code_id)
+        code_id = written_code_id), 
+      user_id
     )
   } else {
     warning("code not added")
