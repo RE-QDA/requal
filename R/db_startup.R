@@ -233,7 +233,8 @@ CREATE TABLE if not exists user_permissions (
 ,   annotation_other_view INTEGER
 ,   analysis_other_view INTEGER    
 ,   report_other_view INTEGER      
-,   permissions_modify INTEGER     
+,   permissions_modify INTEGER
+,   project_owner INTEGER     
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
@@ -392,7 +393,24 @@ update_db_schema <- function(pool) {
 
 create_default_user <- function(pool, project_id, user_id) {
 
-
+    default_user_permission_df <- tibble::tibble(
+      data_modify                  = 1,
+      data_other_modify            = 1,
+      data_other_view              = 1,
+      attributes_modify            = 1,
+      attributes_other_modify      = 1,
+      attributes_other_view        = 1,
+      codebook_modify              = 1,
+      codebook_other_modify        = 1,
+      codebook_other_view          = 1,
+      annotation_modify            = 1,
+      annotation_other_modify      = 1,
+      annotation_other_view        = 1,
+      analysis_other_view          = 1,
+      report_other_view            = 1,
+      permissions_modify           = 1,
+      project_owner                = 1
+    )
   if (golem::get_golem_options("mode") == "local") {
     user_df <- tibble::tibble(
       user_name = Sys.info()["user"]
@@ -402,44 +420,20 @@ create_default_user <- function(pool, project_id, user_id) {
     user_df_stored <- dplyr::tbl(pool, "users") %>%
       dplyr::filter(.data$user_name == !!user_df$user_name) %>%
       dplyr::collect()
-    user_permission_df <- tibble::tibble(
+    user_permission_df <- dplyr::bind_cols(
+      tibble::tibble(
       user_id = user_df_stored$user_id,
-      project_id = project_id,
-      data_modify                  = 1,
-      data_other_modify            = 1,
-      data_other_view              = 1,
-      attributes_modify            = 1,
-      attributes_other_modify      = 1,
-      attributes_other_view        = 1,
-      codebook_modify              = 1,
-      codebook_other_modify        = 1,
-      codebook_other_view          = 1,
-      annotation_modify            = 1,
-      annotation_other_modify      = 1,
-      annotation_other_view        = 1,
-      analysis_other_view          = 1,
-      report_other_view            = 1,
-      permissions_modify           = 1
+      project_id = project_id
+      ),
+      default_user_permission_df
     )
-  }else{
-    user_permission_df <- tibble::tibble(
+  } else {
+    user_permission_df <-  dplyr::bind_cols(
+     tibble::tibble(
       user_id = user_id,
-      project_id = project_id,
-      data_modify                  = 1,
-      data_other_modify            = 1,
-      data_other_view              = 1,
-      attributes_modify            = 1,
-      attributes_other_modify      = 1,
-      attributes_other_view        = 1,
-      codebook_modify              = 1,
-      codebook_other_modify        = 1,
-      codebook_other_view          = 1,
-      annotation_modify            = 1,
-      annotation_other_modify      = 1,
-      annotation_other_view        = 1,
-      analysis_other_view          = 1,
-      report_other_view            = 1,
-      permissions_modify           = 1
+      project_id = project_id
+      ),
+      default_user_permission_df
     )
   }
 

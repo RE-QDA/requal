@@ -56,17 +56,17 @@ add_permissions_record <- function(pool, project_id, user_id) {
     user_id = user_id,
     data_modify                  = 0,
     data_other_modify            = 0,
-    data_other_view              = 0,
+    data_other_view              = 1,
     attributes_modify            = 0,
     attributes_other_modify      = 0,
-    attributes_other_view        = 0,
-    codebook_modify              = 0,
+    attributes_other_view        = 1,
+    codebook_modify              = 1,
     codebook_other_modify        = 0,
-    codebook_other_view          = 0,
-    annotation_modify            = 0,
+    codebook_other_view          = 1,
+    annotation_modify            = 1,
     annotation_other_modify      = 0,
     annotation_other_view        = 0,
-    analysis_other_view          = 0,
+    analysis_other_view          = 1,
     report_other_view            = 0,
     permissions_modify           = 0
   )
@@ -88,7 +88,7 @@ remove_permissions_record <- function(pool, project_id, user_id) {
                  WHERE user_id IN ({user_id})
                  AND project_id = {project_id};", .con = pool)
   
-  DBI::dbExecute(pool, remove_user_permissions_sql)
+  purrr::map(remove_user_permissions_sql, ~DBI::dbExecute(pool, .x))
   #TODO
   # log
 }

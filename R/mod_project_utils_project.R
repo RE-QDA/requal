@@ -2,6 +2,7 @@ create_project_db <- function(pool,
                               project_name,
                               project_description,
                               user_id) {
+ 
   project_df <- tibble::tibble(project_name,
     project_description,
     created_at = as.character(Sys.time())
@@ -19,12 +20,12 @@ create_project_db <- function(pool,
     dplyr::collect() %>%
     dplyr::slice_max(project_id, n = 1)
 
-  project <- active_project_df %>%
-    dplyr::pull(project_id)
-
-
-  names(project) <- active_project_df %>%
-                                 dplyr::pull(project_name)
+  project <- stats::setNames(
+    active_project_df %>%
+    dplyr::pull(project_id),
+    active_project_df %>%
+    dplyr::pull(project_name)
+  )
 
   return(project)
 }
