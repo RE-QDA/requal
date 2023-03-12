@@ -71,7 +71,7 @@ mod_document_code_server <- function(id, glob) {
           loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -103,7 +103,7 @@ mod_document_code_server <- function(id, glob) {
           loc$text <- load_doc_to_display(
               glob$pool, 
               glob$active_project,
-              user_id = glob$user$user_id,
+              user = glob$user,
               input$doc_selector,
               loc$code_df$active_codebook,
               ns = NS(id)
@@ -151,7 +151,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -188,7 +188,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -235,7 +235,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)

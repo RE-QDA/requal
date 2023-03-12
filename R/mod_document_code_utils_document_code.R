@@ -55,20 +55,27 @@ load_doc <- function(pool, project_id, doc_id){
 
 # Load segments for document display  -------------------------------------------
 
-load_segments_db <- function(pool, active_project, user_id, doc_id) {
+load_segments_db <- function(pool, active_project, user, doc_id) {
     code_id <- segment_start <- segment_end <- NULL
     if (isTruthy(active_project)) {
         
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-            dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
+            # dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
             dplyr::select(code_id,
                           segment_start,
-                          segment_end) %>%
+                          segment_end, 
+                          user_id) %>%
             dplyr::collect()
         
-        return(segments)
+        if(user$data$annotation_other_view == 0){
+            segments <- segments %>% 
+                dplyr::filter(user_id == !!user$user_id)
+        }
+        
+        return(segments %>% 
+                   dplyr::select(code_id, segment_start, segment_end))
         
     } else {""}
 }
@@ -260,7 +267,7 @@ calculate_code_overlap <- function(raw_segments) {
 
 load_doc_to_display <- function(pool, 
                                 active_project,
-                                user_id,
+                                user,
                                 doc_selector,
                                 codebook,
                                 ns){
@@ -270,7 +277,7 @@ load_doc_to_display <- function(pool,
     
     coded_segments <- load_segments_db(pool, 
                                        active_project,
-                                       user_id,
+                                       user,
                                        doc_selector) %>% 
         calculate_code_overlap()
     
