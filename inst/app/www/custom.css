@@ -91,6 +91,7 @@ margin: 0px !important;
 background: none;
 border: 0px !important;
 overflow: hidden;
+cursor: grab;
 }
 
 .box.box-solid {
