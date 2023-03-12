@@ -168,13 +168,15 @@ mod_user_manager_server <- function(id, glob) {
     })
     
     # remove users ----
-    observeEvent(req(input$remove_members), {
-      
-      owner_check <- sum(loc$users_permissions_df %>%
-        dplyr::filter(user_id %in% input$remove_members) %>%
-        dplyr::pull(project_owner)) == 0
-      if (!owner_check) warn_user("Project owners cannot be removed from project.")
-      req(owner_check)
+    observeEvent(input$remove_members, {
+      owner_check <- loc$users_permissions_df %>%
+        dplyr::filter(
+          project_id %in% glob$active_project &
+          user_id %in% req(input$members_to_remove)
+          ) %>%
+        dplyr::pull(project_owner)
+      if (any(owner_check == 1)) warn_user("Project owners cannot be removed from project.")
+      req(all(owner_check == 0))
       remove_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
