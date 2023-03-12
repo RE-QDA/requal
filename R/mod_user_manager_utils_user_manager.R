@@ -174,7 +174,7 @@ add_user_UI <- function(id) {
                 multiple = TRUE
     ),
     actionButton(ns("assign"), "Assign") %>% 
-      tagAppendAttributes(style = "text-align: left; display: -webkit-inline-box;")
+      tagAppendAttributes(style = "text-align: left;")
   )
 }
 
@@ -189,7 +189,7 @@ remove_user_UI <- function(id) {
                 multiple = TRUE
     ),
     actionButton(ns("remove_members"), "Remove") %>% 
-      tagAppendAttributes(style = "text-align: left; display: -webkit-inline-box;")
+      tagAppendAttributes(style = "text-align: left;")
   )
 }
 
