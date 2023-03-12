@@ -63,7 +63,7 @@ mod_user_manager_server <- function(id, glob) {
     
     output$user_management_buttons_ui <- renderUI({
       if(golem::get_golem_options("mode") == "server" && 
-         glob$user$data$permissions_modify == 1){
+        req(glob$user$data$permissions_modify) == 1){
         div(
           menu_btn(
             uiOutput(ns("add_user_ui")),
@@ -141,7 +141,8 @@ mod_user_manager_server <- function(id, glob) {
     
     # add new users ----
     observeEvent(input$assign, {
-      
+     
+      req(input$rql_users > 0)
       # run check on existing users
       existing_users <- dplyr::tbl(glob$pool, "users") %>%
         dplyr::pull(user_id)
@@ -197,7 +198,7 @@ mod_user_manager_server <- function(id, glob) {
     observeEvent(loc$users_permissions_df, {
       
       loc$users_to_add <- loc$all_users_choices[!loc$all_users_choices %in% as.integer(loc$users_permissions_df$user_id)]
-      if (length(loc$users_to_add) < 1) {loc$users_to_add <- "All registered users have been assigned."}
+      if (length(loc$users_to_add) < 1) {loc$users_to_add <- c("All registered users have been assigned." = 0)}
       # display users to add
       updateSelectInput(
         session = session,
