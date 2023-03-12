@@ -35,8 +35,7 @@ mod_user_manager_server <- function(id, glob) {
           credentials_pass = golem::get_golem_options(which = "credentials_pass")
         ) 
         
-        loc$all_users_choices <- loc$all_users$user_id
-        names(loc$all_users_choices) <- loc$all_users$user_login
+        loc$all_users_choices <- stats::setNames(loc$all_users$user_id, loc$all_users$user_login)
         
         loc$users_permissions_df <- get_user_permissions(
           glob$pool, 
@@ -79,6 +78,8 @@ mod_user_manager_server <- function(id, glob) {
         ) %>% tagAppendAttributes(style = "display: -webkit-inline-box;") 
       }
     })
+    outputOptions(output, "user_management_buttons_ui", suspendWhenHidden = FALSE)
+    
     
     output$user_save_permissions_ui <- renderUI({
       if(golem::get_golem_options("mode") == "server" && 
