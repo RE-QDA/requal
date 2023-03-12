@@ -73,7 +73,8 @@ load_codes_names <- function(pool, active_project){
         codes <- dplyr::tbl(pool, "codes") %>%
             dplyr::filter(.data$project_id == as.numeric(active_project)) %>% 
             dplyr::select(code_id, 
-                          code_name) %>%
+                          code_name, 
+                          user_id) %>%
             dplyr::collect()
         
         return(codes)

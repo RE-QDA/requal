@@ -84,11 +84,19 @@ mod_summary_server <- function(id, glob) {
           ),
           selected = loc$users$user_id
         )
+        
         # list codes
         loc$codes <- load_codes_names(
           pool = glob$pool,
           active_project = glob$active_project
         )
+        
+        if(!is.null(glob$user$data) && 
+           glob$user$data$codebook_other_view != 1){
+          loc$codes <- loc$codes %>% 
+            dplyr::filter(user_id == !!glob$user$user_id)
+        }
+        
         shinyWidgets::updatePickerInput(
           session = session,
           "summary_codes",
@@ -106,7 +114,14 @@ mod_summary_server <- function(id, glob) {
         pool = glob$pool,
         active_project = glob$active_project
       ) %>%
-        dplyr::select(doc_id, doc_name)
+        dplyr::select(doc_id, doc_name, user_id)
+      
+      if(!is.null(glob$user$data) && 
+         glob$user$data$data_other_view != 1){
+        loc$docs <- loc$docs %>% 
+          dplyr::filter(user_id == !!glob$user$user_id)
+      }
+      
       shinyWidgets::updatePickerInput(
         session = session,
         "summary_docs",

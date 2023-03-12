@@ -34,10 +34,24 @@ mod_browser_server <- function(id, glob){
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
+        documents <- glob$documents
+        if(!is.null(glob$user$data) && 
+           glob$user$data$data_other_view != 1){
+          user_docs <- dplyr::tbl(glob$pool, "documents") %>% 
+            dplyr::filter(user_id == !!glob$user$user_id) %>% 
+            dplyr::collect()
+        
+          if(nrow(user_docs)){
+            documents <- documents[documents %in% user_docs$doc_id] 
+          }else{
+            documents <- NULL
+          }
+        }
+        
         updateSelectInput(
           session = session,
           "browser_doc",
-          choices = c("", glob$documents)
+          choices = c("", documents)
         )
         
         users <- dplyr::tbl(glob$pool, "users") %>% 
@@ -67,12 +81,19 @@ mod_browser_server <- function(id, glob){
     
     observeEvent(glob$codebook, {
       if (isTruthy(glob$active_project)) {
+        codebook <- glob$codebook
+        if(!is.null(glob$user$data) && 
+           glob$user$data$codebook_other_view != 1){
+          codebook <- codebook %>% 
+            dplyr::filter(user_id == !!glob$user$user_id)
+        }
+        
         updateSelectInput(
           session = session, 
           "browser_code", 
           choices = c("", stats::setNames(
-            glob$codebook$code_id,
-            glob$codebook$code_name
+            codebook$code_id,
+            codebook$code_name
           ))
         )
       }
