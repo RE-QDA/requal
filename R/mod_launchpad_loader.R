@@ -112,11 +112,10 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
 
-          # list existing projects in load selector
-          updateSelectInput(session,
-            "project_selector_load",
-            choices = existing_projects # global variable obtained on app start
-          )
+      updateSelectInput(session,
+                          "project_selector_load",
+                          choices = existing_projects # global variable obtained on app start
+      )
 
       # create glob$pool if it was not launched previously
       if (!isTruthy(glob$active_project)) {
@@ -139,13 +138,30 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
         update_db_schema(glob$pool)
       }
       
-      observeEvent(glob$pool, {
-        updateSelectInput(session,
-                          "project_selector_load",
-                          choices = read_project_db(glob$pool,
-                                                    project_id = NULL
-                          )
-        )
+      # observeEvent(glob$pool, {
+      #   updateSelectInput(session,
+      #                     "project_selector_load",
+      #                     choices = read_project_db(glob$pool,
+      #                                               project_id = NULL
+      #                     )
+      #   )
+      # })
+      
+      observeEvent(glob$user$user_id, {
+        if(isTruthy(glob$user$user_id)){
+          projects <- read_project_db(glob$pool, project_id = NULL)
+          permitted_projects <- dplyr::tbl(glob$pool, "user_permissions") %>% 
+            dplyr::filter(user_id == !!glob$user$user_id) %>% 
+            dplyr::collect()
+          if(!is.null(permitted_projects)){
+            projects <- projects[projects %in% permitted_projects$project_id]
+            updateSelectInput(session,
+                              "project_selector_load",
+                              choices = projects
+            )
+            
+          }
+        }
       })
 
       observeEvent(input$project_load, {
@@ -193,15 +209,11 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
       )
     })
 
-
-
     ####################
     # General setup ####
     ####################
 
     # set active project from load ----
-
-
 
     observeEvent(loc$active_project, {
       glob$active_project <- loc$active_project
