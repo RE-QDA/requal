@@ -111,7 +111,6 @@ mod_user_manager_server <- function(id, glob) {
           dplyr::filter(!duplicated(user_id_copy))
         
         # generated user boxes with nested permissions
-        # browser()
         gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
       }
     })

@@ -88,7 +88,7 @@ CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   user_id INTEGER
-,   code_name TEXT UNIQUE
+,   code_name TEXT
 ,   code_description TEXT
 ,   code_color TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
@@ -514,11 +514,12 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(.data$code_name == !!codes_df$code_name &
-        .data$project_id == project_id) %>%
+        .data$project_id == project_id & 
+        .data$user_id == !!user_id) %>%
       dplyr::pull(code_id)
     log_add_code_record(pool, project_id, codes_df %>%
-      dplyr::mutate(code_id = written_code_id),
-    user_id = user_id
+      dplyr::mutate(
+        code_id = written_code_id)
     )
   } else {
     warning("code not added")

@@ -43,7 +43,7 @@ mod_categories_server <- function(id, glob) {
         })
     
     output$category_mgmt_ui <- renderUI({
-      if(glob$user$data$codebook_modify == 1){
+      if(!is.null(glob$user$data) && glob$user$data$codebook_modify == 1){
         menu_column(
           width = 2,
           menu_btn(
@@ -61,7 +61,7 @@ mod_categories_server <- function(id, glob) {
     # List existing codes in code boxes --------
     output$uncategorized <- renderUI({
         glob$codebook
-        render_codes_ui(id, glob$pool, glob$active_project)
+        render_codes_ui(id, glob$pool, glob$active_project, glob$user)
     })
     
     # List existing categories in category boxes ----
@@ -69,7 +69,8 @@ mod_categories_server <- function(id, glob) {
       render_categories(
         id = id,
         active_project = glob$active_project,
-        pool = glob$pool
+        pool = glob$pool, 
+        user = glob$user
       )
     })
 
@@ -80,7 +81,8 @@ mod_categories_server <- function(id, glob) {
         render_categories(
           id = id,
           active_project = glob$active_project,
-          pool = glob$pool
+          pool = glob$pool, 
+          user = glob$user
         )
       })
 
@@ -122,7 +124,8 @@ mod_categories_server <- function(id, glob) {
           render_categories(
             id = id,
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = glob$user
           )
         })
 
@@ -204,7 +207,8 @@ mod_categories_server <- function(id, glob) {
         render_categories(
           id = id,
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         )
       })
 
