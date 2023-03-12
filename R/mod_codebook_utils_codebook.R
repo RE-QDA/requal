@@ -29,17 +29,27 @@ create_code_UI <- function(id) {
 }
 
 merge_code_UI <- function(id, pool, project, user) {
+    
+    req(user$data)
+    
+    codes <- list_db_codes(
+        pool,
+        project_id = project, 
+        user = user
+    )
+    
+    if(user$data$codebook_other_modify == 0){
+        codes <- codes %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
+    
     ns <- NS(id)
     tags$div(
         h4("Merge codes"),
         selectInput(
             ns("merge_from"),
             label = "Merge from",
-            choices = c("", list_db_codes(
-                pool,
-                project_id = project, 
-                user = user
-            ) %>%
+            choices = c("", codes %>%
                 pair_code_id()),
             selected = "",
             multiple = FALSE
@@ -47,11 +57,7 @@ merge_code_UI <- function(id, pool, project, user) {
         selectInput(
             ns("merge_to"),
             label = "Merge into",
-            choices = c("", list_db_codes(
-                pool,
-                project_id = project, 
-                user = user
-            ) %>%
+            choices = c("", codes %>%
                 pair_code_id()),
             selected = "",
             multiple = FALSE
@@ -65,17 +71,27 @@ merge_code_UI <- function(id, pool, project, user) {
 
 
 delete_code_UI <- function(id, pool, project, user) {
+    
+    req(user$data)
+    
+    codes <- list_db_codes(
+        pool,
+        project_id = project, 
+        user = user
+    )
+    
+    if(user$data$codebook_other_modify == 0){
+        codes <- codes %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
+    
     ns <- NS(id)
     tags$div(
         h4("Delete codes"),
         selectizeInput(
             ns("code_to_del"),
             label = "Select codes to delete",
-            choices = list_db_codes(
-                pool,
-                project_id = project, 
-                user = user
-            ) %>%
+            choices = codes %>%
                 pair_code_id(),
             selected = NULL,
             multiple = TRUE,
