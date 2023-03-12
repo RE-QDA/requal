@@ -81,7 +81,7 @@ render_categories <- function(id, pool,
             project_id = active_project
         )
     
-        if(user$data$codebook_other_view == 0){
+        if(!is.null(user) && user$data$codebook_other_view == 0){
             project_categories <- project_categories %>% 
                 dplyr::filter(user_id == !!user$user_id)
         }
@@ -118,7 +118,9 @@ read_db_categories <- function(pool, active_project, user) {
         ) %>%
         dplyr::collect()
     
-    if(!is.null(user) && user$data$codebook_other_modify == 0){
+    if(!is.null(user) && 
+       !is.null(user$data) && 
+       user$data$codebook_other_modify == 0){
         project_categories_df <- project_categories_df %>% 
             dplyr::filter(user_id == !!user$user_id)
     }
@@ -180,6 +182,7 @@ create_new_category_UI <- function(id) {
 # delete category UI -----
 
 delete_category_UI <- function(id, pool, active_project, user) {
+    req(user)
     categories <- read_db_categories(
         pool, active_project = active_project, 
         user = user
