@@ -66,7 +66,9 @@ mod_summary_server <- function(id, glob) {
           dplyr::select(user_id, user_name) %>%
           dplyr::collect()
         
-        if(!is.null(glob$user$data) && glob$user$data$report_other_view != 1){
+        if(!is.null(glob$user$data) && 
+           !is.null(glob$user$data$report_other_view) &&
+           glob$user$data$report_other_view != 1){
           loc$users <- loc$users %>% 
             dplyr::filter(user_id == glob$user$user_id)
         }

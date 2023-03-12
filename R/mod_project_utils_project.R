@@ -76,17 +76,21 @@ list_db_projects <- function(pool) {
 
 
 # list_db_documents -----------------------------
-list_db_documents <- function(pool, active_project) {
+list_db_documents <- function(pool, active_project, user) {
   doc_id <- doc_name <- NULL
 
   active_project <- as.integer(active_project)
 
   project_documents <- dplyr::tbl(pool, "documents") %>%
     dplyr::filter(.data$project_id == .env$active_project) %>%
-    dplyr::select(.data$doc_id, .data$doc_name) %>%
+    dplyr::select(.data$doc_id, .data$doc_name, .data$user_id) %>%
     dplyr::collect() %>%
     dplyr::mutate(doc_name = ifelse(is.na(doc_name), "", doc_name))
 
+  if(!is.null(user$data) && user$data$data_other_modify == 0){
+    project_documents <- project_documents %>% 
+      dplyr::filter(user_id == user$user_id)
+  }
 
   documents_list <- project_documents$doc_id
   names(documents_list) <- project_documents$doc_name
@@ -94,29 +98,35 @@ list_db_documents <- function(pool, active_project) {
   return(documents_list)
 }
 
-list_db_document_table <- function(pool, active_project) {
+list_db_document_table <- function(pool, active_project, user) {
   active_project <- as.integer(active_project)
-
+  
   documents_table <- dplyr::tbl(pool, "documents") %>%
     dplyr::filter(.data$project_id == .env$active_project) %>%
-    dplyr::collect() %>%
-    dplyr::select( # "ID" = doc_id,
-      "Name" = doc_name,
-      "Description" = doc_description,
-      "Date added" = created_at
-    )
+    dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
+                       dplyr::select(user_id, user_name), 
+                     by = "user_id") %>% 
+    dplyr::collect()
+  
+  if(!is.null(user$data) && user$data$data_other_view == 0){
+    documents_table <- documents_table %>% 
+      dplyr::filter(user_id == user$user_id)
+  }
 
-  return(documents_table)
+  documents_table %>% dplyr::select( # "ID" = doc_id,
+    "Name" = doc_name,
+    "Description" = doc_description,
+    "Date added" = created_at, 
+    "Created by" = user_name,
+  )
 }
 
-make_doc_table <- function(pool, active_project, doc_list) {
+make_doc_table <- function(glob, doc_list) {
   renderTable(colnames = FALSE, {
-    req(active_project)
+    req(glob$active_project)
 
     if (isTruthy(doc_list)) {
-      list_db_document_table(pool,
-        active_project = active_project
-      )
+      list_db_document_table(glob$pool, glob$active_project, glob$user)
     } else {
       "This project does not contain any documents yet."
     }

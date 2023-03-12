@@ -87,10 +87,12 @@ CREATE TABLE if not exists categories_codes_map (
 CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   user_id INTEGER
 ,   code_name TEXT UNIQUE
 ,   code_description TEXT
 ,   code_color TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -99,11 +101,13 @@ CREATE TABLE if not exists codes (
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   project_id INTEGER
+,   user_id INTEGER
 ,   doc_name TEXT
 ,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
