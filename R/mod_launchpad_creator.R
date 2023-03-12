@@ -138,9 +138,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         # user control ----
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-
+      # create user in db if an uknown project admin logs in
         if (glob$user$project_owner && !(glob$user$user_id %in% existing_user_id)) {
-          # create user in db if an uknown admin logs in
            user_df <- tibble::tibble(
               user_id = glob$user$user_id,
               user_login = glob$user$user_login,
@@ -150,14 +149,13 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           DBI::dbWriteTable(glob$pool, "users", user_df,
             append = TRUE, row.names = FALSE
           )
+      # abort project creation if user is not project admin
         } else if (!glob$user$project_owner) {
-          # abort project creation if user is not project owner
           warn_user("Only users with project administration privileges can create new projects.")
           req(glob$user$project_owner)
         } else {
 
-          # if user control ok, create project
-
+      # if user control ok, create project
           loc$active_project <- create_project_db(
             pool = glob$pool,
             project_name = input$project_name,
