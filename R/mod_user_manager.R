@@ -79,12 +79,11 @@ mod_user_manager_server <- function(id, glob) {
       }
     })
     outputOptions(output, "user_management_buttons_ui", suspendWhenHidden = FALSE)
-    
-    
+
     output$user_save_permissions_ui <- renderUI({
       if(golem::get_golem_options("mode") == "server" && 
          glob$user$data$permissions_modify == 1){
-        actionButton(ns("save_permissions"), "Save")
+        actionButton(ns("save_permissions"), "Save permissions")
       }
     })
     
@@ -100,7 +99,6 @@ mod_user_manager_server <- function(id, glob) {
             names_to = "permission",
             values_to = "value"
           ) 
-        
         # create nested df for nested UI
         users_permissions_nested <- loc$users_permissions_long %>% 
           dplyr::mutate(user_id_copy = user_id) %>%
@@ -129,12 +127,10 @@ mod_user_manager_server <- function(id, glob) {
         project_id = glob$active_project,
         permissions_df = loc$users_permissions_long
       )
-      
-      loc$users_permissions_df <- get_user_permissions(
+     loc$users_permissions_df <- get_user_permissions(
         glob$pool, 
         glob$active_project
       )
-      
       showNotification("Changes to permissions were saved.")
     })
     
@@ -152,7 +148,6 @@ mod_user_manager_server <- function(id, glob) {
         # create user in db if an uknown user is assigned
         users_df <- loc$all_users %>% 
           dplyr::filter(user_id %in% as.integer(input$rql_users))
-        
         purrr::map(users_df$user_id, .f = function(x) {
           users_df_filtered <- users_df %>% 
             dplyr::filter(user_id == as.integer(x))
@@ -160,24 +155,26 @@ mod_user_manager_server <- function(id, glob) {
                             append = TRUE, row.names = FALSE)
         })
       }
-      
       add_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
         user_id = req(input$rql_users)
       )
-      
       # refresh users for current project
       loc$users_permissions_df <- get_user_permissions(
         glob$pool, 
         glob$active_project
       )
-      
     })
     
     # remove users ----
-    observeEvent(input$remove_members, {
+    observeEvent(req(input$remove_members), {
       
+      owner_check <- sum(loc$users_permissions_df %>%
+        dplyr::filter(user_id %in% input$remove_members) %>%
+        dplyr::pull(project_owner)) == 0
+      if (!owner_check) warn_user("Project owners cannot be removed from project.")
+      req(owner_check)
       remove_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
@@ -194,7 +191,7 @@ mod_user_manager_server <- function(id, glob) {
     })
     
     # update user selection inputs ----
-    observeEvent(loc$users_permissions_df, {
+    observeEvent(c(loc$users_permissions_df, glob$active_project), {
       
       loc$users_to_add <- loc$all_users_choices[!loc$all_users_choices %in% as.integer(loc$users_permissions_df$user_id)]
       if (length(loc$users_to_add) < 1) {loc$users_to_add <- c("All registered users have been assigned." = 0)}

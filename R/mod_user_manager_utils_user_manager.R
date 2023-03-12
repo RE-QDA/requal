@@ -68,7 +68,8 @@ add_permissions_record <- function(pool, project_id, user_id) {
     annotation_other_view        = 0,
     analysis_other_view          = 1,
     report_other_view            = 0,
-    permissions_modify           = 0
+    permissions_modify           = 0,
+    project_owner                = 0
   )
   res <- DBI::dbWriteTable(pool, "user_permissions", new_users_df, 
                            append = TRUE, row.names = FALSE)
@@ -173,7 +174,7 @@ add_user_UI <- function(id) {
                 multiple = TRUE
     ),
     actionButton(ns("assign"), "Assign") %>% 
-      tagAppendAttributes(style = "text-align: left")
+      tagAppendAttributes(style = "text-align: left; display: -webkit-inline-box;")
   )
 }
 
@@ -188,7 +189,7 @@ remove_user_UI <- function(id) {
                 multiple = TRUE
     ),
     actionButton(ns("remove_members"), "Remove") %>% 
-      tagAppendAttributes(style = "text-align: left")
+      tagAppendAttributes(style = "text-align: left; display: -webkit-inline-box;")
   )
 }
 
