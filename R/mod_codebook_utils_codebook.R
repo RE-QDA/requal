@@ -28,7 +28,7 @@ create_code_UI <- function(id) {
     )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
-merge_code_UI <- function(id, pool, project) {
+merge_code_UI <- function(id, pool, project, user) {
     ns <- NS(id)
     tags$div(
         h4("Merge codes"),
@@ -37,7 +37,8 @@ merge_code_UI <- function(id, pool, project) {
             label = "Merge from",
             choices = c("", list_db_codes(
                 pool,
-                project_id = project
+                project_id = project, 
+                user = user
             ) %>%
                 pair_code_id()),
             selected = "",
@@ -48,7 +49,8 @@ merge_code_UI <- function(id, pool, project) {
             label = "Merge into",
             choices = c("", list_db_codes(
                 pool,
-                project_id = project
+                project_id = project, 
+                user = user
             ) %>%
                 pair_code_id()),
             selected = "",
@@ -62,7 +64,7 @@ merge_code_UI <- function(id, pool, project) {
 }
 
 
-delete_code_UI <- function(id, pool, project) {
+delete_code_UI <- function(id, pool, project, user) {
     ns <- NS(id)
     tags$div(
         h4("Delete codes"),
@@ -71,7 +73,8 @@ delete_code_UI <- function(id, pool, project) {
             label = "Select codes to delete",
             choices = list_db_codes(
                 pool,
-                project_id = project
+                project_id = project, 
+                user = user
             ) %>%
                 pair_code_id(),
             selected = NULL,
@@ -117,7 +120,7 @@ delete_code_UI <- function(id, pool, project) {
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
-list_db_codes <- function(pool, project_id) {
+list_db_codes <- function(pool, project_id, user) {
     
     ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
     code_id <- code_name <- code_description <- code_color <- NULL
@@ -128,9 +131,15 @@ list_db_codes <- function(pool, project_id) {
             code_id,
             code_name,
             code_description,
-            code_color
+            code_color, 
+            user_id
         ) %>%
         dplyr::collect()
+    
+    if(!is.null(user$data) && user$data$codebook_other_view == 0){
+        project_codes <- project_codes %>% 
+            dplyr::filter(user_id == user$user_id)
+    }
     
     return(project_codes)
 }
@@ -158,7 +167,8 @@ pair_code_id <- function(db_codes_df) {
 gen_codes_ui <- function(code_id,
                          code_name,
                          code_description,
-                         code_color) {
+                         code_color, 
+                         user_id) {
     box(
         code_description,
         id = code_id,
@@ -227,11 +237,12 @@ delete_codes_segment_db <- function(pool,
 
 # Render codes -----
 
-render_codes <- function(pool, active_project) {
+render_codes <- function(pool, active_project, user) {
     if (isTruthy(active_project)) {
         project_codes <- list_db_codes(
             pool = pool,
-            project_id = active_project
+            project_id = active_project, 
+            user = user
         )
         
         if (nrow(project_codes) == 0) {

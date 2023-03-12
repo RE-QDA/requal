@@ -51,7 +51,8 @@ mod_codebook_server <- function(id, glob) {
     observeEvent(glob$active_project, {
         loc$codebook <- list_db_codes(
             glob$pool,
-            glob$active_project
+            glob$active_project, 
+            glob$user
         )
     })
 
@@ -59,12 +60,13 @@ mod_codebook_server <- function(id, glob) {
     output$codes_ui <- renderUI({
       render_codes(
         active_project = glob$active_project,
-        pool = glob$pool
+        pool = glob$pool, 
+        user = glob$user
       )
     })
     
     output$code_mgmt_ui <- renderUI({
-      if(glob$user$data$codebook_modify == 1){
+      if(!is.null(glob$user$data) && glob$user$data$codebook_modify == 1){
         menu_column(
           width = 2,
           menu_btn(
@@ -109,7 +111,8 @@ mod_codebook_server <- function(id, glob) {
       # check if code name is unique
       code_names <- list_db_codes(
         pool = glob$pool,
-        project_id = glob$active_project
+        project_id = glob$active_project, 
+        user = glob$user
       )$code_name
 
       if (!input$code_name %in% code_names & input$code_name != "") {
@@ -129,7 +132,8 @@ mod_codebook_server <- function(id, glob) {
               collapse = ", "
             ),
             ")"
-          )
+          ), 
+          user_id = glob$user$user_id
         )
 
         add_codes_record(
@@ -142,7 +146,8 @@ mod_codebook_server <- function(id, glob) {
         output$codes_ui <- renderUI({
           render_codes(
             active_project = glob$active_project,
-            pool = glob$pool
+            pool = glob$pool, 
+            user = glob$user
           )
         })
 
@@ -151,10 +156,10 @@ mod_codebook_server <- function(id, glob) {
           create_code_UI(id)
         })
         output$code_merge_ui <- renderUI({
-          merge_code_UI(id, glob$pool, glob$active_project)
+          merge_code_UI(id, glob$pool, glob$active_project, glob$user)
         })
         output$code_delete_ui <- renderUI({
-          delete_code_UI(id, glob$pool, glob$active_project)
+          delete_code_UI(id, glob$pool, glob$active_project, glob$user)
         })
       } else {
         showModal(modalDialog(
@@ -166,14 +171,15 @@ mod_codebook_server <- function(id, glob) {
       # update codebook return value
       loc$codebook <- list_db_codes(
           glob$pool,
-          glob$active_project
+          glob$active_project, 
+          glob$user
         )
     })
 
     #---Delete code UI --------------
     output$code_delete_ui <- renderUI({
       req(glob$active_project)
-      delete_code_UI(id, glob$pool, glob$active_project)
+      delete_code_UI(id, glob$pool, glob$active_project, glob$user)
     })
     outputOptions(output, "code_delete_ui", suspendWhenHidden = FALSE)
 
@@ -212,31 +218,33 @@ mod_codebook_server <- function(id, glob) {
       # re-render UI
 
       output$code_merge_ui <- renderUI({
-        merge_code_UI(id, glob$pool, glob$active_project)
+        merge_code_UI(id, glob$pool, glob$active_project, glob$user)
       })
       output$code_delete_ui <- renderUI({
-        delete_code_UI(id, glob$pool, glob$active_project)
+        delete_code_UI(id, glob$pool, glob$active_project, glob$user)
       })
 
       # relist remaining codes
       output$codes_ui <- renderUI({
         render_codes(
           active_project = glob$active_project,
-          pool = glob$pool
+          pool = glob$pool, 
+          user = glob$user
         )
       })
 
       # update codebook return value
       loc$codebook <- list_db_codes(
           glob$pool,
-          glob$active_project
+          glob$active_project, 
+          glob$user
         )
     })
 
     #---Merge code UI --------------
     output$code_merge_ui <- renderUI({
       req(glob$active_project)
-      merge_code_UI(id, glob$pool, glob$active_project)
+      merge_code_UI(id, glob$pool, glob$active_project, glob$user)
     })
     outputOptions(output, "code_merge_ui", suspendWhenHidden = FALSE)
 
@@ -257,25 +265,27 @@ mod_codebook_server <- function(id, glob) {
           # update codebook return value
           loc$codebook <- list_db_codes(
               glob$pool,
-              glob$active_project
+              glob$active_project, 
+              glob$user
             )
 
           # relist remaining codes
           output$codes_ui <- renderUI({
             render_codes(
               active_project = glob$active_project,
-              pool = glob$pool
+              pool = glob$pool, 
+              user = glob$user
             )
           })
 
           # re-render UI
           output$code_merge_ui <- renderUI({
             req(glob$active_project)
-            merge_code_UI(id, glob$pool, glob$active_project)
+            merge_code_UI(id, glob$pool, glob$active_project, glob$user)
           })
           output$code_delete_ui <- renderUI({
             req(glob$active_project)
-            delete_code_UI(id, glob$pool, glob$active_project)
+            delete_code_UI(id, glob$pool, glob$active_project, glob$user)
           })
         }
       } else {
