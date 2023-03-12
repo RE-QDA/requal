@@ -52,15 +52,16 @@ upload_doc_UI <- function(id) {
 
 # delete doc UI -----
 
-delete_doc_UI <- function(id, pool, project) {
+delete_doc_UI <- function(id, glob) {
     ns <- NS(id)
     tags$div(
         h4("Delete document"),
         selectizeInput(ns("doc_delete_list"),
                        label = "Remove selected documents from project",
                        choices = list_db_documents(
-                           pool,
-                           active_project = local(project)
+                           glob$pool,
+                           active_project = local(glob$active_project), 
+                           user = glob$user
                        ),
                        multiple = TRUE,
                        selected = NULL,
@@ -96,6 +97,7 @@ delete_db_documents <- function(pool,
 add_input_document <- function(pool, project, doc_name, doc_text, doc_description, user_id) {
     text_df <- tibble::tibble(
         project_id = project,
+        user_id = user_id,
         doc_name = .env$doc_name,
         doc_description = .env$doc_description,
         doc_text = .env$doc_text

@@ -73,7 +73,9 @@ mod_reporting_server <- function(id, glob) {
         ) %>%
           dplyr::arrange(dplyr::desc(created_at)) 
         
-        if(!is.null(glob$user$data) && glob$user$data$report_other_view == 1){
+        if(!is.null(glob$user$data) && 
+           !is.null(glob$user$data$report_other_view) &&
+           glob$user$data$report_other_view == 1){
           loc$logs_df <- loc$logs_df %>%
             dplyr::mutate(detail = purrr::map_chr(.data$detail, possibly_parse_payload_json)) 
         }else{
