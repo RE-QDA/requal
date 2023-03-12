@@ -38,9 +38,10 @@ mod_categories_server <- function(id, glob) {
     observeEvent(glob$active_project, {
         glob$category <- read_db_categories(
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = NULL
         )
-        })
+    })
     
     output$category_mgmt_ui <- renderUI({
       if(!is.null(glob$user$data) && glob$user$data$codebook_modify == 1){
@@ -109,7 +110,8 @@ mod_categories_server <- function(id, glob) {
         categories_input_df <- data.frame(
           project_id = glob$active_project,
           category_name = input$category_name,
-          category_description = input$category_desc
+          category_description = input$category_desc, 
+          user_id = glob$user$user_id
         )
 
         add_category_record(
@@ -147,14 +149,16 @@ mod_categories_server <- function(id, glob) {
           inputId = "categories_to_del",
           choices = c("", read_db_categories(
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = glob$user
           ))
         )
         
         # update return value
         glob$category <- read_db_categories(
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         )
       } else {
         warn_user("Category name must be unique.")
@@ -167,7 +171,8 @@ mod_categories_server <- function(id, glob) {
       req(glob$active_project)
       delete_category_UI(id,
         pool = glob$pool,
-        active_project = glob$active_project
+        active_project = glob$active_project, 
+        user = glob$user
       )
     })
     outputOptions(output, "category_delete", suspendWhenHidden = FALSE)
@@ -198,7 +203,8 @@ mod_categories_server <- function(id, glob) {
         inputId = "categories_to_del",
         choices = c("", read_db_categories(
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         ))
       )
 
@@ -215,7 +221,8 @@ mod_categories_server <- function(id, glob) {
       # update return value
       glob$category <- read_db_categories(
         pool = glob$pool,
-        active_project = glob$active_project
+        active_project = glob$active_project, 
+        user = glob$user
       )
     })
 

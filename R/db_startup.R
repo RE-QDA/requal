@@ -64,9 +64,11 @@ CREATE TABLE if not exists cases_documents_map (
 CREATE TABLE if not exists categories (
     project_id INTEGER
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   user_id INTEGER
 ,   category_name TEXT
 ,   category_description TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
