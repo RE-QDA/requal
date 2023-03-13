@@ -172,7 +172,7 @@ set_controlbar <- function() {
 
 # menu col and btn ---
 
-menu_btn <- function(..., label, icon) {
+menu_btn <- function(..., label, icon, inputId = NULL) {
   
   shinyWidgets::dropdown(
    ...,
@@ -186,7 +186,8 @@ menu_btn <- function(..., label, icon) {
     size = "md", 
     width = "370px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
-    right = FALSE
+    right = FALSE,
+    inputId = inputId
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 

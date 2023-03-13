@@ -15,21 +15,22 @@ mod_user_manager_ui <- function(id) {
         menu_btn(
           uiOutput(ns("add_user_ui")),
           label = "Add user",
-          icon = "plus"
+          icon = "plus",
+          inputId = ns("add_menu")
         ),
         menu_btn(
           uiOutput(ns("remove_user_ui")),
           label = "Remove user",
-          icon = "minus"
+          icon = "minus",
+          inputId = ns("remove_menu")
         )
       ) %>% tagAppendAttributes(style = "display: -webkit-inline-box;")
     },
+    actionButton(ns("test"), "test"),
     tags$h2("Project members"),
     uiOutput(ns("assigned_users")),
     if (golem::get_golem_options("mode") == "server") {
-      conditionalPanel("output.permissions_modify == 1",
-      actionButton(ns("save_permissions"), "Save permissions"), ns = ns
-      )
+      actionButton(ns("save_permissions"), "Save permissions")
     }
   )
 }
@@ -44,7 +45,7 @@ mod_user_manager_server <- function(id, glob) {
 
     # initialize user management page on project load ----
     observeEvent(glob$active_project, {
-      if (golem::get_golem_options("mode") == "server") {  
+      if (golem::get_golem_options("mode") == "server") {
         # on init, get a list of users in credentials
         loc$all_users <- get_users(
           credentials_path = golem::get_golem_options(which = "credentials_path"),
@@ -57,33 +58,12 @@ mod_user_manager_server <- function(id, glob) {
           glob$pool,
           glob$active_project
         )
-        
+
         loc$project_members_ids <- loc$users_permissions_df %>%
           dplyr::mutate(user_id = stats::setNames(user_id, user_name)) %>%
           dplyr::pull(user_id)
       }
-
-      # add user permission to glob
-      # glob$user$permissions <- loc$users_permissions_df %>%
-      #   dplyr::filter(user_id == glob$user$user_id) %>%
-      #   dplyr::select(dplyr::any_of(
-      #     c("data_modify", "data_other_modify", "data_other_view",
-      #       "attributes_modify", "attributes_other_modify", "attributes_other_view",
-      #       "codebook_modify", "codebook_other_modify",
-      #       "annotation_modify", "annotation_other_modify", "annotation_other_view",
-      #       "analysis_other_view", "report_other_view", "permissions_modify"))) %>%
-      #   as.list()
     })
-
-    # hide save permission UI from users without sufficient permission ======
-      output$permissions_modify <- eventReactive(loc$users_permissions_df, { 
-        loc$permissions_modify <- loc$users_permissions_df %>%
-          dplyr::filter(user_id == glob$user$user_id) %>%
-          dplyr::pull(permissions_modify)
-        })
-      outputOptions(output, "permissions_modify", suspendWhenHidden = FALSE)
-
-      
 
     # render project members =======================================================
     output$assigned_users <- renderUI({
@@ -239,5 +219,32 @@ mod_user_manager_server <- function(id, glob) {
       remove_user_UI(id)
     })
     outputOptions(output, "remove_user_ui", suspendWhenHidden = FALSE)
+
+
+    # hide save permission UI from users without sufficient permission ======
+    observeEvent(loc$users_permissions_df, {
+      loc$permissions_modify <- loc$users_permissions_df %>%
+        dplyr::filter(user_id == glob$user$user_id) %>%
+        dplyr::pull(permissions_modify)
+        }
+    )
+    observeEvent(
+      {
+        input$add_menu
+        input$remove_menu
+        loc$permissions_modify
+      },
+      {
+        if (loc$permissions_modify == 0) {
+          shinyjs::enable("assign")
+          shinyjs::enable("remove_members")
+          shinyjs::enable("save_permissions")
+        } else {
+          shinyjs::disable("assign")
+          shinyjs::disable("remove_members")
+          shinyjs::disable("save_permissions")
+        }
+      }
+    )
   })
 }
