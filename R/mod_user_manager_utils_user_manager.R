@@ -212,3 +212,9 @@ menu_btn2 <- function(..., label, icon) {
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
+# check permission to modify permissions
+
+check_modify_permission <- function(permission, msg) {
+     if (permission != 1) warn_user(msg)
+     req(permission == 1)
+     }
