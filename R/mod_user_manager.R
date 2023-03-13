@@ -26,7 +26,6 @@ mod_user_manager_ui <- function(id) {
         )
       ) %>% tagAppendAttributes(style = "display: -webkit-inline-box;")
     },
-    actionButton(ns("test"), "test"),
     tags$h2("Project members"),
     uiOutput(ns("assigned_users")),
     if (golem::get_golem_options("mode") == "server") {
@@ -226,8 +225,7 @@ mod_user_manager_server <- function(id, glob) {
       loc$permissions_modify <- loc$users_permissions_df %>%
         dplyr::filter(user_id == glob$user$user_id) %>%
         dplyr::pull(permissions_modify)
-        }
-    )
+    })
     observeEvent(
       {
         input$add_menu
@@ -236,15 +234,14 @@ mod_user_manager_server <- function(id, glob) {
       },
       {
         if (loc$permissions_modify == 0) {
-          shinyjs::enable("assign")
-          shinyjs::enable("remove_members")
-          shinyjs::enable("save_permissions")
+          shinyjs::addClass("assign", "disabled")
+          shinyjs::addClass("remove_members", "disabled")
+          shinyjs::addClass("save_permissions", "disabled")
         } else {
-          shinyjs::disable("assign")
-          shinyjs::disable("remove_members")
-          shinyjs::disable("save_permissions")
+          shinyjs::removeClass("assign", "disabled")
+          shinyjs::removeClass("remove_members", "disabled")
+          shinyjs::removeClass("save_permissions", "disabled")
         }
-      }
-    )
+      })
   })
 }

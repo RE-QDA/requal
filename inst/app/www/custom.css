@@ -118,3 +118,8 @@ width: 100% !important;
   background-color: white;
   border: 1px solid #cccccc;
 }
+
+.disabled{
+  cursor: not-allowed;
+  pointer-events: none;
+}
