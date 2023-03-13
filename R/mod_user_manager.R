@@ -115,7 +115,7 @@ mod_user_manager_server <- function(id, glob) {
     # change permissions =======================================================
     observeEvent(input$save_permissions, {
       check_modify_permission(
-        loc$permissions_modify,
+        glob$user$data$permissions_modify,
         "Missing permission to modify permissions."
       )
       loc$users_permissions_long <- loc$users_permissions_long %>%
@@ -140,7 +140,7 @@ mod_user_manager_server <- function(id, glob) {
     # add new users =======================================================
     observeEvent(input$assign, {
       check_modify_permission(
-        loc$permissions_modify,
+        glob$user$data$permissions_modify,
         "Missing permission to add users."
       )
 
@@ -178,7 +178,7 @@ mod_user_manager_server <- function(id, glob) {
     # remove users =======================================================
     observeEvent(input$remove_members, {
       check_modify_permission(
-        loc$permissions_modify,
+        glob$user$data$permissions_modify,
         "Missing permission to remove users."
       )
       owner_check <- loc$users_permissions_df %>%

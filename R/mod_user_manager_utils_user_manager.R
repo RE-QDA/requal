@@ -118,13 +118,13 @@ gen_permissions_ui <- function(id,
   if(user_permissions$permissions_modify == 1){
     checkboxInput(
       inputId = ns(paste(user_id, permission, sep = "_")),
-      label = permission,
+      label = translate_permissions(permission),
       value = value,
     ) 
   }else{
     disabled_checkbox(
       inputId = ns(paste(user_id, permission, sep = "_")),
-      label = permission,
+      label = translate_permissions(permission),
       value = value
     )
   }
@@ -212,9 +212,26 @@ menu_btn2 <- function(..., label, icon) {
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
-# check permission to modify permissions
+# translate DB names to natural language
 
-check_modify_permission <- function(permission, msg) {
-     if (permission != 1) warn_user(msg)
-     req(permission == 1)
-     }
+translate_permissions <- function(permission){
+
+dplyr::case_when( 
+    permission == "data_modify"             ~ "Data: Modify own"
+  , permission == "data_other_modify"       ~ "Data: Modify others"
+  , permission == "data_other_view"         ~ "Data: View others"
+  , permission == "attributes_modify"       ~ "Attributes: Modify own"
+  , permission == "attributes_other_modify" ~ "Attributes: Modify others"  
+  , permission == "attributes_other_view"   ~ "Attributes: View others"
+  , permission == "codebook_modify"         ~ "Codes and categories: Modify own"
+  , permission == "codebook_other_modify"   ~ "Codes and categories: Modify others"  
+  , permission == "codebook_other_view"     ~ "Codes and categories: View others"  
+  , permission == "annotation_modify"       ~ "Annotations: Modify own"
+  , permission == "annotation_other_modify" ~ "Annotations: Modify others"      
+  , permission == "annotation_other_view"   ~ "Annotations: View others"      
+  , permission == "analysis_other_view"     ~ "Analysis: View others"    
+  , permission == "report_other_view"       ~ "Report: View others"  
+  , permission == "permissions_modify"      ~ "Permissions: Modify"  
+)
+
+}
