@@ -234,13 +234,13 @@ mod_user_manager_server <- function(id, glob) {
       },
       {
         if (loc$permissions_modify == 0) {
-          shinyjs::addClass("assign", "disabled")
-          shinyjs::addClass("remove_members", "disabled")
-          shinyjs::addClass("save_permissions", "disabled")
+          shinyjs::disable("assign")
+          shinyjs::disable("remove_members")
+          shinyjs::disable("save_permissions")
         } else {
-          shinyjs::removeClass("assign", "disabled")
-          shinyjs::removeClass("remove_members", "disabled")
-          shinyjs::removeClass("save_permissions", "disabled")
+          shinyjs::enable("assign")
+          shinyjs::enable("remove_members")
+          shinyjs::enable("save_permissions")
         }
       })
   })
