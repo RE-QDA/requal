@@ -341,12 +341,20 @@ warn_user <- function(warning) {
                         warning))
 }
   
-# check priviledges ---
+# check permission to modify permissions
 
-check_permissions <- function(permission) {
+check_modify_permission <- function(permission, msg) {
+     if (permission != 1) warn_user(msg)
+     req(permission == 1)
+     }
 
-if (!isTruthy(permission)) {
-  warn_user("Insufficent permissions.")
-}
-req(permission)
+# filter data by view permissions
+
+filter_view <- function(df, user_id, permission) {
+  if (permission == 0) {
+    df %>%
+      dplyr::filter(user_id == !!user_id)
+  } else if (permission == 1) {
+     df
+  }
 }
