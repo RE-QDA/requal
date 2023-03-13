@@ -167,13 +167,13 @@ gen_users_permissions_ui <- function(nested_df, id, user_permissions){
 add_user_UI <- function(id) {
   ns <- NS(id)
   tags$div(
-    h4("Add user to project"),
+    h4("Add users to project"),
     selectInput(ns("rql_users"),
-                label = "Assign selected users to project",
+                label = "Select users",
                 choices = "",
                 multiple = TRUE
     ),
-    actionButton(ns("assign"), "Assign") %>% 
+    actionButton(ns("assign"), "Add users") %>% 
       tagAppendAttributes(style = "text-align: left;")
   )
 }
@@ -182,13 +182,13 @@ add_user_UI <- function(id) {
 remove_user_UI <- function(id) {
   ns <- NS(id)
   tags$div(
-    h4("Remove user from project"),
+    h4("Remove users from project"),
     selectInput(ns("members_to_remove"),
-                label = "Remove selected users from project",
+                label = "Select users",
                 choices = "",
                 multiple = TRUE
     ),
-    actionButton(ns("remove_members"), "Remove") %>% 
+    actionButton(ns("remove_members"), "Remove users") %>% 
       tagAppendAttributes(style = "text-align: left;")
   )
 }
