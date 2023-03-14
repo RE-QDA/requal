@@ -55,11 +55,22 @@ mod_document_code_server <- function(id, glob) {
     # Refresh list of documents when documents are added/removed --------
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
-        updateSelectInput(
-          session = session,
-          "doc_selector",
-          choices = c("", glob$documents)
-        )
+        if(glob$user$data$data_other_view == 1){
+          updateSelectInput(
+            session = session,
+            "doc_selector",
+            choices = c("", glob$documents)
+          )  
+        }else{
+          visible_docs <- read_visible_docs(glob$pool, glob$active_project, 
+                                            glob$user$user_id)
+          updateSelectInput(
+            session = session, 
+            "doc_selector", 
+            choices = c("", visible_docs)
+          )
+        }
+        
       }
     })
 
