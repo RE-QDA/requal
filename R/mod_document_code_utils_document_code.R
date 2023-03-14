@@ -27,6 +27,19 @@ read_doc_db <- function(pool, active_project) {
     
 }
 
+read_visible_docs <- function(pool, active_project, user_id){
+    docs <- dplyr::tbl(pool, "documents") %>% 
+        dplyr::filter(.data$project_id == !!as.integer(active_project) & 
+                          .data$user_id == !!as.integer(user_id)) %>%
+        dplyr::select(doc_name, doc_id) %>%
+        dplyr::collect() %>%
+        dplyr::mutate(doc_name = ifelse(is.na(doc_name),
+                                        as.character(doc_id),
+                                        doc_name))
+    
+    stats::setNames(docs$doc_id, docs$doc_name)
+}
+
 # Load documents to display -----------------------------
 
 load_doc_db <- function(pool, active_project, doc_id) {
