@@ -394,13 +394,20 @@ load_segment_codes_db <- function(pool,
                           suffix = c(".x", ".y")
         ) %>%
         dplyr::filter(.data$project_id == as.integer(active_project) &
-                          .data$doc_id == as.integer(active_doc) &
-                          .data$user_id == as.integer(.env$user_id)) %>%
+                          .data$doc_id == as.integer(active_doc)) %>%
         dplyr::filter(dplyr::between(marked_codes,
                                      .data$segment_start,
                                      .data$segment_end)) %>%
-        dplyr::select(code_id, code_name, segment_id) %>%
+        dplyr::select(code_id, code_name, segment_id, user_id) %>%
         dplyr::collect() 
+    
+    if(!is.null(user_id)){
+        segment_codes_df <- segment_codes_df %>% 
+            dplyr::filter(.data$user_id == as.integer(.env$user_id))
+    }
+    
+    segment_codes_df %>% 
+        dplyr::select(code_id, code_name, segment_id)
 }
 
 # Parse tag position -----------
@@ -431,7 +438,6 @@ delete_segment_codes_db <- function(pool,
     query <- glue::glue_sql("DELETE FROM segments
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
-                       AND user_id = {user_id}
                        AND segment_id = {segment_id}", .con = pool)
     
     purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
