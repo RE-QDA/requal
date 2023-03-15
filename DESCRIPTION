@@ -60,6 +60,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyselect,
     viridisLite
 Encoding: UTF-8
 LazyData: true
