@@ -32,6 +32,8 @@ app_server <- function(input, output, session) {
 
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
+    shinyjs::show(id = ".shinymanager_logout")
+    shinyjs::show(id = "btn-memo")
   })
 
   # documents  ----
