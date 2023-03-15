@@ -52,7 +52,7 @@ mod_user_server <- function(id, glob) {
           name = loc$user_data$user_name,
           image = "www/user_logo.jpg", 
           title = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail),
-          subtitle = paste0("Project:", glob$active_project), 
+          subtitle = paste("Project:", names(glob$active_project)), 
           footer =  actionButton(ns("edit_user"),
                                  "Edit"),
           fluidRow(
