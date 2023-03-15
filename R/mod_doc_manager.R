@@ -24,24 +24,7 @@ mod_doc_manager_ui <- function(id) {
     ),
     # menu
     
-    menu_column(
-      width = 2,
-      menu_btn(
-        uiOutput(ns("doc_create_ui")),
-        label = "Create document",
-        icon = "plus"
-      ),
-      menu_btn(
-        uiOutput(ns("doc_upload_ui")),
-        label =  "Upload file",
-        icon = "upload"
-      ),
-      menu_btn(
-        uiOutput(ns("doc_delete_ui")),
-        label =  "Delete document",
-        icon = "minus"
-      )
-    )
+    uiOutput(ns("doc_mgmt_ui"))
   )
 }
 
@@ -59,9 +42,32 @@ mod_doc_manager_server <- function(id, glob) {
       } 
     })
 
+    output$doc_mgmt_ui <- renderUI({
+      if(glob$user$data$data_modify == 1){
+        menu_column(
+          width = 2,
+          menu_btn(
+            uiOutput(ns("doc_create_ui")),
+            label = "Create document",
+            icon = "plus"
+          ),
+          menu_btn(
+            uiOutput(ns("doc_upload_ui")),
+            label =  "Upload file",
+            icon = "upload"
+          ),
+          menu_btn(
+            uiOutput(ns("doc_delete_ui")),
+            label =  "Delete document",
+            icon = "minus"
+          )
+        )
+      }
+    })
+    
     #---Create doc UI --------------
     output$doc_create_ui <- renderUI({
-      create_doc_UI(id)
+      create_doc_UI(id) 
     })
     outputOptions(output, "doc_create_ui", suspendWhenHidden = FALSE)
     
@@ -74,7 +80,7 @@ mod_doc_manager_server <- function(id, glob) {
     #---Delete doc UI --------------
     output$doc_delete_ui <- renderUI({
       req(glob$active_project)
-      delete_doc_UI(id, glob$pool, glob$active_project)
+      delete_doc_UI(id, glob)
     })
     outputOptions(output, "doc_delete_ui", suspendWhenHidden = FALSE)
     
@@ -86,13 +92,13 @@ mod_doc_manager_server <- function(id, glob) {
 
       doc_startup <- list_db_documents(
         pool = glob$pool,
-        active_project = glob$active_project
+        active_project = glob$active_project, 
+        user = glob$user
       )
       glob$documents <- doc_startup
 
       output$doc_list_table <- make_doc_table(
-        glob$pool,
-        glob$active_project,
+        glob,
         glob$documents
       )
 
@@ -119,14 +125,14 @@ mod_doc_manager_server <- function(id, glob) {
         )
 
         output$doc_list_table <- make_doc_table(
-          glob$pool,
-          glob$active_project,
+          glob,
           glob$documents
         )
 
         glob$documents <- list_db_documents(
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         )
 
         updateTextInput(
@@ -162,16 +168,15 @@ mod_doc_manager_server <- function(id, glob) {
         glob$user$user_id
       )
 
-
       # update reactive value containing project documents
       glob$documents <- list_db_documents(
         pool = glob$pool,
-        active_project = glob$active_project
+        active_project = glob$active_project, 
+        user = glob$user
       )
 
       output$doc_list_table <- make_doc_table(
-        glob$pool,
-        glob$active_project,
+        glob,
         glob$documents
       )
 
@@ -205,7 +210,6 @@ mod_doc_manager_server <- function(id, glob) {
             doc_name_parsed <- input$doc_upload_name
           }
 
-
           add_input_document(
             pool = glob$pool,
             project = glob$active_project,
@@ -216,14 +220,14 @@ mod_doc_manager_server <- function(id, glob) {
           )
 
           output$doc_list_table <- make_doc_table(
-            glob$pool,
-            glob$active_project,
+            glob,
             glob$documents
           )
 
           glob$documents <- list_db_documents(
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = glob$user
           )
 
           updateSelectInput(

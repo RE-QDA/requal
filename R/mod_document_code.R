@@ -55,11 +55,22 @@ mod_document_code_server <- function(id, glob) {
     # Refresh list of documents when documents are added/removed --------
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
-        updateSelectInput(
-          session = session,
-          "doc_selector",
-          choices = c("", glob$documents)
-        )
+        if(glob$user$data$data_other_view == 1){
+          updateSelectInput(
+            session = session,
+            "doc_selector",
+            choices = c("", glob$documents)
+          )  
+        }else{
+          visible_docs <- read_visible_docs(glob$pool, glob$active_project, 
+                                            glob$user$user_id)
+          updateSelectInput(
+            session = session, 
+            "doc_selector", 
+            choices = c("", visible_docs)
+          )
+        }
+        
       }
     })
 
@@ -71,7 +82,7 @@ mod_document_code_server <- function(id, glob) {
           loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -103,7 +114,7 @@ mod_document_code_server <- function(id, glob) {
           loc$text <- load_doc_to_display(
               glob$pool, 
               glob$active_project,
-              user_id = glob$user$user_id,
+              user = glob$user,
               input$doc_selector,
               loc$code_df$active_codebook,
               ns = NS(id)
@@ -128,8 +139,6 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
-
-
     # Coding tools ------------------------------------------------------------
     observeEvent(input$selected_code, {
       req(input$selected_code, input$tag_position)
@@ -151,7 +160,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -163,16 +172,31 @@ mod_document_code_server <- function(id, glob) {
     # Segment removal ----------
     observeEvent(input$remove_codes, {
       req(glob$active_project)
-      loc$marked_segments_df <- load_segment_codes_db(
+      
+      if(glob$user$data$annotation_other_modify == 0){
+        loc$marked_segments_df <- load_segment_codes_db(
           glob$pool, 
           glob$active_project,
           user_id = glob$user$user_id,
           active_doc = input$doc_selector,
           marked_codes = parse_tag_pos(
-              input$tag_position,
-              "start"
-              )
-      )
+            input$tag_position,
+            "start"
+          )
+        )  
+      }else{
+        loc$marked_segments_df <- load_segment_codes_db(
+          glob$pool, 
+          glob$active_project,
+          user_id = NULL,
+          active_doc = input$doc_selector,
+          marked_codes = parse_tag_pos(
+            input$tag_position,
+            "start"
+          )
+        )
+      }
+      
 
       if (nrow(loc$marked_segments_df) == 0) {
         NULL
@@ -188,7 +212,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)
@@ -235,7 +259,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
-            user_id = glob$user$user_id,
+            user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
             ns = NS(id)

@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_categories_ui <- function(id) {
   ns <- NS(id)
-
+  
   fluidRow(
     column(
       width = 5,
@@ -21,19 +21,9 @@ mod_categories_ui <- function(id) {
       tags$br(),
       uiOutput(ns("categories_ui")) %>% tagAppendAttributes(class = "scrollable90")
     ),
-
+    
     # menu
-    menu_column(
-      width = 2,
-      menu_btn(
-        uiOutput(ns("category_create")),
-        label = "Create category",
-        icon = "plus"),
-      menu_btn(
-        uiOutput(ns("category_delete")),
-        label =  "Delete category",
-        icon = "minus")
-      )
+    uiOutput(ns("category_mgmt_ui"))
   )
 }
 
@@ -46,48 +36,66 @@ mod_categories_server <- function(id, glob) {
     
     # initialize categories upon load
     observeEvent(glob$active_project, {
-        glob$category <- read_db_categories(
-            pool = glob$pool,
-            active_project = glob$active_project
-        )
-        })
-
-
-    # List existing codes in code boxes --------
-    output$uncategorized <- renderUI({
-        glob$codebook
-        render_codes_ui(id, glob$pool, glob$active_project)
+      glob$category <- read_db_categories(
+        pool = glob$pool,
+        active_project = glob$active_project, 
+        user = NULL
+      )
     })
     
-    # List existing categories in category boxes ----
+    output$category_mgmt_ui <- renderUI({
+      if(!is.null(glob$user$data) && glob$user$data$codebook_modify == 1){
+        menu_column(
+          width = 2,
+          menu_btn(
+            uiOutput(ns("category_create")),
+            label = "Create category",
+            icon = "plus"),
+          menu_btn(
+            uiOutput(ns("category_delete")),
+            label =  "Delete category",
+            icon = "minus")
+        )
+      }
+    })
+    
+    # List existing codes in code boxes -------------------
+    output$uncategorized <- renderUI({
+      glob$codebook
+      render_codes_ui(id, glob$pool, glob$active_project, glob$user)
+    })
+    
+    # List existing categories in category boxes ----------
     output$categories_ui <- renderUI({
       render_categories(
         id = id,
         active_project = glob$active_project,
-        pool = glob$pool
+        pool = glob$pool, 
+        user = glob$user
       )
     })
-
-    # Relist categories on codebook changes
+    
+    # Relist categories on codebook changes ---------------
     observeEvent(glob$codebook, {
-
+      
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
           active_project = glob$active_project,
-          pool = glob$pool
+          pool = glob$pool, 
+          user = glob$user
         )
       })
-
+      
     })
-
-    #---Generate create categories UI --------------
+    
+    # Generate create categories UI -----------------------
     output$category_create <- renderUI({
       req(glob$active_project)
       create_new_category_UI(id)
     })
     outputOptions(output, "category_create", suspendWhenHidden = FALSE)
-
+    
     # Create categories ------
     observeEvent(input$category_add, {
       # check if code name is unique
@@ -96,15 +104,16 @@ mod_categories_server <- function(id, glob) {
         pool = glob$pool,
         project_id = glob$active_project
       )$category_name
-
+      
       if (!input$category_name %in% category_names & input$category_name != "") {
         
         categories_input_df <- data.frame(
           project_id = glob$active_project,
           category_name = input$category_name,
-          category_description = input$category_desc
+          category_description = input$category_desc, 
+          user_id = glob$user$user_id
         )
-
+        
         add_category_record(
           pool = glob$pool,
           project_id = glob$active_project,
@@ -117,10 +126,11 @@ mod_categories_server <- function(id, glob) {
           render_categories(
             id = id,
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = glob$user
           )
         })
-
+        
         # refresh create UI
         updateTextInput(
           session = session,
@@ -139,44 +149,47 @@ mod_categories_server <- function(id, glob) {
           inputId = "categories_to_del",
           choices = c("", read_db_categories(
             pool = glob$pool,
-            active_project = glob$active_project
+            active_project = glob$active_project, 
+            user = glob$user
           ))
         )
         
         # update return value
         glob$category <- read_db_categories(
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         )
       } else {
         warn_user("Category name must be unique.")
       }
     })
-
+    
     # Delete categories ------
     # delete UI
     output$category_delete <- renderUI({
       req(glob$active_project)
       delete_category_UI(id,
-        pool = glob$pool,
-        active_project = glob$active_project
+                         pool = glob$pool,
+                         active_project = glob$active_project, 
+                         user = glob$user
       )
     })
     outputOptions(output, "category_delete", suspendWhenHidden = FALSE)
-
+    
     # delete action
     observeEvent(input$category_remove, {
-
-        # remove from edges
+      
+      # remove from edges
       edge <- list()
       edge$category_id <- input$categories_to_del
       delete_category_code_record(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          edge = edge)
-
-    # remove from db
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        edge = edge)
+      
+      # remove from db
       delete_db_category(
         pool = glob$pool,
         active_project = glob$active_project,
@@ -190,46 +203,74 @@ mod_categories_server <- function(id, glob) {
         inputId = "categories_to_del",
         choices = c("", read_db_categories(
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         ))
       )
-
+      
       # refresh listed categories
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
           pool = glob$pool,
-          active_project = glob$active_project
+          active_project = glob$active_project, 
+          user = glob$user
         )
       })
-
+      
       # update return value
       glob$category <- read_db_categories(
         pool = glob$pool,
-        active_project = glob$active_project
+        active_project = glob$active_project, 
+        user = glob$user
       )
     })
-
-    # Create edge
+    
+    # Create edge -----------------------------------------
     observeEvent(input$edges_category, {
-        add_category_code_record(
+      if(!is.null(glob$user) && glob$user$data$codebook_modify == 1){
+        # Can only modify own codes and categories
+        owns_code <- glob$codebook %>% 
+          dplyr::filter(code_id == input$edges_category$code_id) %>% 
+          dplyr::pull(user_id) == glob$user$user_id
+        
+        owns_category <- dplyr::tbl(glob$pool, "categories") %>% 
+          dplyr::filter(category_id == !!input$edges_category$category_id) %>% 
+          dplyr::collect() %>% 
+          dplyr::pull(user_id) == glob$user$user_id
+        
+        if(all(c(owns_code, owns_category))){
+          add_category_code_record(
             pool = glob$pool,
             active_project = glob$active_project,
             user_id = glob$user$user_id,
             edge = input$edges_category)
+        }else{
+          warn_user("You don't have permissions for modifying codes and categories created by others.")
+          # TODO: delete code from category
+        }
+        
+      }else if(!is.null(glob$user) && glob$user$data$codebook_other_modify == 1){
+        # Can modify all codes and categories
+        add_category_code_record(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          edge = input$edges_category)
+      }
     })
     
     # Delete edge
     observeEvent(input$edges_category_delete, {
-        delete_category_code_record(
-            pool = glob$pool,
-            active_project = glob$active_project,
-            user_id = glob$user$user_id,
-            edge = input$edges_category_delete)
+      delete_category_code_record(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        edge = input$edges_category_delete)
     })
-
+    
     # return active categories details in glob$category ----
-
-
+    
+    
   })
 }
