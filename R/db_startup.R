@@ -9,7 +9,7 @@ CREATE TABLE if not exists attributes (
 ,   attribute_object TEXT
 ,   attribute_type TEXT
 ,   user_id INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -19,9 +19,9 @@ CREATE TABLE if not exists attributes_users_map (
     user_id INTEGER
 ,   attribute_id INTEGER
 ,   attribute_value_id INTEGER 
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
-,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id)
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
 );
 ",
 
@@ -31,7 +31,7 @@ CREATE TABLE if not exists attribute_values (
     attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   attribute_id INTEGER
 ,   value TEXT
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id)
+,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
 );
 ",
 
@@ -42,7 +42,7 @@ CREATE TABLE if not exists cases (
 ,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   case_name TEXT
 ,   case_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -53,9 +53,9 @@ CREATE TABLE if not exists cases_documents_map (
     project_id INTEGER
 ,   case_id INTEGER
 ,   doc_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(case_id) REFERENCES cases(case_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
 );
 ",
 
@@ -64,9 +64,11 @@ CREATE TABLE if not exists cases_documents_map (
 CREATE TABLE if not exists categories (
     project_id INTEGER
 ,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   user_id INTEGER
 ,   category_name TEXT
 ,   category_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -76,9 +78,9 @@ CREATE TABLE if not exists categories_codes_map (
     project_id INTEGER
 ,   category_id INTEGER
 ,   code_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(category_id) REFERENCES categories(category_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
 );
 ",
 
@@ -87,10 +89,12 @@ CREATE TABLE if not exists categories_codes_map (
 CREATE TABLE if not exists codes (
     project_id INTEGER
 ,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   code_name TEXT UNIQUE
+,   user_id INTEGER
+,   code_name TEXT
 ,   code_description TEXT
 ,   code_color TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -99,11 +103,13 @@ CREATE TABLE if not exists codes (
 CREATE TABLE if not exists documents (
     doc_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   project_id INTEGER
+,   user_id INTEGER
 ,   doc_name TEXT
 ,   doc_description TEXT
 ,   doc_text TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -115,8 +121,8 @@ CREATE TABLE if not exists logs
 ,   action TEXT
 ,   payload JSON
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -124,9 +130,9 @@ CREATE TABLE if not exists logs
 "
 CREATE TABLE if not exists memos (
     project_id INTEGER
-,   memo_id INTEGER PRIMARY KEY
+,   memo_id INTEGER PRIMARY KEY AUTOINCREMENT
 ,   text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -135,8 +141,8 @@ CREATE TABLE if not exists memos (
 CREATE TABLE if not exists memos_codes_map (
     memo_id INTEGER
     ,   code_id INTEGER
-    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -147,8 +153,8 @@ CREATE TABLE if not exists memos_documents_map (
     ,   doc_id INTEGER
     ,   memo_start INTEGER
     ,   memo_end INTEGER
-    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -157,8 +163,8 @@ CREATE TABLE if not exists memos_documents_map (
 CREATE TABLE if not exists memos_segments_map (
     memo_id INTEGER
     ,   segment_id INTEGER
-    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id)
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id)
+    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id) ON DELETE CASCADE
+    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
 );
 ",
 
@@ -177,7 +183,7 @@ CREATE TABLE projects (
 CREATE TABLE if not exists requal_version (
     project_id INTEGER
 ,   version TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
 
@@ -192,10 +198,10 @@ CREATE TABLE if not exists segments (
 ,   segment_start INTEGER
 ,   segment_end INTEGER
 ,   segment_text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id)
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id)
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id)ON DELETE CASCADE
+,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
@@ -215,16 +221,57 @@ CREATE TABLE if not exists users (
 CREATE TABLE if not exists user_permissions (
     user_id INTEGER
 ,   project_id INTEGER
-,   can_code INTEGER
-,   can_modify_codes INTEGER
-,   can_delete_codes INTEGER
-,   can_modify_documents INTEGER
-,   can_delete_documents INTEGER
-,   can_manage INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id)
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)
+,   data_modify INTEGER            
+,   data_other_modify INTEGER     
+,   data_other_view INTEGER       
+,   attributes_modify INTEGER      
+,   attributes_other_modify INTEGER
+,   attributes_other_view INTEGER  
+,   codebook_modify INTEGER        
+,   codebook_other_modify INTEGER  
+,   codebook_other_view INTEGER    
+,   annotation_modify INTEGER     
+,   annotation_other_modify INTEGER
+,   annotation_other_view INTEGER
+,   analysis_other_view INTEGER    
+,   report_other_view INTEGER      
+,   permissions_modify INTEGER
+,   project_owner INTEGER     
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 "
+)
+
+db_call_df_unordered <- tibble::tibble(
+  table = names(db_call),
+  sql = db_call
+)
+
+# Arrange by priority as required by postgres
+db_call_df_ordered <- tibble::tibble(
+table = c(
+"projects", 
+"requal_version", 
+"users", 
+"user_permissions", 
+"logs",
+"documents", 
+"codes", 
+"categories", 
+"categories_codes_map", 
+"cases", 
+"cases_documents_map", 
+"segments", 
+"memos", 
+"attributes", 
+"attribute_values"
+))
+
+db_call_df <- dplyr::full_join(
+  db_call_df_ordered,
+  db_call_df_unordered,
+  by = "table"
 )
 
 db_call_df_unordered <- tibble::tibble(
@@ -276,9 +323,40 @@ create_db_schema <- function(pool) {
       ) %>%
       dplyr::pull(psql)
 
-    purrr::walk(psql, ~DBI::dbExecute(pool, psql))
+    purrr::walk(psql, ~DBI::dbExecute(pool, .x))
   } else {
     purrr::walk(db_call_df$sql, ~DBI::dbExecute(pool, .x))
+  }
+}
+
+update_db_schema <- function(pool) {
+  existing_tables <- pool::dbListTables(pool)
+  existing_tables_no_sqlite <- existing_tables[!grepl("sqlite", existing_tables)]
+  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
+  if (length(missing_tables) > 0) {
+    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
+    if (db_postgres) {
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables) %>%
+        dplyr::mutate(
+          psql =
+            stringr::str_replace(
+              sql,
+              "INTEGER PRIMARY KEY AUTOINCREMENT",
+              "SERIAL PRIMARY KEY"
+            )
+        )
+      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
+    } else {
+    
+      to_create_tables <- db_call_df %>%
+        dplyr::filter(table %in% missing_tables)
+
+      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
+    }
+    message("Updated reQual schema.")
+  } else {
+    NULL
   }
 }
 
@@ -317,7 +395,24 @@ update_db_schema <- function(pool) {
 
 create_default_user <- function(pool, project_id, user_id) {
 
-
+    default_user_permission_df <- tibble::tibble(
+      data_modify                  = 1,
+      data_other_modify            = 1,
+      data_other_view              = 1,
+      attributes_modify            = 1,
+      attributes_other_modify      = 1,
+      attributes_other_view        = 1,
+      codebook_modify              = 1,
+      codebook_other_modify        = 1,
+      codebook_other_view          = 1,
+      annotation_modify            = 1,
+      annotation_other_modify      = 1,
+      annotation_other_view        = 1,
+      analysis_other_view          = 1,
+      report_other_view            = 1,
+      permissions_modify           = 1,
+      project_owner                = 1
+    )
   if (golem::get_golem_options("mode") == "local") {
     user_df <- tibble::tibble(
       user_name = Sys.info()["user"]
@@ -327,26 +422,20 @@ create_default_user <- function(pool, project_id, user_id) {
     user_df_stored <- dplyr::tbl(pool, "users") %>%
       dplyr::filter(.data$user_name == !!user_df$user_name) %>%
       dplyr::collect()
-    user_permission_df <- tibble::tibble(
+    user_permission_df <- dplyr::bind_cols(
+      tibble::tibble(
       user_id = user_df_stored$user_id,
-      project_id = project_id,
-      can_code = 1,
-      can_modify_codes = 1,
-      can_delete_codes = 1,
-      can_modify_documents = 1,
-      can_delete_documents = 1,
-      can_manage = 1
+      project_id = project_id
+      ),
+      default_user_permission_df
     )
-  }else{
-    user_permission_df <- tibble::tibble(
+  } else {
+    user_permission_df <-  dplyr::bind_cols(
+     tibble::tibble(
       user_id = user_id,
-      project_id = project_id,
-      can_code = 1,
-      can_modify_codes = 1,
-      can_delete_codes = 1,
-      can_modify_documents = 1,
-      can_delete_documents = 1,
-      can_manage = 1
+      project_id = project_id
+      ),
+      default_user_permission_df
     )
   }
 
@@ -389,7 +478,8 @@ add_documents_record <- function(pool, project_id, document_df, user_id) {
     written_document_id <- dplyr::tbl(pool, "documents") %>%
       dplyr::filter(.data$doc_name == !!document_df$doc_name &
         .data$doc_text == !!document_df$doc_text &
-        .data$project_id == project_id) %>%
+        .data$project_id == project_id &
+        .data$user_id == !!user_id) %>%
       dplyr::pull(doc_id)
     log_add_document_record(pool, project_id, document_df %>%
       dplyr::mutate(doc_id = written_document_id),
@@ -421,11 +511,13 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(.data$code_name == !!codes_df$code_name &
-        .data$project_id == project_id) %>%
+        .data$project_id == project_id & 
+        .data$user_id == !!user_id) %>%
       dplyr::pull(code_id)
     log_add_code_record(pool, project_id, codes_df %>%
-      dplyr::mutate(code_id = written_code_id),
-    user_id = user_id
+      dplyr::mutate(
+        code_id = written_code_id), 
+      user_id
     )
   } else {
     warning("code not added")
@@ -444,9 +536,10 @@ add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
 # Globals ####
 
 make_globals <- quote({
-  mode <- golem::get_golem_options(which = "mode")
-  if (mode == "server") {
-    pool <- pool::dbPool(
+
+  if (golem::get_golem_options(which = "mode") == "server") {
+
+    startup_con <- DBI::dbConnect(
       drv = RPostgreSQL::PostgreSQL(),
       host = golem::get_golem_options(which = "dbhost"),
       port = golem::get_golem_options(which = "dbport"),
@@ -455,9 +548,14 @@ make_globals <- quote({
       password = golem::get_golem_options(which = "dbpassword")
     )
 
-    onStop(function() {
-      pool::poolClose(glob$pool)
-    })
-
+    if("projects" %in% pool::dbListTables(startup_con)){
+      existing_projects <- dplyr::pull(dplyr::tbl(startup_con, "projects"), project_id)
+      names(existing_projects) <- dplyr::pull(dplyr::tbl(startup_con, "projects"), project_name)
+    }else{
+      existing_projects <- data.frame()
+    }
+    
+    DBI::dbDisconnect(startup_con)
+    
   }
 })

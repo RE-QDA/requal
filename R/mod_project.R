@@ -26,14 +26,19 @@ mod_project_server <- function(id, glob) {
     output$project_manager <- renderUI({
       if (!is.null(glob$active_project) & !is.null(glob$pool)) {
         tagList(
-          tabsetPanel(
-            tabPanel(
-              "Manage documents",
-              mod_doc_manager_ui("doc_manager_ui_1")
+            tabsetPanel(
+              id = "project_tabs",
+              tabPanel(
+                "Manage documents",
+                mod_doc_manager_ui("doc_manager_ui_1"),
+                value = "doc_manager_tab"
+              ),
+              tabPanel(
+                "Manage users",
+                mod_user_manager_ui("user_manager_1"),
+                value = "user_manager_tab"
+              )
             )
-          ) # ,
-          # tabPanel("Project information"),
-          # tabPanel("Settings")
         )
       } else {
         "No active project."

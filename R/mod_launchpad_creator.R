@@ -45,10 +45,8 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
 
-
       # file system prep -----
       volumes <- c(Home = fs::path_home(), get_volume_paths())
-
 
       shinyFiles::shinyDirChoose(
         input,
@@ -120,7 +118,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
       observeEvent(input$project_create, {
         req(input$project_name)
 
-        if (is.null(glob$active_project)) {
+        if (!isTruthy(glob$active_project)) {
           glob$pool <- pool::dbPool(
             drv = RPostgreSQL::PostgreSQL(),
             host = golem::get_golem_options(which = "dbhost"),
@@ -136,36 +134,34 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             })
           })
         }
+        
         # user control ----
-
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-
-        if (glob$user$is_admin && !(glob$user$user_id %in% existing_user_id)) {
-          # create user in db if an uknown admin logs in
-          users_df <- data.frame(
-            user_id = glob$user$user_id,
-            user_name = glob$user$name,
-            user_mail = glob$user$mail
-          )
-          DBI::dbWriteTable(pool, "users", users_df,
+      # create user in db if an uknown project admin logs in
+        if (glob$user$project_owner && !(glob$user$user_id %in% existing_user_id)) {
+           user_df <- tibble::tibble(
+              user_id = glob$user$user_id,
+              user_login = glob$user$user_login,
+              user_name = glob$user$name,
+              user_mail = glob$user$mail
+            )
+          DBI::dbWriteTable(glob$pool, "users", user_df,
             append = TRUE, row.names = FALSE
           )
-        } else if (!glob$user$is_admin) {
-          # abort project creation if user is not admin
-          warn_user("Only administrators can create new projects.")
-          req(glob$user$is_admin)
+      # abort project creation if user is not project admin
+        } else if (!glob$user$project_owner) {
+          warn_user("Only users with project administration privileges can create new projects.")
+          req(glob$user$project_owner)
         } else {
 
-          # if user control ok, create project
-
+      # if user control ok, create project
           loc$active_project <- create_project_db(
             pool = glob$pool,
             project_name = input$project_name,
             project_description = input$project_description,
             user_id = glob$user$user_id
           )
-          names(loc$active_project) <- input$project_name
         }
       })
     })

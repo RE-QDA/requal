@@ -27,6 +27,19 @@ read_doc_db <- function(pool, active_project) {
     
 }
 
+read_visible_docs <- function(pool, active_project, user_id){
+    docs <- dplyr::tbl(pool, "documents") %>% 
+        dplyr::filter(.data$project_id == !!as.integer(active_project) & 
+                          .data$user_id == !!as.integer(user_id)) %>%
+        dplyr::select(doc_name, doc_id) %>%
+        dplyr::collect() %>%
+        dplyr::mutate(doc_name = ifelse(is.na(doc_name),
+                                        as.character(doc_id),
+                                        doc_name))
+    
+    stats::setNames(docs$doc_id, docs$doc_name)
+}
+
 # Load documents to display -----------------------------
 
 load_doc_db <- function(pool, active_project, doc_id) {
@@ -55,20 +68,27 @@ load_doc <- function(pool, project_id, doc_id){
 
 # Load segments for document display  -------------------------------------------
 
-load_segments_db <- function(pool, active_project, user_id, doc_id) {
+load_segments_db <- function(pool, active_project, user, doc_id) {
     code_id <- segment_start <- segment_end <- NULL
     if (isTruthy(active_project)) {
         
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-            dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
+            # dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
             dplyr::select(code_id,
                           segment_start,
-                          segment_end) %>%
+                          segment_end, 
+                          user_id) %>%
             dplyr::collect()
         
-        return(segments)
+        if(user$data$annotation_other_view == 0){
+            segments <- segments %>% 
+                dplyr::filter(user_id == !!user$user_id)
+        }
+        
+        return(segments %>% 
+                   dplyr::select(code_id, segment_start, segment_end))
         
     } else {""}
 }
@@ -260,7 +280,7 @@ calculate_code_overlap <- function(raw_segments) {
 
 load_doc_to_display <- function(pool, 
                                 active_project,
-                                user_id,
+                                user,
                                 doc_selector,
                                 codebook,
                                 ns){
@@ -270,7 +290,7 @@ load_doc_to_display <- function(pool,
     
     coded_segments <- load_segments_db(pool, 
                                        active_project,
-                                       user_id,
+                                       user,
                                        doc_selector) %>% 
         calculate_code_overlap()
     
@@ -387,13 +407,20 @@ load_segment_codes_db <- function(pool,
                           suffix = c(".x", ".y")
         ) %>%
         dplyr::filter(.data$project_id == as.integer(active_project) &
-                          .data$doc_id == as.integer(active_doc) &
-                          .data$user_id == as.integer(.env$user_id)) %>%
+                          .data$doc_id == as.integer(active_doc)) %>%
         dplyr::filter(dplyr::between(marked_codes,
                                      .data$segment_start,
                                      .data$segment_end)) %>%
-        dplyr::select(code_id, code_name, segment_id) %>%
+        dplyr::select(code_id, code_name, segment_id, user_id) %>%
         dplyr::collect() 
+    
+    if(!is.null(user_id)){
+        segment_codes_df <- segment_codes_df %>% 
+            dplyr::filter(.data$user_id == as.integer(.env$user_id))
+    }
+    
+    segment_codes_df %>% 
+        dplyr::select(code_id, code_name, segment_id)
 }
 
 # Parse tag position -----------
@@ -424,7 +451,6 @@ delete_segment_codes_db <- function(pool,
     query <- glue::glue_sql("DELETE FROM segments
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
-                       AND user_id = {user_id}
                        AND segment_id = {segment_id}", .con = pool)
     
     purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})

@@ -12,14 +12,9 @@ mod_user_attributes_ui <- function(id){
   tagList(
     textOutput(ns("user_message")),
     tableOutput(ns("user_attributes_table")),
-    textInput(ns("attribute_name"), 
-              label = "Attribute name",
-              placeholder = "Write an attribute name"),
-    textAreaInput(ns("attribute_values"), 
-              label = "Attribute values",
-              placeholder = "Write possible attribute values separated by comma"),
-    actionButton(ns("add_attribute"), "Add user attribute")
-    
+    uiOutput(ns("attribute_name_ui")),
+    uiOutput(ns("attribute_values_ui")),
+    uiOutput(ns("add_attribute_ui"))
   )
 }
     
@@ -31,7 +26,6 @@ mod_user_attributes_server <- function(id, glob){
     ns <- session$ns
     
     observeEvent(input$add_attribute, {
-      
       existing_attributes <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(.data$attribute_object == "user") %>% 
         dplyr::collect()
@@ -50,7 +44,8 @@ mod_user_attributes_server <- function(id, glob){
                              attribute_id = new_attribute_id, 
                              attribute_values = input$attribute_values)
         
-        log_create_user_attribute(glob$pool, glob$active_project, user_id = 1, 
+        log_create_user_attribute(glob$pool, glob$active_project, 
+                                  user_id = glob$user$user_id, 
                                   attribute_data = list(
                                     attribute_name = input$attribute_name,
                                     attribute_id = new_attribute_id, 
@@ -69,6 +64,28 @@ mod_user_attributes_server <- function(id, glob){
     
     output$user_message <- renderText({
       "Here you can add user attributes for your users to select from." 
+    })
+    
+    output$attribute_name_ui <- renderUI({
+      if(glob$user$data$attributes_modify == 1){
+        textInput(ns("attribute_name"), 
+                  label = "Attribute name",
+                  placeholder = "Write an attribute name") 
+      }
+    })
+    
+    output$attribute_values_ui <- renderUI({
+      if(glob$user$data$attributes_modify == 1){
+        textAreaInput(ns("attribute_values"), 
+                      label = "Attribute values",
+                      placeholder = "Write possible attribute values separated by comma")
+      }
+    })
+    
+    output$add_attribute_ui <- renderUI({
+      if(glob$user$data$attributes_modify == 1){
+        actionButton(ns("add_attribute"), "Add user attribute")
+      }
     })
     
     output$user_attributes_table <- renderTable({

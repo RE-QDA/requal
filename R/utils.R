@@ -172,21 +172,22 @@ set_controlbar <- function() {
 
 # menu col and btn ---
 
-menu_btn <- function(..., label, icon) {
+menu_btn <- function(..., label, icon, inputId = NULL) {
   
   shinyWidgets::dropdown(
    ...,
     label = NULL,
     style = "material-circle",
     tooltip = shinyWidgets::tooltipOptions(
-      placement = "left",
+      placement = "right",
       title = label,
       html = FALSE
     ),
     size = "md", 
     width = "370px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
-    right = TRUE
+    right = FALSE,
+    inputId = inputId
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
@@ -341,7 +342,20 @@ warn_user <- function(warning) {
                         warning))
 }
   
+# check permission to modify permissions
 
+check_modify_permission <- function(permission, msg) {
+     if (permission != 1) warn_user(msg)
+     req(permission == 1)
+     }
 
-    
+# filter data by view permissions
 
+filter_view <- function(df, user_id, permission) {
+  if (permission == 0) {
+    df %>%
+      dplyr::filter(user_id == !!user_id)
+  } else if (permission == 1) {
+     df
+  }
+}

@@ -4,7 +4,8 @@ gen_categories_ui <- function(id,
                               active_project,
                               category_id,
                               category_name,
-                              category_description) {
+                              category_description, 
+                              user) {
     ns <- NS(id)
     tags$div(
         box(
@@ -23,7 +24,8 @@ gen_categories_ui <- function(id,
                 labels = render_category_edges(
                     pool, 
                     active_project = active_project,
-                    category_id = category_id
+                    category_id = category_id, 
+                    user = user
                 ),
                 class = "category-rank-list",
                 css_id = glue::glue(ns("rank-list_{category_id}")),
@@ -45,14 +47,15 @@ gen_categories_ui <- function(id,
 }
 
 
-render_codes_ui <- function(id, pool, active_project){
+render_codes_ui <- function(id, pool, active_project, user){
     ns <- NS(id)
     sortable::rank_list(
         input_id = ns("code_list"),
         text = NULL,
         labels = render_codes(
             pool = pool,
-            active_project = active_project
+            active_project = active_project, 
+            user = user
         ),
         class = "codes-rank-list",
         options = sortable::sortable_options(
@@ -69,17 +72,19 @@ render_codes_ui <- function(id, pool, active_project){
 
 # Render categories -----
 render_categories <- function(id, pool, 
-                              active_project) {
+                              active_project, 
+                              user) {
     if (isTruthy(active_project)) {
         project_categories <- list_db_categories(
             id = id,
             pool, 
             project_id = active_project
-        ) # %>%
-        # dplyr::mutate(
-        #   project_db = project_db,
-        #   active_project = active_project
-        # )
+        )
+    
+        if(!is.null(user) && user$data$codebook_other_view == 0){
+            project_categories <- project_categories %>% 
+                dplyr::filter(user_id == !!user$user_id)
+        }
         
         if (nrow(project_categories) == 0) {
             "No categories have been created."
@@ -90,7 +95,8 @@ render_categories <- function(id, pool,
                     active_project = active_project, 
                     category_id = .x$category_id, 
                     category_name = .x$category_name, 
-                    category_description = .x$category_description)
+                    category_description = .x$category_description, 
+                    user = user)
                 )
         }
     } else {
@@ -100,16 +106,24 @@ render_categories <- function(id, pool,
 
 # Read categories--------------------------------------------------------
 
-read_db_categories <- function(pool, active_project) {
+read_db_categories <- function(pool, active_project, user) {
     category_id <- category_description <- category_name <- NULL
     
     project_categories_df <- dplyr::tbl(pool, "categories") %>%
         dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
         dplyr::select(
             category_id,
-            category_name
+            category_name, 
+            user_id
         ) %>%
         dplyr::collect()
+    
+    if(!is.null(user) && 
+       !is.null(user$data) && 
+       user$data$codebook_other_modify == 0){
+        project_categories_df <- project_categories_df %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
     
     project_categories <- project_categories_df$category_id
     names(project_categories) <- project_categories_df$category_name
@@ -134,7 +148,8 @@ list_db_categories <- function(id, pool, project_id) {
         dplyr::select(
             category_id,
             category_name,
-            category_description
+            category_description, 
+            user_id
         ) %>%
         dplyr::collect() %>%
         dplyr::bind_cols(tibble::tibble("id" = id))
@@ -166,16 +181,20 @@ create_new_category_UI <- function(id) {
 
 # delete category UI -----
 
-delete_category_UI <- function(id, pool, active_project) {
+delete_category_UI <- function(id, pool, active_project, user) {
+    req(user)
+    categories <- read_db_categories(
+        pool, active_project = active_project, 
+        user = user
+    )
+    
     ns <- NS(id)
     tags$div(
         h4("Delete category"),
         selectizeInput(
             ns("categories_to_del"),
             label = "Select categories to delete",
-            choices = c("", read_db_categories(
-                pool, active_project = active_project
-            )),
+            choices = c("", categories),
             selected = NULL,
             multiple = TRUE,
             options = list(
@@ -277,13 +296,16 @@ delete_category_code_record <- function(pool,
 
 render_category_edges <- function(pool,
                                   active_project,
-                                  category_id) {
+                                  category_id, 
+                                  user) {
     category_edges <- dplyr::tbl(pool, "categories_codes_map") %>%
         dplyr::filter(.data$category_id == .env$category_id) %>%
         dplyr::pull(code_id)
     
     project_codes <- list_db_codes(
-        pool, project_id = active_project
+        pool, 
+        project_id = active_project, 
+        user = user
     ) %>%
         dplyr::filter(code_id %in% category_edges)
     

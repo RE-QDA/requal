@@ -112,13 +112,15 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
 
-      # close start-up pool
-
-      # pool::poolClose(pool)
+      updateSelectInput(session,
+                          "project_selector_load",
+                          choices = existing_projects # global variable obtained on app start
+      )
 
       # create glob$pool if it was not launched previously
-      if (is.null(glob$active_project)) {
-        glob$pool <- pool::dbPool(
+      if (!isTruthy(glob$active_project)) {
+
+          glob$pool <- pool::dbPool(
           drv = RPostgreSQL::PostgreSQL(),
           host = golem::get_golem_options(which = "dbhost"),
           port = golem::get_golem_options(which = "dbport"),
@@ -136,13 +138,30 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
         update_db_schema(glob$pool)
       }
       
-      observeEvent(glob$pool, {
-        updateSelectInput(session,
-                          "project_selector_load",
-                          choices = read_project_db(glob$pool,
-                                                    project_id = NULL
-                          )
-        )
+      # observeEvent(glob$pool, {
+      #   updateSelectInput(session,
+      #                     "project_selector_load",
+      #                     choices = read_project_db(glob$pool,
+      #                                               project_id = NULL
+      #                     )
+      #   )
+      # })
+      
+      observeEvent(glob$user$user_id, {
+        if(isTruthy(glob$user$user_id)){
+          projects <- read_project_db(glob$pool, project_id = NULL)
+          permitted_projects <- dplyr::tbl(glob$pool, "user_permissions") %>% 
+            dplyr::filter(user_id == !!glob$user$user_id) %>% 
+            dplyr::collect()
+          if(!is.null(permitted_projects)){
+            projects <- projects[projects %in% permitted_projects$project_id]
+            updateSelectInput(session,
+                              "project_selector_load",
+                              choices = projects
+            )
+            
+          }
+        }
       })
 
       observeEvent(input$project_load, {
@@ -164,11 +183,11 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             user_name = glob$user$name,
             user_mail = glob$user$mail
           )
-          DBI::dbWriteTable(pool, "users", users_df,
+          DBI::dbWriteTable(glob$pool, "users", users_df,
             append = TRUE, row.names = FALSE
           )
 
-          create_default_user(pool, input$project_selector_load, glob$user$user_id)
+          create_default_user(glob$pool, input$project_selector_load, glob$user$user_id)
         }
 
         loc$active_project <- isolate(
@@ -190,15 +209,11 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
       )
     })
 
-
-
     ####################
     # General setup ####
     ####################
 
     # set active project from load ----
-
-
 
     observeEvent(loc$active_project, {
       glob$active_project <- loc$active_project

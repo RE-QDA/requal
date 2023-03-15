@@ -17,10 +17,12 @@ app_server <- function(input, output, session) {
   )  
 
   observeEvent(auth, {
-      glob$user$name <- auth$user
+      glob$user$user_login <- auth$user
       glob$user$user_id <- as.integer(auth$user_id)
+      glob$user$name <- auth$user_name
+      glob$user$mail <- auth$user_mail
+      glob$user$project_owner <- as.logical(auth$project_owner)
       glob$user$is_admin <- as.logical(auth$admin)
-      glob$user$mail <- "email@example.com" #TODO
   })
         
 
@@ -36,6 +38,9 @@ app_server <- function(input, output, session) {
   mod_project_server("mod_project_ui_1", glob)
   # output: glob$documents
   mod_doc_manager_server("doc_manager_ui_1", glob)
+  # output: no output, permissions and membership written to DB
+  # ---- to prevent manipulation via UI
+  mod_user_manager_server("user_manager_1", glob)
 
   # codebook  ----
   # output: glob$codebook
@@ -50,7 +55,7 @@ app_server <- function(input, output, session) {
   mod_analysis_server("analysis_ui_1", glob)
   mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
-  
+
   # reporting
   mod_reporting_server("reporting_ui_1", glob)
   mod_user_attributes_server("user_attributes_ui_1", glob)

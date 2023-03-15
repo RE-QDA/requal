@@ -108,8 +108,13 @@ mod_analysis_server <- function(id, glob) {
           selected_categories = as.integer(input$category_filter),
           selected_docs = as.integer(input$document_filter)
         )
-
+        
         if (nrow(loc$temp_df) > 0) {
+          if (glob$user$data$analysis_other_view != 1){
+            loc$temp_df <- loc$temp_df %>% 
+              dplyr::filter(user_id == glob$user$user_id)
+          }
+          
           loc$segments_df <- loc$temp_df %>%
             dplyr::left_join(glob$codebook,
               by = "code_id"
@@ -125,7 +130,6 @@ mod_analysis_server <- function(id, glob) {
         }
       }
     )
-
 
     observeEvent(loc$segments_df, {
       if (nrow(loc$segments_df) > 0) {
