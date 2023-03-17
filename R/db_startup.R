@@ -236,7 +236,7 @@ CREATE TABLE if not exists user_permissions (
 ,   analysis_other_view INTEGER    
 ,   report_other_view INTEGER      
 ,   permissions_modify INTEGER
-,   project_owner INTEGER     
+,   project_admin INTEGER     
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
@@ -411,7 +411,7 @@ create_default_user <- function(pool, project_id, user_id) {
       analysis_other_view          = 1,
       report_other_view            = 1,
       permissions_modify           = 1,
-      project_owner                = 1
+      project_admin                = 1
     )
   if (golem::get_golem_options("mode") == "local") {
     user_df <- tibble::tibble(
