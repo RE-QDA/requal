@@ -28,7 +28,6 @@ mod_memo_server <- function(id, glob) {
     memo_list <- reactiveVal()
     output$new_memo_btn <- renderUI({
       req(glob$user$data)
-      # browser()
       if(glob$user$data$memo_modify == 1){
         actionButton(ns("new_memo"), "New memo") 
       }
