@@ -131,8 +131,10 @@ CREATE TABLE if not exists logs
 CREATE TABLE if not exists memos (
     project_id INTEGER
 ,   memo_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   user_id INTEGER
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
 
