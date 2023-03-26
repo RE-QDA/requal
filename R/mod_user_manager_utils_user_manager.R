@@ -69,6 +69,9 @@ add_permissions_record <- function(pool, project_id, user_id) {
     analysis_other_view          = 1,
     report_other_view            = 0,
     permissions_modify           = 0,
+    memo_modify                  = 1, 
+    memo_other_modify            = 0, 
+    memo_other_view              = 1, 
     project_owner                = 0
   )
   res <- DBI::dbWriteTable(pool, "user_permissions", new_users_df, 
@@ -231,7 +234,10 @@ dplyr::case_when(
   , permission == "annotation_other_view"   ~ "Annotations: View others"      
   , permission == "analysis_other_view"     ~ "Analysis: View others"    
   , permission == "report_other_view"       ~ "Report: View others"  
-  , permission == "permissions_modify"      ~ "Permissions: Modify"  
+  , permission == "memo_modify"             ~ "Memos: Modify"
+  , permission == "memo_other_modify"       ~ "Memos: Modify others"
+  , permission == "memo_other_view"         ~ "Memos: View others"
+  , permission == "permissions_modify"      ~ "Permissions: Modify"
 )
 
 }
