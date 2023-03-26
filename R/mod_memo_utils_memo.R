@@ -79,13 +79,6 @@ render_memos <- function(id, memo_df) {
     )
 }
 
-# read specific memo text from db ----
-read_memo_db <- function(pool, memo_id) {
-    memo_text <- dplyr::tbl(pool, "memos") %>%
-        dplyr::filter(.data$memo_id == as.integer(.env$memo_id)) %>%
-        dplyr::pull(text)
-}
-
 # update memo record ------
 
 update_memo_record <- function(pool, project, memo_id, memo_text, user_id) {
