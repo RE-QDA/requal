@@ -27,12 +27,22 @@ mod_memo_server <- function(id, glob) {
 
     memo_list <- reactiveVal()
     output$new_memo_btn <- renderUI({
-        actionButton(ns("new_memo"), "New memo")
+      req(glob$user$data)
+      # browser()
+      if(glob$user$data$memo_modify == 1){
+        actionButton(ns("new_memo"), "New memo") 
+      }
     })
 
     output$memo <- DT::renderDataTable({
       if (isTruthy(glob$active_project)) {
-        memo_list(list_memo_records(glob$pool, glob$active_project))
+        visible_memos <- list_memo_records(glob$pool, glob$active_project)
+        if(glob$user$data$memo_other_view == 0 && nrow(visible_memos) > 0){
+          visible_memos <- visible_memos %>% 
+            dplyr::filter(user_id == glob$user$user_id) 
+        }
+        
+        memo_list(visible_memos) 
         
         DT::datatable(memo_list() %>%
           dplyr::arrange(dplyr::desc(memo_id)) %>%
@@ -73,29 +83,38 @@ mod_memo_server <- function(id, glob) {
         text = req(input$memo_text),
         user_id = glob$user$user_id
       )
-
-      memo_list(list_memo_records(glob$pool, glob$active_project))
+      
+      visible_memos <- list_memo_records(glob$pool, glob$active_project)
+      if(glob$user$data$memo_other_view == 0 && nrow(visible_memos) > 0){
+        visible_memos <- visible_memos %>% 
+          dplyr::filter(user_id == glob$user$user_id) 
+      }
+      memo_list(visible_memos)
 
       removeModal()
     })
 
-
     # Display selected memo -----
     observeEvent(input$selected_memo, {
+      memo <- read_memo_by_id(glob$pool, glob$active_project, input$selected_memo)
+      can_modify <- find_memo_permission(memo$user_id, glob$user)
+      
       showModal(
         modalDialog(
-          title = paste0(memo_list() %>%
-            dplyr::filter(memo_id == as.integer(input$selected_memo)) %>%
-            dplyr::pull(.data$memo_name)),
+          title = memo$memo_name,
           textAreaInput(ns("displayed_memo_text"), "Text",
-            value = read_memo_db(glob$pool, input$selected_memo),
+            value = memo$memo_text,
             width = "100%", height = "100%",
             placeholder = "First 50 characters of the first line will become a searchable title..."
           ) %>% tagAppendAttributes(style = "height: 50vh"),
           footer = tagList(
             modalButton("Close"),
-            actionButton(ns("save_changes"), "Save & Close"),
-            actionButton(ns("delete_memo"), "Delete", class = "btn-danger")
+            if(can_modify){ 
+              list(
+                actionButton(ns("save_changes"), "Save & Close"), 
+                actionButton(ns("delete_memo"), "Delete", class = "btn-danger")  
+              )
+            }
           )
         )
       )
@@ -106,8 +125,13 @@ mod_memo_server <- function(id, glob) {
                          input$selected_memo, req(input$displayed_memo_text),
         user_id = glob$user$user_id
       )
-
-      memo_list(list_memo_records(glob$pool, glob$active_project))
+      
+      visible_memos <- list_memo_records(glob$pool, glob$active_project)
+      if(glob$user$data$memo_other_view == 0 && nrow(visible_memos) > 0){
+        visible_memos <- visible_memos %>% 
+          dplyr::filter(user_id == glob$user$user_id) 
+      }
+      memo_list(visible_memos)
 
       removeModal()
     })
@@ -116,8 +140,13 @@ mod_memo_server <- function(id, glob) {
       delete_memo_record(glob$pool, glob$active_project, input$selected_memo,
         user_id = glob$user$user_id
       )
-
-      memo_list(list_memo_records(glob$pool, glob$active_project))
+      
+      visible_memos <- list_memo_records(glob$pool, glob$active_project)
+      if(glob$user$data$memo_other_view == 0 && nrow(visible_memos) > 0){
+        visible_memos <- visible_memos %>% 
+          dplyr::filter(user_id == glob$user$user_id) 
+      }
+      memo_list(visible_memos)
 
       removeModal()
     })
