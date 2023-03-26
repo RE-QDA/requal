@@ -20,6 +20,7 @@ list_memo_records <- function(pool, project) {
 add_memo_record <- function(pool, project, text, user_id) {
     
     memo_df <- data.frame(project_id = local(project),
+                          user_id = user_id, 
                           text = text)
     
     res <- DBI::dbWriteTable(pool, "memos", memo_df, append = TRUE, row.names = FALSE)
