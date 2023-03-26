@@ -13,6 +13,7 @@ mod_user_attributes_ui <- function(id){
     textOutput(ns("user_message")),
     tableOutput(ns("user_attributes_table")),
     uiOutput(ns("attribute_name_ui")),
+    uiOutput(ns("attribute_type_ui")),
     uiOutput(ns("attribute_values_ui")),
     uiOutput(ns("add_attribute_ui"))
   )
@@ -32,7 +33,7 @@ mod_user_attributes_server <- function(id, glob){
       
       if(!input$attribute_name %in% existing_attributes$attribute_name){
         add_attribute(pool = glob$pool, input$attribute_name,
-                      type = "category", object = "user")
+                      type = input$attribute_type, object = "user")
         
         new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
           dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
@@ -40,16 +41,20 @@ mod_user_attributes_server <- function(id, glob){
           dplyr::collect() %>% 
           dplyr::pull(attribute_id)
         
-        add_attribute_values(pool = glob$pool, 
-                             attribute_id = new_attribute_id, 
-                             attribute_values = input$attribute_values)
+        if(input$attribute_type == "category"){
+          add_attribute_values(pool = glob$pool, 
+                               attribute_id = new_attribute_id, 
+                               attribute_values = input$attribute_values) 
+        }
         
-        log_create_user_attribute(glob$pool, glob$active_project, 
-                                  user_id = glob$user$user_id, 
-                                  attribute_data = list(
-                                    attribute_name = input$attribute_name,
-                                    attribute_id = new_attribute_id, 
-                                    attribute_values = input$attribute_values)) 
+        log_create_user_attribute(
+          glob$pool, glob$active_project, 
+          user_id = glob$user$user_id, 
+          attribute_data = list(
+            attribute_name = input$attribute_name,
+            attribute_id = new_attribute_id, 
+            attribute_values = input$attribute_values)
+        ) 
       }
       
       shinyjs::reset("attribute_name")
@@ -74,11 +79,22 @@ mod_user_attributes_server <- function(id, glob){
       }
     })
     
-    output$attribute_values_ui <- renderUI({
+    output$attribute_type_ui <- renderUI({
       if(glob$user$data$attributes_modify == 1){
-        textAreaInput(ns("attribute_values"), 
-                      label = "Attribute values",
-                      placeholder = "Write possible attribute values separated by comma")
+        selectInput(ns("attribute_type"), 
+                  label = "Attribute type",
+                  choices = c("Categorical"="category", "Numeric"="numeric")) 
+      }
+    })
+    
+    output$attribute_values_ui <- renderUI({
+      req(input$attribute_type)
+      if(glob$user$data$attributes_modify == 1){
+        if(input$attribute_type == "category"){
+          textAreaInput(ns("attribute_values"), 
+                        label = "Attribute values",
+                        placeholder = "Write possible attribute values separated by comma")  
+        }
       }
     })
     
