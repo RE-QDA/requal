@@ -15,6 +15,7 @@ mod_user_attributes_ui <- function(id){
     uiOutput(ns("attribute_name_ui")),
     uiOutput(ns("attribute_type_ui")),
     uiOutput(ns("attribute_values_ui")),
+    uiOutput(ns("attribute_num_range_ui")),
     uiOutput(ns("add_attribute_ui"))
   )
 }
@@ -33,7 +34,10 @@ mod_user_attributes_server <- function(id, glob){
       
       if(!input$attribute_name %in% existing_attributes$attribute_name){
         add_attribute(pool = glob$pool, input$attribute_name,
-                      type = input$attribute_type, object = "user")
+                      type = input$attribute_type, 
+                      min = input$attribute_min, 
+                      max = input$attribute_max,
+                      object = "user")
         
         new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
           dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
@@ -53,7 +57,9 @@ mod_user_attributes_server <- function(id, glob){
           attribute_data = list(
             attribute_name = input$attribute_name,
             attribute_id = new_attribute_id, 
-            attribute_values = input$attribute_values)
+            attribute_values = input$attribute_values, 
+            attribute_min = input$attribute_min, 
+            attribute_max = input$attribute_max)
         ) 
       }
       
@@ -61,8 +67,7 @@ mod_user_attributes_server <- function(id, glob){
       shinyjs::reset("attribute_values")
       
       user_attributes <- read_user_attributes(glob$pool) %>% 
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
+        summarise_user_attributes()
       
       output$user_attributes_table <- renderTable({user_attributes})
     })
@@ -98,6 +103,20 @@ mod_user_attributes_server <- function(id, glob){
       }
     })
     
+    output$attribute_num_range_ui <- renderUI({
+      req(input$attribute_type)
+      if(glob$user$data$attributes_modify == 1){
+        if(input$attribute_type == "numeric"){
+          list(
+            numericInput(ns("attribute_min"), "Minimum (optional):", 
+                         value = NULL, min = -Inf, max = Inf),
+            numericInput(ns("attribute_max"), "Maximum (optional):", 
+                         value = NULL, min = -Inf, max = Inf) 
+          )
+        }
+      }
+    })
+    
     output$add_attribute_ui <- renderUI({
       if(glob$user$data$attributes_modify == 1){
         actionButton(ns("add_attribute"), "Add user attribute")
@@ -106,8 +125,7 @@ mod_user_attributes_server <- function(id, glob){
     
     output$user_attributes_table <- renderTable({
       read_user_attributes(glob$pool) %>% 
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
+        summarise_user_attributes()
     })  
   })
 }

@@ -8,6 +8,8 @@ CREATE TABLE if not exists attributes (
 ,   attribute_name TEXT
 ,   attribute_object TEXT
 ,   attribute_type TEXT
+,   attribute_min INTEGER
+,   attribute_max INTEGER
 ,   user_id INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
