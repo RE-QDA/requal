@@ -54,8 +54,8 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
     purrr::walk(seq_len(nrow(user_attributes_df)), function(x) {
         # Check if attribute has value
         existing_attr <- dplyr::tbl(pool, "attributes_users_map") %>% 
-            dplyr::filter(.data$user_id == !!user_id & 
-                              .data$attribute_id == !!user_attributes_df$attribute_id[x]) %>% 
+            dplyr::filter(.data$user_id == !!user_id &
+                              .data$attribute_id == !!user_attributes_df$attribute_id[x]) %>%
             dplyr::collect()
         
         if(nrow(existing_attr)){
@@ -68,21 +68,23 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
                  WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
                 
                 DBI::dbExecute(pool, update_attributes_sql)
-                log_change_user_attribute(pool, local(project_id), 
-                                          data.frame(
-                                              attribute_id = attr_id, 
+                log_change_user_attribute(pool,
+                                          user_id = user_id,
+                                          project_id = local(project_id),
+                                          user_attribute = data.frame(
+                                              attribute_id = attr_id,
                                               attribute_value_id = attr_value
-                                          ), 
-                                          user_id = user_id)   
+                                          ))
             }
         }else{
             values_df <- user_attributes_df[x,] %>% 
                 dplyr::select(user_id, attribute_id, attribute_value_id)
             DBI::dbWriteTable(pool, "attributes_users_map", 
                               values_df, append = TRUE, row.names = FALSE)
-            log_change_user_attribute(pool, local(project_id), 
-                                      values_df, 
-                                      user_id = user_id)
+            log_change_user_attribute(pool,
+                                      project_id = local(project_id),
+                                      user_id = user_id,
+                                      user_attribute = values_df)
         }
     })
 }
