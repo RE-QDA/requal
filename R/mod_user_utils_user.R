@@ -85,7 +85,8 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
             }
         }else{
             values_df <- user_attributes_df[x,] %>% 
-                dplyr::select(user_id, attribute_id, attribute_value_id)
+                dplyr::select(user_id, attribute_id, 
+                              attribute_value_id, project_id)
             DBI::dbWriteTable(pool, "attributes_users_map", 
                               values_df, append = TRUE, row.names = FALSE)
             log_change_user_attribute(pool,
@@ -96,10 +97,12 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
     })
 }
 
-read_user_attributes_by_id <- function(pool, user_id){
+read_user_attributes_by_id <- function(pool, user_id, project_id){
     dplyr::tbl(pool, "attributes_users_map") %>% 
-        dplyr::filter(.data$user_id == !!user_id) %>% 
-        dplyr::left_join(., dplyr::tbl(pool, "attributes"), by = "attribute_id", 
+        dplyr::filter(.data$user_id == !!user_id & 
+                          .data$project_id == !!as.numeric(project_id)) %>% 
+        dplyr::left_join(., dplyr::tbl(pool, "attributes") %>% dplyr::select(-user_id), 
+                         by = c("attribute_id", "project_id"), 
                          suffix = c(".x", ".y")) %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"), 
                          by = c("attribute_id", "attribute_value_id"), 

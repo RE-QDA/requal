@@ -72,7 +72,8 @@ mod_user_server <- function(id, glob) {
         dplyr::group_by(attribute_name) %>% 
         dplyr::summarise(values = list(value))
       
-      loc$specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = glob$user$user_id)
+      loc$specific_user_attributes <- read_user_attributes_by_id(
+        glob$pool, user_id = glob$user$user_id, project_id = glob$active_project)
       
       showModal(
         modalDialog(
