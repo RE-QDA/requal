@@ -24,20 +24,15 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-
     # module reactive vals ----
-
     loc <- reactiveValues()
     loc$db_path <- NULL
     loc$active_project <- NULL
     loc$doc_list <- NULL
 
-
     ####################
     # General setup ####
     ####################
-
-
 
     ##################
     # Local setup ####
@@ -119,26 +114,14 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         req(input$project_name)
 
         if (!isTruthy(glob$active_project)) {
-          glob$pool <- pool::dbPool(
-            drv = RPostgreSQL::PostgreSQL(),
-            host = golem::get_golem_options(which = "dbhost"),
-            port = golem::get_golem_options(which = "dbport"),
-            dbname = golem::get_golem_options(which = "dbname"),
-            user = golem::get_golem_options(which = "dbusername"),
-            password = golem::get_golem_options(which = "dbpassword")
-          )
-
-          reactive({
-            onStop(function() {
-              pool::poolClose(glob$pool)
-            })
-          })
+          glob$pool <- pool
         }
         
         # user control ----
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-      # create user in db if an uknown project admin logs in
+        
+        # create user in db if an uknown project admin logs in
         if (glob$user$project_owner && !(glob$user$user_id %in% existing_user_id)) {
            user_df <- tibble::tibble(
               user_id = glob$user$user_id,
