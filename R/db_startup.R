@@ -8,8 +8,10 @@ CREATE TABLE if not exists attributes (
 ,   attribute_name TEXT
 ,   attribute_object TEXT
 ,   attribute_type TEXT
+,   project_id INTEGER
 ,   user_id INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
   
@@ -19,9 +21,11 @@ CREATE TABLE if not exists attributes_users_map (
     user_id INTEGER
 ,   attribute_id INTEGER
 ,   attribute_value_id INTEGER 
+,   project_id INTEGER
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
 ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
+,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
   

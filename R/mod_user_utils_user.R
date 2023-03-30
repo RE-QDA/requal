@@ -39,6 +39,8 @@ get_user_attributes_from_modal <- function(input, user_attributes){
 }
 
 update_user_attributes <- function(pool, project_id, user_id, user_attributes_df){
+    project_id <- local(project_id)
+    
     attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
         dplyr::select(attribute_id, attribute_name) %>% 
         dplyr::collect()
@@ -49,12 +51,14 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
     user_attributes_df <- user_attributes_df %>% 
         dplyr::left_join(., attribute_ids, by = "attribute_name") %>% 
         dplyr::left_join(., attribute_values, by = c("attribute_id", "attribute_value"="value")) %>% 
-        dplyr::mutate(user_id = user_id)
+        dplyr::mutate(user_id = user_id, 
+                      project_id = project_id)
     
     purrr::walk(seq_len(nrow(user_attributes_df)), function(x) {
         # Check if attribute has value
         existing_attr <- dplyr::tbl(pool, "attributes_users_map") %>% 
             dplyr::filter(.data$user_id == !!user_id &
+                              .data$project_id == !!as.numeric(project_id) &  
                               .data$attribute_id == !!user_attributes_df$attribute_id[x]) %>%
             dplyr::collect()
         
@@ -63,9 +67,12 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
             attr_value <- user_attributes_df$attribute_value_id[x]
             
             if(existing_attr$attribute_value_id != attr_value){
+                
                 update_attributes_sql <- glue::glue_sql("UPDATE attributes_users_map
                  SET attribute_value_id = {attr_value}
-                 WHERE user_id = {user_id} AND attribute_id = {attr_id}", .con = pool)
+                 WHERE user_id = {user_id} 
+                 AND attribute_id = {attr_id}
+                 AND project_id = {project_id}", .con = pool)
                 
                 DBI::dbExecute(pool, update_attributes_sql)
                 log_change_user_attribute(pool,

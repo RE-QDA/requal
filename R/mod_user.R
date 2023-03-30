@@ -36,7 +36,7 @@ mod_user_server <- function(id, glob) {
         glob$user$data <- loc$user_data
         
         # user attributes ---- 
-        loc$user_attributes <- read_user_attributes(glob$pool) %>%
+        loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>%
           dplyr::group_by(attribute_name) %>% 	
           dplyr::summarise(values = list(value))
         
@@ -68,7 +68,7 @@ mod_user_server <- function(id, glob) {
     # edit user ----
     observeEvent(input$edit_user, {
       
-      loc$user_attributes <- read_user_attributes(glob$pool) %>% 
+      loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
         dplyr::group_by(attribute_name) %>% 
         dplyr::summarise(values = list(value))
       
@@ -112,7 +112,7 @@ mod_user_server <- function(id, glob) {
                      input$user_email
       )
       
-      loc$user_attributes <- read_user_attributes(glob$pool) %>%
+      loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>%
         dplyr::group_by(attribute_name) %>% 	
         dplyr::summarise(values = list(value))
       
