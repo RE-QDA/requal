@@ -122,7 +122,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           dplyr::pull(user_id)
 
         # create user in db if an uknown project admin logs in
-        if (glob$user$project_owner && !(glob$user$user_id %in% existing_user_id)) {
+        if (glob$user$project_admin && !(glob$user$user_id %in% existing_user_id)) {
            user_df <- tibble::tibble(
               user_id = glob$user$user_id,
               user_login = glob$user$user_login,

@@ -411,7 +411,7 @@ create_default_user <- function(pool, project_id, user_id) {
     analysis_other_view          = 1,
     report_other_view            = 1,
     permissions_modify           = 1,
-    project_owner                = 1
+    project_admin                = 1
   )
 
   if (golem::get_golem_options("mode") == "local") {
