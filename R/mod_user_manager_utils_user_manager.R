@@ -5,8 +5,8 @@ disabled_checkbox <- function(inputId, label, value = FALSE, width = NULL){
     inputTag$attribs$checked <- "checked"
   shiny::div(class = "form-group shiny-input-container", 
              style = htmltools::css(width = shiny::validateCssUnit(width)), 
-      shiny::div(class = "checkbox", 
-                 tags$label(inputTag, tags$span(label))))
+             shiny::div(class = "checkbox", 
+                        tags$label(inputTag, tags$span(label))))
 }
 
 # read users from credentials DB ----
@@ -57,7 +57,7 @@ add_permissions_record <- function(pool, project_id, user_id) {
     data_modify                  = 0,
     data_other_modify            = 0,
     data_other_view              = 1,
-    attributes_modify            = 1,
+    attributes_modify            = 0,
     attributes_other_modify      = 0,
     attributes_other_view        = 0,
     codebook_modify              = 0,
@@ -215,8 +215,8 @@ menu_btn2 <- function(..., label, icon) {
 # translate DB names to natural language
 
 translate_permissions <- function(permission){
-
-dplyr::case_when( 
+  
+  dplyr::case_when( 
     permission == "data_modify"             ~ "Data: Modify own"
   , permission == "data_other_modify"       ~ "Data: Modify others"
   , permission == "data_other_view"         ~ "Data: View others"
@@ -232,6 +232,6 @@ dplyr::case_when(
   , permission == "analysis_other_view"     ~ "Analysis: View others"    
   , permission == "report_other_view"       ~ "Report: View others"  
   , permission == "permissions_modify"      ~ "Permissions: Modify"  
-)
-
+  )
+  
 }
