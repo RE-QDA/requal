@@ -6,7 +6,7 @@ credentials <- data.frame(
   user_id = c(1,2,3,4,5,6),
   user_name = c("Administrátor", "Martin H", "Michal S", "Nina F", "Radim H", "Testér"),
   user_mail = "mail@example.com",
-  project_owner = c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
+  project_admin = c(TRUE, TRUE, TRUE, TRUE, TRUE, FALSE),
   stringsAsFactors = FALSE
 )
 # Init the database
