@@ -165,7 +165,7 @@ mod_user_manager_server <- function(id, glob) {
           project_id %in% glob$active_project &
             user_id %in% req(input$members_to_remove)
         ) %>%
-        dplyr::pull(project_owner)
+        dplyr::pull(project_admin)
       if (any(owner_check == 1)) warn_user("Project owners cannot be removed from project.")
       req(all(owner_check == 0))
       remove_permissions_record(

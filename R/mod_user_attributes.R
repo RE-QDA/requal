@@ -25,15 +25,32 @@ mod_user_attributes_server <- function(id, glob){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
+    output$user_attributes_table <- renderTable({
+      read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
+        dplyr::group_by(attribute_name) %>%
+        dplyr::summarise(values = paste0(value, collapse = ", "))
+    })
+    
+    observeEvent(glob$active_project, {
+      # re-render on project change
+      output$user_attributes_table <- renderTable({
+        read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
+          dplyr::group_by(attribute_name) %>%
+          dplyr::summarise(values = paste0(value, collapse = ", "))
+      })
+    })
+    
     observeEvent(input$add_attribute, {
       
       existing_attributes <- dplyr::tbl(glob$pool, "attributes") %>% 
-        dplyr::filter(.data$attribute_object == "user") %>% 
+        dplyr::filter(.data$attribute_object == "user" & 
+                        .data$project_id == !!as.numeric(glob$active_project)) %>% 
         dplyr::collect()
       
       if(!input$attribute_name %in% existing_attributes$attribute_name){
         add_attribute(pool = glob$pool, input$attribute_name,
-                      type = "category", object = "user")
+                      type = "category", object = "user", 
+                      project_id = glob$active_project)
         
         new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
           dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
@@ -45,7 +62,8 @@ mod_user_attributes_server <- function(id, glob){
                              attribute_id = new_attribute_id, 
                              attribute_values = input$attribute_values)
         
-        log_create_user_attribute(glob$pool, glob$active_project, user_id = 1, 
+        log_create_user_attribute(glob$pool, glob$active_project, 
+                                  user_id = glob$user$user_id, 
                                   attribute_data = list(
                                     attribute_name = input$attribute_name,
                                     attribute_id = new_attribute_id, 
@@ -55,7 +73,7 @@ mod_user_attributes_server <- function(id, glob){
       shinyjs::reset("attribute_name")
       shinyjs::reset("attribute_values")
       
-      user_attributes <- read_user_attributes(glob$pool) %>% 
+      user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
         dplyr::group_by(attribute_name) %>%
         dplyr::summarise(values = paste0(value, collapse = ", "))
       
@@ -88,10 +106,5 @@ mod_user_attributes_server <- function(id, glob){
       }
     })
     
-    output$user_attributes_table <- renderTable({
-      read_user_attributes(glob$pool) %>% 
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
-    })  
   })
 }
