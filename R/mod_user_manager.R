@@ -11,7 +11,7 @@ mod_user_manager_ui <- function(id) {
   ns <- NS(id)
   tagList(
     if (golem::get_golem_options("mode") == "server") {
-      div(
+      fluidRow(class = "module_tools",
         menu_btn(
           uiOutput(ns("add_user_ui")),
           label = "Add user",
@@ -24,13 +24,15 @@ mod_user_manager_ui <- function(id) {
           icon = "minus",
           inputId = ns("remove_menu")
         )
-      ) %>% tagAppendAttributes(style = "display: -webkit-inline-box;")
+      ) 
     },
-    tags$h2("Project members"),
+    fluidRow(class = "module_content",
+      tags$h2("Project members"),
     uiOutput(ns("assigned_users")),
     if (golem::get_golem_options("mode") == "server") {
       actionButton(ns("save_permissions"), "Save permissions")
     }
+    )
   )
 }
 
