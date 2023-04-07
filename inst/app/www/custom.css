@@ -123,3 +123,11 @@ width: 100% !important;
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.module_tools {
+  padding-left: 20px;
+  display: -webkit-inline-box;
+}
+.module_content {
+  padding-left: 20px;
+}
