@@ -27,16 +27,11 @@ mod_reporting_ui <- function(id) {
                value = "agree",
                mod_agreement_ui("agreement_ui_1")
       ),
-      tabPanel("Browse coded docs", 
+      tabPanel("Text overlap", 
                id = ns("browser"), 
                value = "browser", 
                mod_browser_ui("browser_ui_1")
       ),
-      tabPanel("User attributes", 
-               id = ns("user_attributes"), 
-               value = "user_attributes", 
-               mod_user_attributes_ui("user_attributes_ui_1")
-      ), 
       tabPanel("Logs",
                id = ns("logs"),
                value = "logs",

@@ -67,7 +67,7 @@ mod_doc_manager_server <- function(id, glob) {
     
     #---Create doc UI --------------
     output$doc_create_ui <- renderUI({
-      create_doc_UI(id) 
+      create_doc_UI(ns(id))
     })
     outputOptions(output, "doc_create_ui", suspendWhenHidden = FALSE)
     

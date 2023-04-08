@@ -80,6 +80,10 @@ shinydashboard::tabItems(
     
     shinydashboard::tabItem("Project",
             mod_project_ui("mod_project_ui_1")),
+    shinydashboard::tabItem("Data",
+            mod_data_ui("data_1")),
+    shinydashboard::tabItem("Attributes",
+            mod_attributes_ui("attributes_1")),
     shinydashboard::tabItem("Codebook",
             mod_codebook_ui("codebook_ui_1")),
     shinydashboard::tabItem("Document",
@@ -109,17 +113,27 @@ set_left_menu <- function() {
                              icon = icon("book")
                          ),
                          shinydashboard::menuItem(
+                             "Data",
+                             tabName = "Data",
+                             icon = icon("database")
+                         ),
+                        shinydashboard::menuItem(
+                             "Attributes",
+                             tabName = "Attributes",
+                             icon = icon("table")
+                         ),
+                         shinydashboard::menuItem(
                              "Codebook",
                              tabName = "Codebook",
                              icon = icon("code")
                          ),
                          shinydashboard::menuItem(
-                             "Workdesk",
+                             "Annotate",
                              tabName = "Document",
                              icon = icon("marker")
                          ),
                          shinydashboard::menuItem(
-                             "Analysis",
+                             "Analyze",
                              tabName = "Analysis",
                              icon = icon("microscope")
                          ),
