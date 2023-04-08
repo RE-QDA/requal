@@ -109,3 +109,34 @@ read_user_attributes_by_id <- function(pool, user_id, project_id){
                          suffix = c(".x", ".y")) %>% 
         dplyr::collect()
 }
+
+transform_user_table <- function(user_table) {
+user_table %>%
+  dplyr::mutate(across(-c(user_id, created_at, user_mail, user_name, user_login), 
+        .fn = function(x) {
+          ifelse(x == 1, 
+          '&#x25CF;', 
+          '&#x25CB;')
+        })) %>%
+        tidyr::unite("Data", tidyselect::starts_with("data"), sep = "") %>%
+        tidyr::unite("Attributes", tidyselect::starts_with("attributes"), sep = "") %>%
+        tidyr::unite("Codebook", tidyselect::starts_with("codebook"), sep = "") %>%
+        tidyr::unite("Annotate", tidyselect::starts_with("annotation"), sep = "") %>%
+        tidyr::unite("Analyze", tidyselect::starts_with("analysis"), sep = "") %>%
+        tidyr::unite("Report", tidyselect::starts_with("report"), sep = "") %>%
+        dplyr::mutate(created_at = format(
+          strptime(created_at, format = "%Y-%m-%d %H:%M:%S"),
+          format = "%Y-%m-%d %H:%M")
+         ) %>%
+        dplyr::select(
+          "Login" = user_login,
+          "Name"  = user_name,
+          "Mail"  = user_mail,
+          "Data",
+          "Attributes",
+          "Annotate",
+          "Analyze",
+          "Report",
+          "Created" = created_at
+          )
+}
