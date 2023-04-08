@@ -2,6 +2,7 @@
 
 create_doc_UI <- function(id) {
     ns <- NS(id)
+   
     tags$div(
         h4("Create document"),
         textInput(ns("doc_name"), 

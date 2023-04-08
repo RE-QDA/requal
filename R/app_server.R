@@ -38,11 +38,17 @@ app_server <- function(input, output, session) {
 
   # documents  ----
   mod_project_server("mod_project_ui_1", glob)
-  # output: glob$documents
-  mod_doc_manager_server("doc_manager_ui_1", glob)
   # output: no output, permissions and membership written to DB
   # ---- to prevent manipulation via UI
   mod_user_manager_server("user_manager_1", glob)
+  
+  # data ----
+  mod_data_server("data_1", glob)
+ 
+
+  # attributes ----
+  mod_attributes_server("attributes_1", glob)
+
 
   # codebook  ----
   # output: glob$codebook
@@ -60,7 +66,6 @@ app_server <- function(input, output, session) {
 
   # reporting
   mod_reporting_server("reporting_ui_1", glob)
-  mod_user_attributes_server("user_attributes_ui_1", glob)
   mod_agreement_server("agreement_ui_1", glob)
   mod_browser_server("browser_ui_1", glob)
   mod_summary_server("summary_ui_1", glob)

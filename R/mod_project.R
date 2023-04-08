@@ -29,9 +29,8 @@ mod_project_server <- function(id, glob) {
             tabsetPanel(
               id = "project_tabs",
               tabPanel(
-                "Manage documents",
-                mod_doc_manager_ui("doc_manager_ui_1"),
-                value = "doc_manager_tab"
+                "Project info",
+                value = "project_info_tab"
               ),
               tabPanel(
                 "Manage users",
