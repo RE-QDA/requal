@@ -96,7 +96,12 @@ remove_permissions_record <- function(pool, project_id, user_id) {
 
 # modify permissions for project
 modify_permissions_record <- function(pool, project_id, permissions_df) {
-  
+  permissions_df <- permissions_df %>%
+      dplyr::select(-c(project_admin, user_login, user_name, created_at, user_mail, project_id)) %>%
+      tidyr::pivot_longer(-user_id, 
+      names_to = "permission",
+      values_to = "value"
+      )
   update_user_permissions_sql <- glue::glue_sql("UPDATE user_permissions
                  SET {`permissions_df$permission`} = {permissions_df$value}
                  WHERE user_id = {permissions_df$user_id}
@@ -193,6 +198,33 @@ remove_user_UI <- function(id) {
   )
 }
 
+# modify_permissions_UI ----
+modify_permissions_UI <- function(id) {
+  ns <- NS(id)
+  tags$div(
+    h4("Modify user permissions for project"),
+    shinyWidgets::pickerInput(ns("members_permissions"), "Select users:",
+      choices = "", multiple = TRUE,
+      options = list(
+        `actions-box` = TRUE,
+        `select-all-text` = "Select all",
+        `deselect-all-text` = "Reset",
+        `none-selected-text` = "Users to change permissions"
+      )
+    ),
+    checkboxGroupInput(
+      ns("permissions_list"),
+      label = NULL,
+      choices = stats::setNames(
+          permission(),
+          translate_permissions(permission())
+          )
+    ),
+    actionButton(ns("save_permissions"), "Save permissions") %>% 
+      tagAppendAttributes(style = "text-align: left;")
+  )
+}
+
 # menu button 2 ----
 menu_btn2 <- function(..., label, icon) {
   
@@ -212,6 +244,25 @@ menu_btn2 <- function(..., label, icon) {
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
+permission <- function() {
+  c(
+"data_modify"          ,  
+"data_other_modify"      ,
+"data_other_view"        ,
+"attributes_modify"      ,
+"attributes_other_modify",
+"attributes_other_view"  ,
+"codebook_modify"        ,
+"codebook_other_modify"  ,
+"codebook_other_view"    ,
+"annotation_modify"      ,
+"annotation_other_modify",
+"annotation_other_view"  ,
+"analysis_other_view"    ,
+"report_other_view"      ,
+"permissions_modify"     
+)
+}
 # translate DB names to natural language
 
 translate_permissions <- function(permission){

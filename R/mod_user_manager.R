@@ -23,16 +23,19 @@ mod_user_manager_ui <- function(id) {
           label = "Remove user",
           icon = "minus",
           inputId = ns("remove_menu")
+        ),
+        menu_btn(
+          uiOutput(ns("modify_permissions_ui")),
+          label = "Modify permissions",
+          icon = "lock",
+          inputId = ns("modify_permissions")
         )
       ) 
     },
     fluidRow(class = "module_content",
-      tags$h2("Project members"),
-    DT::DTOutput(ns("assigned_users")),
-    if (golem::get_golem_options("mode") == "server") {
-      actionButton(ns("save_permissions"), "Save permissions")
-    }
-    )
+      tags$h2("Project members"), tags$br(),
+      DT::DTOutput(ns("assigned_users"))
+  )
   )
 }
 
@@ -70,43 +73,14 @@ mod_user_manager_server <- function(id, glob) {
     output$assigned_users <- DT::renderDataTable(server = FALSE, {
       if (golem::get_golem_options("mode") == "server") {
         loc$users_display <- loc$users_permissions_df %>%
-        dplyr::mutate(across(-c(user_id, created_at, user_mail, user_name, user_login), 
-        .fn = function(x) {
-          ifelse(x == 1, '<i class="fa fa-check"></i>', '<i class="fa fa-cross"></i>')
-        })) %>%
-        tidyr::unite("Data", tidyselect::starts_with("data")) %>%
-        tidyr::unite("Attributes", tidyselect::starts_with("attributes")) %>%
-        tidyr::unite("Codebook", tidyselect::starts_with("codebook")) %>%
-        tidyr::unite("Annotation", tidyselect::starts_with("annotation")) %>%
-        tidyr::unite("Report", tidyselect::starts_with("report")) %>%
-        dplyr::select(
-          "Login" = user_login,
-          "Name"  = user_name,
-          "Mail"  = user_mail,
-          "Data",
-          "Attributes"
-          )
+        transform_user_table()
           
   
       DT::datatable(
       loc$users_display,
       escape = FALSE, # To allow the rendering of HTML elements
-      options = list(
-        paging = FALSE,
-        searching = FALSE,
-        ordering = FALSE,
-        columnDefs = list(
-          list(targets = 1, render = DT::JS("function(data, type, row, meta) {
-            return '<input type=\"checkbox\" class=\"row-checkbox\" value=\"' + meta.row + '\" ' + (data ? 'checked' : '') + '>';
-          }")),
-          list(targets = 2, className = "dt-center"),
-          list(targets = 3, className = "dt-center")
-        )
-      ),
-      callback = DT::JS("table.on('change', '.row-checkbox', function() {
-        table.cell($(this).closest('td')).data(this.checked);
-      });")
-    )
+      rownames = FALSE
+      )
 
     
         #gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
@@ -121,17 +95,20 @@ mod_user_manager_server <- function(id, glob) {
         glob$user$data$permissions_modify,
         "Missing permission to modify permissions."
       )
-      loc$users_permissions_long <- loc$users_permissions_long %>%
-        dplyr::mutate(value = purrr::map2_int(user_id, permission,
-          .f = function(user_id, permission) {
-            input[[paste(user_id, permission, sep = "_")]]
-          }
-        ))
+
+      modified_permissions_df <- loc$users_permissions_df %>%
+      dplyr::filter(user_id %in% input$members_permissions) %>%
+      dplyr::mutate(across(matches("modify|view"), .fns = function(x) {
+        x  <- 0 # reset permissions
+      })) %>%
+      dplyr::mutate(across(all_of(input$permissions_list), .fns = function(x) {
+        x  <- 1 # apply new permissions
+      }))
 
       modify_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        permissions_df = loc$users_permissions_long
+        permissions_df = modified_permissions_df
       )
       loc$users_permissions_df <- get_user_permissions(
         glob$pool,
@@ -229,6 +206,19 @@ mod_user_manager_server <- function(id, glob) {
           loc$users_permissions_df$user_name
         ))
       )
+
+      # display users permissions
+      shinyWidgets::updatePickerInput(
+        session = session,
+        "members_permissions",
+        choices = stats::setNames(
+          loc$users_permissions_df$user_id,
+          loc$users_permissions_df$user_name
+          )
+      )
+      
+
+      
     })
 
     # Add user UI =======================================================
@@ -242,6 +232,12 @@ mod_user_manager_server <- function(id, glob) {
       remove_user_UI(id)
     })
     outputOptions(output, "remove_user_ui", suspendWhenHidden = FALSE)
+   
+   # Modify permissions UI =======================================================
+    output$modify_permissions_ui <- renderUI({
+      modify_permissions_UI(id)
+    })
+    outputOptions(output, "modify_permissions_ui", suspendWhenHidden = FALSE)
 
 
     # hide save permission UI from users without sufficient permission ======
@@ -254,6 +250,7 @@ mod_user_manager_server <- function(id, glob) {
       {
         input$add_menu
         input$remove_menu
+        input$modify_permissions
         loc$permissions_modify
       },
       {
