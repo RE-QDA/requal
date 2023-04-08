@@ -28,7 +28,7 @@ mod_user_manager_ui <- function(id) {
     },
     fluidRow(class = "module_content",
       tags$h2("Project members"),
-    uiOutput(ns("assigned_users")),
+    DT::DTOutput(ns("assigned_users")),
     if (golem::get_golem_options("mode") == "server") {
       actionButton(ns("save_permissions"), "Save permissions")
     }
@@ -67,27 +67,49 @@ mod_user_manager_server <- function(id, glob) {
     })
 
     # render project members =======================================================
-    output$assigned_users <- renderUI({
+    output$assigned_users <- DT::renderDataTable(server = FALSE, {
       if (golem::get_golem_options("mode") == "server") {
-        loc$users_permissions_long <- loc$users_permissions_df %>%
-          # dplyr::select(-permissions_modify) %>%
-          dplyr::select(user_id, tidyselect::matches("view|modify")) %>%
-          tidyr::pivot_longer(
-            -user_id,
-            names_to = "permission",
-            values_to = "value"
+        loc$users_display <- loc$users_permissions_df %>%
+        dplyr::mutate(across(-c(user_id, created_at, user_mail, user_name, user_login), 
+        .fn = function(x) {
+          ifelse(x == 1, '<i class="fa fa-check"></i>', '<i class="fa fa-cross"></i>')
+        })) %>%
+        tidyr::unite("Data", tidyselect::starts_with("data")) %>%
+        tidyr::unite("Attributes", tidyselect::starts_with("attributes")) %>%
+        tidyr::unite("Codebook", tidyselect::starts_with("codebook")) %>%
+        tidyr::unite("Annotation", tidyselect::starts_with("annotation")) %>%
+        tidyr::unite("Report", tidyselect::starts_with("report")) %>%
+        dplyr::select(
+          "Login" = user_login,
+          "Name"  = user_name,
+          "Mail"  = user_mail,
+          "Data",
+          "Attributes"
           )
-        # create nested df for nested UI
-        users_permissions_nested <- loc$users_permissions_long %>%
-          dplyr::mutate(user_id_copy = user_id) %>%
-          tidyr::nest(data = -user_id_copy) %>%
-          dplyr::inner_join(loc$users_permissions_df,
-            by = c("user_id_copy" = "user_id")
-          ) %>%
-          dplyr::filter(!duplicated(user_id_copy))
+          
+  
+      DT::datatable(
+      loc$users_display,
+      escape = FALSE, # To allow the rendering of HTML elements
+      options = list(
+        paging = FALSE,
+        searching = FALSE,
+        ordering = FALSE,
+        columnDefs = list(
+          list(targets = 1, render = DT::JS("function(data, type, row, meta) {
+            return '<input type=\"checkbox\" class=\"row-checkbox\" value=\"' + meta.row + '\" ' + (data ? 'checked' : '') + '>';
+          }")),
+          list(targets = 2, className = "dt-center"),
+          list(targets = 3, className = "dt-center")
+        )
+      ),
+      callback = DT::JS("table.on('change', '.row-checkbox', function() {
+        table.cell($(this).closest('td')).data(this.checked);
+      });")
+    )
 
-        # generated user boxes with nested permissions
-        gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
+    
+        #gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
       } else {
         "Local version of reQual does not support multiple users."
       }

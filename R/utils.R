@@ -359,3 +359,17 @@ filter_view <- function(df, user_id, permission) {
      df
   }
 }
+
+# DT options
+
+dt_options <- function() {
+  list(
+          paging = TRUE,
+          searching = TRUE,
+          fixedColumns = TRUE,
+          autoWidth = TRUE,
+          ordering = TRUE,
+          dom = "lfrtpBi",
+          buttons = c("csv")
+        )
+}

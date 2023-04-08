@@ -94,15 +94,7 @@ mod_reporting_server <- function(id, glob) {
         req(loc$logs_df),
         filter = "top",
         extensions = c("Buttons"),
-        options = list(
-          paging = TRUE,
-          searching = TRUE,
-          fixedColumns = TRUE,
-          autoWidth = TRUE,
-          ordering = TRUE,
-          dom = "lfrtpBi",
-          buttons = c("csv")
-        ),
+        options = dt_options(),
         class = "display"
       )
     })
