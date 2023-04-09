@@ -9,23 +9,32 @@
 #' @importFrom shiny NS tagList
 mod_doc_manager_ui <- function(id) {
   ns <- NS(id)
-
-  fluidRow(
-    tags$style(".shiny-file-input-progress {display: none}"),
-    column(
-      width = 10,
-      br(),
-      htmlOutput(ns("project_name")),
-      uiOutput(ns("no_active_project")),
-      tags$div(
+tagList(
+ fluidRow(class = "module_tools",
+        mod_rql_button_ui(ns("create_doc"), 
+        label = "Create document", 
+        icon = "plus"),
+          menu_btn(
+            uiOutput(ns("doc_upload_ui")),
+            label =  "Upload file",
+            icon = "upload"
+          ),
+          menu_btn(
+            uiOutput(ns("doc_delete_ui")),
+            label =  "Delete document",
+            icon = "minus"
+          ),
+      ),
+    fluidRow(class = "module_content",
+        tags$style(".shiny-file-input-progress {display: none}"),
+        tags$h2("List of project documents"), 
+          tags$div(
         tableOutput(ns("doc_list_table"))
       ) %>%
         tagAppendAttributes(class = "scrollable90")
-    ),
-    # menu
-    
-    uiOutput(ns("doc_mgmt_ui"))
-  )
+    )
+    )
+
 }
 
 #' doc_manager Server Functions
@@ -42,60 +51,49 @@ mod_doc_manager_server <- function(id, glob) {
       } 
     })
 
-    output$doc_mgmt_ui <- renderUI({
-      if(glob$user$data$data_modify == 1){
-        menu_column(
-          width = 2,
-          menu_btn(
-            uiOutput(ns("doc_create_ui")),
-            label = "Create document",
-            icon = "plus"
-          ),
-          menu_btn(
-            uiOutput(ns("doc_upload_ui")),
-            label =  "Upload file",
-            icon = "upload"
-          ),
-          menu_btn(
-            uiOutput(ns("doc_delete_ui")),
-            label =  "Delete document",
-            icon = "minus"
-          )
-        )
-      }
-    })
+   
+  #  # handle permissions
+  #     if(glob$user$data$data_modify == 1){
+      
+  #     }
+   
     
     #---Create doc UI --------------
-    output$doc_create_ui <- renderUI({
-      create_doc_UI(ns(id))
-    })
-    outputOptions(output, "doc_create_ui", suspendWhenHidden = FALSE)
-    
-    #---Upload doc UI --------------
-    output$doc_upload_ui <- renderUI({
-      upload_doc_UI(id)
-    })
-    outputOptions(output, "doc_upload_ui", suspendWhenHidden = FALSE)
-    
-    #---Delete doc UI --------------
-    output$doc_delete_ui <- renderUI({
-      req(glob$active_project)
-      delete_doc_UI(id, glob)
-    })
-    outputOptions(output, "doc_delete_ui", suspendWhenHidden = FALSE)
-    
+    mod_rql_button_server(
+    id = "create_doc",
+    "Create document",
+    tagList(
+        textInput(ns("doc_name"), 
+                  label = "Document name", 
+                  placeholder = "Short name") %>%
+            tagAppendAttributes(class = "required"),
+        
+        textAreaInput(ns("doc_description"), 
+                      label = "Document description", 
+                      placeholder = "Description"),
+        
+        textAreaInput(ns("doc_text"), 
+                      label = "Document content", 
+                      placeholder = "Paste the new document content here") %>%
+            tagAppendAttributes(class = "required"),
+        
+        actionButton(ns("doc_add"), 
+                     label = "Create document")
+    )
+    )
+
+ 
 # list documents initially ----
     observeEvent(glob$active_project, {
       output$project_name <- renderText({
         paste(tags$b("Active project:"), names(glob$active_project))
       })
 
-      doc_startup <- list_db_documents(
+      glob$documents <- list_db_documents(
         pool = glob$pool,
         active_project = glob$active_project, 
         user = glob$user
       )
-      glob$documents <- doc_startup
 
       output$doc_list_table <- make_doc_table(
         glob,
@@ -112,7 +110,7 @@ mod_doc_manager_server <- function(id, glob) {
     # observe documents actions ----
     # document input ----
     observeEvent(input$doc_add, {
-      
+      print("x")
       if ((!req(input$doc_name) %in% c("", names(glob$documents))) &
         isTruthy(input$doc_text)) {
         add_input_document(
