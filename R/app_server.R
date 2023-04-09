@@ -44,7 +44,7 @@ app_server <- function(input, output, session) {
   
   # data ----
   mod_data_server("data_1", glob)
- 
+
 
   # attributes ----
   mod_attributes_server("attributes_1", glob)

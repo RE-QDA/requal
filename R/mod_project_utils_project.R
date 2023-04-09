@@ -80,10 +80,8 @@ list_db_projects <- function(pool) {
 list_db_documents <- function(pool, active_project, user) {
   doc_id <- doc_name <- NULL
 
-  active_project <- as.integer(active_project)
-
   project_documents <- dplyr::tbl(pool, "documents") %>%
-    dplyr::filter(.data$project_id == .env$active_project) %>%
+    dplyr::filter(.data$project_id == as.integer(active_project)) %>%
     dplyr::select(.data$doc_id, .data$doc_name, .data$user_id) %>%
     dplyr::collect() %>%
     dplyr::mutate(doc_name = ifelse(is.na(doc_name), "", doc_name))
