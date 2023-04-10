@@ -24,7 +24,7 @@ mod_rql_button_ui <- function(id, label, icon, inputId = NULL){
     width = "370px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
     right = FALSE,
-    inputId = inputId
+    inputId = ifelse(is.null(inputId), paste0(id, "-rql_button_id"), inputId)
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 
   )
@@ -33,11 +33,22 @@ mod_rql_button_ui <- function(id, label, icon, inputId = NULL){
 #' rql_button Server Functions
 #'
 #' @noRd 
-mod_rql_button_server <- function(id, custom_title, custom_tagList){
+mod_rql_button_server <- function(id, custom_title, custom_tagList, glob = NULL, permission = TRUE){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    output$rql_button <- renderUI({
+    
+
+  output$rql_button <- renderUI({
+    # We provide default permission as TRUE
+    # this way we have to opt-in into permission checks
+    # otherwise the module just creates menu buttons
+    if (!is.logical(permission)) {
+    req(glob$active_project)
+    validate(
+      need(glob$user$data[[permission]] == TRUE, 'Insufficent permission.')
+    )
+    }
     tags$div(
         h4(custom_title),
         custom_tagList

@@ -9,32 +9,32 @@
 #' @importFrom shiny NS tagList
 mod_doc_manager_ui <- function(id) {
   ns <- NS(id)
-tagList(
- fluidRow(class = "module_tools",
-        mod_rql_button_ui(ns("create_doc"), 
-        label = "Create document", 
-        icon = "plus"),
-          menu_btn(
-            uiOutput(ns("doc_upload_ui")),
-            label =  "Upload file",
-            icon = "upload"
-          ),
-          menu_btn(
-            uiOutput(ns("doc_delete_ui")),
-            label =  "Delete document",
-            icon = "minus"
-          ),
+  tagList(
+    fluidRow(
+      class = "module_tools",
+      mod_rql_button_ui(ns("doc_create_ui"),
+        label = "Create document",
+        icon = "plus"
       ),
-    fluidRow(class = "module_content",
-        tags$style(".shiny-file-input-progress {display: none}"),
-        tags$h2("List of project documents"), 
-          tags$div(
+      mod_rql_button_ui(ns("doc_upload_ui"),
+        label = "Upload file",
+        icon = "upload"
+      ),
+      mod_rql_button_ui(ns("doc_delete_ui"),
+        label = "Delete document",
+        icon = "minus"
+      ),
+    ),
+    fluidRow(
+      class = "module_content",
+      tags$style(".shiny-file-input-progress {display: none}"),
+      tags$h2("List of project documents"),
+      tags$div(
         tableOutput(ns("doc_list_table"))
       ) %>%
         tagAppendAttributes(class = "scrollable90")
     )
-    )
-
+  )
 }
 
 #' doc_manager Server Functions
@@ -48,42 +48,45 @@ mod_doc_manager_server <- function(id, glob) {
     output$no_active_project <- renderUI({
       if (is.null(glob$active_project)) {
         "No active project."
-      } 
+      }
     })
 
-   
-  #  # handle permissions
-  #     if(glob$user$data$data_modify == 1){
-      
-  #     }
-   
-    
+
+    #  # handle permissions
+    #     if(glob$user$data$data_modify == 1){
+
+    #     }
+
+
     #---Create doc UI --------------
     mod_rql_button_server(
-    id = "create_doc",
-    "Create document",
-    tagList(
-        textInput(ns("doc_name"), 
-                  label = "Document name", 
-                  placeholder = "Short name") %>%
-            tagAppendAttributes(class = "required"),
-        
-        textAreaInput(ns("doc_description"), 
-                      label = "Document description", 
-                      placeholder = "Description"),
-        
-        textAreaInput(ns("doc_text"), 
-                      label = "Document content", 
-                      placeholder = "Paste the new document content here") %>%
-            tagAppendAttributes(class = "required"),
-        
-        actionButton(ns("doc_add"), 
-                     label = "Create document")
-    )
+      id = "doc_create_ui",
+      custom_title = "Create document",
+      custom_tagList = create_doc_UI(ns = ns),
+      glob,
+      permission = "data_modify"
     )
 
- 
-# list documents initially ----
+    #---Upload doc UI --------------
+    mod_rql_button_server(
+      id = "doc_upload_ui",
+      custom_title = "Upload file",
+      custom_tagList = upload_doc_UI(ns = ns),
+      glob,
+      permission = "data_modify"
+    )
+
+    #---Delete doc UI --------------
+    mod_rql_button_server(
+      id = "doc_delete_ui",
+      custom_title = "Delete document",
+      custom_tagList = delete_doc_UI(ns = ns, glob),
+      glob,
+      permission = "data_modify"
+    )
+
+
+    # list documents initially ----
     observeEvent(glob$active_project, {
       output$project_name <- renderText({
         paste(tags$b("Active project:"), names(glob$active_project))
@@ -91,7 +94,7 @@ mod_doc_manager_server <- function(id, glob) {
 
       glob$documents <- list_db_documents(
         pool = glob$pool,
-        active_project = glob$active_project, 
+        active_project = glob$active_project,
         user = glob$user
       )
 
@@ -110,7 +113,6 @@ mod_doc_manager_server <- function(id, glob) {
     # observe documents actions ----
     # document input ----
     observeEvent(input$doc_add, {
-      print("x")
       if ((!req(input$doc_name) %in% c("", names(glob$documents))) &
         isTruthy(input$doc_text)) {
         add_input_document(
@@ -118,7 +120,7 @@ mod_doc_manager_server <- function(id, glob) {
           project = glob$active_project,
           doc_name = input$doc_name,
           doc_text = input$doc_text,
-          doc_description = input$doc_description, 
+          doc_description = input$doc_description,
           user_id = glob$user$user_id
         )
 
@@ -129,7 +131,7 @@ mod_doc_manager_server <- function(id, glob) {
 
         glob$documents <- list_db_documents(
           pool = glob$pool,
-          active_project = glob$active_project, 
+          active_project = glob$active_project,
           user = glob$user
         )
 
@@ -169,7 +171,7 @@ mod_doc_manager_server <- function(id, glob) {
       # update reactive value containing project documents
       glob$documents <- list_db_documents(
         pool = glob$pool,
-        active_project = glob$active_project, 
+        active_project = glob$active_project,
         user = glob$user
       )
 
@@ -213,7 +215,7 @@ mod_doc_manager_server <- function(id, glob) {
             project = glob$active_project,
             doc_name = doc_name_parsed,
             doc_text = doc_upload_text,
-            doc_description = input$doc_upload_description, 
+            doc_description = input$doc_upload_description,
             user_id = glob$user$user_id
           )
 
@@ -224,7 +226,7 @@ mod_doc_manager_server <- function(id, glob) {
 
           glob$documents <- list_db_documents(
             pool = glob$pool,
-            active_project = glob$active_project, 
+            active_project = glob$active_project,
             user = glob$user
           )
 
