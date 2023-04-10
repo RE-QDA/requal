@@ -1,36 +1,27 @@
 # create doc UI -----
 
-create_doc_UI <- function(id) {
-    ns <- NS(id)
-   
+create_doc_UI <- function(ns) {
     tags$div(
-        h4("Create document"),
         textInput(ns("doc_name"), 
                   label = "Document name", 
                   placeholder = "Short name") %>%
             tagAppendAttributes(class = "required"),
-        
         textAreaInput(ns("doc_description"), 
                       label = "Document description", 
                       placeholder = "Description"),
-        
         textAreaInput(ns("doc_text"), 
                       label = "Document content", 
                       placeholder = "Paste the new document content here") %>%
             tagAppendAttributes(class = "required"),
-        
         actionButton(ns("doc_add"), 
                      label = "Create document")
-        
     ) %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # upload doc UI -----
 
-upload_doc_UI <- function(id) {
-    ns <- NS(id)
+upload_doc_UI <- function(ns) {
     tags$div(
-        h4("Upload file"),
         textInput(ns("doc_upload_name"), label = "Document name", placeholder = "Optional filename replacement"),
         textAreaInput(ns("doc_upload_description"), label = "Document description", placeholder = "Description"),
         fileInput(ns("doc_path"), NULL,
@@ -53,10 +44,8 @@ upload_doc_UI <- function(id) {
 
 # delete doc UI -----
 
-delete_doc_UI <- function(id, glob) {
-    ns <- NS(id)
+delete_doc_UI <- function(ns, glob) {
     tags$div(
-        h4("Delete document"),
         selectizeInput(ns("doc_delete_list"),
                        label = "Remove selected documents from project",
                        choices = list_db_documents(
