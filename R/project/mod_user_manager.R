@@ -12,24 +12,21 @@ mod_user_manager_ui <- function(id) {
   tagList(
     if (golem::get_golem_options("mode") == "server") {
       fluidRow(class = "module_tools",
-        menu_btn(
-          uiOutput(ns("add_user_ui")),
-          label = "Add user",
-          icon = "plus",
-          inputId = ns("add_menu")
-        ),
-        menu_btn(
-          uiOutput(ns("remove_user_ui")),
-          label = "Remove user",
-          icon = "minus",
-          inputId = ns("remove_menu")
-        ),
-        menu_btn(
-          uiOutput(ns("modify_permissions_ui")),
-          label = "Modify permissions",
-          icon = "lock",
-          inputId = ns("modify_permissions")
-        )
+      mod_rql_button_ui(ns("add_user_ui"),
+        label = "Add user",
+        icon = "minus",
+        inputId = ns("add_menu")
+      ),
+      mod_rql_button_ui(ns("remove_user_ui"),
+        label = "Remove user",
+        icon = "plus",
+        inputId = ns("remove_menu")
+      ),
+      mod_rql_button_ui(ns("modify_permissions_ui"),
+        label = "Modify permissions",
+        icon = "lock",
+        inputId = ns("modify_permissions")
+      )
       ) 
     },
     fluidRow(class = "module_content",
