@@ -56,7 +56,7 @@ merge_code_UI <- function(id, pool, project, user) {
         selectInput(
             ns("merge_to"),
             label = "Merge into",
-            choices = c("",  stats::setNames(codes$code_id, codes$code_name)),
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
             selected = "",
             multiple = FALSE
         ),
@@ -89,7 +89,7 @@ delete_code_UI <- function(id, pool, project, user) {
         selectizeInput(
             ns("code_to_del"),
             label = "Select codes to delete",
-            choices =  stats::setNames(codes$code_id, codes$code_name),
+            choices = stats::setNames(codes$code_id, codes$code_name),
             selected = NULL,
             multiple = TRUE,
             options = list(

@@ -36,7 +36,7 @@ mod_user_server <- function(id, glob) {
         glob$user$data <- loc$user_data
         
         # user attributes ---- 
-        loc$user_attributes <- read_user_attributes(glob$pool) %>%
+        loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>%
           dplyr::group_by(attribute_name) %>% 	
           dplyr::summarise(values = list(value))
         
@@ -68,11 +68,12 @@ mod_user_server <- function(id, glob) {
     # edit user ----
     observeEvent(input$edit_user, {
       
-      loc$user_attributes <- read_user_attributes(glob$pool) %>% 
+      loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
         dplyr::group_by(attribute_name) %>% 
         dplyr::summarise(values = list(value))
       
-      loc$specific_user_attributes <- read_user_attributes_by_id(glob$pool, user_id = glob$user$user_id)
+      loc$specific_user_attributes <- read_user_attributes_by_id(
+        glob$pool, user_id = glob$user$user_id, project_id = glob$active_project)
       
       showModal(
         modalDialog(
@@ -112,18 +113,19 @@ mod_user_server <- function(id, glob) {
                      input$user_email
       )
       
-      loc$user_attributes <- read_user_attributes(glob$pool) %>%
+      loc$user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>%
         dplyr::group_by(attribute_name) %>% 	
         dplyr::summarise(values = list(value))
-     
-     if (nrow(loc$user_attributes) > 0) {
-      loc$user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
-      update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, loc$user_attr_values_df)
+      
+      if (nrow(loc$user_attributes) > 0) {
+        loc$user_attr_values_df <- get_user_attributes_from_modal(input, loc$user_attributes$attribute_name)
+        update_user_attributes(glob$pool, glob$active_project, user_id = glob$user$user_id, loc$user_attr_values_df)
       }
+      
       loc$user_data <- read_user_db(glob$pool, user_id = glob$user$user_id, glob$active_project)
       removeModal()
       
-      glob$user <- loc$user_data
+      glob$user$data <- loc$user_data
     })
   })
 }

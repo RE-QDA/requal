@@ -4,7 +4,8 @@ add_attribute <- function(pool, attribute_name, type = "categorical", object, pr
     new_attribute <- data.frame(
         attribute_name = attribute_name, 
         attribute_object = object, 
-        attribute_type = type
+        attribute_type = type, 
+        project_id = project_id
     )
     
     res <- DBI::dbWriteTable(pool, "attributes", new_attribute, append = TRUE, row.names = FALSE)
@@ -37,9 +38,10 @@ add_attribute_values <- function(pool, attribute_id, attribute_values){
 }
 
 read_user_attributes <- function(pool, project_id){
-   
+    
     dplyr::tbl(pool, "attributes") %>%
         dplyr::filter(.data$attribute_object == "user") %>%
+        dplyr::filter(.data$project_id == !!as.numeric(project_id)) %>% 
         dplyr::select(attribute_id, attribute_name) %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"),
                          by = "attribute_id", 
