@@ -387,3 +387,23 @@ dt_options <- function() {
           buttons = c("csv")
         )
 }
+
+# Requal menu buttons 
+
+rql_picker_UI <- function(inputId, label, choices = "", multiple = TRUE, none = "") { 
+    shinyWidgets::pickerInput(inputId, label,
+      choices = "", multiple = multiple,
+      options = list(
+        `actions-box` = TRUE,
+        `select-all-text` = "Select all",
+        `deselect-all-text` = "Reset",
+        `none-selected-text` = none
+      )
+    )
+} 
+
+
+rql_button_UI <- function(inputId, label, class = NULL) {
+     actionButton(inputId, label, class) %>% 
+      tagAppendAttributes(style = "text-align: left;")
+}

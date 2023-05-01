@@ -173,12 +173,10 @@ add_user_UI <- function(id) {
   ns <- NS(id)
   tags$div(
     h4("Add users to project"),
-    selectInput(ns("rql_users"),
-                label = "Select users",
-                choices = "",
-                multiple = TRUE
+    rql_picker_UI(ns("rql_users"),
+                label = "Select users"
     ),
-    actionButton(ns("assign"), "Add users") %>% 
+    rql_button_UI(ns("assign"), "Add users") %>% 
       tagAppendAttributes(style = "text-align: left;")
   )
 }
@@ -188,13 +186,8 @@ remove_user_UI <- function(id) {
   ns <- NS(id)
   tags$div(
     h4("Remove users from project"),
-    selectInput(ns("members_to_remove"),
-                label = "Select users",
-                choices = "",
-                multiple = TRUE
-    ),
-    actionButton(ns("remove_members"), "Remove users") %>% 
-      tagAppendAttributes(style = "text-align: left;")
+   rql_picker_UI(ns("members_to_remove"), "Select users:", none = "Users to remove"),
+   rql_button_UI(ns("remove_members"), "Remove users")
   )
 }
 
@@ -203,15 +196,10 @@ modify_permissions_UI <- function(id) {
   ns <- NS(id)
   tags$div(
     h4("Modify user permissions for project"),
-    shinyWidgets::pickerInput(ns("members_permissions"), "Select users:",
-      choices = "", multiple = TRUE,
-      options = list(
-        `actions-box` = TRUE,
-        `select-all-text` = "Select all",
-        `deselect-all-text` = "Reset",
-        `none-selected-text` = "Users to change permissions"
-      )
-    ),
+    rql_picker_UI(
+      ns("members_permissions"), 
+      "Select users:",
+      none = "Users to change permissions"),
     checkboxGroupInput(
       ns("permissions_list"),
       label = NULL,
@@ -220,8 +208,7 @@ modify_permissions_UI <- function(id) {
           translate_permissions(permission())
           )
     ),
-    actionButton(ns("save_permissions"), "Save permissions") %>% 
-      tagAppendAttributes(style = "text-align: left;")
+    rql_button_UI(ns("save_permissions"), "Save permissions")
   )
 }
 
