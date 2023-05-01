@@ -11,7 +11,7 @@ mod_user_attributes_ui <- function(id){
   ns <- NS(id)
   tagList(
     textOutput(ns("user_message")),
-    tableOutput(ns("user_attributes_table")),
+    DT::dataTableOutput(ns("user_attributes_table")),
     uiOutput(ns("attribute_name_ui")),
     uiOutput(ns("attribute_values_ui")),
     uiOutput(ns("add_attribute_ui")),
@@ -26,19 +26,32 @@ mod_user_attributes_server <- function(id, glob){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
-    output$user_attributes_table <- renderTable({
-      read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
+    output$user_attributes_table <- DT::renderDataTable({
+      get_user_attributes_data_table(glob$pool, project_id = glob$active_project) %>% 
+      DT::datatable(., escape = FALSE, 
+                options = list(dom = 't', paging = FALSE, ordering = FALSE))
+    })
+    
+    observeEvent(input$delete_attribute_click, {
+      browser()
+      selectedRow <- as.numeric(strsplit(input$delete_attribute_click, "_")[[1]][2])
+      # Check if the click event was on a button
+      if (startsWith(input$mytable_cell_clicked$value, "<button")) {
+        # Get the ID of the row that was clicked
+        row_id <- as.numeric(str_extract(input$mytable_cell_clicked$id, "\\d+"))
+        # Print a message to the console
+        print(paste0("Button clicked on row ", row_id))
+        # You can add code here to perform an action when the button is clicked
+      }
     })
     
     observeEvent(glob$active_project, {
+      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
       # re-render on project change
-      output$user_attributes_table <- renderTable({
-        read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
-          dplyr::group_by(attribute_name) %>%
-          dplyr::summarise(values = paste0(value, collapse = ", "))
-      })
+      output$user_attributes_table <- DT::renderDT({
+        user_attributes }, 
+        escape = FALSE, 
+        options = list(dom = 't', paging = FALSE, ordering = FALSE))
       
       output$user_attributes_chart <- renderPlot({
         req(glob$active_project)
@@ -114,11 +127,12 @@ mod_user_attributes_server <- function(id, glob){
       shinyjs::reset("attribute_name")
       shinyjs::reset("attribute_values")
       
-      user_attributes <- read_user_attributes(glob$pool, project_id = glob$active_project) %>% 
-        dplyr::group_by(attribute_name) %>%
-        dplyr::summarise(values = paste0(value, collapse = ", "))
+      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
+      browser()
       
-      output$user_attributes_table <- renderTable({user_attributes})
+      output$user_attributes_table <- DT::renderDT({
+        user_attributes}, escape = FALSE, 
+        options = list(dom = 't', paging = FALSE, ordering = FALSE))
     })
     
     output$user_message <- renderText({

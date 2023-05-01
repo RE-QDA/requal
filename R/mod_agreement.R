@@ -431,6 +431,7 @@ mod_agreement_server <- function(id, glob) {
         )
         
         if (length(unique(segments$user_id)) > 1) {
+          # jaká je interpretace n ?
           overlap_df <- calculate_code_overlap_by_users(segments) %>%
             join_user_names(., users) %>%
             dplyr::group_by(coder1_name, coder2_name, coder1_id, coder2_id) %>%
