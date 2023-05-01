@@ -404,6 +404,6 @@ rql_picker_UI <- function(inputId, label, choices = "", multiple = TRUE, none = 
 
 
 rql_button_UI <- function(inputId, label, class = NULL) {
-     actionButton(inputId, label, class) %>% 
+     actionButton(inputId, label, class = class) %>% 
       tagAppendAttributes(style = "text-align: left;")
 }
