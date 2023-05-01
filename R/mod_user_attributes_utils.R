@@ -48,3 +48,13 @@ read_user_attributes <- function(pool, project_id){
                          suffix = c(".x", ".y")) %>%
         dplyr::collect()
 }
+
+get_user_attributes_data_table <- function(pool, project_id){
+  read_user_attributes(pool, project_id) %>% 
+    dplyr::group_by(attribute_id, attribute_name) %>%
+    dplyr::summarise(values = paste0(value, collapse = ", ")) %>% 
+    dplyr::mutate(
+      button = as.character(actionButton(ns(paste0('button_', attribute_id)), 
+                                         label = "Delete"))
+    )
+}
