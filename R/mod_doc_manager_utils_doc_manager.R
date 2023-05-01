@@ -13,9 +13,8 @@ create_doc_UI <- function(ns) {
                       label = "Document content", 
                       placeholder = "Paste the new document content here") %>%
             tagAppendAttributes(class = "required"),
-        actionButton(ns("doc_add"), 
-                     label = "Create document")
-    ) %>% tagAppendAttributes(style = "text-align: left")
+        rql_button_UI(ns("doc_add"), 
+                     label = "Create document"))
 }
 
 # upload doc UI -----
@@ -46,24 +45,20 @@ upload_doc_UI <- function(ns) {
 
 delete_doc_UI <- function(ns, glob) {
     tags$div(
-        selectizeInput(ns("doc_delete_list"),
+        rql_picker_UI(ns("doc_delete_list"),
                        label = "Remove selected documents from project",
                        choices = list_db_documents(
                            glob$pool,
                            active_project = local(glob$active_project), 
                            user = glob$user
                        ),
-                       multiple = TRUE,
-                       selected = NULL,
-                       options = list(
-                           closeAfterSelect = "true"
-                       )
+                       none = "Documents to remove"
         ),
-        actionButton(ns("doc_remove"),
+        rql_button_UI(ns("doc_remove"),
                      "Remove",
                      class = "btn-danger"
         )
-    ) %>% tagAppendAttributes(style = "text-align: left")
+    )
 }
 
 # delete documents from project ----

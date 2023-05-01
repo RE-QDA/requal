@@ -31,7 +31,10 @@ mod_user_manager_ui <- function(id) {
     },
     fluidRow(class = "module_content",
       tags$h2("Project members"), tags$br(),
-      DT::DTOutput(ns("assigned_users"))
+      DT::DTOutput(ns("assigned_users")),
+      if (golem::get_golem_options("mode") == "local") {
+        "User management is only enabled for the server version."
+      }
   )
   )
 }
@@ -68,7 +71,8 @@ mod_user_manager_server <- function(id, glob) {
 
     # render project members =======================================================
     output$assigned_users <- DT::renderDataTable(server = FALSE, {
-      if (golem::get_golem_options("mode") == "server") {
+      req(golem::get_golem_options("mode") == "server") 
+
         loc$users_display <- loc$users_permissions_df %>%
         transform_user_table()
           
@@ -78,12 +82,6 @@ mod_user_manager_server <- function(id, glob) {
       escape = FALSE, # To allow the rendering of HTML elements
       rownames = FALSE
       )
-
-    
-        #gen_users_permissions_ui(users_permissions_nested, id = id, glob$user$data)
-      } else {
-        "Local version of reQual does not support multiple users."
-      }
     })
 
     # change permissions =======================================================
@@ -140,6 +138,7 @@ mod_user_manager_server <- function(id, glob) {
           )
         })
       }
+      # add user to project
       add_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
@@ -222,19 +221,16 @@ mod_user_manager_server <- function(id, glob) {
     output$add_user_ui <- renderUI({
       add_user_UI(id)
     })
-    outputOptions(output, "add_user_ui", suspendWhenHidden = FALSE)
 
     # Remove user UI =======================================================
     output$remove_user_ui <- renderUI({
       remove_user_UI(id)
     })
-    outputOptions(output, "remove_user_ui", suspendWhenHidden = FALSE)
    
    # Modify permissions UI =======================================================
     output$modify_permissions_ui <- renderUI({
       modify_permissions_UI(id)
     })
-    outputOptions(output, "modify_permissions_ui", suspendWhenHidden = FALSE)
 
 
     # hide save permission UI from users without sufficient permission ======
