@@ -397,7 +397,6 @@ mod_agreement_server <- function(id, glob) {
     
     observeEvent({req(input$metrics_select == "by_attribute")
       input$calculate}, {
-        # browser()
         
         attribute_id <- as.numeric(input$attributes_select_ui)
         segments <- load_all_segments_db(

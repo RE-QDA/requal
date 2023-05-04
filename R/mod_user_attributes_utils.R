@@ -75,7 +75,7 @@ get_user_attributes_summary <- function(pool, project_id){
   
   users <- dplyr::tbl(pool, "users") %>% 
     dplyr::collect() %>% 
-    dplyr::inner_join(., permissions)
+    dplyr::inner_join(., permissions, by = "user_id")
   
   # Get user attributes
   attr_user_map <- dplyr::tbl(pool, "attributes_users_map") %>% 

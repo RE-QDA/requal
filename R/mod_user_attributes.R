@@ -114,7 +114,7 @@ mod_user_attributes_server <- function(id, glob){
       
       # TODO: check user permissions / attributes_other_modify
       # What permission should user have to delete user attribute?
-      if(glob$user$data$attributes_modify == 1){
+      if(glob$user$data$attributes_other_modify == 1){
         showModal(
           modalDialog(
             title = "Delete user attribute",
