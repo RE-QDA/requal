@@ -1,6 +1,6 @@
 # Load segments for analysis -------------------------------------------
 
-load_segments_analysis <- function(project_db,
+load_segments_analysis <- function(pool,
                                   active_project,
                                   selected_codes,
                                   selected_categories,
@@ -8,18 +8,14 @@ load_segments_analysis <- function(project_db,
 
     if (isTruthy(selected_codes) | isTruthy(selected_categories)) {
 
-      con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-      on.exit(DBI::dbDisconnect(con))
-
-        category_edges <- dplyr::tbl(con, "categories_codes_map") %>%
+        category_edges <- dplyr::tbl(pool, "categories_codes_map") %>%
         dplyr::filter(.data$category_id %in% !!selected_categories) %>%
         dplyr::pull(code_id)
 
       code_filter <- as.integer(unique(c(category_edges[isTruthy(category_edges)], selected_codes[isTruthy(selected_codes)])))
 
 
-
-        segments <- dplyr::tbl(con, "segments") %>%
+        segments_input <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(code_id  %in% !!code_filter) %>%
             dplyr::filter(doc_id  %in% !!as.integer(selected_docs)) %>%
@@ -28,9 +24,16 @@ load_segments_analysis <- function(project_db,
                           segment_id,
                           segment_text,
                           segment_start,
-                          segment_end
+                          segment_end, 
+                          user_id
                           ) %>%
             dplyr::collect()
+
+            users <- dplyr::tbl(pool, "users") %>% 
+                     dplyr::select(user_id, user_name) %>% 
+                     dplyr::collect()
+
+            segments <- dplyr::left_join(segments_input, users, by = "user_id")
 
 
         return(segments)

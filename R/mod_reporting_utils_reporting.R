@@ -1,17 +1,11 @@
 # Load logs for reporting -------------------------------------------
-
-load_logs_for_reporting <- function(project_db, 
-                                    active_project) {
-    
-    con <- DBI::dbConnect(RSQLite::SQLite(),
-                          project_db)
-    on.exit(DBI::dbDisconnect(con))
-    
-    logs <- dplyr::tbl(con, "logs") %>%
+load_logs_for_reporting <- function(pool, active_project) {
+    logs <- dplyr::tbl(pool, "logs") %>%
         dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-        dplyr::left_join(., dplyr::tbl(con, "users") %>% 
+        dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
                              dplyr::select(.data$user_id, .data$user_name), 
-                         by = "user_id") %>% 
+                         by = "user_id", 
+                         suffix = c(".x", ".y")) %>% 
         dplyr::select(.data$action, 
                       user = .data$user_name, 
                       detail = .data$payload, 
@@ -37,8 +31,15 @@ shorten_value <- function(x){
     }
 }
 
-parse_payload_json <- function(x){
-    jsonlite::fromJSON(x) %>% 
+parse_payload_json <- function(x, sanitize = FALSE){
+    tmp <- jsonlite::fromJSON(x)
+    
+    if(sanitize){
+        tmp <- tmp %>% 
+            dplyr::select(-dplyr::any_of(c("segment_text", "segment_start", "segment_end")))
+    }
+    
+    tmp %>% 
         purrr::map2_chr(names(.), ., function(name, value) {
             paste0(toupper(name), ": ", shorten_value(collapse_array(value)))
         }) %>% 
