@@ -160,10 +160,26 @@ log_change_user_attribute <- function(con, project_id, user_attribute, user_id){
                data = user_attribute)
 }
 
+log_create_attribute <- function(con, project_id, attribute_data, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id, 
+               action = "Create attribute", 
+               data = attribute_data)
+}
+
 log_create_user_attribute <- function(con, project_id, attribute_data, user_id){
     log_action(con, 
                user_id = user_id, 
                project_id, 
                action = "Create user attribute", 
                data = attribute_data)
+}
+
+log_delete_user_attribute <- function(con, project_id, attribute_id, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id, 
+               action = "Delete user attribute", 
+               data = list(attribute_id = attribute_id))
 }

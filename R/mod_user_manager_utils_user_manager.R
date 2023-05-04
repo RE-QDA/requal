@@ -1,3 +1,5 @@
+utils::globalVariables(c("user", "user_mail"))
+
 disabled_checkbox <- function(inputId, label, value = FALSE, width = NULL){
   value <- shiny::restoreInput(id = inputId, default = value)
   inputTag <- tags$input(id = inputId, type = "checkbox", disabled = "disabled")
@@ -57,16 +59,16 @@ add_permissions_record <- function(pool, project_id, user_id) {
     data_modify                  = 0,
     data_other_modify            = 0,
     data_other_view              = 1,
-    attributes_modify            = 0,
+    attributes_modify            = 1,
     attributes_other_modify      = 0,
-    attributes_other_view        = 1,
-    codebook_modify              = 1,
+    attributes_other_view        = 0,
+    codebook_modify              = 0,
     codebook_other_modify        = 0,
     codebook_other_view          = 1,
     annotation_modify            = 1,
     annotation_other_modify      = 0,
     annotation_other_view        = 0,
-    analysis_other_view          = 1,
+    analysis_other_view          = 0,
     report_other_view            = 0,
     permissions_modify           = 0,
     memo_modify                  = 1, 

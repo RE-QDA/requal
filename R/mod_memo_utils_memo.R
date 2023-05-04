@@ -114,7 +114,7 @@ delete_memo_record <- function(pool, project, memo_id, user_id) {
 dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
 {
     if (!is.null(badgeStatus)) 
-        validateStatus(badgeStatus)
+        shinydashboard:::validateStatus(badgeStatus)
     items <- c(list(...))
     dropdownClass <- paste0("dropdown")
     numItems <- length(items)
