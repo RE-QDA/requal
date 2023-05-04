@@ -32,6 +32,7 @@ get_golem_config <- function(
   ), 
   use_parent = TRUE
 ){
+
   config::get(
     value = value, 
     config = config, 

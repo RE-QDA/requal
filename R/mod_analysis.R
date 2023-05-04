@@ -27,12 +27,12 @@ mod_analysis_ui <- function(id) {
           size = 15
         ),
         selectInput(ns("category_filter"),
-                    label = "Filter by category",
-                    choices = "",
-                    multiple = TRUE,
-                    selectize = FALSE,
-                    width = "100%",
-                    size = 15
+          label = "Filter by category",
+          choices = "",
+          multiple = TRUE,
+          selectize = FALSE,
+          width = "100%",
+          size = 15
         ),
         selectInput(ns("document_filter"),
           label = "Filter by document",
@@ -42,7 +42,7 @@ mod_analysis_ui <- function(id) {
           width = "100%",
           size = 15
         )
-      ) %>% tagAppendAttributes(class = "scrollable90") ,
+      ) %>% tagAppendAttributes(class = "scrollable90"),
       uiOutput(ns("download"))
     )
   )
@@ -51,94 +51,94 @@ mod_analysis_ui <- function(id) {
 #' analysis Server Functions
 #'
 #' @noRd
-mod_analysis_server <- function(id, project, user, codebook, category, documents, segments) {
+mod_analysis_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
+    loc <- reactiveValues()
 
     # Filters ----
 
-    observeEvent(codebook(), {
+    observeEvent(glob$codebook, {
       updateSelectInput(
         session = session,
         "code_filter",
         choices = c("", stats::setNames(
-          codebook()$code_id,
-          codebook()$code_name)
-        ),
-        selected = codebook()$code_id
+          glob$codebook$code_id,
+          glob$codebook$code_name
+        )),
+        selected = glob$codebook$code_id
       )
     })
 
-    observeEvent(documents(), {
+    observeEvent(glob$documents, {
       updateSelectInput(
         session = session,
         "document_filter",
-        choices = c("", documents()),
-        selected = documents()
+        choices = c("", glob$documents),
+        selected = glob$documents
       )
     })
-    observeEvent(category(), {
+    observeEvent(glob$category, {
       updateSelectInput(
         session = session,
         "category_filter",
-        choices = c("", category()),
-        selected = category()
+        choices = c("", glob$category),
+        selected = glob$category
       )
     })
 
     # Segments to display and filter ----
-
-    segments_df <- reactiveVal()
-
     observeEvent(
       {
         input$code_filter
         input$category_filter
         input$document_filter
-        segments()
-        codebook()
-        category()
-        documents()
-        project()$active_project
+        glob$segments
+        glob$codebook
+        glob$category
+        glob$documents
+        glob$active_project
       },
       {
-        temp_df <- load_segments_analysis(
-          project_db = project()$project_db,
-          active_project = project()$active_project,
-          selected_codes = input$code_filter,
-          selected_categories = input$category_filter,
-          selected_docs = input$document_filter
+        loc$temp_df <- load_segments_analysis(
+          pool = glob$pool,
+          active_project = as.integer(glob$active_project),
+          selected_codes = as.integer(input$code_filter),
+          selected_categories = as.integer(input$category_filter),
+          selected_docs = as.integer(input$document_filter)
         )
-
-        if (nrow(temp_df) > 0) {
-          segments_df(
-            temp_df %>%
-              dplyr::left_join(codebook(),
-                by = "code_id"
-              ) %>%
-              dplyr::left_join(tibble::enframe(documents(),
-                name = "doc_name",
-                value = "doc_id"
-              ),
-              by = "doc_id"
-              )
-          )
+        
+        if (nrow(loc$temp_df) > 0) {
+          if (glob$user$data$analysis_other_view != 1){
+            loc$temp_df <- loc$temp_df %>% 
+              dplyr::filter(user_id == glob$user$user_id)
+          }
+          
+          loc$segments_df <- loc$temp_df %>%
+            dplyr::left_join(glob$codebook,
+              by = "code_id"
+            ) %>%
+            dplyr::left_join(tibble::enframe(glob$documents,
+              name = "doc_name",
+              value = "doc_id"
+            ),
+            by = "doc_id"
+            )
         } else {
-          segments_df(as.data.frame(NULL))
+          loc$segments_df <- as.data.frame(NULL)
         }
       }
     )
 
-
-    segments_taglist <- eventReactive(segments_df(), {
-      if (nrow(segments_df()) > 0) {
-        purrr::pmap(
+    observeEvent(loc$segments_df, {
+      if (nrow(loc$segments_df) > 0) {
+        loc$segments_taglist <- purrr::pmap(
           list(
-            segments_df()$segment_text,
-            segments_df()$doc_name,
-            segments_df()$code_name,
-            segments_df()$code_color
+            loc$segments_df$segment_text,
+            loc$segments_df$doc_name,
+            loc$segments_df$code_name,
+            loc$segments_df$code_color
           ),
           ~ format_cutouts(
             segment_text = ..1,
@@ -151,28 +151,37 @@ mod_analysis_server <- function(id, project, user, codebook, category, documents
     })
 
     output$segments <- renderUI({
-      if (nrow(req(segments_df())) > 0) {
-        segments_taglist()
+      if (nrow(req(loc$segments_df)) > 0) {
+        loc$segments_taglist
       } else {
         "No coded segments detected."
       }
     })
 
     output$download <- renderUI({
-      if (nrow(req(segments_df())) > 0) {
-        mod_download_handler_ui("download_handler_ui_1")
+      if (nrow(req(loc$segments_df)) > 0) {
+        tagList(
+          mod_download_handler_ui("download_handler_ui_1"),
+          mod_download_html_ui("download_html_ui_1")
+        )
       } else {
         ""
       }
     })
 
-
-    return(reactive({
-      if (nrow(req(segments_df())) > 0) {
-        segments_df() %>% dplyr::select(doc_name, doc_id, code_name, code_id, segment_text)
-      } else {
-        as.data.frame(NULL)
+    # for download modules
+    observeEvent(
+      {
+        loc$segments_df
+        loc$segments_taglist
+      },
+      {
+        if (nrow(loc$segments_df) > 0) {
+          glob$segments_df <- loc$segments_df %>%
+            dplyr::select(doc_name, doc_id, code_name, code_id, segment_text, user_name)
+          glob$segments_taglist <- loc$segments_taglist
+        }
       }
-    }))
+    )
   })
 }

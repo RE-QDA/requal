@@ -2,86 +2,105 @@
 
 #' @importFrom rlang .data
 create_code_UI <- function(id) {
-  ns <- NS(id)
-  tags$div(
-    h4("Create codes"),
-    textInput(
-      ns("code_name"),
-      label = "Code name",
-      placeholder = "Short but informative name"
-    ) %>% tagAppendAttributes(class = "required"),
-    textAreaInput(
-      ns("code_desc"),
-      label = "Code description",
-      placeholder = "Description and instructions"
-    ),
-    colourpicker::colourInput(
-      ns("color_pick"),
-      label = "Highlight",
-      value = "yellow",
-      showColour = "background",
-      closeOnClick = TRUE
-    ),
-    actionButton(ns("code_add"),
-      label = "Create"
-    )
-  )  %>% tagAppendAttributes(style = "text-align: left")
+    ns <- NS(id)
+    tags$div(
+        h4("Create codes"),
+        textInput(
+            ns("code_name"),
+            label = "Code name",
+            placeholder = "Short but informative name"
+        ) %>% tagAppendAttributes(class = "required"),
+        textAreaInput(
+            ns("code_desc"),
+            label = "Code description",
+            placeholder = "Description and instructions"
+        ),
+        colourpicker::colourInput(
+            ns("color_pick"),
+            label = "Highlight",
+            value = "yellow",
+            showColour = "background",
+            closeOnClick = TRUE
+        ),
+        actionButton(ns("code_add"),
+                     label = "Create"
+        )
+    )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
-merge_code_UI <- function(id, project) {
-  ns <- NS(id)
-  tags$div(
-    h4("Merge codes"),
-    selectInput(
-      ns("merge_from"),
-      label = "Merge from",
-      choices = c("", list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
-      ) %>%
-        pair_code_id()),
-      selected = "",
-      multiple = FALSE
-    ),
-    selectInput(
-      ns("merge_to"),
-      label = "Merge into",
-      choices = c("", list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
-      ) %>%
-        pair_code_id()),
-      selected = "",
-      multiple = FALSE
-    ),
-    actionButton(ns("code_merge"),
-      label = "Merge",
-      class = "btn-warning"
+merge_code_UI <- function(id, pool, project, user) {
+    
+    req(user$data)
+    
+    codes <- list_db_codes(
+        pool,
+        project_id = project, 
+        user = user
     )
-  )  %>% tagAppendAttributes(style = "text-align: left")
+    
+    if(user$data$codebook_other_modify == 0){
+        codes <- codes %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
+    
+    ns <- NS(id)
+    tags$div(
+        h4("Merge codes"),
+        selectInput(
+            ns("merge_from"),
+            label = "Merge from",
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
+            selected = "",
+            multiple = FALSE
+        ),
+        selectInput(
+            ns("merge_to"),
+            label = "Merge into",
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
+            selected = "",
+            multiple = FALSE
+        ),
+        actionButton(ns("code_merge"),
+                     label = "Merge",
+                     class = "btn-warning"
+        )
+    )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
 
-delete_code_UI <- function(id, project) {
-  ns <- NS(id)
-  tags$div(
-    h4("Delete codes"),
-    selectInput(
-      ns("code_to_del"),
-      label = "Select codes to delete",
-      choices = list_db_codes(
-        project_db = project()$project_db,
-        project_id = project()$active_project
-      ) %>%
-        pair_code_id(),
-      selected = "",
-      multiple = TRUE
-    ),
-    actionButton(ns("code_del_btn"),
-      label = "Delete",
-      class = "btn-danger"
+delete_code_UI <- function(id, pool, project, user) {
+    
+    req(user$data)
+    
+    codes <- list_db_codes(
+        pool,
+        project_id = project, 
+        user = user
     )
-  )  %>% tagAppendAttributes(style = "text-align: left")
+    
+    if(user$data$codebook_other_modify == 0){
+        codes <- codes %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
+    
+    ns <- NS(id)
+    tags$div(
+        h4("Delete codes"),
+        selectizeInput(
+            ns("code_to_del"),
+            label = "Select codes to delete",
+            choices = stats::setNames(codes$code_id, codes$code_name),
+            selected = NULL,
+            multiple = TRUE,
+            options = list(
+                closeAfterSelect = "true"
+            )
+        ),
+        actionButton(ns("code_del_btn"),
+                     label = "Delete",
+                     class = "btn-danger"
+        )
+    )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
 # TODO
@@ -114,47 +133,30 @@ delete_code_UI <- function(id, project) {
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
-list_db_codes <- function(project_db, project_id) {
-
-  ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
-  code_id <- code_name <- code_description <- code_color <- NULL
-
-
-  con <- DBI::dbConnect(
-    RSQLite::SQLite(),
-    project_db
-  )
-  on.exit(DBI::dbDisconnect(con))
-
-  project_codes <- dplyr::tbl(con, "codes") %>%
-    dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
-    dplyr::select(
-      code_id,
-      code_name,
-      code_description,
-      code_color
-    ) %>%
-    dplyr::collect()
-
-  return(project_codes)
+list_db_codes <- function(pool, project_id, user) {
+    
+    ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
+    code_id <- code_name <- code_description <- code_color <- NULL
+    
+    project_codes <- dplyr::tbl(pool, "codes") %>%
+        dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
+        dplyr::select(
+            code_id,
+            code_name,
+            code_description,
+            code_color, 
+            user_id
+        ) %>%
+        dplyr::collect()
+    
+    if(!is.null(user$data) && user$data$codebook_other_view == 0){
+        project_codes <- project_codes %>% 
+            dplyr::filter(user_id == user$user_id)
+    }
+    
+    return(project_codes)
 }
 
-# Pair code names and ids -----
-
-pair_code_id <- function(db_codes_df) {
-  ids <- db_codes_df %>%
-    dplyr::select(dplyr::ends_with("_id")) %>%
-    dplyr::pull()
-
-  named_ids <- db_codes_df %>%
-    dplyr::select(dplyr::ends_with("_name")) %>%
-    dplyr::pull()
-
-  choices <- ids
-  names(choices) <- named_ids
-
-  return(choices)
-}
 
 
 
@@ -162,103 +164,119 @@ pair_code_id <- function(db_codes_df) {
 gen_codes_ui <- function(code_id,
                          code_name,
                          code_description,
-                         code_color) {
-  box(
-    code_description,
-    id = code_id,
-    title = code_name,
-    closable = FALSE,
-    width = NULL,
-    background = "light-blue",
-    collapsible = TRUE,
-    collapsed = TRUE,
-    boxToolSize = "md",
-    label = tagAppendAttributes(
-      boxLabel(
-        text = "code",
-        status = "warning"
-      ),
-      style = paste0("background-color:", code_color, " !important;"),
-      class = "custom_label"
-    ),
-    # dropdownMenu = boxDropdown(
-    #     boxDropdownItem("Edit"),
-    #     boxDropdownItem("Merge"),
-    #     boxDropdownItem("Delete")
-    # ),
-    ""
-  ) %>% tagAppendAttributes(
-    `data-code_id` = code_id,
-    class = "code_item",
-    style = "max-width: 500px"
-  ) 
+                         code_color, 
+                         user_id) {
+    box(
+        code_description,
+        id = code_id,
+        title = code_name,
+        closable = FALSE,
+        width = NULL,
+        background = "light-blue",
+        collapsible = TRUE,
+        collapsed = TRUE,
+        boxToolSize = "md",
+        label = tagAppendAttributes(
+            boxLabel(
+                text = "code",
+                status = "warning"
+            ),
+            style = paste0("background-color:", code_color, " !important;"),
+            class = "custom_label"
+        ),
+        # dropdownMenu = boxDropdown(
+        #     boxDropdownItem("Edit"),
+        #     boxDropdownItem("Merge"),
+        #     boxDropdownItem("Delete")
+        # ),
+        ""
+    ) %>% tagAppendAttributes(
+        `data-code_id` = code_id,
+        class = "code_item",
+        style = "max-width: 500px"
+    ) 
 }
 
 # Delete codes from project ------
 delete_db_codes <-
-  function(project_db,
-           active_project,
-           delete_code_id, 
-           user_id) {
-    con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-    on.exit(DBI::dbDisconnect(con))
+    function(pool, 
+             active_project,
+             delete_code_id, 
+             user_id) {
+        
+        DBI::dbExecute(pool,
+                   glue::glue_sql("DELETE from codes
+                   WHERE code_id IN ({delete_code_id})",
+                   .con = pool)
+                   )
 
-    DBI::dbExecute(con,
-      "DELETE FROM codes
-                       WHERE code_id IN (?);",
-      params = list(delete_code_id)
-    )
+        
+        log_delete_code_record(pool, active_project, delete_code_id, user_id)
+    }
+# Delete codes from segments table 
 
-    log_delete_code_record(con, active_project, delete_code_id, user_id)
-  }
 
+delete_codes_segment_db <- function(pool, 
+                                    active_project,
+                                    user_id,
+                                    code_id) {
+    
+    # delete code from a segment
+    query <- glue::glue_sql("DELETE FROM segments
+                       WHERE project_id = {active_project}
+                       AND code_id = {code_id}", 
+                       .con = pool)
+    
+    purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
+    
+   #todo log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)
+}
 
 # Render codes -----
 
-render_codes <- function(active_project,
-                         project_db) {
-  if (isTruthy(active_project)) {
-    project_codes <- list_db_codes(
-      project_db = project_db,
-      project_id = active_project
-    )
-
-
-    if (nrow(project_codes) == 0) {
-      "No codes have been created."
+render_codes <- function(pool, active_project, user) {
+    if (isTruthy(active_project)) {
+        project_codes <- list_db_codes(
+            pool = pool,
+            project_id = active_project, 
+            user = user
+        )
+        
+        if (nrow(project_codes) == 0) {
+            "No codes have been created."
+        } else {
+            purrr::pmap(project_codes, gen_codes_ui)
+        }
     } else {
-      purrr::pmap(project_codes, gen_codes_ui)
+        "No active project."
     }
-  } else {
-    "No active project."
-  }
 }
 
 
 # Merge codes ------
 
-merge_codes <- function(project_db,
+merge_codes <- function(pool,
                         active_project,
                         merge_from,
                         merge_to, 
                         user_id) {
-  con <- DBI::dbConnect(RSQLite::SQLite(), project_db)
-  on.exit(DBI::dbDisconnect(con))
-
-  # should rewrite all merge from ids to the value of merge to in segments
-  update_segments_sql <- glue::glue_sql("UPDATE segments
+    # should rewrite all merge from ids to the value of merge to in segments
+    update_segments_sql <- glue::glue_sql("UPDATE segments
                  SET code_id = {merge_to}
-                 WHERE code_id = {merge_from}", .con = con)
-  res <- DBI::dbSendStatement(con, update_segments_sql)
-  DBI::dbClearResult(res)
+                 WHERE code_id = {merge_from}", .con = pool)
+    DBI::dbExecute(pool, update_segments_sql)
+    
+    # should delete merge from row from codes
+    delete_code_category_sql <- glue::glue_sql("DELETE FROM categories_codes_map WHERE code_id = {merge_from}",
+                                      .con = pool
+    )
+    DBI::dbExecute(pool, delete_code_category_sql)
 
-  # should delete merge from row from codes
-  delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}",
-    .con = con
-  )
-  res2 <- DBI::dbSendStatement(con, delete_code_sql)
-  DBI::dbClearResult(res2)
-
-  # should log action with from-to ids
-  log_merge_code_record(con, project_id = active_project, merge_from, merge_to, user_id)
+    delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}",
+                                      .con = pool
+    )
+    DBI::dbExecute(pool, delete_code_sql)
+    
+    # should log action with from-to ids
+    log_merge_code_record(pool, project_id = active_project, merge_from, merge_to, user_id)
 }
