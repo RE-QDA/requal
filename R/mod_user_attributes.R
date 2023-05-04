@@ -11,10 +11,10 @@ mod_user_attributes_ui <- function(id){
   ns <- NS(id)
   tagList(
     textOutput(ns("user_message")),
-    DT::dataTableOutput(ns("user_attributes_table")),
     uiOutput(ns("attribute_name_ui")),
     uiOutput(ns("attribute_values_ui")),
     uiOutput(ns("add_attribute_ui")),
+    DT::dataTableOutput(ns("user_attributes_table")),
     plotOutput(ns("user_attributes_chart"))
   )
 }
@@ -29,20 +29,8 @@ mod_user_attributes_server <- function(id, glob){
     output$user_attributes_table <- DT::renderDataTable({
       get_user_attributes_data_table(glob$pool, project_id = glob$active_project) %>% 
       DT::datatable(., escape = FALSE, 
-                options = list(dom = 't', paging = FALSE, ordering = FALSE))
-    })
-    
-    observeEvent(input$delete_attribute_click, {
-      browser()
-      selectedRow <- as.numeric(strsplit(input$delete_attribute_click, "_")[[1]][2])
-      # Check if the click event was on a button
-      if (startsWith(input$mytable_cell_clicked$value, "<button")) {
-        # Get the ID of the row that was clicked
-        row_id <- as.numeric(str_extract(input$mytable_cell_clicked$id, "\\d+"))
-        # Print a message to the console
-        print(paste0("Button clicked on row ", row_id))
-        # You can add code here to perform an action when the button is clicked
-      }
+                options = list(dom = 't', paging = FALSE, ordering = FALSE), 
+                colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
     })
     
     observeEvent(glob$active_project, {
@@ -51,30 +39,13 @@ mod_user_attributes_server <- function(id, glob){
       output$user_attributes_table <- DT::renderDT({
         user_attributes }, 
         escape = FALSE, 
-        options = list(dom = 't', paging = FALSE, ordering = FALSE))
+        options = list(dom = 't', paging = FALSE, ordering = FALSE), 
+        colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
       
       output$user_attributes_chart <- renderPlot({
         req(glob$active_project)
         
-        attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
-          dplyr::filter(project_id == !!as.numeric(glob$active_project)) %>% 
-          dplyr::collect()
-        
-        attribute_values <- dplyr::tbl(glob$pool, "attributes") %>% 
-          dplyr::left_join(., dplyr::tbl(glob$pool, "attribute_values"), by = "attribute_id") %>% 
-          dplyr::select(attribute_id, attribute_name, attribute_value_id, value) %>% 
-          dplyr::collect()
-        
-        user_attributes <- attr_user_map %>% 
-          dplyr::left_join(., attribute_values, by = c("attribute_id", "attribute_value_id")) %>% 
-          dplyr::select(user_id, attribute_name, attribute_value = value)
-        
-        user_attributes_summary <- user_attributes %>% 
-          dplyr::count(attribute_name, attribute_value) %>% 
-          dplyr::group_by(attribute_name) %>% 
-          dplyr::mutate(share = n / sum(n)) %>% 
-          dplyr::ungroup() %>% 
-          dplyr::filter(!is.na(attribute_name))
+        user_attributes_summary <- get_user_attributes_summary(glob$pool, glob$active_project)
         
         unique_attributes <- unique(user_attributes_summary$attribute_name)
         n_attributes <- length(unique_attributes)
@@ -128,11 +99,58 @@ mod_user_attributes_server <- function(id, glob){
       shinyjs::reset("attribute_values")
       
       user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
-      browser()
       
       output$user_attributes_table <- DT::renderDT({
         user_attributes}, escape = FALSE, 
-        options = list(dom = 't', paging = FALSE, ordering = FALSE))
+        options = list(dom = 't', paging = FALSE, ordering = FALSE), 
+        colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
+    })
+    
+    observeEvent(input$selected_attr, {
+      user_attribute_name <- dplyr::tbl(glob$pool, "attributes") %>% 
+        dplyr::filter(attribute_id == !!input$selected_attr) %>% 
+        dplyr::collect() %>% 
+        dplyr::pull(attribute_name)
+      
+      # TODO: check user permissions / attributes_other_modify
+      # What permission should user have to delete user attribute?
+      if(glob$user$data$attributes_modify == 1){
+        showModal(
+          modalDialog(
+            title = "Delete user attribute",
+            HTML(paste0("Are you sure that you want to delete user attribute: <b>", user_attribute_name, "</b>?")),
+            footer = tagList(
+              modalButton("Cancel"),
+              actionButton(ns("delete_attr"), "Yes, delete", class = "btn-danger")
+            ), 
+            easyClose = TRUE
+          )
+        )
+      }else{
+        showModal(
+          modalDialog(
+            title = "Delete user attribute",
+            paste0("You don't have necessary permissions for deleting user attributes."),
+            footer = tagList(
+              modalButton("Cancel")
+            ), 
+            easyClose = TRUE
+          )
+        )
+      }
+    })
+    
+    observeEvent(input$delete_attr, {
+      delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
+                            user_id = glob$user$user_id, input$selected_attr)
+      
+      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
+      output$user_attributes_table <- DT::renderDT({
+        user_attributes}, escape = FALSE, 
+        options = list(dom = 't', paging = FALSE, ordering = FALSE), 
+        colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
+      
+      removeModal()
     })
     
     output$user_message <- renderText({

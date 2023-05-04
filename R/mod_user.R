@@ -100,7 +100,7 @@ mod_user_server <- function(id, glob) {
           
           footer = tagList(
             modalButton("Cancel"),
-            actionButton(ns("save_close"), "Save & Close")
+            actionButton(ns("save_close"), "Save & Close", class = "btn-success")
           )
         )
       )
