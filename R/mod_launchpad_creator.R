@@ -1,3 +1,5 @@
+utils::globalVariables(c("pool"))
+
 #' launchpad_creator UI Function
 #'
 #' @description A shiny Module.

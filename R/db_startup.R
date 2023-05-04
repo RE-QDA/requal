@@ -1,3 +1,4 @@
+utils::globalVariables(c("sql"))
 
 db_call <- c(
   

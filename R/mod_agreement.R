@@ -1,3 +1,5 @@
+utils::globalVariables(c("attribute_object", "attribute_value", "attribute_value1", "attribute_value2"))
+
 #' agreement UI Function
 #'
 #' @description A shiny Module.
