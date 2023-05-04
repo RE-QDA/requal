@@ -53,13 +53,13 @@ mod_user_attributes_server <- function(id, glob){
         if(n_attributes > 0){
           rows <- ceiling(sqrt(n_attributes))
           cols <- ceiling(n_attributes / rows)
-          par(mfrow = c(rows, cols), oma = rep(0, 4), mar = c(0, 0, 2, 0))
+          graphics::par(mfrow = c(rows, cols), oma = rep(0, 4), mar = c(0, 0, 2, 0))
           
           purrr::walk(unique_attributes, function(x) {
             tmp <- user_attributes_summary %>% 
               dplyr::filter(attribute_name == !!x) 
             
-            pie(tmp$n, labels = tmp$attribute_value, main = paste0("Attribute: ", x))
+            graphics::pie(tmp$n, labels = tmp$attribute_value, main = paste0("Attribute: ", x))
           })  
         }
       })

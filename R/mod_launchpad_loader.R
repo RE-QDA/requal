@@ -1,3 +1,5 @@
+utils::globalVariables(c("existing_projects"))
+
 #' launchpad_loader UI Function
 #'
 #' @description A shiny Module.
