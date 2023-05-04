@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-Assisted Qualitative Data Analysis
-Version: 0.6.1.9001
+Version: 0.10.0.9000
 Authors@R:
     c(
      person(given = "Radim",
@@ -30,7 +30,6 @@ Authors@R:
 Description: PKG_DESC.
 License: MIT + file LICENSE
 Imports:
-    attempt,
     colourpicker,
     config (>= 0.3.1),
     DBI,
@@ -45,24 +44,27 @@ Imports:
     htmlwidgets,
     jsonlite,
     magrittr,
-    processx,
+    pool,
     purrr,
     rlang,
+    RPostgreSQL,
     RSQLite,
     shiny (>= 1.6.0),
     shinydashboard,
     shinydashboardPlus,
     shinyFiles,
     shinyjs,
+    shinymanager,
     shinyWidgets,
     sortable,
     stringr,
     tibble,
     tidyr,
+    tidyselect,
     viridisLite
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Suggests:
     rmarkdown,
     knitr,
