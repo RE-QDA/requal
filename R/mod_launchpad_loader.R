@@ -1,3 +1,5 @@
+utils::globalVariables(c("existing_projects"))
+
 #' launchpad_loader UI Function
 #'
 #' @description A shiny Module.
@@ -60,6 +62,7 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
           reactive({
             onStop(function() {
+              print("closing pool")
               pool::poolClose(glob$pool)
             })
           })
@@ -117,21 +120,10 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
       # create glob$pool if it was not launched previously
       if (!isTruthy(glob$active_project)) {
-
-          glob$pool <- pool::dbPool(
-          drv = RPostgreSQL::PostgreSQL(),
-          host = golem::get_golem_options(which = "dbhost"),
-          port = golem::get_golem_options(which = "dbport"),
-          dbname = golem::get_golem_options(which = "dbname"),
-          user = golem::get_golem_options(which = "dbusername"),
-          password = golem::get_golem_options(which = "dbpassword")
-        )
-
-        reactive({
-          onStop(function() {
-            pool::poolClose(glob$pool)
-          })
-        })
+        glob$pool <- pool
+        con <- pool::poolCheckout(glob$pool)
+        print(DBI::dbListConnections(RPostgreSQL::PostgreSQL(), con))
+        pool::poolReturn(con)
 
         update_db_schema(glob$pool)
       }

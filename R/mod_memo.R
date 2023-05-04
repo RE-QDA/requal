@@ -69,7 +69,7 @@ mod_memo_server <- function(id, glob) {
           ) %>% tagAppendAttributes(style = "height: 50vh"),
           footer = tagList(
             modalButton("Cancel"),
-            actionButton(ns("save_close"), "Save & Close")
+            actionButton(ns("save_close"), "Save & Close", class = "btn-success")
           )
         )
       )
