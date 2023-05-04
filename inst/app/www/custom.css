@@ -91,6 +91,7 @@ margin: 0px !important;
 background: none;
 border: 0px !important;
 overflow: hidden;
+cursor: grab;
 }
 
 .box.box-solid {
@@ -111,3 +112,14 @@ margin-left: -20px !important;
 margin-right: auto !important; 
 width: 100% !important;  
 } 
+
+
+.dropdown-toggle[role="combobox"] {
+  background-color: white;
+  border: 1px solid #cccccc;
+}
+
+.disabled{
+  cursor: not-allowed;
+  pointer-events: none;
+}

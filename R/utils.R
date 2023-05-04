@@ -18,7 +18,37 @@ utils::globalVariables(c("project_name",
                          ".",
                          "segment_start",
                          "segment_text",
-                         "memo_id"))
+                         "memo_id", 
+                         "coder1_name", 
+                         "coder2_name", 
+                         "user_name", 
+                         "user_id", 
+                         "coder1_id", 
+                         "coder2_id", 
+                         "coder2_id2", 
+                         "coder1_id2", 
+                         "coder1_name2", 
+                         "coder2_name2", 
+                         "memo_name", 
+                         "n_char", 
+                         "is_overlap", 
+                         "total_overlap", 
+                         "w_total_overlap", 
+                         "n_char_coded", 
+                         "n_coders",
+                         "n_segments", 
+                         "doc_text", 
+                         "marked", 
+                         "n", 
+                         "segment_break", 
+                         "max_intersect", 
+                         "min_intersect", 
+                         "position_type", 
+                         "position_start", 
+                         "tag_start", 
+                         "tag_end", 
+                         "credentials"
+                         ))
 
 
 set_dashboard_body <- function() {
@@ -142,21 +172,22 @@ set_controlbar <- function() {
 
 # menu col and btn ---
 
-menu_btn <- function(..., label, icon) {
+menu_btn <- function(..., label, icon, inputId = NULL) {
   
   shinyWidgets::dropdown(
    ...,
     label = NULL,
     style = "material-circle",
     tooltip = shinyWidgets::tooltipOptions(
-      placement = "left",
+      placement = "right",
       title = label,
       html = FALSE
     ),
     size = "md", 
     width = "370px",
-    icon = icon(icon) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
-    right = TRUE
+    icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
+    right = FALSE,
+    inputId = inputId
   ) %>% tagAppendAttributes(style = "padding-right: 5px; padding-top: 10px; top: 1vh; position: relative; min-width: 50%;")
 }
 
@@ -201,6 +232,108 @@ get_volume_paths <- function() {
   
 }
 
+# loader UI
+
+loader_UI_local <- function(ns){
+
+tagList(
+  h3("Project file"),
+  div(span(textOutput(
+    ns("project_path_load")
+  ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
+  shinyFiles::shinyFilesButton(
+    ns("sel_file_load"),
+    "File select",
+    "Please select a project file",
+    multiple = FALSE
+  ),
+  selectInput(
+    ns("project_selector_load"),
+    "Select project",
+    choices = NULL
+  ),
+  actionButton(
+    ns("project_load"),
+    label = "Load project",
+    class = "btn-success"
+  )
+)
+
+}
+
+loader_UI_server <- function(ns){
+
+tagList(
+  h3("Remote project"),
+  selectInput(
+    ns("project_selector_load"),
+    "Select project",
+    choices = NULL
+  ),
+  actionButton(
+    ns("project_load"),
+    label = "Load project",
+    class = "btn-success"
+  )
+)
+
+}
+
+# creator UI
+
+creator_UI_local <- function(ns) {
+  tagList(
+    h3("New project name"),
+    textInput(
+      ns("project_name"),
+      label = NULL,
+      placeholder = "The name of your project."
+    ),
+    h3("New project folder"),
+    div(span(textOutput(
+      ns("project_path")
+    ), class = "form-control"), class = "form-group shiny-input-container"),
+    shinyFiles::shinyDirButton(
+      ns("sel_directory"),
+      "Folder select",
+      "Please select a project folder"
+    ),
+    h3("New project description"),
+    textAreaInput(
+      ns("project_description"),
+      label = NULL,
+      placeholder = "Brief description of your project"
+    ),
+    actionButton(
+      ns("project_create"),
+      label = "Create project",
+      class = "btn-success"
+    )
+  )
+}
+
+creator_UI_server <- function(ns) {
+  tagList(
+    h3("New project name"),
+    textInput(
+      ns("project_name"),
+      label = NULL,
+      placeholder = "The name of your project."
+    ),
+    h3("New project description"),
+    textAreaInput(
+      ns("project_description"),
+      label = NULL,
+      placeholder = "Brief description of your project"
+    ),
+    actionButton(
+      ns("project_create"),
+      label = "Create project",
+      class = "btn-success"
+    )
+  )
+}
+
 # warnings ------
 
 warn_user <- function(warning) {
@@ -209,7 +342,20 @@ warn_user <- function(warning) {
                         warning))
 }
   
+# check permission to modify permissions
 
+check_modify_permission <- function(permission, msg) {
+     if (permission != 1) warn_user(msg)
+     req(permission == 1)
+     }
 
-    
+# filter data by view permissions
 
+filter_view <- function(df, user_id, permission) {
+  if (permission == 0) {
+    df %>%
+      dplyr::filter(user_id == !!user_id)
+  } else if (permission == 1) {
+     df
+  }
+}

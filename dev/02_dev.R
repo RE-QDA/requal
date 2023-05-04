@@ -31,8 +31,9 @@ usethis::use_package( "stringr" )
 usethis::use_package( "htmlwidgets" )
 usethis::use_package( "sortable" )
 usethis::use_package( "shinyWidgets" )
-
-
+usethis::use_package( "RPostgreSQL" )
+usethis::use_package( "shinymanager" )
+usethis::use_package( "pool" )
 
 
 ## Add modules ----
@@ -43,6 +44,8 @@ golem::add_module( name = "launchpad_creator" ) # Name of the module
 # Project menu
 golem::add_module( name = "project" ) # Name of the module
 golem::add_module( name = "doc_manager" ) # Name of the module
+golem::add_module( name = "user_manager" ) # Name of the module
+
 
 
 # Codebook menu
@@ -57,14 +60,18 @@ golem::add_module( name = "document_code" ) # Name of the module
 # Analysis
 golem::add_module( name = "analysis" ) # Name of the module
 golem::add_module( name = "download_handler" ) # Name of the module
+golem::add_module( name = "download_html" ) # Name of the module
+
 
 golem::add_module( name = "reporting" ) # Name of the module
 golem::add_module( name = "settings" ) # Name of the module
 golem::add_module( name = "about" ) # Name of the module
 golem::add_module( name = "user" ) # Name of the module
 golem::add_module( name = "memo" ) # Name of the module
-golem::add_module( name = "reproducibility" )
+golem::add_module( name = "agreement" )
+golem::add_module( name = "browser" )
 golem::add_module( name = "text_stats")
+golem::add_module( name = "summary" )
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -78,13 +85,10 @@ golem::add_utils( "analysis", module = "analysis" )
 golem::add_utils( "reporting", module = "reporting" )
 golem::add_utils( "user", module = "user" )
 golem::add_utils( "memo", module = "memo" )
-golem::add_utils( "reproducibility", module = "reproducibility" )
-golem::add_utils( "text_stats", module = "reproducibility" )
-
-
-
-
-
+golem::add_utils( "agreement", module = "agreement" )
+golem::add_utils( "text_stats", module = "agreement" )
+golem::add_utils( "browser", module = "browser" )
+golem::add_utils( "user_manager", module = "user_manager" )
 
 
 

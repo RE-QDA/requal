@@ -7,3 +7,5 @@
 .DS_Store
 .sqlite
 inst/doc
+requal.yml
+requal_users.sqlite

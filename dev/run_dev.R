@@ -9,5 +9,18 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
-(run_app())
+(run_app(
+  mode = "server",
+  dbname = "fsv_test",
+  dbhost = "localhost",
+  dbusername = "requal_admin",
+  dbpassword = "test",
+  credentials_path = "requal_users.sqlite",
+  credentials_pass = "test",
+  options = list("launch.browser")
+))
 
+# (run_app(
+#   mode = "local",
+#   options = list("launch.browser")
+# ))
