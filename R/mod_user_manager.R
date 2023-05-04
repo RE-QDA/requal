@@ -1,3 +1,5 @@
+utils::globalVariables(c("user_id_copy", "permission", "project_admin", "permissions_modify"))
+
 #' user_manager UI Function
 #'
 #' @description A shiny Module.
