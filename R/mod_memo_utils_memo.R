@@ -1,25 +1,52 @@
 # list existing memos ------
 list_memo_records <- function(pool, project) {
-    memos_df <- dplyr::tbl(pool, "memos") %>%
+    dplyr::tbl(pool, "memos") %>%
         dplyr::filter(.data$project_id == local(as.integer(project))) %>%
         dplyr::select(
             memo_id,
-            memo_name = text
+            memo_name = text, 
+            # memo_text = text, 
+            user_id
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
             memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
                                1, 50)) 
-    
-    return(memos_df)
 }
 
+read_memo_by_id <- function(pool, project, memo_id) {
+    dplyr::tbl(pool, "memos") %>%
+        dplyr::filter(.data$project_id == local(as.integer(project))) %>%
+        dplyr::filter(.data$memo_id == local(as.integer(memo_id))) %>% 
+        dplyr::select(
+            memo_id,
+            memo_name = text, 
+            memo_text = text, 
+            user_id
+        ) %>%
+        dplyr::collect() %>% 
+        dplyr::mutate(
+            memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
+                               1, 50)) 
+}
 
+find_memo_permission <- function(memo_user_id, user){
+    if(user$data$memo_modify == 0){
+        FALSE
+    }else if(memo_user_id == user$user_id){
+        TRUE
+    }else if(user$data$memo_other_modify == 1){
+        TRUE
+    }else{
+        FALSE
+    }
+}
 
 # write new free memo to db ------
 add_memo_record <- function(pool, project, text, user_id) {
     
     memo_df <- data.frame(project_id = local(project),
+                          user_id = user_id, 
                           text = text)
     
     res <- DBI::dbWriteTable(pool, "memos", memo_df, append = TRUE, row.names = FALSE)
@@ -50,13 +77,6 @@ render_memos <- function(id, memo_df) {
                 br()
                 )
     )
-}
-
-# read specific memo text from db ----
-read_memo_db <- function(pool, memo_id) {
-    memo_text <- dplyr::tbl(pool, "memos") %>%
-        dplyr::filter(.data$memo_id == as.integer(.env$memo_id)) %>%
-        dplyr::pull(text)
 }
 
 # update memo record ------

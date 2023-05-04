@@ -38,10 +38,8 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
     ##################
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
 
-
       # file system prep ----
       volumes <- c(Home = fs::path_home(), get_volume_paths())
-
 
       shinyFiles::shinyFileChoose(
         input,
