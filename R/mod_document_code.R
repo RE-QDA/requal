@@ -125,7 +125,7 @@ mod_document_code_server <- function(id, glob) {
           list(
             loc$code_df$active_codebook$code_id,
             loc$code_df$active_codebook$code_name,
-            loc$code_df$active_codebook$code_color
+            loc$code_df$active_codebook$code_color,
             loc$code_df$active_codebook$code_description
           ),
           ~ generate_coding_tools(
