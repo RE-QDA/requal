@@ -132,10 +132,10 @@ mod_document_code_server <- function(id, glob) {
             ns = ns,
             code_id = ..1,
             code_name = ..2,
-            code_color = ..3
+            code_color = ..3,
             code_desc = ..4)
           )
-        )
+
       } else {
         ""
       }
