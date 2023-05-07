@@ -230,7 +230,7 @@ mod_doc_manager_server <- function(id, glob) {
             user = glob$user
           )
 
-          updateSelectInput(
+          shinyWidgets::updatePickerInput(
             session = session,
             "doc_delete_list",
             choices = glob$documents
