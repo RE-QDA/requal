@@ -1,3 +1,5 @@
+utils::globalVariables(c("coders"))
+
 calculate_coders_overlap <- function(segments){
     segments %>% 
         dplyr::mutate(marked = purrr::map2(
