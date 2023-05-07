@@ -49,16 +49,14 @@ merge_code_UI <- function(id, pool, project, user) {
         selectInput(
             ns("merge_from"),
             label = "Merge from",
-            choices = c("", codes %>%
-                pair_code_id()),
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
             selected = "",
             multiple = FALSE
         ),
         selectInput(
             ns("merge_to"),
             label = "Merge into",
-            choices = c("", codes %>%
-                pair_code_id()),
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
             selected = "",
             multiple = FALSE
         ),
@@ -91,8 +89,7 @@ delete_code_UI <- function(id, pool, project, user) {
         selectizeInput(
             ns("code_to_del"),
             label = "Select codes to delete",
-            choices = codes %>%
-                pair_code_id(),
+            choices = stats::setNames(codes$code_id, codes$code_name),
             selected = NULL,
             multiple = TRUE,
             options = list(
@@ -160,22 +157,6 @@ list_db_codes <- function(pool, project_id, user) {
     return(project_codes)
 }
 
-# Pair code names and ids -----
-
-pair_code_id <- function(db_codes_df) {
-    ids <- db_codes_df %>%
-        dplyr::select(dplyr::ends_with("_id")) %>%
-        dplyr::pull()
-    
-    named_ids <- db_codes_df %>%
-        dplyr::select(dplyr::ends_with("_name")) %>%
-        dplyr::pull()
-    
-    choices <- ids
-    names(choices) <- named_ids
-    
-    return(choices)
-}
 
 
 

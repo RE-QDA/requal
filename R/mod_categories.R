@@ -1,3 +1,5 @@
+utils::globalVariables(c("category_id"))
+
 #' categories UI Function
 #'
 #' @description A shiny Module.
