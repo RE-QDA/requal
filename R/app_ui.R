@@ -33,7 +33,6 @@ app_ui <- function(request, mode = NULL, access = NULL) {
           inputId = ".shinymanager_logout",
           label = NULL,
           icon = icon("sign-out", verify_fa = FALSE),
-          style = "display:none;",
           title = "Logout"
         )) %>%
           tagAppendAttributes(class = "dropdown")
