@@ -79,4 +79,19 @@ app_server <- function(input, output, session) {
 
   # memo
   mod_memo_server("memo_ui_1", glob)
+
+  # admin interface
+  output$fab_button_ui <- renderUI({
+    req(glob$user$is_admin)
+        if (req(glob$user$is_admin)) {
+       shinymanager::fab_button(
+            actionButton(
+              inputId = ".shinymanager_admin",
+              label = "User database",
+              icon = icon("gears", verify_fa = FALSE)
+            ),
+            position = "bottom-left"
+          )
+    }
+  })
 }

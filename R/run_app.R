@@ -34,7 +34,7 @@ run_app <- function(mode = "local",
                                        height = "30%", style = "margin-right: 20px"
                                    ),
                                    enable_admin = TRUE,
-                                   fab_position = "bottom-left"
+                                   fab_position = "none"
           ),
           local = app_ui
           ),

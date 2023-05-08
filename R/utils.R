@@ -91,9 +91,7 @@ shinydashboard::tabItems(
     shinydashboard::tabItem("Analysis",
             mod_analysis_ui("analysis_ui_1")),
     shinydashboard::tabItem("Reporting",
-            mod_reporting_ui("reporting_ui_1")),
-    shinydashboard::tabItem("Settings",
-            mod_settings_ui("settings_ui_1"))
+            mod_reporting_ui("reporting_ui_1"))
 )
     )
     
@@ -139,16 +137,9 @@ set_left_menu <- function() {
                              "Report",
                              tabName = "Reporting",
                              icon = icon("chart-bar")
-                         )
-                         # menuItem(
-                         #   "Settings",
-                         #   tabName = "Settings"
-                         # ),
-                        #  shinydashboard::menuItem(
-                        #      "About",
-                        #      tabName = "About",
-                        #      icon = icon("info")
-                        #  )
+                         ),
+                         uiOutput("fab_button_ui")
+
                      ))
     
     
