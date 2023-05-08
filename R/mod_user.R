@@ -58,7 +58,7 @@ mod_user_server <- function(id, glob) {
           fluidRow(
             dashboardUserItem(
               width = 12,
-              tags$div(purrr::map(loc$permissions_list, tags$p),
+              tags$div(purrr::map(translate_permissions(loc$permissions_list), tags$p),
                        style = "text-align: left")
             )
           ))

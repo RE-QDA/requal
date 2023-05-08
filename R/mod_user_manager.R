@@ -16,12 +16,12 @@ mod_user_manager_ui <- function(id) {
       fluidRow(class = "module_tools",
       mod_rql_button_ui(ns("add_user_ui"),
         label = "Add user",
-        icon = "minus",
+        icon = "plus",
         inputId = ns("add_menu")
       ),
       mod_rql_button_ui(ns("remove_user_ui"),
         label = "Remove user",
-        icon = "plus",
+        icon = "minus",
         inputId = ns("remove_menu")
       ),
       mod_rql_button_ui(ns("modify_permissions_ui"),
@@ -164,7 +164,7 @@ mod_user_manager_server <- function(id, glob) {
           project_id %in% glob$active_project &
             user_id %in% req(input$members_to_remove)
         ) %>%
-        dplyr::pull(project_admin)
+        dplyr::pull(project_owner)
       if (any(owner_check == 1)) warn_user("Project owners cannot be removed from project.")
       req(all(owner_check == 0))
       remove_permissions_record(
@@ -189,20 +189,20 @@ mod_user_manager_server <- function(id, glob) {
         loc$users_to_add <- c("All registered users have been assigned." = 0)
       }
       # display users to add
-      updateSelectInput(
+      shinyWidgets::updatePickerInput(
         session = session,
         "rql_users",
-        choices = c("", loc$users_to_add)
+        choices = loc$users_to_add
       )
 
       # display users to remove
-      updateSelectInput(
+      shinyWidgets::updatePickerInput(
         session = session,
         "members_to_remove",
-        choices = c("", stats::setNames(
+        choices = stats::setNames(
           loc$users_permissions_df$user_id,
           loc$users_permissions_df$user_name
-        ))
+        )
       )
 
       # display users permissions
@@ -220,21 +220,57 @@ mod_user_manager_server <- function(id, glob) {
     })
 
     # Add user UI =======================================================
-    output$add_user_ui <- renderUI({
-      add_user_UI(id)
-    })
+    mod_rql_button_server(
+      id = "add_user_ui",
+      custom_title = "Add users to project",
+      custom_tagList = tagList(
+            rql_picker_UI(ns("rql_users"),
+                label = "Select users",
+                none = "Users to add"),
+            rql_button_UI(ns("assign"), 
+            label = "Add users")
+            ),
+      glob,
+      permission = "permissions_modify"
+    )
+
 
     # Remove user UI =======================================================
-    output$remove_user_ui <- renderUI({
-      remove_user_UI(id)
-    })
+    mod_rql_button_server(
+      id = "remove_user_ui",
+      custom_title = "Remove users from project",
+      custom_tagList = tagList(
+   rql_picker_UI(ns("members_to_remove"), "Select users:", none = "Users to remove"),
+   rql_button_UI(ns("remove_members"), "Remove users")
+            ),
+      glob,
+      permission = "permissions_modify"
+    )
+
    
    # Modify permissions UI =======================================================
-    output$modify_permissions_ui <- renderUI({
-      modify_permissions_UI(id)
-    })
-
-
+       mod_rql_button_server(
+      id = "modify_permissions_ui",
+      custom_title = "Modify user permissions for project",
+      custom_tagList = tagList(
+   rql_picker_UI(
+      ns("members_permissions"), 
+      "Select users:",
+      none = "Users to change permissions"),
+    checkboxGroupInput(
+      ns("permissions_list"),
+      label = NULL,
+      choices = stats::setNames(
+          permission(),
+          translate_permissions(permission())
+          )
+    ),
+    rql_button_UI(ns("save_permissions"), "Save permissions")
+            ),
+      glob,
+      permission = "permissions_modify"
+    )
+  
     # hide save permission UI from users without sufficient permission ======
     observeEvent(loc$users_permissions_df, {
       loc$permissions_modify <- loc$users_permissions_df %>%

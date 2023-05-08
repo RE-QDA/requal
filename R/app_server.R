@@ -36,13 +36,16 @@ app_server <- function(input, output, session) {
     shinyjs::show(id = "btn-memo")
   })
 
-  # documents  ----
+  # Project  ----
   mod_project_server("mod_project_ui_1", glob)
-  # output: no output, permissions and membership written to DB
-  # ---- to prevent manipulation via UI
+  # Manage users ---- 
   mod_user_manager_server("user_manager_1", glob)
-  
-  # data ----
+  # output: no output, permissions and membership written to DB
+  # to prevent manipulation via UI
+  # About ----
+  mod_about_server("about_ui_1", glob)
+
+  # Data ----
   mod_data_server("data_1", glob)
 
 
@@ -70,8 +73,6 @@ app_server <- function(input, output, session) {
   mod_browser_server("browser_ui_1", glob)
   mod_summary_server("summary_ui_1", glob)
 
-  # about -----
-  mod_about_server("about_ui_1", glob)
 
   # user
   mod_user_server("user_ui_1", glob)
