@@ -82,7 +82,6 @@ app_server <- function(input, output, session) {
 
   # admin interface
   output$fab_button_ui <- renderUI({
-    req(glob$user$is_admin)
         if (req(glob$user$is_admin)) {
        shinymanager::fab_button(
             actionButton(
