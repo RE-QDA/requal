@@ -114,7 +114,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
       observeEvent(input$project_create, {
         req(input$project_name)
-        browser()
+
         if (!isTruthy(glob$active_project)) {
           glob$pool <- pool
         }
@@ -135,7 +135,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
             append = TRUE, row.names = FALSE
           )
       # abort project creation if user is not project admin
-        } else if (!glob$user$project_admin) {
+        } else if (!as.logical(glob$user$project_admin)) {
           warn_user("Only users with project administration privileges can create new projects.")
           req(glob$user$project_admin)
         } else {

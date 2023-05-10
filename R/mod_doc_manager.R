@@ -39,6 +39,7 @@ mod_doc_manager_server <- function(id, glob) {
     output$no_active_project <- renderUI({
       if (is.null(glob$active_project)) {
         "No active project."
+        "test"
       } 
     })
 
