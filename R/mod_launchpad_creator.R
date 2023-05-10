@@ -114,7 +114,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
     observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
       observeEvent(input$project_create, {
         req(input$project_name)
-
+        browser()
         if (!isTruthy(glob$active_project)) {
           glob$pool <- pool
         }
@@ -122,13 +122,6 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
         # user control ----
         existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
           dplyr::pull(user_id)
-        
-        # FIXME: this is a hotfix 
-        if(length(glob$user$project_admin) == 0 | is.null(glob$user$project_admin)){
-          glob$user$project_admin <- glob$user$is_admin
-        }else{
-          glob$user$project_admin <- FALSE
-        }
 
         # create user in db if an unknown project admin logs in
         if (glob$user$project_admin && !(glob$user$user_id %in% existing_user_id)) {
