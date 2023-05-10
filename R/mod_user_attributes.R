@@ -11,10 +11,8 @@ mod_user_attributes_ui <- function(id){
   ns <- NS(id)
   tagList(
     textOutput(ns("user_message")),
-    uiOutput(ns("attribute_name_ui")) %>% 
-      tagAppendAttributes(class = "required"),
-    uiOutput(ns("attribute_values_ui")) %>% 
-      tagAppendAttributes(class = "required"),
+    uiOutput(ns("attribute_name_ui")),
+    uiOutput(ns("attribute_values_ui")),
     uiOutput(ns("add_attribute_ui")),
     DT::dataTableOutput(ns("user_attributes_table")),
     plotOutput(ns("user_attributes_chart"))
