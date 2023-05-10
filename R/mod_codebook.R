@@ -17,17 +17,30 @@ mod_codebook_ui <- function(id) {
       tabPanel("Codes",
         id = ns("codebook_tabset"),
         value = "codebook_tabset",
+    fluidRow(
+      class = "module_tools",
+      mod_rql_button_ui(ns("code_create_ui"),
+        label = "Create code",
+        icon = "plus"
+      ),
+      mod_rql_button_ui(ns("code_merge_ui"),
+        label = "Merge codes",
+        icon = "compress"
+      ),
+      mod_rql_button_ui(ns("code_delete_ui"),
+        label = "Delete code",
+        icon = "minus"
+      ),
+    ),
         fluidRow(
+          class = "module_content",
           column(
             width = 10,
             br(),
             uiOutput(
               ns("codes_ui")
             ) %>% tagAppendAttributes(class = "scrollable90")
-          ),
-
-          # menu
-          uiOutput(ns("code_mgmt_ui"))
+          )
         )
       ),
       tabPanel("Categories",
@@ -97,13 +110,6 @@ mod_codebook_server <- function(id, glob) {
         )
       }
     })
-
-    #---Create code UI --------------
-    output$code_create_ui <- renderUI({
-      req(glob$active_project)
-      create_code_UI(id)
-    })
-    outputOptions(output, "code_create_ui", suspendWhenHidden = FALSE)
 
     #---Create new code------------------------------------------------------
     observeEvent(input$code_add, {
@@ -176,16 +182,7 @@ mod_codebook_server <- function(id, glob) {
         )
     })
 
-    #---Delete code UI --------------
-    output$code_delete_ui <- renderUI({
-      req(glob$active_project)
-      delete_code_UI(id, glob$pool, glob$active_project, glob$user)
-    })
-    outputOptions(output, "code_delete_ui", suspendWhenHidden = FALSE)
-
     #---Delete existing code-------------------------------------
-
-
     observeEvent(input$code_del_btn, {
       req(input$code_to_del)
 
@@ -241,12 +238,6 @@ mod_codebook_server <- function(id, glob) {
         )
     })
 
-    #---Merge code UI --------------
-    output$code_merge_ui <- renderUI({
-      req(glob$active_project)
-      merge_code_UI(id, glob$pool, glob$active_project, glob$user)
-    })
-    outputOptions(output, "code_merge_ui", suspendWhenHidden = FALSE)
 
     #---Merge codes-----------------------------------------------------
     observeEvent(input$code_merge, {
@@ -292,6 +283,32 @@ mod_codebook_server <- function(id, glob) {
         NULL
       }
     })
+
+    # Codes UI ---- 
+    #---Create code UI --------------
+    mod_rql_button_server(
+      id = "code_create_ui",
+      custom_title = "Create code",
+      custom_tagList = create_code_UI(ns),
+      glob,
+      permission = "codebook_modify"
+    )
+    #---Merge code UI --------------
+    mod_rql_button_server(
+      id = "code_merge_ui",
+      custom_title = "Merge codes",
+      custom_tagList = merge_code_UI(ns, glob$pool, glob$active_project, glob$user),
+      glob,
+      permission = "codebook_modify"
+    )
+    #---Delete code UI --------------
+    mod_rql_button_server(
+      id = "code_delete_ui",
+      custom_title = "Delete code",
+      custom_tagList = delete_code_UI(ns, glob$pool, glob$active_project, glob$user),
+      glob,
+      permission = "codebook_modify"
+    )
 
     # returns loc$codebook ----
 
