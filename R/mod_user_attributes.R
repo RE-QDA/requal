@@ -11,8 +11,10 @@ mod_user_attributes_ui <- function(id){
   ns <- NS(id)
   tagList(
     textOutput(ns("user_message")),
-    uiOutput(ns("attribute_name_ui")),
-    uiOutput(ns("attribute_values_ui")),
+    uiOutput(ns("attribute_name_ui")) %>% 
+      tagAppendAttributes(class = "required"),
+    uiOutput(ns("attribute_values_ui")) %>% 
+      tagAppendAttributes(class = "required"),
     uiOutput(ns("add_attribute_ui")),
     DT::dataTableOutput(ns("user_attributes_table")),
     plotOutput(ns("user_attributes_chart"))
@@ -72,7 +74,11 @@ mod_user_attributes_server <- function(id, glob){
                         .data$project_id == !!as.numeric(glob$active_project)) %>% 
         dplyr::collect()
       
-      if(!input$attribute_name %in% existing_attributes$attribute_name){
+      if(input$attribute_name == "" | input$attribute_values == ""){
+        warn_user("Attribute name and values cannot be empty.")
+      }else if(input$attribute_name %in% existing_attributes$attribute_name){
+        warn_user(paste0("Attribute ", input$attribute_name, " already exists. Choose a different name."))
+      }else{
         add_attribute(pool = glob$pool, input$attribute_name,
                       type = "category", object = "user", 
                       project_id = glob$active_project)
@@ -93,10 +99,10 @@ mod_user_attributes_server <- function(id, glob){
                                     attribute_name = input$attribute_name,
                                     attribute_id = new_attribute_id, 
                                     attribute_values = input$attribute_values)) 
+        
+        shinyjs::reset("attribute_name")
+        shinyjs::reset("attribute_values")
       }
-      
-      shinyjs::reset("attribute_name")
-      shinyjs::reset("attribute_values")
       
       user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
       
