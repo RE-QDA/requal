@@ -15,7 +15,6 @@ mod_doc_manager_ui <- function(id) {
     column(
       width = 10,
       br(),
-      "test",
       htmlOutput(ns("project_name")),
       uiOutput(ns("no_active_project")),
       tags$div(

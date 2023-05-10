@@ -104,7 +104,7 @@ set_left_menu <- function() {
                      collapsed = FALSE,
                      shinydashboard::sidebarMenu(
                          shinydashboard::menuItem(
-                             "Project",
+                             "Project test",
                              tabName = "Project",
                              icon = icon("book")
                          ),
