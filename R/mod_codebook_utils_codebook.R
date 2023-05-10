@@ -1,10 +1,8 @@
 # Create codebook manager UI
 
 #' @importFrom rlang .data
-create_code_UI <- function(id) {
-    ns <- NS(id)
+create_code_UI <- function(ns) {
     tags$div(
-        h4("Create codes"),
         textInput(
             ns("code_name"),
             label = "Code name",
@@ -28,7 +26,7 @@ create_code_UI <- function(id) {
     )  %>% tagAppendAttributes(style = "text-align: left")
 }
 
-merge_code_UI <- function(id, pool, project, user) {
+merge_code_UI <- function(ns, pool, project, user) {
     
     req(user$data)
     
@@ -41,11 +39,8 @@ merge_code_UI <- function(id, pool, project, user) {
     if(user$data$codebook_other_modify == 0){
         codes <- codes %>% 
             dplyr::filter(user_id == !!user$user_id)
-    }
-    
-    ns <- NS(id)
+    }   
     tags$div(
-        h4("Merge codes"),
         selectInput(
             ns("merge_from"),
             label = "Merge from",
@@ -68,7 +63,7 @@ merge_code_UI <- function(id, pool, project, user) {
 }
 
 
-delete_code_UI <- function(id, pool, project, user) {
+delete_code_UI <- function(ns, pool, project, user) {
     
     req(user$data)
     
@@ -82,10 +77,7 @@ delete_code_UI <- function(id, pool, project, user) {
         codes <- codes %>% 
             dplyr::filter(user_id == !!user$user_id)
     }
-    
-    ns <- NS(id)
     tags$div(
-        h4("Delete codes"),
         selectizeInput(
             ns("code_to_del"),
             label = "Select codes to delete",
