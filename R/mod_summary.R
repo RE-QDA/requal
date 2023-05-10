@@ -141,12 +141,15 @@ mod_summary_server <- function(id, glob) {
     observeEvent(input$calculate, {
       req(glob$active_project)
 
-      loc$coded_segments <- load_all_segments_db(
-        pool = glob$pool,
-        active_project = glob$active_project
-      ) %>%
-        dplyr::left_join(., loc$codes, by = "code_id") %>%
-        dplyr::left_join(., loc$docs, by = "doc_id") %>%
+      loc$coded_segments <- 
+        load_all_segments_db(
+          pool = glob$pool,
+          active_project = glob$active_project
+        ) %>%
+        dplyr::left_join(., loc$codes %>% dplyr::select(code_id, code_name), 
+                         by = "code_id") %>%
+        dplyr::left_join(., loc$docs %>% dplyr::select(doc_id, doc_name), 
+                         by = "doc_id") %>% 
         dplyr::filter(
           user_id %in% as.integer(input$summary_coders) &
             code_id %in% as.integer(input$summary_codes) &

@@ -11,7 +11,7 @@ golem::document_and_reload()
 # Run the application
 (run_app(
   mode = "server",
-  dbname = "requal",
+  dbname = "fsv_test",
   dbhost = "localhost",
   dbusername = "requal_admin",
   dbpassword = "test",

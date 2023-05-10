@@ -1,3 +1,4 @@
+utils::globalVariables(c("sql"))
 
 db_call <- c(
   
@@ -135,8 +136,10 @@ CREATE TABLE if not exists logs
 CREATE TABLE if not exists memos (
     project_id INTEGER
 ,   memo_id INTEGER PRIMARY KEY AUTOINCREMENT
+,   user_id INTEGER
 ,   text TEXT
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 ",
   
@@ -240,7 +243,10 @@ CREATE TABLE if not exists user_permissions (
 ,   analysis_other_view INTEGER    
 ,   report_other_view INTEGER      
 ,   permissions_modify INTEGER
-,   project_admin INTEGER     
+,   memo_modify INTEGER
+,   memo_other_modify INTEGER
+,   memo_other_view INTEGER
+,   project_owner INTEGER     
 ,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
@@ -399,24 +405,27 @@ update_db_schema <- function(pool) {
 
 create_default_user <- function(pool, project_id, user_id) {
 
-  default_user_permission_df <- tibble::tibble(
-    data_modify                  = 1,
-    data_other_modify            = 1,
-    data_other_view              = 1,
-    attributes_modify            = 1,
-    attributes_other_modify      = 1,
-    attributes_other_view        = 1,
-    codebook_modify              = 1,
-    codebook_other_modify        = 1,
-    codebook_other_view          = 1,
-    annotation_modify            = 1,
-    annotation_other_modify      = 1,
-    annotation_other_view        = 1,
-    analysis_other_view          = 1,
-    report_other_view            = 1,
-    permissions_modify           = 1,
-    project_admin                = 1
-  )
+default_user_permission_df <- tibble::tibble(
+      data_modify                  = 1,
+      data_other_modify            = 1,
+      data_other_view              = 1,
+      attributes_modify            = 1,
+      attributes_other_modify      = 1,
+      attributes_other_view        = 1,
+      codebook_modify              = 1,
+      codebook_other_modify        = 1,
+      codebook_other_view          = 1,
+      annotation_modify            = 1,
+      annotation_other_modify      = 1,
+      annotation_other_view        = 1,
+      analysis_other_view          = 1,
+      report_other_view            = 1,
+      permissions_modify           = 1,
+      memo_modify                  = 1, 
+      memo_other_modify            = 1, 
+      memo_other_view              = 1, 
+      project_owner                = 1
+    )
 
   if (golem::get_golem_options("mode") == "local") {
     user_df <- tibble::tibble(
@@ -487,7 +496,8 @@ add_documents_record <- function(pool, project_id, document_df, user_id) {
                       .data$user_id == !!user_id) %>%
       dplyr::pull(doc_id)
     log_add_document_record(pool, project_id, document_df %>%
-                              dplyr::mutate(doc_id = written_document_id),
+                              dplyr::mutate(doc_id = written_document_id, 
+                                            doc_text = substr(doc_text, 1, 140)),
                             user_id = user_id
     )
   } else {
