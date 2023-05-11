@@ -12,16 +12,16 @@ mod_attributes_ui <- function(id){
 
   tabsetPanel(
       type = "tabs", id = ns("attributes_tabset"),
-     tabPanel("Attributes", 
-               id = ns("attributes_manager"), 
-               value = "attributes_manager", 
-               mod_attributes_manager_ui(ns("attributes_manager_1"))
-  ),
       tabPanel("User attributes", 
                id = ns("user_attributes"), 
                value = "user_attributes", 
                mod_user_attributes_ui(ns("user_attributes_ui_1"))
-  )
+  ),
+       tabPanel("Attributes", 
+               id = ns("attributes_manager"), 
+               value = "attributes_manager", 
+               mod_attributes_manager_ui(ns("attributes_manager_1"))
+  ) # TODO move to first position when ready
     
   
   )
