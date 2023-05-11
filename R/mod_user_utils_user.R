@@ -136,7 +136,7 @@ transform_user_table <- function(user_table) {
     )) %>%
     tidyr::unite("Data", tidyselect::starts_with("data"), sep = "") %>%
     tidyr::unite("Attributes", tidyselect::starts_with("attributes"), sep = "") %>%
-    tidyr::unite("Codebook", tidyselect::starts_with("codes"), sep = "") %>%
+    tidyr::unite("Codebook", tidyselect::starts_with("codebook"), sep = "") %>%
     tidyr::unite("Annotate", tidyselect::starts_with("annotation"), sep = "") %>%
     tidyr::unite("Analyze", tidyselect::starts_with("analysis"), sep = "") %>%
     tidyr::unite("Report", tidyselect::starts_with("report"), sep = "") %>%
@@ -151,10 +151,11 @@ transform_user_table <- function(user_table) {
       "Mail"  = user_mail,
       "Data",
       "Attributes",
+      "Codebook",
       "Annotate",
-      "Memos",
       "Analyze",
       "Report",
+      "Memos",
       "Created" = created_at
     )
 }
