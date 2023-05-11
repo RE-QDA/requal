@@ -16,7 +16,7 @@ mod_attributes_ui <- function(id){
                id = ns("attributes_manager"), 
                value = "attributes_manager", 
                mod_attributes_manager_ui(ns("attributes_manager_1"))
-  ),
+  ) %>% tagAppendAttributes(style = "display:none"), #TODO 
       tabPanel("User attributes", 
                id = ns("user_attributes"), 
                value = "user_attributes", 
