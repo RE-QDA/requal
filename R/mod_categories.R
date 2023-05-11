@@ -22,7 +22,7 @@ mod_categories_ui <- function(id) {
         label = "Delete category",
         icon = "minus"
       )
-    ),
+    )%>% tagAppendAttributes(class = "module_tools"),
     fluidRow(
       class = "module_content",
       column(
@@ -140,29 +140,6 @@ mod_categories_server <- function(id, glob) {
           )
         })
 
-        # refresh create UI
-        updateTextInput(
-          session = session,
-          inputId = "category_name",
-          value = ""
-        )
-        updateTextAreaInput(
-          session = session,
-          inputId = "category_desc",
-          value = ""
-        )
-
-        # refresh delete UI
-        updateSelectInput(
-          session = session,
-          inputId = "categories_to_del",
-          choices = c("", read_db_categories(
-            pool = glob$pool,
-            active_project = glob$active_project,
-            user = glob$user
-          ))
-        )
-
         # update return value
         glob$category <- read_db_categories(
           pool = glob$pool,
@@ -193,17 +170,6 @@ mod_categories_server <- function(id, glob) {
         active_project = glob$active_project,
         user_id = glob$user_id,
         delete_cat_id = input$categories_to_del
-      )
-
-      # refresh delete UI
-      updateSelectInput(
-        session = session,
-        inputId = "categories_to_del",
-        choices = c("", read_db_categories(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user = glob$user
-        ))
       )
 
       # refresh listed categories
