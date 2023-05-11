@@ -71,11 +71,14 @@ mod_user_attributes_server <- function(id, glob){
         dplyr::filter(.data$attribute_object == "user" & 
                         .data$project_id == !!as.numeric(glob$active_project)) %>% 
         dplyr::collect()
-      
-      if(input$attribute_name == "" | input$attribute_values == ""){
+      if(!isTruthy(input$attribute_name) | !isTruthy(input$attribute_values)){
         warn_user("Attribute name and values cannot be empty.")
       }else if(input$attribute_name %in% existing_attributes$attribute_name){
         warn_user(paste0("Attribute ", input$attribute_name, " already exists. Choose a different name."))
+      }else if(
+        length(strsplit(input$attribute_values, split = "[,;\r\n]")[[1]]) != length(unique(strsplit(input$attribute_values, split = "[,;\r\n]")[[1]]))
+        ){
+        warn_user("Attribute values must be unique.")
       }else{
         add_attribute(pool = glob$pool, input$attribute_name,
                       type = "category", object = "user", 
