@@ -28,7 +28,7 @@ mod_doc_manager_ui <- function(id) {
     fluidRow(
       class = "module_content",
       tags$style(".shiny-file-input-progress {display: none}"),
-      tags$h2("List of project documents"),
+      tags$h2("Project documents"),
       tags$div(
         tableOutput(ns("doc_list_table"))
       ) %>%

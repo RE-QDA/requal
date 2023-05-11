@@ -159,10 +159,8 @@ list_db_categories <- function(id, pool, project_id) {
 
 # create category UI -----
 
-create_new_category_UI <- function(id) {
-    ns <- NS(id)
+create_new_category_UI <- function(ns) {
     tags$div(
-        h4("Create category"),
         textInput(
             ns("category_name"),
             label = "Category name",
@@ -181,16 +179,13 @@ create_new_category_UI <- function(id) {
 
 # delete category UI -----
 
-delete_category_UI <- function(id, pool, active_project, user) {
+delete_category_UI <- function(ns, pool, active_project, user) {
     req(user)
     categories <- read_db_categories(
         pool, active_project = active_project, 
         user = user
     )
-    
-    ns <- NS(id)
     tags$div(
-        h4("Delete category"),
         selectizeInput(
             ns("categories_to_del"),
             label = "Select categories to delete",
