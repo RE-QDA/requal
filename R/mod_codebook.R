@@ -46,7 +46,7 @@ mod_codebook_ui <- function(id) {
       tabPanel("Categories",
         id = ns("categories"),
         value = "categories",
-        mod_categories_ui("categories_ui_1")
+        mod_categories_ui("categories_ui_1") 
       )
     )
   )
