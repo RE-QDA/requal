@@ -76,7 +76,7 @@ mod_user_attributes_server <- function(id, glob){
       }else if(input$attribute_name %in% existing_attributes$attribute_name){
         warn_user(paste0("Attribute ", input$attribute_name, " already exists. Choose a different name."))
       }else if(
-        length(strsplit(input$attribute_values, split = "[,;\r\n]")[[1]]) != length(unique(strsplit(input$attribute_values, split = "[,;\r\n]")[[1]]))
+        length(split_values(input$attribute_values)) != length(unique(split_values(input$attribute_values)))
         ){
         warn_user("Attribute values must be unique.")
       }else{
