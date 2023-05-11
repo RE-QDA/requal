@@ -125,15 +125,17 @@ mod_document_code_server <- function(id, glob) {
           list(
             loc$code_df$active_codebook$code_id,
             loc$code_df$active_codebook$code_name,
-            loc$code_df$active_codebook$code_color
+            loc$code_df$active_codebook$code_color,
+            loc$code_df$active_codebook$code_description
           ),
           ~ generate_coding_tools(
             ns = ns,
             code_id = ..1,
             code_name = ..2,
-            code_color = ..3
+            code_color = ..3,
+            code_desc = ..4)
           )
-        )
+
       } else {
         ""
       }
