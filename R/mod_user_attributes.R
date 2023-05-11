@@ -82,7 +82,8 @@ mod_user_attributes_server <- function(id, glob){
       }else{
         add_attribute(pool = glob$pool, input$attribute_name,
                       type = "category", object = "user", 
-                      project_id = glob$active_project)
+                      project_id = glob$active_project, 
+                      user_id = glob$user$user_id)
         
         new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
           dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
