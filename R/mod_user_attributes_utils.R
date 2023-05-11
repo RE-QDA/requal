@@ -13,15 +13,17 @@ add_attribute <- function(pool, attribute_name, type = "categorical", object, pr
     if(!res) warning("attribute was not added")
 }
 
+split_values <- function(x){
+  strsplit(x, "[,;\r\n]") %>% 
+    unlist() %>% 
+    trimws()
+}
+
 add_attribute_values <- function(pool, attribute_id, attribute_values){
   
-    values <- strsplit(attribute_values, ",") %>% 
-        unlist() %>% 
-        trimws()
-    
     values_df <- data.frame(
         attribute_id = attribute_id, 
-        value = values
+        value = split_values(attribute_values)
     )
     
     res <- DBI::dbWriteTable(pool, "attribute_values", values_df, append = TRUE, row.names = FALSE)
