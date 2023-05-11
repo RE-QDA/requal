@@ -36,7 +36,7 @@ mod_document_code_ui <- function(id) {
       ),
       br(), br(),
       uiOutput(ns("code_list"))
-    )
+    ) %>% tagAppendAttributes(class = "scrollable90")
   )
 }
 
