@@ -43,9 +43,9 @@ read_user_attributes <- function(pool, project_id){
         dplyr::collect()
 }
 
-get_user_attributes_data_table <- function(pool, project_id){
+get_user_attributes_data_table <- function(ns, pool, project_id){
   # create memo as link ----
-  js_fun <- "Shiny.setInputValue('user_attributes_ui_1-selected_attr', this.name, {priority: 'event'});"
+  js_fun <- paste0("Shiny.setInputValue('", ns("selected_attr"), "', this.name, {priority: 'event'});")
   quote_sign <- '"'
   
   read_user_attributes(pool, project_id) %>% 

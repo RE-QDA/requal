@@ -15,6 +15,7 @@ mod_user_attributes_ui <- function(id){
     uiOutput(ns("attribute_values_ui")),
     uiOutput(ns("add_attribute_ui")),
     DT::dataTableOutput(ns("user_attributes_table")),
+    actionButton(ns("show_graph"), label = "Show distribution", icon = icon("chart-pie", verify_fa = FALSE)),
     plotOutput(ns("user_attributes_chart"))
   )
 }
@@ -25,25 +26,22 @@ mod_user_attributes_ui <- function(id){
 mod_user_attributes_server <- function(id, glob){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-    
-    output$user_attributes_table <- DT::renderDataTable({
-      get_user_attributes_data_table(glob$pool, project_id = glob$active_project) %>% 
-      DT::datatable(., escape = FALSE, 
-                options = list(dom = 't', paging = FALSE, ordering = FALSE), 
-                colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
-    })
-    
-    observeEvent(glob$active_project, {
-      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
-      # re-render on project change
-      output$user_attributes_table <- DT::renderDT({
-        user_attributes }, 
-        escape = FALSE, 
+    loc <- reactiveValues()
+
+     output$user_attributes_table <- DT::renderDT({
+        req(loc$user_attributes)}, escape = FALSE, 
         options = list(dom = 't', paging = FALSE, ordering = FALSE), 
         colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
-      
-      output$user_attributes_chart <- renderPlot({
+
+    observeEvent(glob$active_project, {
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
+      # re-render on project change
+    })
+
+    observeEvent(input$show_graph, {
         req(glob$active_project)
+
+        output$user_attributes_chart <- renderPlot({
         
         user_attributes_summary <- get_user_attributes_summary(glob$pool, glob$active_project)
         
@@ -105,12 +103,8 @@ mod_user_attributes_server <- function(id, glob){
         shinyjs::reset("attribute_values")
       }
       
-      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
       
-      output$user_attributes_table <- DT::renderDT({
-        user_attributes}, escape = FALSE, 
-        options = list(dom = 't', paging = FALSE, ordering = FALSE), 
-        colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
     })
     
     observeEvent(input$selected_attr, {
@@ -147,15 +141,14 @@ mod_user_attributes_server <- function(id, glob){
       }
     })
     
+   
+
     observeEvent(input$delete_attr, {
       delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
                             user_id = glob$user$user_id, input$selected_attr)
       
-      user_attributes <- get_user_attributes_data_table(glob$pool, project_id = glob$active_project)
-      output$user_attributes_table <- DT::renderDT({
-        user_attributes}, escape = FALSE, 
-        options = list(dom = 't', paging = FALSE, ordering = FALSE), 
-        colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
+      
       
       removeModal()
     })
