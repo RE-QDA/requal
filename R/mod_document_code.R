@@ -174,6 +174,7 @@ mod_document_code_server <- function(id, glob) {
     # Segment removal ----------
     observeEvent(input$remove_codes, {
       req(glob$active_project)
+      req(isTruthy(input$doc_selector))
       
       if(glob$user$data$annotation_other_modify == 0){
         loc$marked_segments_df <- load_segment_codes_db(
