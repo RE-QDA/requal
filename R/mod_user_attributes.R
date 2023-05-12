@@ -10,13 +10,25 @@
 mod_user_attributes_ui <- function(id){
   ns <- NS(id)
   tagList(
+    fluidRow(
+      class = "module_tools",
+      div(
+      mod_rql_button_ui(ns("attribute_create_ui"),
+        label = "Create attribute",
+        icon = "plus"
+      )) %>% tagAppendAttributes(style = "padding-right: 25px;"),
+      mod_rql_button_ui(ns("attribute_delete_ui"),
+        label = "Delete attribute",
+        icon = "minus"
+      )
+    ),
+    fluidRow(
+      class = "module_content",
     textOutput(ns("user_message")),
-    uiOutput(ns("attribute_name_ui")),
-    uiOutput(ns("attribute_values_ui")),
-    uiOutput(ns("add_attribute_ui")),
     DT::dataTableOutput(ns("user_attributes_table")),
     actionButton(ns("show_graph"), label = "Show distribution", icon = icon("chart-pie", verify_fa = FALSE)),
     plotOutput(ns("user_attributes_chart"))
+  )
   )
 }
     
@@ -28,17 +40,22 @@ mod_user_attributes_server <- function(id, glob){
     ns <- session$ns
     loc <- reactiveValues()
 
+    # re-render attributes data on project change
+    observeEvent(glob$active_project, {
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, 
+      glob$pool, 
+      project_id = glob$active_project)
+    })
+
+    # attributes table
      output$user_attributes_table <- DT::renderDT({
         req(loc$user_attributes)}, escape = FALSE, 
         options = list(dom = 't', paging = FALSE, ordering = FALSE), 
         colnames = c("Attribute ID", "Attribute name", "Attribute values", "Actions"))
-
-    observeEvent(glob$active_project, {
-      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
-      # re-render on project change
-    })
-
+    
+    # pie chart
     observeEvent(input$show_graph, {
+      browser()
         req(glob$active_project)
         output$user_attributes_chart <- renderPlot({
         
@@ -62,6 +79,7 @@ mod_user_attributes_server <- function(id, glob){
       })
     })
     
+    # Add attribute event ----
     observeEvent(input$add_attribute, {
       
       existing_attributes <- dplyr::tbl(glob$pool, "attributes") %>% 
@@ -103,9 +121,12 @@ mod_user_attributes_server <- function(id, glob){
       }
       
       loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
-      
+      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
+            loc$user_attributes$attribute_id,
+            loc$user_attributes$attribute_name))
     })
     
+    # Attribute table event ----
     observeEvent(input$selected_attr, {
       user_attribute_name <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(attribute_id == !!input$selected_attr) %>% 
@@ -141,42 +162,76 @@ mod_user_attributes_server <- function(id, glob){
     })
     
    
-
+    # Delete attribute event from table ----
     observeEvent(input$delete_attr, {
+   
       delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
                             user_id = glob$user$user_id, input$selected_attr)
+
       
       loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
       
+      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
+            loc$user_attributes$attribute_id,
+            loc$user_attributes$attribute_name))
       
       removeModal()
     })
+
+    # Delete attribute event from tools ----
+    observeEvent(input$attribute_delete_btn, {
+
+
+      delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
+                            user_id = glob$user$user_id, input$attribute_delete)
+      
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
+      
+      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
+            loc$user_attributes$attribute_id,
+            loc$user_attributes$attribute_name))
+
+    })
     
     output$user_message <- renderText({
-      "Here you can add user attributes for your users to select from." 
+      "Here you can add user attributes for your users to self-report." 
     })
     
-    output$attribute_name_ui <- renderUI({
-      if(glob$user$data$attributes_modify == 1){
-        textInput(ns("attribute_name"), 
+    #---Create attribute UI --------------
+    mod_rql_button_server(
+      id = "attribute_create_ui",
+      custom_title = "Create attribute",
+      custom_tagList = tagList(
+          textInput(ns("attribute_name"), 
                   label = "Attribute name",
-                  placeholder = "Write an attribute name") 
-      }
-    })
-    
-    output$attribute_values_ui <- renderUI({
-      if(glob$user$data$attributes_modify == 1){
-        textAreaInput(ns("attribute_values"), 
+                  placeholder = "Write an attribute name"),
+          textAreaInput(ns("attribute_values"), 
                       label = "Attribute values",
-                      placeholder = "Write possible attribute values separated by comma")
-      }
-    })
-    
-    output$add_attribute_ui <- renderUI({
-      if(glob$user$data$attributes_modify == 1){
-        actionButton(ns("add_attribute"), "Add user attribute")
-      }
-    })
+                      placeholder = "Write possible attribute values separated by comma"),
+           actionButton(ns("add_attribute"), "Add user attribute")
+      ),
+      glob,
+      permission = "attributes_modify"
+    )
+    #---Delete attribute UI --------------
+    mod_rql_button_server(
+      id = "attribute_delete_ui",
+      custom_title = "Delete attribute",
+      custom_tagList = tagList(
+        rql_picker_UI(
+          ns("attribute_delete"),
+          label = "Select attributes:",
+          choices = stats::setNames(
+            loc$user_attributes$attribute_id,
+            loc$user_attributes$attribute_name),
+          multiple = FALSE,
+          none = "Attributes to delete"
+        ),
+        actionButton(ns("attribute_delete_btn"), "Delete user attribute")
+      ),
+      glob,
+      permission = "attributes_modify"
+    )
     
   })
 }

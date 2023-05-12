@@ -381,14 +381,22 @@ dt_options <- function() {
 # Requal menu buttons 
 
 rql_picker_UI <- function(inputId, label, choices = "", multiple = TRUE, none = "") { 
-    shinyWidgets::pickerInput(inputId, label,
-      choices = "", multiple = multiple,
-      options = list(
+
+    if (multiple) {
+    options <- list(
         `actions-box` = TRUE,
         `select-all-text` = "Select all",
         `deselect-all-text` = "Reset",
         `none-selected-text` = none
       )
+    } else {
+       options <- list(
+        `none-selected-text` = none
+      )
+    }
+    shinyWidgets::pickerInput(inputId, label,
+      choices = choices, multiple = multiple,
+      options = options
     )
 } 
 
