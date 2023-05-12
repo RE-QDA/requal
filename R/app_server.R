@@ -29,10 +29,11 @@ app_server <- function(input, output, session) {
   mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
 
   mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
-
+  
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
     shinyjs::show(id = "btn-memo")
+    shinyjs::show(selector = "div.tab-content")
   })
 
   # Project  ----

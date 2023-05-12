@@ -76,7 +76,7 @@ set_dashboard_body <- function() {
 
   '))),
 
-shinydashboard::tabItems(
+shinyjs::hidden(shinydashboard::tabItems(
     
     shinydashboard::tabItem("Project",
             mod_project_ui("mod_project_ui_1")),
@@ -86,13 +86,14 @@ shinydashboard::tabItems(
             mod_attributes_ui("attributes_1")),
     shinydashboard::tabItem("Codebook",
             mod_codebook_ui("codebook_ui_1")),
-    shinydashboard::tabItem("Document",
+    shinydashboard::tabItem("Annotate",
             mod_document_code_ui("document_code_ui_1")),
-    shinydashboard::tabItem("Analysis",
+    shinydashboard::tabItem("Analyze",
             mod_analysis_ui("analysis_ui_1")),
-    shinydashboard::tabItem("Reporting",
+    shinydashboard::tabItem("Report",
             mod_reporting_ui("reporting_ui_1"))
 )
+    )
     )
     
 }
@@ -125,17 +126,17 @@ set_left_menu <- function() {
                          ),
                          shinydashboard::menuItem(
                              "Annotate",
-                             tabName = "Document",
+                             tabName = "Annotate",
                              icon = icon("marker")
                          ),
                          shinydashboard::menuItem(
                              "Analyze",
-                             tabName = "Analysis",
+                             tabName = "Analyze",
                              icon = icon("microscope")
                          ),
                          shinydashboard::menuItem(
                              "Report",
-                             tabName = "Reporting",
+                             tabName = "Report",
                              icon = icon("chart-bar")
                          ),
                          uiOutput("fab_button_ui")

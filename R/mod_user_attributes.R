@@ -40,7 +40,6 @@ mod_user_attributes_server <- function(id, glob){
 
     observeEvent(input$show_graph, {
         req(glob$active_project)
-
         output$user_attributes_chart <- renderPlot({
         
         user_attributes_summary <- get_user_attributes_summary(glob$pool, glob$active_project)
