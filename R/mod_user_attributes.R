@@ -39,12 +39,21 @@ mod_user_attributes_server <- function(id, glob){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     loc <- reactiveValues()
+     loc$change_observer <- 0
 
     # re-render attributes data on project change
     observeEvent(glob$active_project, {
       loc$user_attributes <- get_user_attributes_data_table(ns = ns, 
       glob$pool, 
       project_id = glob$active_project)
+    })
+    observeEvent(req(loc$change_observer > 0), {
+      loc$user_attributes <- get_user_attributes_data_table(ns = ns, 
+      glob$pool, 
+      project_id = glob$active_project)
+      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
+            loc$user_attributes$attribute_id,
+            loc$user_attributes$attribute_name))
     })
 
     # attributes table
@@ -119,11 +128,8 @@ mod_user_attributes_server <- function(id, glob){
         shinyjs::reset("attribute_name")
         shinyjs::reset("attribute_values")
       }
-      
-      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
-      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
-            loc$user_attributes$attribute_id,
-            loc$user_attributes$attribute_name))
+      loc$change_observer <- loc$change_observer + 1
+
     })
     
     # Attribute table event ----
@@ -167,13 +173,8 @@ mod_user_attributes_server <- function(id, glob){
    
       delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
                             user_id = glob$user$user_id, input$selected_attr)
-
       
-      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
-      
-      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
-            loc$user_attributes$attribute_id,
-            loc$user_attributes$attribute_name))
+      loc$change_observer <- loc$change_observer + 1
       
       removeModal()
     })
@@ -185,11 +186,8 @@ mod_user_attributes_server <- function(id, glob){
       delete_user_attribute(pool = glob$pool, project_id = glob$active_project, 
                             user_id = glob$user$user_id, input$attribute_delete)
       
-      loc$user_attributes <- get_user_attributes_data_table(ns = ns, glob$pool, project_id = glob$active_project)
-      
-      shinyWidgets::updatePickerInput(session = session, "attribute_delete", choices = stats::setNames(
-            loc$user_attributes$attribute_id,
-            loc$user_attributes$attribute_name))
+          loc$change_observer <- loc$change_observer + 1
+
 
     })
     
