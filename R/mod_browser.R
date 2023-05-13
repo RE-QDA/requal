@@ -16,7 +16,7 @@ mod_browser_ui <- function(id){
     selectInput(ns("browser_code"), 
                 "Select code: ", 
                 choices = ""), 
-    checkboxGroupInput(ns("browser_coders"), "Select coders:", 
+    rql_picker_UI(ns("browser_coders"), "Select coders:", 
                        choices = ""),
     actionButton(ns("calculate"), "Browse"),
     uiOutput(ns("document_viewer"))
@@ -65,7 +65,7 @@ mod_browser_server <- function(id, glob){
             dplyr::filter(user_id == glob$user$user_id)
         }
         
-        updateCheckboxGroupInput(
+        shinyWidgets::updatePickerInput(
           session = session, 
           "browser_coders", 
           choices = c(
