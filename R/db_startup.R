@@ -29,6 +29,34 @@ CREATE TABLE if not exists attributes_users_map (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
+
+  "attributes_documents_map" = 
+  "
+  CREATE TABLE if not exists attributes_documents_map (
+      doc_id INTEGER
+  ,   attribute_id INTEGER
+  ,   attribute_value_id INTEGER 
+  ,   project_id INTEGER
+  ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+  );
+  ",
+
+  "attributes_cases_map" = 
+  "
+  CREATE TABLE if not exists attributes_cases_map (
+      case_id INTEGER
+  ,   attribute_id INTEGER
+  ,   attribute_value_id INTEGER 
+  ,   project_id INTEGER
+  ,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+  );
+  ",
   
   "attribute_values" =
     "
