@@ -59,10 +59,14 @@ mod_summary_server <- function(id, glob) {
       glob$active_project
       glob$codebook
       glob$documents
+      glob$users_observer
     }, {
       if (isTruthy(glob$active_project)) {
         # list users
         loc$users <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::left_join(dplyr::tbl(glob$pool, "user_permissions"), 
+          by = "user_id") %>% 
+          dplyr::filter(project_id == as.integer(!!glob$active_project)) %>% 
           dplyr::select(user_id, user_name) %>%
           dplyr::collect()
         

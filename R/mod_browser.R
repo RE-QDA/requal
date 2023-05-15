@@ -53,9 +53,14 @@ mod_browser_server <- function(id, glob){
           "browser_doc",
           choices = c("", documents)
         )
-        
-        users <- dplyr::tbl(glob$pool, "users") %>% 
-          dplyr::select(user_id, user_name) %>% 
+      }
+    })
+
+    observeEvent(glob$users_observer, {
+          users <- dplyr::tbl(glob$pool, "users") %>% 
+          dplyr::left_join(dplyr::tbl(glob$pool, "user_permissions"), 
+          by = "user_id") %>% 
+          dplyr::filter(project_id == as.integer(!!glob$active_project)) %>%           dplyr::select(user_id, user_name) %>% 
           dplyr::collect()
         
         if(!is.null(glob$user$data) && 
@@ -76,7 +81,6 @@ mod_browser_server <- function(id, glob){
           ), 
           selected = users$user_id
         )
-      }
     })
     
     observeEvent(glob$codebook, {
