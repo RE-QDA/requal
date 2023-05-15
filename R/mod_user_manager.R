@@ -151,6 +151,8 @@ mod_user_manager_server <- function(id, glob) {
         glob$pool,
         glob$active_project
       )
+
+      glob$users_observer <- glob$users_observer + 1
     })
 
     # remove users =======================================================
@@ -180,6 +182,9 @@ mod_user_manager_server <- function(id, glob) {
         glob$pool,
         glob$active_project
       )
+      
+      glob$users_observer <- glob$users_observer + 1
+
     })
 
     # update user selection inputs =======================================================

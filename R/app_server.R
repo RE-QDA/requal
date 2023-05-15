@@ -34,6 +34,7 @@ app_server <- function(input, output, session) {
     updateControlbar("control_bar")
     shinyjs::show(id = "btn-memo")
     shinyjs::show(selector = "div.tab-content")
+    glob$users_observer <- 0
   })
 
   # Project  ----

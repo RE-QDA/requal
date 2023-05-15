@@ -48,9 +48,13 @@ mod_agreement_server <- function(id, glob) {
     
     agreement_message <- "Agreement measures cannot be computed for a single active coder."
     
-    observeEvent(glob$documents, {
+    observeEvent(c(glob$documents, glob$users_observer), {
       if (isTruthy(glob$active_project)) {
+        
         users <- dplyr::tbl(glob$pool, "users") %>% 
+          dplyr::left_join(dplyr::tbl(glob$pool, "user_permissions"), 
+          by = "user_id") %>% 
+          dplyr::filter(project_id == as.integer(!!glob$active_project)) %>% 
           dplyr::select(user_id, user_name) %>% 
           dplyr::collect()
         
