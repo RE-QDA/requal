@@ -27,7 +27,7 @@ mod_agreement_ui <- function(id) {
                             "Overlap by user attribute [segments]" = "by_attribute_segment"
                 )
     ),
-    checkboxGroupInput(ns("repro_coders"), "Select coders:", 
+    rql_picker_UI(ns("repro_coders"), "Select coders:", 
                        choices = ""),
     uiOutput(ns("attributes_select")),
     # selectInput(, 
@@ -61,7 +61,7 @@ mod_agreement_server <- function(id, glob) {
             dplyr::filter(user_id == glob$user$user_id)
         }
         
-        updateCheckboxGroupInput(
+        shinyWidgets::updatePickerInput(
           session = session, 
           "repro_coders", 
           choices = c(

@@ -64,7 +64,7 @@ mod_user_attributes_server <- function(id, glob){
     
     # pie chart
     observeEvent(input$show_graph, {
-      browser()
+      
         req(glob$active_project)
         output$user_attributes_chart <- renderPlot({
         
