@@ -15,7 +15,14 @@ mod_project_ui <- function(id) {
               tabPanel(
                 "Project info",
                 fluidRow(class = "module_content",
-                uiOutput(ns("project_manager"))
+       h4("Active project"),
+       tags$b(textOutput(ns("project_name"))),
+       h4("Project description"),
+       div(textOutput(ns("project_description"))),
+       h4("Created at"),
+       div(
+        textOutput(ns("project_date"))
+       )
                 ),
                 value = "project_info_tab"
               ),
@@ -39,20 +46,19 @@ mod_project_ui <- function(id) {
 mod_project_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    loc <- reactiveValues()
 
-    output$project_manager <- renderUI({
-      if (!is.null(glob$active_project) & !is.null(glob$pool)) {
-       tagList(
-       br(),
-       h4(names(glob$active_project))
-       )
-      } else {
-        tagList(
-          br(),
-        "No active project."
-        )
-      }
-})
+    observeEvent(glob$active_project, {
+      loc$project_df <- dplyr::tbl(pool, "projects") %>%
+      dplyr::filter(project_id == local(as.integer(glob$active_project)))
+
+      output$project_name <- renderText({names(glob$active_project)})
+      output$project_description <- renderText({loc$project_df %>% dplyr::pull(project_description)})
+      output$project_date <- renderText({format(loc$project_df %>% dplyr::pull(created_at),
+        format = "%Y-%m-%d %H:%M:%S")})
+
+
+    })
     return(NULL)
   })
 }
