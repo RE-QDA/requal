@@ -41,7 +41,17 @@ mod_analysis_ui <- function(id) {
           selectize = FALSE,
           width = "100%",
           size = 15
+        ),
+        if (golem::get_golem_options(which = "mode") == "server") {
+        selectInput(ns("user_filter"),
+          label = "Filter by user",
+          choices = "",
+          multiple = TRUE,
+          selectize = FALSE,
+          width = "100%",
+          size = 15
         )
+        }
       ) %>% tagAppendAttributes(class = "scrollable90"),
       uiOutput(ns("download"))
     )
@@ -57,6 +67,14 @@ mod_analysis_server <- function(id, glob) {
 
     loc <- reactiveValues()
 
+   if (golem::get_golem_options(which = "mode") == "server") {
+    observeEvent(input$user_filter, {
+      loc$user_filter <- input$user_filter
+    })
+   } else {
+    # local version does not have user filter UI
+    loc$user_filter <- 1  # for local version
+   }
     # Filters ----
 
     observeEvent(glob$codebook, {
@@ -88,12 +106,31 @@ mod_analysis_server <- function(id, glob) {
       )
     })
 
+    observeEvent(glob$users_observer, {
+      req(golem::get_golem_options(which = "mode") == "server")
+      updateSelectInput(
+        session = session,
+        "user_filter",
+        choices = c("", get_user_permissions(
+        glob$pool,
+        glob$active_project
+        ) %>% dplyr::pull(user_id, name = "user_name")
+      )
+        ,
+        selected = get_user_permissions(
+        glob$pool,
+        glob$active_project
+        ) %>% dplyr::pull(user_id)
+      )
+    })
+
     # Segments to display and filter ----
     observeEvent(
       {
         input$code_filter
         input$category_filter
         input$document_filter
+        loc$user_filter
         glob$segments
         glob$codebook
         glob$category
@@ -106,7 +143,8 @@ mod_analysis_server <- function(id, glob) {
           active_project = as.integer(glob$active_project),
           selected_codes = as.integer(input$code_filter),
           selected_categories = as.integer(input$category_filter),
-          selected_docs = as.integer(input$document_filter)
+          selected_docs = as.integer(input$document_filter),
+          selected_users = as.integer(loc$user_filter)
         )
         
         if (nrow(loc$temp_df) > 0) {

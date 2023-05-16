@@ -71,7 +71,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
       # set active project from create ----
       observeEvent(input$project_create, {
         req(input$project_name, input$sel_directory)
-
+browser()
         loc$db_path <- paste0(
           loc$project_directory,
           .Platform$file.sep,
