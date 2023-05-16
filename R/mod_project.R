@@ -78,7 +78,7 @@ mod_project_server <- function(id, glob) {
         loc$project_date
       })
     observeEvent(glob$active_project, {
-      loc$project_df <- dplyr::tbl(pool, "projects") %>%
+      loc$project_df <- dplyr::tbl(glob$pool, "projects") %>%
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
     })
 
@@ -132,7 +132,7 @@ mod_project_server <- function(id, glob) {
         )
       }
 
-      loc$project_df <- dplyr::tbl(pool, "projects") %>%
+      loc$project_df <- dplyr::tbl(glob$pool, "projects") %>%
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
       shinyjs::removeClass(paste0("sw-content-", ns("project_edit_menu")), "sw-show", asis = TRUE)
       showNotification("Changes to project were saved.")
