@@ -180,7 +180,7 @@ mod_doc_manager_server <- function(id, glob) {
         glob$documents
       )
 
-      updateSelectInput(
+      shinyWidgets::updatePickerInput(
         session = session,
         "doc_delete_list",
         choices = glob$documents
@@ -210,14 +210,33 @@ mod_doc_manager_server <- function(id, glob) {
             doc_name_parsed <- input$doc_upload_name
           }
 
-          add_input_document(
-            pool = glob$pool,
-            project = glob$active_project,
-            doc_name = doc_name_parsed,
-            doc_text = doc_upload_text,
-            doc_description = input$doc_upload_description,
-            user_id = glob$user$user_id
+          add_document <- tryCatch(
+            {
+              add_input_document(
+                pool = glob$pool,
+                project = glob$active_project,
+                doc_name = doc_name_parsed,
+                doc_text = doc_upload_text,
+                doc_description = input$doc_upload_description,
+                user_id = glob$user$user_id
+              )
+            },
+            error = function(e) {
+              message("Error in adding document: ", e$message)
+              "failed"
+            }
           )
+
+
+
+
+
+
+
+
+          if (add_document == "failed") {
+            warn_user("The uploaded document produced errors. Delete the document and upload it again with correctly set encoding.")
+          }
 
           output$doc_list_table <- make_doc_table(
             glob,
