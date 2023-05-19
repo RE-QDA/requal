@@ -26,6 +26,7 @@ upload_doc_UI <- function(ns) {
         fileInput(ns("doc_path"), NULL,
                   multiple = FALSE,
                   buttonLabel = "Select file",
+                  placeholder = "Only .txt files allowed.",
                   accept = c("text/plain", ".txt")
         ) %>%
             tagAppendAttributes(class = "required"),

@@ -52,12 +52,6 @@ mod_doc_manager_server <- function(id, glob) {
     })
 
 
-    #  # handle permissions
-    #     if(glob$user$data$data_modify == 1){
-
-    #     }
-
-
     #---Create doc UI --------------
     mod_rql_button_server(
       id = "doc_create_ui",
