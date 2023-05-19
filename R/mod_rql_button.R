@@ -46,7 +46,7 @@ mod_rql_button_server <- function(id, custom_title, custom_tagList, glob = NULL,
     if (!is.logical(permission)) {
     req(glob$active_project)
     validate(
-      need(glob$user$data[[permission]] == TRUE, 'Insufficent permission.')
+      need(any(glob$user$data[[permission]], glob$user$data$project_owner), 'Insufficent permission.')
     )
     }
     tags$div(

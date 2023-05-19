@@ -88,11 +88,7 @@ mod_user_manager_server <- function(id, glob) {
 
     # change permissions =======================================================
     observeEvent(input$save_permissions, {
-      check_modify_permission(
-        glob$user$data$permissions_modify,
-        "Missing permission to modify permissions."
-      )
-
+      req(input$members_permissions)
       modified_permissions_df <- loc$users_permissions_df %>%
       dplyr::filter(user_id %in% input$members_permissions) %>%
       dplyr::mutate(across(matches("modify|view"), .fns = function(x) {
@@ -282,23 +278,6 @@ mod_user_manager_server <- function(id, glob) {
         dplyr::filter(user_id == glob$user$user_id) %>%
         dplyr::pull(permissions_modify)
     })
-    observeEvent(
-      {
-        input$add_menu
-        input$remove_menu
-        input$modify_permissions
-        loc$permissions_modify
-      },
-      {
-        if (loc$permissions_modify == 0) {
-          shinyjs::disable("assign")
-          shinyjs::disable("remove_members")
-          shinyjs::disable("save_permissions")
-        } else {
-          shinyjs::enable("assign")
-          shinyjs::enable("remove_members")
-          shinyjs::enable("save_permissions")
-        }
-      })
+
   })
 }
