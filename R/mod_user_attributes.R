@@ -93,7 +93,6 @@ mod_user_attributes_server <- function(id, glob){
           dplyr::filter(.data$project_id == !!as.numeric(glob$active_project), 
                         .data$attribute_name == local(input$attribute_name), 
                         .data$attribute_object == "user") %>% 
-          dplyr::collect() %>% 
           dplyr::pull(attribute_id)
         
         add_attribute_values(pool = glob$pool, 
@@ -122,7 +121,6 @@ mod_user_attributes_server <- function(id, glob){
     observeEvent(input$selected_attr, {
       user_attribute_name <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(attribute_id == !!input$selected_attr) %>% 
-        dplyr::collect() %>% 
         dplyr::pull(attribute_name)
       
       # TODO: check user permissions / attributes_other_modify
