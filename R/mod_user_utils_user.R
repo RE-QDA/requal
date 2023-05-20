@@ -42,6 +42,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
     project_id <- local(project_id)
     
     attribute_ids <- dplyr::tbl(pool, "attributes") %>% 
+        dplyr::filter(project_id == !!as.numeric(project_id)) %>% 
         dplyr::select(attribute_id, attribute_name) %>% 
         dplyr::collect()
     attribute_values <- dplyr::tbl(pool, "attribute_values") %>% 
