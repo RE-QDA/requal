@@ -517,12 +517,14 @@ create_project_record <- function(pool, project_df, user_id) {
 add_documents_record <- function(pool, project_id, document_df, user_id) {
   res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE, row.names = FALSE)
   if (res) {
+    project_id <- as.integer(project_id)
     written_document_id <- dplyr::tbl(pool, "documents") %>%
       dplyr::filter(.data$doc_name == !!document_df$doc_name &
                       .data$doc_text == !!document_df$doc_text &
                       .data$project_id == project_id &
                       .data$user_id == !!user_id) %>%
-      dplyr::pull(doc_id)
+      dplyr::pull(doc_id) %>% max()
+
     log_add_document_record(pool, project_id, document_df %>%
                               dplyr::mutate(doc_id = written_document_id, 
                                             doc_text = substr(doc_text, 1, 140)),
