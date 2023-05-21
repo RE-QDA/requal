@@ -80,8 +80,7 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
                                           user_id = user_id,
                                           project_id = local(project_id),
                                           user_attribute = data.frame(
-                                              attribute_id = attr_id,
-                                              attribute_value_id = attr_value
+                                              attribute_id = attr_id
                                           ))
             }
         }else{
@@ -93,7 +92,8 @@ update_user_attributes <- function(pool, project_id, user_id, user_attributes_df
             log_change_user_attribute(pool,
                                       project_id = local(project_id),
                                       user_id = user_id,
-                                      user_attribute = values_df)
+                                      user_attribute = values_df %>% 
+                                          dplyr::select(-attribute_value_id))
         }
     })
 }

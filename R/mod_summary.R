@@ -62,9 +62,7 @@ mod_summary_server <- function(id, glob) {
     }, {
       if (isTruthy(glob$active_project)) {
         # list users
-        loc$users <- dplyr::tbl(glob$pool, "users") %>%
-          dplyr::select(user_id, user_name) %>%
-          dplyr::collect()
+        loc$users <- get_users_in_project(glob$pool, glob$active_project)
         
         if(!is.null(glob$user$data) && 
            !is.null(glob$user$data$report_other_view) &&
