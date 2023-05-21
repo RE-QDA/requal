@@ -67,26 +67,26 @@ mod_analysis_server <- function(id, glob) {
           label = "Filter by code",
           choices = "",
           multiple = TRUE,
-          none = "None"
+          none = "Off"
           ),
         rql_picker_UI(ns("category_filter"),
           label = "Filter by category",
           choices = "",
           multiple = TRUE,
-          none = "None"
+          none = "Off"
           ),
         rql_picker_UI(ns("document_filter"),
           label = "Filter by document",
           choices = "",
           multiple = TRUE,
-          none = "None"
+          none = "Off"
         ),
         if (golem::get_golem_options(which = "mode") == "server") {
         rql_picker_UI(ns("user_filter"),
           label = "Filter by user",
           choices = "",
           multiple = TRUE,
-          none = "None"
+          none = "Off"
         )
         }
         ),
