@@ -183,3 +183,27 @@ log_delete_user_attribute <- function(con, project_id, attribute_id, user_id){
                action = "Delete user attribute", 
                data = list(attribute_id = attribute_id))
 }
+
+log_add_user_permission <- function(con, project_id, permission_data, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id,
+               action = "Add user permission", 
+               data = permission_data)
+}
+
+log_remove_user_permission <- function(con, project_id, permission_data, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id,
+               action = "Remove user permissions", 
+               data = permission_data)
+}
+
+log_change_user_permission <- function(con, project_id, permission_data, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id,
+               action = "Change user permission", 
+               data = permission_data)
+}
