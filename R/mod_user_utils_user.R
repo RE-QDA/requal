@@ -114,17 +114,29 @@ read_user_attributes_by_id <- function(pool, user_id, project_id) {
     dplyr::collect()
 }
 
+permission_button <- function(class, color, title) {
+  as.character(
+    shiny::tagList(
+      shiny::tags$button(
+        tags$i(class = class, style = paste0("color:",  color), title = title),
+        style = "min-width:35px;"
+        ), 
+        shiny::tags$br()
+        )
+        )
+}
+
 transform_user_table <- function(user_table) {
   user_table %>%
     dplyr::mutate(across(-c(user_id, created_at, user_mail, user_name, user_login),
       .fn = function(x) {
         dplyr::case_when(
-          x == 1 & stringr::str_detect(dplyr::cur_column(), "other_modify") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-users", style = "color:black", title = "Can modify others"))),
-          x == 0 & stringr::str_detect(dplyr::cur_column(), "other_modify") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-users", style = "color:white", title = "Can't modify others"))),
-          x == 1 & stringr::str_detect(dplyr::cur_column(), "other_view") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-eye", style = "color:black", title = "Can view others"))),
-          x == 0 & stringr::str_detect(dplyr::cur_column(), "other_view") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-eye", style = "color:white", title = "Can't view others"))),
-          x == 1 & stringr::str_detect(dplyr::cur_column(), "modify") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-wrench", style = "color:black", title = "Can modify"))),
-          x == 0 & stringr::str_detect(dplyr::cur_column(), "modify") ~ as.character(shiny::tags$button(tags$i(class = "fas fa-wrench", style = "color:white", title = "Can't modify")))
+          x == 1 & stringr::str_detect(dplyr::cur_column(), "other_modify") ~ permission_button("fas fa-users", "black", "Can modify others"),
+          x == 0 & stringr::str_detect(dplyr::cur_column(), "other_modify") ~ permission_button("fas fa-users", "white", "Can't modify others"),
+          x == 1 & stringr::str_detect(dplyr::cur_column(), "other_view") ~ permission_button("fas fa-eye","black", "Can view others"),
+          x == 0 & stringr::str_detect(dplyr::cur_column(), "other_view") ~ permission_button("fas fa-eye", "white", "Can't view others"),
+          x == 1 & stringr::str_detect(dplyr::cur_column(), "modify") ~ permission_button("fas fa-wrench","black", "Can modify"),
+          x == 0 & stringr::str_detect(dplyr::cur_column(), "modify") ~ permission_button("fas fa-wrench","white", "Can't modify")
         )
       }
     )) %>%
