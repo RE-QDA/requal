@@ -87,7 +87,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-        glob$segments <- glob$segments + 1
+        glob$segments_observer <- glob$segments_observer + 1
       }
     })
     # Render selected text
@@ -167,7 +167,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-        glob$segments <- glob$segments + 1
+        glob$segments_observer <- glob$segments_observer + 1
       }
     })
 
@@ -220,7 +220,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-        glob$segments <- glob$segments + 1
+        glob$segments_observer <- glob$segments_observer + 1
         
       } else {
         showModal(
@@ -267,7 +267,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-        glob$segments <- glob$segments + 1
+        glob$segments_observer <- glob$segments_observer + 1
       }
     })
 
@@ -277,6 +277,6 @@ mod_document_code_server <- function(id, glob) {
       input$tag_position
     })
 
-    # returns glob$segments
+    # returns glob$segments_observer
   })
 }
