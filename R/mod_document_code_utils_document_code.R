@@ -29,8 +29,8 @@ read_doc_db <- function(pool, active_project) {
 
 read_visible_docs <- function(pool, active_project, user_id){
     docs <- dplyr::tbl(pool, "documents") %>% 
-        dplyr::filter(.data$project_id == !!as.integer(active_project) & 
-                          .data$user_id == !!as.integer(user_id)) %>%
+        dplyr::filter(.data$project_id == !!as.integer(active_project), 
+                      .data$user_id == !!as.integer(user_id)) %>%
         dplyr::select(doc_name, doc_id) %>%
         dplyr::collect() %>%
         dplyr::mutate(doc_name = ifelse(is.na(doc_name),
@@ -47,8 +47,8 @@ load_doc_db <- function(pool, active_project, doc_id) {
     if (isTruthy(active_project)) {
         
         doc_text <- dplyr::tbl(pool, "documents") %>%
-            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
+            dplyr::filter(.data$project_id == as.integer(active_project), 
+                          .data$doc_id == as.integer(.env$doc_id)) %>%
             dplyr::pull(doc_text)
         
         return(doc_text)
@@ -61,8 +61,8 @@ load_doc <- function(pool, project_id, doc_id){
     doc_text <- NULL
     
     dplyr::tbl(pool, "documents") %>%
-        dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
-        dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
+        dplyr::filter(.data$project_id == as.integer(.env$project_id), 
+                      .data$doc_id == as.integer(.env$doc_id)) %>%
         dplyr::pull(doc_text)
 }
 
@@ -73,9 +73,8 @@ load_segments_db <- function(pool, active_project, user, doc_id) {
     if (isTruthy(active_project)) {
         
         segments <- dplyr::tbl(pool, "segments") %>%
-            dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-            dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-            # dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
+            dplyr::filter(.data$project_id == as.integer(active_project), 
+                          .data$doc_id == as.integer(.env$doc_id)) %>%
             dplyr::select(code_id,
                           segment_start,
                           segment_end, 
@@ -143,10 +142,10 @@ write_segment_db <- function(
     # Check overlap
     # - return segments with the same document ID and code ID from the DB
     coded_segments <- dplyr::tbl(pool, "segments") %>%
-        dplyr::filter(.data$project_id == as.integer(active_project)) %>%
-        dplyr::filter(.data$user_id == as.integer(.env$user_id)) %>% 
-        dplyr::filter(.data$doc_id == as.integer(.env$doc_id)) %>%
-        dplyr::filter(.data$code_id == as.integer(.env$code_id)) %>%
+        dplyr::filter(.data$project_id == as.integer(active_project), 
+                      .data$user_id == as.integer(.env$user_id), 
+                      .data$doc_id == as.integer(.env$doc_id), 
+                      .data$code_id == as.integer(.env$code_id)) %>%
         dplyr::select(project_id, user_id, doc_id, code_id, segment_id,
                       segment_start,
                       segment_end) %>%
@@ -202,12 +201,12 @@ write_segment_db <- function(
     
     if(res){
         written_segment_id <- dplyr::tbl(pool, "segments") %>% 
-            dplyr::filter(.data$project_id == !!segment_df$project_id & 
-                              .data$doc_id == !!segment_df$doc_id &
-                              .data$code_id == !!segment_df$code_id &
-                              .data$segment_start == !!segment_df$segment_start & 
-                              .data$segment_end == !!segment_df$segment_end & 
-                              .data$user_id == !!segment_df$user_id) %>% 
+            dplyr::filter(.data$project_id == !!segment_df$project_id, 
+                          .data$doc_id == !!segment_df$doc_id, 
+                          .data$code_id == !!segment_df$code_id, 
+                          .data$segment_start == !!segment_df$segment_start, 
+                          .data$segment_end == !!segment_df$segment_end, 
+                          .data$user_id == !!segment_df$user_id) %>% 
             dplyr::pull(segment_id)
         
         log_add_segment_record(pool, project_id = active_project, segment_df %>% 
@@ -406,8 +405,8 @@ load_segment_codes_db <- function(pool,
                           by = "code_id", 
                           suffix = c(".x", ".y")
         ) %>%
-        dplyr::filter(.data$project_id == as.integer(active_project) &
-                          .data$doc_id == as.integer(active_doc)) %>%
+        dplyr::filter(.data$project_id == as.integer(active_project), 
+                      .data$doc_id == as.integer(active_doc)) %>%
         dplyr::filter(dplyr::between(marked_codes,
                                      .data$segment_start,
                                      .data$segment_end)) %>%

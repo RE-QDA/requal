@@ -35,8 +35,8 @@ add_attribute_values <- function(pool, attribute_id, attribute_values){
 read_user_attributes <- function(pool, project_id){
     
     dplyr::tbl(pool, "attributes") %>%
-        dplyr::filter(.data$attribute_object == "user") %>%
-        dplyr::filter(.data$project_id == !!as.numeric(project_id)) %>% 
+        dplyr::filter(.data$attribute_object == "user", 
+                      .data$project_id == !!as.numeric(project_id)) %>%
         dplyr::select(attribute_id, attribute_name) %>%
         dplyr::left_join(., dplyr::tbl(pool, "attribute_values"),
                          by = "attribute_id", 

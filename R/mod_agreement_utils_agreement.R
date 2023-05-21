@@ -131,6 +131,54 @@ calculate_code_overlap_by_users <- function(segments){
     })
 }
 
+calculate_code_overlap_by_users_code <- function(segments){
+    user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
+    segment_vector <- total_overlap <- n_char <- NULL
+    coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
+    
+    unique_coders <- segments %>% 
+        dplyr::pull(user_id) %>% unique()
+    
+    # Create a combination of all coders who coded something
+    coders_grid <- as.data.frame(t(utils::combn(unique_coders, m = 2))) %>% 
+        dplyr::rename(coder1_id = V1, coder2_id = V2)
+    
+    # Calculate overlap between coders by doc_id and code_id
+    # for each pair of coders
+    purrr::map_df(seq_len(nrow(coders_grid)), function(x) {
+        coder1_id <- coders_grid$coder1_id[x]
+        coder2_id <- coders_grid$coder2_id[x]
+        
+        coded_segments_by_two <- segments %>% 
+            dplyr::filter(user_id %in% c(coder1_id, coder2_id))
+        
+        fst_coder <- coded_segments_by_two %>% 
+            dplyr::filter(user_id == coder1_id) %>% 
+            dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
+            tidyr::unnest(., segment_vector)
+        
+        snd_coder <- coded_segments_by_two %>% 
+            dplyr::filter(user_id == coder2_id) %>% 
+            dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
+            tidyr::unnest(., segment_vector)
+        
+        tmp <- dplyr::full_join(
+            fst_coder %>% dplyr::select(coder1 = user_id, doc_id, code_id, segment_vector), 
+            snd_coder %>% dplyr::select(coder2 = user_id, doc_id, code_id, segment_vector), 
+            by = c("segment_vector", "doc_id", "code_id")
+        )
+        
+        tmp %>% 
+            dplyr::group_by(code_id) %>% 
+            dplyr::summarise(coder1_id = coder1_id, 
+                             coder1_missing_char = sum(is.na(coder1)), 
+                             coder2_id = coder2_id,
+                             coder2_missing_char = sum(is.na(coder2)), 
+                             n_char = dplyr::n()) %>% 
+            dplyr::mutate(total_overlap = 1 - ((coder1_missing_char + coder2_missing_char) / n_char))
+    })
+}
+
 calculate_segment_overlap_by_users <- function(segments){
     user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
     segment_vector <- total_overlap <- n_char <- NULL
@@ -223,6 +271,20 @@ create_overlap_heatmap <- function(df, fill){
     ggplot2::ggplot(df, 
                     ggplot2::aes(x = factor(coder1_name), 
                                  y = factor(coder2_name), 
+                                 fill = {{fill}})) + 
+        
+        ggplot2::geom_tile() + 
+        ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
+        ggplot2::theme_minimal() + 
+        ggplot2::labs(x = "", y = "", fill = "Overlap") + 
+        ggplot2::coord_fixed() + 
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
+}
+
+create_overlap_heatmap_attribute <- function(df, fill){
+    ggplot2::ggplot(df, 
+                    ggplot2::aes(x = factor(attribute_value1), 
+                                 y = factor(attribute_value2), 
                                  fill = {{fill}})) + 
         
         ggplot2::geom_tile() + 
