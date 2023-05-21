@@ -116,6 +116,14 @@ find_changed_permissions <- function(pool, project_id, permissions_df){
 
 # modify permissions for project
 modify_permissions_record <- function(pool, project_id, permissions_df, user_id) {
+  
+    permissions_df <- permissions_df %>%
+      dplyr::select(-c(project_owner, user_login, user_name, created_at, user_mail, project_id)) %>%
+      tidyr::pivot_longer(-user_id, 
+      names_to = "permission",
+      values_to = "value"
+      )
+  
   changed_permissions_df <- find_changed_permissions(pool, project_id, permissions_df)
   
   update_user_permissions_sql <- glue::glue_sql("UPDATE user_permissions

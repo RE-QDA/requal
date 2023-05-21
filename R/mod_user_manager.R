@@ -105,7 +105,7 @@ mod_user_manager_server <- function(id, glob) {
       modify_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        permissions_df = loc$users_permissions_long, 
+        permissions_df = modified_permissions_df, 
         user_id = glob$user$user_id
       )
       loc$users_permissions_df <- get_user_permissions(
