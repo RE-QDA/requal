@@ -109,7 +109,8 @@ mod_user_manager_server <- function(id, glob) {
       modify_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        permissions_df = loc$users_permissions_long
+        permissions_df = loc$users_permissions_long, 
+        user_id = glob$user$user_id
       )
       loc$users_permissions_df <- get_user_permissions(
         glob$pool,
@@ -147,7 +148,8 @@ mod_user_manager_server <- function(id, glob) {
       add_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        user_id = req(input$rql_users)
+        permission_user_id = req(input$rql_users), 
+        user_id = glob$user$user_id
       )
       # refresh users for current project
       loc$users_permissions_df <- get_user_permissions(
@@ -167,13 +169,14 @@ mod_user_manager_server <- function(id, glob) {
           project_id %in% glob$active_project &
             user_id %in% req(input$members_to_remove)
         ) %>%
-        dplyr::pull(project_admin)
+        dplyr::pull(project_owner)
       if (any(owner_check == 1)) warn_user("Project owners cannot be removed from project.")
       req(all(owner_check == 0))
       remove_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
-        user_id = req(input$members_to_remove)
+        permission_user_id = req(input$members_to_remove), 
+        user_id = glob$user$user_id
       )
 
       # refresh users for current project

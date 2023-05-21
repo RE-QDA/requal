@@ -50,9 +50,7 @@ mod_agreement_server <- function(id, glob) {
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
-        users <- dplyr::tbl(glob$pool, "users") %>% 
-          dplyr::select(user_id, user_name) %>% 
-          dplyr::collect()
+        users <- get_users_in_project(glob$pool, glob$active_project)
         
         if(!is.null(glob$user$data) && 
            !is.null(glob$user$data$report_other_view) &&
