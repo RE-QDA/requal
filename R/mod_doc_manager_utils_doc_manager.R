@@ -53,6 +53,7 @@ delete_doc_UI <- function(ns, glob) {
                            active_project = local(glob$active_project), 
                            user = glob$user
                        ),
+                       multiple = FALSE,
                        none = "Documents to remove"
         ),
         rql_button_UI(ns("doc_remove"),

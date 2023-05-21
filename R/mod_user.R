@@ -51,8 +51,8 @@ mod_user_server <- function(id, glob) {
         dashboardUser(
           name = loc$user_data$user_name,
           image = "www/user_logo.jpg", 
-          title = ifelse(is.na(loc$user_data$user_mail), "@", loc$user_data$user_mail),
-          subtitle = paste("Project:", names(glob$active_project)), 
+          title = user_data$user_login,
+          subtitle = ifelse(is.na(loc$user_data$user_mail), "No email address provided.", loc$user_data$user_mail), 
           footer =  actionButton(ns("edit_user"),
                                  "Edit"),
           fluidRow(

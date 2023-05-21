@@ -35,6 +35,7 @@ app_server <- function(input, output, session) {
     shinyjs::show(id = "btn-memo")
     shinyjs::show(selector = "div.tab-content")
     glob$users_observer <- 0
+    glob$segments_observer <- 0
   })
 
   # Project  ----
@@ -60,7 +61,7 @@ app_server <- function(input, output, session) {
   # output: glob$category
   mod_categories_server("categories_ui_1", glob)
   # workdesk ----
-  # output: glob$segments
+  # output: glob$segments_observer
   mod_document_code_server("document_code_ui_1", glob)
 
   # analysis ----

@@ -50,7 +50,7 @@ load_segments_analysis <- function(pool,
 
 
 
-format_cutouts <- function(segment_text, segment_document, segment_code, segment_color) {
+format_segments <- function(segment_text, segment_document, segment_code, segment_color) {
 
 
   tags$div(
