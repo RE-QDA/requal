@@ -20,7 +20,7 @@ tagList(
       actionButton(ns("doc_refresh"),
         label = "",
         icon = icon("sync")
-    ) |> tagAppendAttributes(title = "Reload document")
+    ) %>% tagAppendAttributes(title = "Reload document")
   )
   )
 ),
