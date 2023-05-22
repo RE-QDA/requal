@@ -9,18 +9,24 @@
 #' @importFrom shiny NS tagList
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
-  fluidRow(
-    tags$head(
-      tags$script(
-        src = "www/document_code_js.js"
-      ),
+tagList(
+  fluidRow(class = "module_tools", style = "width: 100%",
+  div(style="display: flex; justify-content: space-between; width: 100%",
+    selectInput(ns("doc_selector"),
+      label = "Select a document to code",
+      choices = "", selected = ""
     ),
-    column(
+    div(style = "display: flex; align-items: center;", 
+      actionButton(ns("doc_refresh"),
+        label = "",
+        icon = icon("sync")
+    ) |> tagAppendAttributes(title = "Reload document")
+  )
+  )
+),
+fluidRow(
+  column(
       width = 10,
-      selectInput(ns("doc_selector"),
-        label = "Select a document to code",
-        choices = "", selected = ""
-      ),
       htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
       textOutput(ns("captured_range")),
       verbatimTextOutput(ns("printLabel"))
@@ -37,6 +43,10 @@ mod_document_code_ui <- function(id) {
       br(), br(),
       uiOutput(ns("code_list"))
     ) %>% tagAppendAttributes(class = "scrollable90")
+  ),
+  tags$script(
+      src = "www/document_code_js.js"
+    )
   )
 }
 
@@ -77,8 +87,8 @@ mod_document_code_server <- function(id, glob) {
     # Displayed text ----------------------------------------------------------
     loc$text <- ""
 
-    observeEvent(input$doc_selector, {
-      if (isTruthy(input$doc_selector)) {
+    observeEvent(c(input$doc_selector, input$doc_refresh), {
+      req(isTruthy(input$doc_selector))
           loc$text <- load_doc_to_display(
             glob$pool, 
             glob$active_project,
@@ -88,7 +98,7 @@ mod_document_code_server <- function(id, glob) {
             ns = NS(id)
         )
         glob$segments_observer <- glob$segments_observer + 1
-      }
+      
     })
     # Render selected text
     output$focal_text <- renderText({
