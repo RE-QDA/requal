@@ -271,11 +271,13 @@ create_overlap_heatmap <- function(df, fill){
     ggplot2::ggplot(df, 
                     ggplot2::aes(x = factor(coder1_name), 
                                  y = factor(coder2_name), 
-                                 fill = {{fill}})) + 
+                                 fill = {{fill}},
+                                 label = round({{fill}}, 2))) + 
         
         ggplot2::geom_tile() + 
+        ggplot2::geom_label(fill = "white") + 
         ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-        ggplot2::theme_minimal() + 
+        ggplot2::theme_minimal(base_size = 18) + 
         ggplot2::labs(x = "", y = "", fill = "Overlap") + 
         ggplot2::coord_fixed() + 
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
@@ -285,11 +287,12 @@ create_overlap_heatmap_attribute <- function(df, fill){
     ggplot2::ggplot(df, 
                     ggplot2::aes(x = factor(attribute_value1), 
                                  y = factor(attribute_value2), 
-                                 fill = {{fill}})) + 
-        
+                                 fill = {{fill}}, 
+                                 label = round({{fill}}, 2))) + 
         ggplot2::geom_tile() + 
+        ggplot2::geom_label(fill = "white") + 
         ggplot2::scale_fill_viridis_c(limits = c(0, 1)) + 
-        ggplot2::theme_minimal() + 
+        ggplot2::theme_minimal(base_size = 18) + 
         ggplot2::labs(x = "", y = "", fill = "Overlap") + 
         ggplot2::coord_fixed() + 
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
