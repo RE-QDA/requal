@@ -180,6 +180,7 @@ calculate_code_overlap_by_users_code <- function(segments){
 }
 
 calculate_segment_overlap_by_users <- function(segments){
+    
     user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
     segment_vector <- total_overlap <- n_char <- NULL
     coder1 <- coder2 <- coder1_missing_char <- coder2_missing_char <- NULL
@@ -193,11 +194,9 @@ calculate_segment_overlap_by_users <- function(segments){
         dplyr::rename(coder1_id = V1, coder2_id = V2)
     
     purrr::map_df(seq_len(nrow(coders_grid)), function(x) {
+        
         coder1_id <- coders_grid$coder1_id[x]
         coder2_id <- coders_grid$coder2_id[x]
-        
-        coded_segments_by_two <- segments %>% 
-            dplyr::filter(user_id %in% c(coder1_id, coder2_id))
         
         coded_segments_by_two <- segments %>% 
             dplyr::filter(user_id %in% c(coder1_id, coder2_id))
@@ -222,20 +221,22 @@ calculate_segment_overlap_by_users <- function(segments){
         coder1 <- tmp %>% 
             dplyr::ungroup() %>% 
             dplyr::group_by(doc_id, code_id, coder1, coder1_segment_id) %>% 
-            dplyr::summarise(overlap = length(segment_vector), 
+            dplyr::summarise(# overlap = length(segment_vector), 
                              is_overlap = any(!is.na(coder2) & !is.na(coder1_segment_id)), 
                              .groups = "drop") %>% 
             dplyr::rename(segment_id = coder1_segment_id) %>% 
+            dplyr::filter(!is.na(segment_id)) %>% 
             dplyr::mutate(coder1 = coder1_id, 
                           coder2 = coder2_id)
         
         coder2 <- tmp %>% 
             dplyr::ungroup() %>% 
             dplyr::group_by(doc_id, code_id, coder2, coder2_segment_id) %>% 
-            dplyr::summarise(overlap = length(segment_vector), 
+            dplyr::summarise(# overlap = length(segment_vector), 
                              is_overlap = any(!is.na(coder1) & !is.na(coder2_segment_id)), 
                              .groups = "drop") %>%
             dplyr::rename(segment_id = coder2_segment_id) %>% 
+            dplyr::filter(!is.na(segment_id)) %>% 
             dplyr::mutate(coder1 = coder1_id, 
                           coder2 = coder2_id)
         
