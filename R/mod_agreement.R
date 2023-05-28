@@ -127,6 +127,7 @@ mod_agreement_server <- function(id, glob) {
     # total_segment ----
     observeEvent({req(input$metrics_select == "total_segment")
       input$calculate}, {
+        
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
@@ -135,9 +136,11 @@ mod_agreement_server <- function(id, glob) {
         if (length(unique(segments$user_id)) > 1) {
           overlap_df <- calculate_segment_overlap_by_users(segments) %>%
             dplyr::summarise(
-              `Total Overlap` = mean(is_overlap),
-              `N segments` = length(unique(segment_id)),
-              `N coders` = length(unique(c(coder1_id, coder2_id)))
+              `Total Overlap` = mean(is_overlap)
+            ) %>% 
+            dplyr::mutate(
+              `N segments` = nrow(segments),
+              `N coders` = length(unique(segments$user_id))
             )
           
           output$overlap_plot <- NULL
@@ -209,14 +212,20 @@ mod_agreement_server <- function(id, glob) {
         )
         
         if (length(unique(segments$user_id)) > 1) {
+          segment_count <- segments %>% 
+            dplyr::group_by(code_id) %>% 
+            dplyr::summarise(
+              n_segments = dplyr::n(), 
+              n_coders = length(unique(user_id))
+            )
+          
           overlap_df <- calculate_segment_overlap_by_users(segments) %>%
             dplyr::group_by(code_id) %>%
             dplyr::summarise(
-              total_overlap = mean(is_overlap),
-              n_segments = length(unique(segment_id)),
-              n_coders = length(unique(c(coder1_id, coder2_id)))
+              total_overlap = mean(is_overlap)
             ) %>%
             dplyr::left_join(., codes, by = "code_id") %>%
+            dplyr::left_join(., segment_count, by = "code_id") %>% 
             dplyr::select(
               code_name, total_overlap,
               n_segments, n_coders
