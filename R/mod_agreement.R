@@ -134,14 +134,20 @@ mod_agreement_server <- function(id, glob) {
         ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         if (length(unique(segments$user_id)) > 1) {
-          overlap_df <- calculate_segment_overlap_by_users(segments) %>%
+          segment_summary <- segments %>% 
             dplyr::summarise(
-              `Total Overlap` = mean(is_overlap)
-            ) %>% 
-            dplyr::mutate(
-              `N segments` = nrow(segments),
-              `N coders` = length(unique(segments$user_id))
+              `N segments` = dplyr::n(), 
+              `N coders` = length(unique(user_id))
             )
+          
+          overlap_df <- calculate_segment_overlap_by_users(segments) %>%
+            dplyr::group_by(coder1_id, coder2_id) %>% 
+            dplyr::summarise(jaccard = mean(is_overlap)) %>% 
+            dplyr::ungroup() %>% 
+            dplyr::summarise(
+              `Total Overlap` = mean(jaccard)
+            ) %>% 
+            dplyr::bind_cols(., segment_summary)
           
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({
