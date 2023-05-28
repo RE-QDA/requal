@@ -198,7 +198,8 @@ calculate_segment_overlap_between_2users <- function(segments, user_id1, user_id
         by = c("segment_vector", "doc_id", "code_id")) %>% 
         dplyr::group_by(doc_id, code_id, coder1_segment_id, coder2_segment_id) %>% 
         dplyr::summarise(length = dplyr::n()) %>% 
-        dplyr::mutate(is_overlap = !is.na(coder1_segment_id) & !is.na(coder2_segment_id))
+        dplyr::mutate(is_overlap = !is.na(coder1_segment_id) & !is.na(coder2_segment_id)) %>% 
+        dplyr::ungroup()
     
     # overcounted parts caused by different unitization between users
     overcounted_fst_coder <- tmp %>% 
@@ -261,7 +262,9 @@ calculate_segment_overlap_by_users <- function(segments){
         coder1_id <- coders_grid$coder1_id[x]
         coder2_id <- coders_grid$coder2_id[x]
         
-        calculate_segment_overlap_between_2users(segments, coder1_id, coder2_id)
+        calculate_segment_overlap_between_2users(segments, coder1_id, coder2_id) %>% 
+            dplyr::mutate(coder1_id = coder1_id, 
+                          coder2_id = coder2_id)
     })
 }
 

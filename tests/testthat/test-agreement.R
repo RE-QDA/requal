@@ -40,3 +40,33 @@ test_that("calculate segment overlap works", {
         round(mean(calculate_segment_overlap_by_users(segments4)$is_overlap), 2), 0.33
     )
 })
+
+segments1b <- dplyr::tribble(
+    ~user_id, ~doc_id, ~code_id, ~segment_id, ~segment_start, ~segment_end, 
+    1, 1, 1, 1, 1, 10, 
+    2, 1, 1, 2, 1, 10
+)
+
+segments2b <- dplyr::tribble(
+    ~user_id, ~doc_id, ~code_id, ~segment_id, ~segment_start, ~segment_end, 
+    1, 1, 1, 1, 1, 10, 
+    2, 1, 1, 2, 20, 30
+)
+
+segments3b <- dplyr::tribble(
+    ~user_id, ~doc_id, ~code_id, ~segment_id, ~segment_start, ~segment_end, 
+    1, 1, 1, 1, 1, 10, 
+    2, 1, 1, 2, 1, 5
+)
+
+test_that("calculate code overlap works", {
+    expect_equal(
+        calculate_code_overlap_by_users(segments1b)$total_overlap, 1
+    )
+    expect_equal(
+        calculate_code_overlap_by_users(segments2b)$total_overlap, 0
+    )
+    expect_equal(
+        calculate_code_overlap_by_users(segments3b)$total_overlap, 0.5
+    )
+})
