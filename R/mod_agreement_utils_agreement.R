@@ -179,6 +179,69 @@ calculate_code_overlap_by_users_code <- function(segments){
     })
 }
 
+calculate_segment_overlap_between_2users <- function(segments, user_id1, user_id2){
+    fst_coder <- segments %>% 
+        dplyr::filter(user_id == user_id1) %>% 
+        dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
+        tidyr::unnest(., segment_vector)
+    
+    snd_coder <- segments %>% 
+        dplyr::filter(user_id == user_id2) %>% 
+        dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
+        tidyr::unnest(., segment_vector)
+    
+    tmp <- dplyr::full_join(
+        fst_coder %>% dplyr::select(coder1 = user_id, coder1_segment_id = segment_id, 
+                                    doc_id, code_id, segment_vector), 
+        snd_coder %>% dplyr::select(coder2 = user_id, coder2_segment_id = segment_id, 
+                                    doc_id, code_id, segment_vector), 
+        by = c("segment_vector", "doc_id", "code_id")) %>% 
+        dplyr::group_by(doc_id, code_id, coder1_segment_id, coder2_segment_id) %>% 
+        dplyr::summarise(length = dplyr::n()) %>% 
+        dplyr::mutate(is_overlap = !is.na(coder1_segment_id) & !is.na(coder2_segment_id))
+    
+    # overcounted parts caused by different unitization between users
+    overcounted_fst_coder <- tmp %>% 
+        dplyr::filter(!is.na(coder1_segment_id)) %>% 
+        dplyr::group_by(coder1_segment_id) %>% 
+        dplyr::summarise(overlaps_with = list(na.omit(coder2_segment_id))) %>% 
+        dplyr::mutate(overcounted = purrr::map_int(overlaps_with, length) > 1) %>% 
+        dplyr::filter(overcounted) %>% 
+        tidyr::unnest(overlaps_with) %>% 
+        dplyr::group_by(coder1_segment_id) %>% 
+        dplyr::filter(dplyr::row_number() > 1) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::rename(coder2_segment_id = overlaps_with)
+    
+    overcounted_snd_coder <- tmp %>% 
+        dplyr::filter(!is.na(coder2_segment_id)) %>% 
+        dplyr::group_by(coder2_segment_id) %>% 
+        dplyr::summarise(overlaps_with = list(na.omit(coder1_segment_id))) %>% 
+        dplyr::mutate(overcounted = purrr::map_int(overlaps_with, length) > 1) %>% 
+        dplyr::filter(overcounted) %>% 
+        tidyr::unnest(overlaps_with) %>% 
+        dplyr::group_by(coder2_segment_id) %>% 
+        dplyr::filter(dplyr::row_number() > 1) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::rename(coder1_segment_id = overlaps_with)
+    
+    overcounted <- dplyr::bind_rows(
+        overcounted_fst_coder, 
+        overcounted_snd_coder
+    )
+    
+    found_overlapping_segments <- tmp %>% 
+        dplyr::filter(!is.na(coder1_segment_id), !is.na(coder2_segment_id))
+    
+    dplyr::left_join(tmp, overcounted, by = c("coder1_segment_id", "coder2_segment_id")) %>% 
+        # deleting partial overlaps (parts of segments coded only by one user)
+        dplyr::mutate(partial_overlap = (is.na(coder1_segment_id) & coder2_segment_id %in% found_overlapping_segments$coder2_segment_id) | 
+                          is.na(coder2_segment_id) & coder1_segment_id %in% found_overlapping_segments$coder1_segment_id, 
+                      overcounted = ifelse(is.na(overcounted), FALSE, overcounted)) %>% 
+        dplyr::filter(!overcounted, !partial_overlap) %>% 
+        dplyr::select(-c(overcounted, partial_overlap))
+}
+
 calculate_segment_overlap_by_users <- function(segments){
     
     user_id <- V1 <- V2 <- coder1_id <- coder2_id <- NULL
@@ -198,51 +261,7 @@ calculate_segment_overlap_by_users <- function(segments){
         coder1_id <- coders_grid$coder1_id[x]
         coder2_id <- coders_grid$coder2_id[x]
         
-        coded_segments_by_two <- segments %>% 
-            dplyr::filter(user_id %in% c(coder1_id, coder2_id))
-        
-        fst_coder <- coded_segments_by_two %>% 
-            dplyr::filter(user_id == coder1_id) %>% 
-            dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
-            tidyr::unnest(., segment_vector)
-        
-        snd_coder <- coded_segments_by_two %>% 
-            dplyr::filter(user_id == coder2_id) %>% 
-            dplyr::mutate(segment_vector = purrr::map2(segment_start, segment_end, ~c(.x:.y))) %>% 
-            tidyr::unnest(., segment_vector)
-        
-        tmp <- dplyr::full_join(
-            fst_coder %>% dplyr::select(coder1 = user_id, coder1_segment_id = segment_id, 
-                                        doc_id, code_id, segment_vector), 
-            snd_coder %>% dplyr::select(coder2 = user_id, coder2_segment_id = segment_id, 
-                                        doc_id, code_id, segment_vector), 
-            by = c("segment_vector", "doc_id", "code_id")) 
-        
-        coder1 <- tmp %>% 
-            dplyr::ungroup() %>% 
-            dplyr::group_by(doc_id, code_id, coder1, coder1_segment_id) %>% 
-            dplyr::summarise(# overlap = length(segment_vector), 
-                             is_overlap = any(!is.na(coder2) & !is.na(coder1_segment_id)), 
-                             .groups = "drop") %>% 
-            dplyr::rename(segment_id = coder1_segment_id) %>% 
-            dplyr::filter(!is.na(segment_id)) %>% 
-            dplyr::mutate(coder1 = coder1_id, 
-                          coder2 = coder2_id)
-        
-        coder2 <- tmp %>% 
-            dplyr::ungroup() %>% 
-            dplyr::group_by(doc_id, code_id, coder2, coder2_segment_id) %>% 
-            dplyr::summarise(# overlap = length(segment_vector), 
-                             is_overlap = any(!is.na(coder1) & !is.na(coder2_segment_id)), 
-                             .groups = "drop") %>%
-            dplyr::rename(segment_id = coder2_segment_id) %>% 
-            dplyr::filter(!is.na(segment_id)) %>% 
-            dplyr::mutate(coder1 = coder1_id, 
-                          coder2 = coder2_id)
-        
-        dplyr::bind_rows(coder1, coder2) %>% 
-            dplyr::rename(coder1_id = coder1, 
-                          coder2_id = coder2)
+        calculate_segment_overlap_between_2users(segments, coder1_id, coder2_id)
     })
 }
 
