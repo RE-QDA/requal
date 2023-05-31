@@ -29,6 +29,34 @@ CREATE TABLE if not exists attributes_users_map (
 ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
 );
 ",
+
+  "attributes_documents_map" = 
+  "
+  CREATE TABLE if not exists attributes_documents_map (
+      doc_id INTEGER
+  ,   attribute_id INTEGER
+  ,   attribute_value_id INTEGER 
+  ,   project_id INTEGER
+  ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+  );
+  ",
+
+  "attributes_cases_map" = 
+  "
+  CREATE TABLE if not exists attributes_cases_map (
+      case_id INTEGER
+  ,   attribute_id INTEGER
+  ,   attribute_value_id INTEGER 
+  ,   project_id INTEGER
+  ,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
+  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+  );
+  ",
   
   "attribute_values" =
     "
@@ -490,11 +518,13 @@ add_documents_record <- function(pool, project_id, document_df, user_id) {
   res <- DBI::dbWriteTable(pool, "documents", document_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_document_id <- dplyr::tbl(pool, "documents") %>%
-      dplyr::filter(.data$doc_name == !!document_df$doc_name &
-                      .data$doc_text == !!document_df$doc_text &
-                      .data$project_id == project_id &
-                      .data$user_id == !!user_id) %>%
+      dplyr::filter(.data$doc_name == !!document_df$doc_name, 
+                    .data$doc_text == !!document_df$doc_text, 
+                    .data$project_id == !!as.numeric(project_id), 
+                    .data$user_id == !!user_id) %>%
       dplyr::pull(doc_id)
+    
+    written_document_id <- written_document_id[written_document_id == max(written_document_id)]
     log_add_document_record(pool, project_id, document_df %>%
                               dplyr::mutate(doc_id = written_document_id, 
                                             doc_text = substr(doc_text, 1, 140)),
@@ -509,9 +539,11 @@ add_cases_record <- function(pool, project_id, case_df, user_id) {
   res <- DBI::dbWriteTable(pool, "cases", case_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_case_id <- dplyr::tbl(pool, "cases") %>%
-      dplyr::filter(.data$case_name == !!case_df$case_name &
-                      .data$project_id == project_id) %>%
+      dplyr::filter(.data$case_name == !!case_df$case_name, 
+                    .data$project_id == !!as.numeric(project_id)) %>%
       dplyr::pull(.data$case_id)
+    
+    written_case_id <- written_case_id[written_case_id == max(written_case_id)]
     log_add_case_record(pool, project_id, case_df %>%
                           dplyr::mutate(case_id = written_case_id),
                         user_id = user_id
@@ -525,10 +557,12 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
   res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
-      dplyr::filter(.data$code_name == !!codes_df$code_name &
-                      .data$project_id == project_id & 
-                      .data$user_id == !!user_id) %>%
+      dplyr::filter(.data$code_name == !!codes_df$code_name, 
+                    .data$project_id == !!as.numeric(project_id), 
+                    .data$user_id == !!user_id) %>%
       dplyr::pull(code_id)
+    
+    written_code_id <- written_code_id[written_code_id == max(written_code_id)]
     log_add_code_record(pool, project_id, codes_df %>%
                           dplyr::mutate(
                             code_id = written_code_id), 

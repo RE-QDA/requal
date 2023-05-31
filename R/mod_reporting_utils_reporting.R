@@ -1,3 +1,14 @@
+
+# Load users who are active in the current project
+get_users_in_project <- function(pool, project_id){
+    users <- dplyr::tbl(pool, "users") %>% 
+        dplyr::left_join(dplyr::tbl(pool, "user_permissions"), 
+                         by = "user_id") %>% 
+        dplyr::filter(project_id == !!as.integer(project_id)) %>% 
+        dplyr::select(user_id, user_name) %>% 
+        dplyr::collect()
+}
+
 # Load logs for reporting -------------------------------------------
 load_logs_for_reporting <- function(pool, active_project) {
     logs <- dplyr::tbl(pool, "logs") %>%

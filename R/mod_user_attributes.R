@@ -53,14 +53,18 @@ mod_user_attributes_server <- function(id, glob){
         if(n_attributes > 0){
           rows <- ceiling(sqrt(n_attributes))
           cols <- ceiling(n_attributes / rows)
-          graphics::par(mfrow = c(rows, cols), oma = rep(0, 4), mar = c(0, 0, 2, 0))
           
-          purrr::walk(unique_attributes, function(x) {
-            tmp <- user_attributes_summary %>% 
-              dplyr::filter(attribute_name == !!x) 
+          ggplot2::ggplot(user_attributes_summary, 
+                          ggplot2::aes(x = "", y = share, fill = attribute_value)) + 
+            ggplot2::geom_bar(stat = "identity") + 
+            ggplot2::geom_text(ggplot2::aes(label = attribute_value), 
+                               position = ggplot2::position_stack(vjust=0.5)) +
+            ggplot2::coord_polar(theta = "y", start = 0) + 
+            ggplot2::facet_wrap(ggplot2::vars(attribute_name), nrow = rows, ncol = cols) + 
+            ggplot2::theme_void() + 
+            ggplot2::theme(legend.position = "none")
             
-            graphics::pie(tmp$n, labels = tmp$attribute_value, main = paste0("Attribute: ", x))
-          })  
+          
         }
       })
     })
@@ -82,12 +86,13 @@ mod_user_attributes_server <- function(id, glob){
       }else{
         add_attribute(pool = glob$pool, input$attribute_name,
                       type = "category", object = "user", 
-                      project_id = glob$active_project)
+                      project_id = glob$active_project, 
+                      user_id = glob$user$user_id)
         
         new_attribute_id <- dplyr::tbl(glob$pool, "attributes") %>% 
-          dplyr::filter(.data$attribute_name == local(input$attribute_name)) %>% 
-          dplyr::filter(.data$attribute_object == "user") %>% 
-          dplyr::collect() %>% 
+          dplyr::filter(.data$project_id == !!as.numeric(glob$active_project), 
+                        .data$attribute_name == local(input$attribute_name), 
+                        .data$attribute_object == "user") %>% 
           dplyr::pull(attribute_id)
         
         add_attribute_values(pool = glob$pool, 
@@ -116,7 +121,6 @@ mod_user_attributes_server <- function(id, glob){
     observeEvent(input$selected_attr, {
       user_attribute_name <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(attribute_id == !!input$selected_attr) %>% 
-        dplyr::collect() %>% 
         dplyr::pull(attribute_name)
       
       # TODO: check user permissions / attributes_other_modify
