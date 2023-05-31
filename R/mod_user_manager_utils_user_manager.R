@@ -21,8 +21,7 @@ get_users <- function(credentials_path, credentials_pass) {
   on.exit(DBI::dbDisconnect(credentials_con))
   
   shinymanager::read_db_decrypt(credentials_con,
-                                passphrase = credentials_pass
-  ) %>% 
+                                passphrase = credentials_pass) %>% 
     dplyr::select(user_id, 
                   user_login = user,
                   user_name,
@@ -51,11 +50,11 @@ get_user_permissions <- function(pool, project_id) {
 
 # add user permissions to project ----
 
-add_permissions_record <- function(pool, project_id, user_id) {
+add_permissions_record <- function(pool, project_id, permission_user_id, user_id) {
   
   new_users_df <- tibble::tibble(
     project_id = project_id,
-    user_id = user_id,
+    user_id = permission_user_id,
     data_modify                  = 0,
     data_other_modify            = 0,
     data_other_view              = 1,
@@ -80,36 +79,52 @@ add_permissions_record <- function(pool, project_id, user_id) {
                            append = TRUE, row.names = FALSE)
   
   if (res) {
-    #TODO
-    # log
+    # log user ID of the user who did it (not which user permission)
+    log_add_user_permission(pool, project_id, new_users_df, user_id)
   }
 }
 
 
 # remove user permissions from project ----
 
-remove_permissions_record <- function(pool, project_id, user_id) {
+remove_permissions_record <- function(pool, project_id, permission_user_id, user_id) {
   
   remove_user_permissions_sql <- glue::glue_sql("DELETE FROM user_permissions
-                 WHERE user_id IN ({user_id})
+                 WHERE user_id IN ({permission_user_id})
                  AND project_id = {project_id};", .con = pool)
   
   purrr::map(remove_user_permissions_sql, ~DBI::dbExecute(pool, .x))
-  #TODO
-  # log
+  log_remove_user_permission(pool, project_id, 
+                             list(user_id = permission_user_id, 
+                                  project_id = project_id), 
+                             user_id)
+}
+
+find_changed_permissions <- function(pool, project_id, permissions_df){
+  original_permissions <- dplyr::tbl(pool, "user_permissions") %>% 
+    dplyr::filter(project_id == !!as.numeric(project_id)) %>% 
+    dplyr::collect() %>% 
+    tidyr::pivot_longer(., cols = 3:ncol(.), 
+                        names_to = "permission", values_to = "value")
+  
+  dplyr::full_join(permissions_df, original_permissions, 
+                                     by = c("user_id", "permission"), 
+                                     suffix = c("", "_old")) %>% 
+    dplyr::filter(value != value_old) %>% 
+    dplyr::select(-c(value_old, project_id))
 }
 
 # modify permissions for project
-modify_permissions_record <- function(pool, project_id, permissions_df) {
+modify_permissions_record <- function(pool, project_id, permissions_df, user_id) {
+  changed_permissions_df <- find_changed_permissions(pool, project_id, permissions_df)
   
   update_user_permissions_sql <- glue::glue_sql("UPDATE user_permissions
-                 SET {`permissions_df$permission`} = {permissions_df$value}
-                 WHERE user_id = {permissions_df$user_id}
+                 SET {`changed_permissions_df$permission`} = {changed_permissions_df$value}
+                 WHERE user_id = {changed_permissions_df$user_id}
                  AND project_id = {project_id};", .con = pool)
   
   purrr::map(update_user_permissions_sql, ~DBI::dbExecute(pool, .x))
-  #TODO
-  # log
+  log_change_user_permission(pool, project_id, changed_permissions_df, user_id)
 }
 
 # Generate user permissions UI -----

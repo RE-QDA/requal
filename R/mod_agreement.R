@@ -20,11 +20,13 @@ mod_agreement_ui <- function(id) {
                             "Overlap by coder [character]" = "by_user",
                             "Overlap by coder and code [character]" = "by_user_code",
                             "Overlap by user attribute [character]" = "by_attribute",
+                            "Overlap by user attribute and code [character]" = "by_attribute_code",
                             "Total overlap [segments]" = "total_segment",
                             "Overlap by code [segments]" = "by_code_segment",
                             "Overlap by coder [segments]" = "by_user_segment",
                             "Overlap by coder and code [segments]" = "by_user_code_segment", 
-                            "Overlap by user attribute [segments]" = "by_attribute_segment"
+                            "Overlap by user attribute [segments]" = "by_attribute_segment", 
+                            "Overlap by user attribute and code [segments]" = "by_attribute_segment_code"
                 )
     ),
     checkboxGroupInput(ns("repro_coders"), "Select coders:", 
@@ -50,9 +52,7 @@ mod_agreement_server <- function(id, glob) {
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
-        users <- dplyr::tbl(glob$pool, "users") %>% 
-          dplyr::select(user_id, user_name) %>% 
-          dplyr::collect()
+        users <- get_users_in_project(glob$pool, glob$active_project)
         
         if(!is.null(glob$user$data) && 
            !is.null(glob$user$data$report_other_view) &&
@@ -75,7 +75,8 @@ mod_agreement_server <- function(id, glob) {
       }
     })
     
-    observeEvent(req(input$metrics_select %in% c("by_attribute", "by_attribute_segment")), {
+    observeEvent(req(input$metrics_select %in% c("by_attribute", "by_attribute_segment", 
+                                                 "by_attribute_code", "by_attribute_segment_code")), {
       user_attributes <- dplyr::tbl(glob$pool, "attributes") %>% 
         dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
                         attribute_object == "user") %>% 
@@ -93,7 +94,8 @@ mod_agreement_server <- function(id, glob) {
       })
     })
     
-    observeEvent(req(!input$metrics_select %in% c("by_attribute", "by_attribute_segment")), {
+    observeEvent(req(!input$metrics_select %in% c("by_attribute", "by_attribute_segment", 
+                                                  "by_attribute_code", "by_attribute_segment_code")), {
       output$attributes_select <- NULL
     })
     
@@ -125,18 +127,27 @@ mod_agreement_server <- function(id, glob) {
     # total_segment ----
     observeEvent({req(input$metrics_select == "total_segment")
       input$calculate}, {
+        
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
         ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
         
         if (length(unique(segments$user_id)) > 1) {
-          overlap_df <- calculate_segment_overlap_by_users(segments) %>%
+          segment_summary <- segments %>% 
             dplyr::summarise(
-              `Total Overlap` = mean(is_overlap),
-              `N segments` = length(unique(segment_id)),
-              `N coders` = length(unique(c(coder1_id, coder2_id)))
+              `N segments` = dplyr::n(), 
+              `N coders` = length(unique(user_id))
             )
+          
+          overlap_df <- calculate_segment_overlap_by_users(segments) %>%
+            dplyr::group_by(coder1_id, coder2_id) %>% 
+            dplyr::summarise(jaccard = mean(is_overlap)) %>% 
+            dplyr::ungroup() %>% 
+            dplyr::summarise(
+              `Total Overlap` = mean(jaccard)
+            ) %>% 
+            dplyr::bind_cols(., segment_summary)
           
           output$overlap_plot <- NULL
           output$overlap_table <- renderTable({
@@ -207,14 +218,20 @@ mod_agreement_server <- function(id, glob) {
         )
         
         if (length(unique(segments$user_id)) > 1) {
+          segment_count <- segments %>% 
+            dplyr::group_by(code_id) %>% 
+            dplyr::summarise(
+              n_segments = dplyr::n(), 
+              n_coders = length(unique(user_id))
+            )
+          
           overlap_df <- calculate_segment_overlap_by_users(segments) %>%
             dplyr::group_by(code_id) %>%
             dplyr::summarise(
-              total_overlap = mean(is_overlap),
-              n_segments = length(unique(segment_id)),
-              n_coders = length(unique(c(coder1_id, coder2_id)))
+              total_overlap = mean(is_overlap)
             ) %>%
             dplyr::left_join(., codes, by = "code_id") %>%
+            dplyr::left_join(., segment_count, by = "code_id") %>% 
             dplyr::select(
               code_name, total_overlap,
               n_segments, n_coders
@@ -397,7 +414,9 @@ mod_agreement_server <- function(id, glob) {
         }
       })
     
+    # by_attribute ----
     observeEvent({req(input$metrics_select == "by_attribute")
+      req(input$attributes_select_ui)
       input$calculate}, {
         
         attribute_id <- as.numeric(input$attributes_select_ui)
@@ -451,21 +470,96 @@ mod_agreement_server <- function(id, glob) {
               n = dplyr::n()
             )
           
-          # overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = w_total_overlap)
+          overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap)
           
-          output$overlap_table <- renderTable(overlap_df)
-          output$overlap_plot <- NULL
-          # output$overlap_plot <- renderPlot({
-          #   overlap_heatmap
-          # }, height = "auto", width = "auto")
+          output$overlap_table <- NULL # renderTable(overlap_df)
+          output$overlap_plot <- renderPlot({
+            overlap_heatmap
+          }, height = "auto", width = "auto")
         } else {
           output$overlap_plot <- NULL
           output$overlap_table <- renderText(agreement_message)
         }
       })
     
-    observeEvent({req(input$metrics_select == "by_attribute_segment")
+    # by_attribute_code ----
+    observeEvent({req(input$metrics_select == "by_attribute_code")
       input$calculate}, {
+        
+        attribute_id <- as.numeric(input$attributes_select_ui)
+        segments <- load_all_segments_db(
+          pool = glob$pool,
+          active_project = glob$active_project
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        
+        attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
+          dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
+                          attribute_id == !!as.numeric(attribute_id)) %>% 
+          dplyr::collect()
+        
+        attribute_values <- dplyr::tbl(glob$pool, "attributes") %>% 
+          dplyr::filter(attribute_id == !!attribute_id) %>% 
+          dplyr::left_join(., dplyr::tbl(glob$pool, "attribute_values"), by = "attribute_id") %>% 
+          dplyr::select(attribute_id, attribute_name, attribute_value_id, value) %>% 
+          dplyr::collect()
+        
+        user_attributes <- attr_user_map %>% 
+          dplyr::left_join(., attribute_values, by = c("attribute_id", "attribute_value_id")) %>% 
+          dplyr::select(user_id, attribute_name, attribute_value = value)
+        
+        users <- load_users_names(
+          pool = glob$pool,
+          active_project = glob$active_project
+        )
+        
+        codes <- load_codes_names(
+          pool = glob$pool,
+          active_project = glob$active_project
+        )
+        
+        if (length(unique(segments$user_id)) > 1) {
+          overlap_df <- calculate_code_overlap_by_users_code(segments) %>%
+            join_user_names(., users) %>%
+            dplyr::group_by(code_id, coder1_name, coder2_name, coder1_id, coder2_id) %>%
+            dplyr::summarise(
+              w_total_overlap = stats::weighted.mean(total_overlap, n_char),
+              .groups = "drop"
+            ) %>%
+            make_overlap_df_symmetrical() %>% 
+            dplyr::left_join(., user_attributes %>% dplyr::select(user_id, attribute_value1 = attribute_value), by = c("coder1_id"="user_id")) %>% 
+            dplyr::left_join(., user_attributes %>% dplyr::select(user_id, attribute_value2 = attribute_value), by = c("coder2_id"="user_id")) %>% 
+            dplyr::group_by(code_id, attribute_value1, attribute_value2) %>% 
+            dplyr::summarise(
+              min_total_overlap = min(w_total_overlap), 
+              mean_total_overlap = mean(w_total_overlap), 
+              max_total_overlap = max(w_total_overlap), 
+              n = dplyr::n()
+            ) %>% 
+            dplyr::left_join(., codes, by = "code_id")
+          
+          n_codes <- length(unique(overlap_df$code_name))
+          
+          if(n_codes > 6){
+            overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name), ncol = 3)
+          }else{
+            overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name))
+          }
+          output$overlap_table <- NULL
+          output$overlap_plot <- renderPlot({
+            overlap_heatmap
+          }, height = "auto", width = "auto")
+        } else {
+          output$overlap_table <- renderText(agreement_message)
+        }
+      })
+    
+    # by_attribute_segment -----
+    observeEvent({req(input$metrics_select == "by_attribute_segment")
+      req(input$attributes_select_ui)
+      input$calculate}, {
+        
         attribute_id <- as.numeric(input$attributes_select_ui)
         segments <- load_all_segments_db(
           pool = glob$pool,
@@ -516,18 +610,91 @@ mod_agreement_server <- function(id, glob) {
               n = dplyr::n()
             )
           
-          # overlap_heatmap <- create_overlap_heatmap(overlap_df, fill = total_overlap)
+          overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap)
           
-          output$overlap_table <- renderTable(overlap_df)
-          output$overlap_plot <- NULL
-          # output$overlap_plot <- renderPlot({
-          #   overlap_heatmap
-          # }, height = "auto", width = "auto")
+          output$overlap_table <- NULL # renderTable(overlap_df)
+          output$overlap_plot <- renderPlot({
+            overlap_heatmap
+          }, height = "auto", width = "auto")
         } else {
           output$overlap_plot <- NULL
           output$overlap_table <- renderText(agreement_message)
         }
       })
+    
+    # by_attribute_code ----
+    observeEvent({req(input$metrics_select == "by_attribute_segment_code")
+      req(input$attributes_select_ui)
+      input$calculate}, {
+        
+        attribute_id <- as.numeric(input$attributes_select_ui)
+        segments <- load_all_segments_db(
+          pool = glob$pool,
+          active_project = glob$active_project
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        
+        attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
+          dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
+                          attribute_id == !!as.numeric(attribute_id)) %>% 
+          dplyr::collect()
+        
+        attribute_values <- dplyr::tbl(glob$pool, "attributes") %>% 
+          dplyr::filter(attribute_id == !!attribute_id) %>% 
+          dplyr::left_join(., dplyr::tbl(glob$pool, "attribute_values"), by = "attribute_id") %>% 
+          dplyr::select(attribute_id, attribute_name, attribute_value_id, value) %>% 
+          dplyr::collect()
+        
+        user_attributes <- attr_user_map %>% 
+          dplyr::left_join(., attribute_values, by = c("attribute_id", "attribute_value_id")) %>% 
+          dplyr::select(user_id, attribute_name, attribute_value = value)
+        
+        users <- load_users_names(
+          pool = glob$pool,
+          active_project = glob$active_project
+        )
+        
+        codes <- load_codes_names(
+          pool = glob$pool,
+          active_project = glob$active_project
+        )
+        
+        if (length(unique(segments$user_id)) > 1) {
+          overlap_df <- calculate_segment_overlap_by_users(segments) %>%
+            dplyr::group_by(code_id, coder1_id, coder2_id) %>%
+            dplyr::summarise(
+              total_overlap = mean(is_overlap),
+              .groups = "drop"
+            ) %>%
+            join_user_names(., users) %>%
+            dplyr::left_join(., codes, by = "code_id") %>%
+            make_overlap_df_symmetrical() %>% 
+            dplyr::left_join(., user_attributes %>% dplyr::select(user_id, attribute_value1 = attribute_value), by = c("coder1_id"="user_id")) %>% 
+            dplyr::left_join(., user_attributes %>% dplyr::select(user_id, attribute_value2 = attribute_value), by = c("coder2_id"="user_id")) %>% 
+            dplyr::group_by(code_id, attribute_value1, attribute_value2) %>% 
+            dplyr::summarise(
+              mean_total_overlap = mean(total_overlap), 
+              n = dplyr::n()
+            ) %>% 
+            dplyr::left_join(., codes, by = "code_id")
+          
+          n_codes <- length(unique(overlap_df$code_name))
+          
+          if(n_codes > 6){
+            overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name), ncol = 3)
+          }else{
+            overlap_heatmap <- create_overlap_heatmap_attribute(overlap_df, fill = mean_total_overlap) +
+              ggplot2::facet_wrap(ggplot2::vars(code_name))
+          }
+          output$overlap_table <- NULL
+          output$overlap_plot <- renderPlot({
+            overlap_heatmap
+          }, height = "auto", width = "auto")
+        } else {
+          output$overlap_table <- renderText(agreement_message)
+        }
+      })
+    
     
   })
   

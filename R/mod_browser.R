@@ -54,10 +54,8 @@ mod_browser_server <- function(id, glob){
           choices = c("", documents)
         )
         
-        users <- dplyr::tbl(glob$pool, "users") %>% 
-          dplyr::select(user_id, user_name) %>% 
-          dplyr::collect()
-        
+        users <- get_users_in_project(glob$pool, glob$active_project)
+          
         if(!is.null(glob$user$data) && 
            !is.null(glob$user$data$report_other_view) &&
            glob$user$data$report_other_view != 1){
