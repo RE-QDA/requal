@@ -51,7 +51,6 @@ add_memo_record <- function(pool, project, text, user_id) {
     
     res <- DBI::dbWriteTable(pool, "memos", memo_df, append = TRUE, row.names = FALSE)
     if(res){
-        browser()
         memo_id <- dplyr::tbl(pool, "memos") %>% 
             dplyr::filter(.data$project_id == !!memo_df$project_id, 
                           .data$text == !!memo_df$text) %>% 
