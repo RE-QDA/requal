@@ -23,8 +23,8 @@ mod_about_ui <- function(id){
         
         p(),
         HTML(paste0("For help, consult ", 
-        a("reQual Wiki", href="https://github.com/RE-QDA/requal/wiki", target = "_blank"), 
-        ".")),
+                    a("reQual Wiki", href="https://github.com/RE-QDA/requal/wiki", target = "_blank"), 
+                    ".")),
         p(),
         p("The development of this tool has been supported by", 
           a(href = "https://www.tacr.cz/en/technology-agency-of-the-czech-republic", 
