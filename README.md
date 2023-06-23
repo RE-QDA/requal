@@ -13,8 +13,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 The goal of `requal` is to provide reproducibility support for
 qualitative coding.
 
-⚠️ **The package is in development and experimental stage.** ⚠️
-
 <img src="https://owncloud.cesnet.cz/index.php/s/mQcxC998RC6qwVP/download" width="100%" />
 
 ## Installation
