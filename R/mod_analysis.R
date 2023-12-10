@@ -161,7 +161,7 @@ mod_analysis_server <- function(id, glob) {
     output$download <- renderUI({
       if (nrow(req(loc$segments_df)) > 0) {
         tagList(
-          mod_download_handler_ui("download_handler_ui_1"),
+          mod_download_csv_ui("download_csv_ui_1", "download_analysis"),
           mod_download_html_ui("download_html_ui_1")
         )
       } else {

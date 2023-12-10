@@ -53,7 +53,6 @@ app_server <- function(input, output, session) {
 
   # analysis ----
   mod_analysis_server("analysis_ui_1", glob)
-  mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
 
   # reporting
@@ -71,4 +70,8 @@ app_server <- function(input, output, session) {
 
   # memo
   mod_memo_server("memo_ui_1", glob)
+  
+  # shared
+  mod_download_csv_server("download_csv_ui_1", glob)
+  
 }
