@@ -49,7 +49,8 @@ mod_doc_manager_server <- function(id, glob) {
           menu_btn(
             uiOutput(ns("doc_create_ui")),
             label = "Create document",
-            icon = "plus"
+            icon = "plus", 
+            inputId = "doc_create_btn"
           ),
           menu_btn(
             uiOutput(ns("doc_upload_ui")),

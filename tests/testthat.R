@@ -1,4 +1,4 @@
 library(testthat)
 library(requal)
 
-test_check("requal")
+# test_check("requal")

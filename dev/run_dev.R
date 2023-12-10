@@ -9,18 +9,29 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 # Run the application
+# (run_app(
+#   mode = "server",
+#   dbname = "requal",
+#   dbhost = "localhost",
+#   dbusername = "requal_admin",
+#   dbpassword = "test",
+#   credentials_path = "requal_users.sqlite",
+#   credentials_pass = "test",
+#   options = list("launch.browser")
+# ))
+
 (run_app(
-  mode = "local",
-  dbname = "requal",
-  dbhost = "localhost",
-  dbusername = "requal_admin",
-  dbpassword = "test",
-  credentials_path = "requal_users.sqlite",
-  credentials_pass = "test",
+  mode = "local_test",
+  dbname = "tests/test.requal",
+  # dbhost = "localhost",
+  # dbusername = "requal_admin",
+  # dbpassword = "test",
+  # credentials_path = "requal_users.sqlite",
+  # credentials_pass = "test",
   options = list("launch.browser")
 ))
 
-# (run_app(
-#   mode = "local",
-#   options = list("launch.browser")
-# ))
+(run_app(
+  mode = "local",
+  options = list("launch.browser")
+))

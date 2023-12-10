@@ -41,7 +41,7 @@ app_server <- function(input, output, session) {
   # output: no output, permissions and membership written to DB
   # ---- to prevent manipulation via UI
   mod_user_manager_server("user_manager_1", glob)
-
+   
   # codebook  ----
   # output: glob$codebook
   mod_codebook_server("codebook_ui_1", glob)
@@ -50,7 +50,7 @@ app_server <- function(input, output, session) {
   # workdesk ----
   # output: glob$segments
   mod_document_code_server("document_code_ui_1", glob)
-
+  
   # analysis ----
   mod_analysis_server("analysis_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
@@ -70,8 +70,8 @@ app_server <- function(input, output, session) {
 
   # memo
   mod_memo_server("memo_ui_1", glob)
-  
+
   # shared
   mod_download_csv_server("download_csv_ui_1", glob)
-  
+
 }

@@ -455,7 +455,7 @@ default_user_permission_df <- tibble::tibble(
       project_owner                = 1
     )
 
-  if (golem::get_golem_options("mode") == "local") {
+  if (golem::get_golem_options("mode") %in% c("local", "local_test")) {
     user_df <- tibble::tibble(
       user_name = Sys.info()["user"]
     )
@@ -595,6 +595,23 @@ make_globals <- quote({
       dbname = golem::get_golem_options(which = "dbname"),
       user = golem::get_golem_options(which = "dbusername"),
       password = golem::get_golem_options(which = "dbpassword")
+    )
+    
+    onStop(function() {
+      print("closing pool")
+      pool::poolClose(pool)
+    })
+    
+    if("projects" %in% pool::dbListTables(pool)){
+      existing_projects <- dplyr::pull(dplyr::tbl(pool, "projects"), project_id)
+      names(existing_projects) <- dplyr::pull(dplyr::tbl(pool, "projects"), project_name)
+    }else{
+      existing_projects <- data.frame()
+    }
+  } else if(golem::get_golem_options(which = "mode") == "local_test") {
+    pool <- pool::dbPool(
+      drv = RSQLite::SQLite(),
+      dbname = golem::get_golem_options(which = "dbname")
     )
     
     onStop(function() {
