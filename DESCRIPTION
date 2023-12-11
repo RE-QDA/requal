@@ -71,7 +71,9 @@ Suggests:
     testthat (>= 3.0.0),
     spelling,
     shinytest2,
-    rvest
+    rvest,
+    devtools,
+    pkgload
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Language: en-US
