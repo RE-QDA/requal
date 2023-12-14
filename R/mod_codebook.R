@@ -73,17 +73,20 @@ mod_codebook_server <- function(id, glob) {
           menu_btn(
             uiOutput(ns("code_create_ui")),
             label = "Create code",
-            icon = "plus"
+            icon = "plus", 
+            inputId = "code_create_btn"
           ),
           menu_btn(
             uiOutput(ns("code_merge_ui")),
             label =  "Merge codes",
-            icon = "compress"
+            icon = "compress", 
+            inputId = "code_merge_btn"
           ),
           menu_btn(
             uiOutput(ns("code_delete_ui")),
             label =  "Delete code",
-            icon = "minus"
+            icon = "minus", 
+            inputId = "code_delete_btn"
           )
         ) 
       }

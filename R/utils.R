@@ -53,7 +53,6 @@ utils::globalVariables(c("project_name",
 
 set_dashboard_body <- function() {
     
-    
     shinydashboard::dashboardBody(
         
         shinyjs::useShinyjs(),
@@ -98,8 +97,6 @@ shinydashboard::tabItems(
 }
 
 set_left_menu <- function() {
-    
-    
     shinydashboardPlus::dashboardSidebar(minified = TRUE, 
                      collapsed = FALSE,
                      shinydashboard::sidebarMenu(
@@ -136,7 +133,8 @@ set_left_menu <- function() {
                              "About",
                              tabName = "About",
                              icon = icon("info")
-                         )
+                         ), 
+                         id = "tab_menu"
                      ))
     
     

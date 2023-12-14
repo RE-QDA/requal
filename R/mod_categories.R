@@ -52,11 +52,13 @@ mod_categories_server <- function(id, glob) {
           menu_btn(
             uiOutput(ns("category_create")),
             label = "Create category",
-            icon = "plus"),
+            icon = "plus", 
+            inputId = "ctg_create_btn"),
           menu_btn(
             uiOutput(ns("category_delete")),
             label =  "Delete category",
-            icon = "minus")
+            icon = "minus", 
+            inputId = "ctg_delete_btn")
         )
       }
     })

@@ -471,7 +471,7 @@ default_user_permission_df <- tibble::tibble(
       ),
       default_user_permission_df
     )
-  } else {
+  } else{
     user_permission_df <-  dplyr::bind_cols(
       tibble::tibble(
         user_id = user_id,

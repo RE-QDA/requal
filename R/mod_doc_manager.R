@@ -55,12 +55,14 @@ mod_doc_manager_server <- function(id, glob) {
           menu_btn(
             uiOutput(ns("doc_upload_ui")),
             label =  "Upload file",
-            icon = "upload"
+            icon = "upload", 
+            inputId = "doc_upload_btn"
           ),
           menu_btn(
             uiOutput(ns("doc_delete_ui")),
             label =  "Delete document",
-            icon = "minus"
+            icon = "minus", 
+            inputId = "doc_delete_btn"
           )
         )
       }
