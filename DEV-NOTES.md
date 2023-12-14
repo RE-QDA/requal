@@ -8,7 +8,7 @@ Instruction for local development of `reQual` server version.
 
 ## Testing
 
-- `shinytest2::record_test()` - starts the test version of the app 
+- `shinytest2::record_test("inst/test_app")` - starts the test version of the app 
 (defined in `app.R` which uses a database with empty project `tests/test_basic.requal`)
 
 ## Test coverage

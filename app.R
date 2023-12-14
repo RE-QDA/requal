@@ -1,5 +1,6 @@
 # For testing purposes only
-pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
+pkgload::load_all(path = "../", export_all = FALSE, helpers = FALSE, 
+                  attach_testthat = FALSE)
 options("golem.app.prod" = TRUE)
 
 file.copy(from = "tests/test_basic_backup.requal", 
