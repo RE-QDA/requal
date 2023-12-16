@@ -1,3 +1,5 @@
+utils::globalVariables(c("share"))
+
 #' reproducibility_user_attributes UI Function
 #'
 #' @description A shiny Module.

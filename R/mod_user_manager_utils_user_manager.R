@@ -1,4 +1,4 @@
-utils::globalVariables(c("user", "user_mail"))
+utils::globalVariables(c("user", "user_mail", "value_old"))
 
 disabled_checkbox <- function(inputId, label, value = FALSE, width = NULL){
   value <- shiny::restoreInput(id = inputId, default = value)

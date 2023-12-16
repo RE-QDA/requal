@@ -1,3 +1,6 @@
+utils::globalVariables(c("category_name", "category_description", 
+                         "code_description", "category_title"))
+
 #' download_csv UI Function
 #'
 #' @description A shiny Module.

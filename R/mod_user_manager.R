@@ -1,4 +1,5 @@
-utils::globalVariables(c("user_id_copy", "permission", "project_admin", "permissions_modify"))
+utils::globalVariables(c("user_id_copy", "permission", "project_admin", 
+                         "permissions_modify", "project_owner"))
 
 #' user_manager UI Function
 #'

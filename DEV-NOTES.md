@@ -36,9 +36,10 @@ Instruction for local development of `reQual` server version.
 - [ ] remove code from category
 
 ### Workdesk
-- [ ] select document to code
-- [ ] assign code to segment
-- [ ] remove code from segment
+- [x] select document to code
+- [x] assign code to segment
+- [x] remove code from segment
+- [ ] removing code using the modal window when there are multiple codes overlapping 
 
 ### Analysis
 - [ ] filter 
