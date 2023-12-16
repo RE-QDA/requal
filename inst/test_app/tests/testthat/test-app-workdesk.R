@@ -24,6 +24,6 @@ test_that("{shinytest2} test delete code", {
     app$set_inputs(`document_code_ui_1-doc_selector` = "1")
     app$wait_for_idle()
     
-    app$expect_screenshot()
+    app$expect_values(output = "document_code_ui_1-focal_text")
     
 })

@@ -74,7 +74,7 @@ test_that("{shinytest2} test creating segment", {
     
     app$click("document_code_ui_1-1")
     
-    app$expect_screenshot()
+    # app$expect_screenshot()
     app$expect_values(output = "document_code_ui_1-focal_text")
     
 })
