@@ -43,8 +43,8 @@ get_codebook_export_table <- function(glob){
   
   dplyr::tbl(glob$pool, "categories_codes_map") %>% 
     dplyr::collect() %>% 
-    dplyr::inner_join(., categories, by = "category_id") %>% 
-    dplyr::left_join(glob$codebook, ., by = "code_id") %>% 
+    dplyr::inner_join(categories, by = "category_id") %>% 
+    dplyr::left_join(glob$codebook, by = "code_id") %>% 
     dplyr::group_by(code_id, code_name, code_description) %>% 
     dplyr::summarise(categories = paste0(category_title, collapse = ", "))
 }
