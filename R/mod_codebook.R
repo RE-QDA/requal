@@ -194,17 +194,18 @@ mod_codebook_server <- function(id, glob) {
           )
         }
         })
-  
+
+    
     output$download <- renderUI({
-      if (nrow(req(loc$codebook)) > 0) {
+      if (nrow(req(glob$codebook)) > 0) {
         tagList(
           mod_download_csv_ui("download_csv_ui_1", "download_codebook"),
-          # mod_download_html_ui("download_html_ui_1")
         )
       } else {
         ""
       }
     })
+
     # end of server module function
   })
 }
