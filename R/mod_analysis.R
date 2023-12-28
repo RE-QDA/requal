@@ -97,7 +97,7 @@ mod_rql_button_server(
         id = "download_ui",
         custom_title = "Download segments",
         custom_tagList = tagList(
-          tags$p(mod_download_handler_ui("download_handler_ui_1")),
+          tags$p(mod_download_csv_ui("download_csv_ui_1", "download_analysis")),
           tags$p(mod_download_html_ui("download_html_ui_1"))
         )
 
@@ -232,13 +232,13 @@ mod_rql_button_server(
       },
       {
         if (!is.null(loc$segments_df) && nrow(loc$segments_df) > 0) {
-          shinyjs::enable("download_handler_ui_1-download", asis = TRUE)
+          shinyjs::enable("download_csv_ui_1-download", asis = TRUE)
           shinyjs::enable("download_html_ui_1-report", asis = TRUE)
           glob$segments_df <- loc$segments_df %>%
             dplyr::select(doc_name, doc_id, code_name, code_id, segment_text, user_name)
           glob$segments_taglist <- loc$segments_taglist
         } else {
-          shinyjs::disable("download_handler_ui_1-download", asis = TRUE)
+          shinyjs::disable("download_csv_ui_1-download", asis = TRUE)
           shinyjs::disable("download_html_ui_1-report", asis = TRUE)
 
         }
