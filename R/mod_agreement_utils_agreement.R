@@ -1,4 +1,6 @@
-utils::globalVariables(c("coders"))
+utils::globalVariables(c("coders", "segment_vector", "coder1_segment_id", 
+                         "coder2_segment_id", "overlaps_with", 
+                         "partial_overlap"))
 
 calculate_coders_overlap <- function(segments){
     segments %>% 
@@ -205,7 +207,7 @@ calculate_segment_overlap_between_2users <- function(segments, user_id1, user_id
     overcounted_fst_coder <- tmp %>% 
         dplyr::filter(!is.na(coder1_segment_id)) %>% 
         dplyr::group_by(coder1_segment_id) %>% 
-        dplyr::summarise(overlaps_with = list(na.omit(coder2_segment_id))) %>% 
+        dplyr::summarise(overlaps_with = list(stats::na.omit(coder2_segment_id))) %>% 
         dplyr::mutate(overcounted = purrr::map_int(overlaps_with, length) > 1) %>% 
         dplyr::filter(overcounted) %>% 
         tidyr::unnest(overlaps_with) %>% 
@@ -217,7 +219,7 @@ calculate_segment_overlap_between_2users <- function(segments, user_id1, user_id
     overcounted_snd_coder <- tmp %>% 
         dplyr::filter(!is.na(coder2_segment_id)) %>% 
         dplyr::group_by(coder2_segment_id) %>% 
-        dplyr::summarise(overlaps_with = list(na.omit(coder1_segment_id))) %>% 
+        dplyr::summarise(overlaps_with = list(stats::na.omit(coder1_segment_id))) %>% 
         dplyr::mutate(overcounted = purrr::map_int(overlaps_with, length) > 1) %>% 
         dplyr::filter(overcounted) %>% 
         tidyr::unnest(overlaps_with) %>% 

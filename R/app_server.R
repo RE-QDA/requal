@@ -63,10 +63,9 @@ app_server <- function(input, output, session) {
   # workdesk ----
   # output: glob$segments_observer
   mod_document_code_server("document_code_ui_1", glob)
-
+  
   # analysis ----
   mod_analysis_server("analysis_ui_1", glob)
-  mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
 
   # reporting
@@ -95,4 +94,7 @@ app_server <- function(input, output, session) {
           )
     }
   })
+  # shared
+  mod_download_csv_server("download_csv_ui_1", glob)
+
 }

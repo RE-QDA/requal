@@ -48,7 +48,8 @@ mod_codebook_ui <- function(id) {
         value = "categories",
         mod_categories_ui("categories_ui_1") 
       )
-    )
+    ), 
+    uiOutput(ns("download"))
   )
 }
 
@@ -194,7 +195,16 @@ mod_codebook_server <- function(id, glob) {
         }
         })
   
-    # returns glob$codebook ----
+    output$download <- renderUI({
+      if (nrow(req(loc$codebook)) > 0) {
+        tagList(
+          mod_download_csv_ui("download_csv_ui_1", "download_codebook"),
+          # mod_download_html_ui("download_html_ui_1")
+        )
+      } else {
+        ""
+      }
+    })
     # end of server module function
   })
 }

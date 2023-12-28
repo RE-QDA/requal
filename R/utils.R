@@ -53,7 +53,6 @@ utils::globalVariables(c("project_name",
 
 set_dashboard_body <- function() {
     
-    
     shinydashboard::dashboardBody(
         
         shinyjs::useShinyjs(),
@@ -99,8 +98,6 @@ shinyjs::hidden(shinydashboard::tabItems(
 }
 
 set_left_menu <- function() {
-    
-    
     shinydashboardPlus::dashboardSidebar(minified = TRUE, 
                      collapsed = FALSE,
                      shinydashboard::sidebarMenu(
@@ -239,48 +236,44 @@ get_volume_paths <- function() {
 # loader UI
 
 loader_UI_local <- function(ns){
-
-tagList(
-  h3("Project file"),
-  div(span(textOutput(
-    ns("project_path_load")
-  ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
-  shinyFiles::shinyFilesButton(
-    ns("sel_file_load"),
-    "File select",
-    "Please select a project file",
-    multiple = FALSE
-  ),
-  selectInput(
-    ns("project_selector_load"),
-    "Select project",
-    choices = NULL
-  ),
-  actionButton(
-    ns("project_load"),
-    label = "Load project",
-    class = "btn-success"
+  tagList(
+    h3("Project file"),
+    div(span(textOutput(
+      ns("project_path_load")
+    ), class = "form-control overflow_barrier"), class = "form-group shiny-input-container"),
+    shinyFiles::shinyFilesButton(
+      ns("sel_file_load"),
+      "File select",
+      "Please select a project file",
+      multiple = FALSE
+    ),
+    selectInput(
+      ns("project_selector_load"),
+      "Select project",
+      choices = NULL
+    ),
+    actionButton(
+      ns("project_load"),
+      label = "Load project",
+      class = "btn-success"
+    )
   )
-)
-
 }
 
 loader_UI_server <- function(ns){
-
-tagList(
-  h3("Remote project"),
-  selectInput(
-    ns("project_selector_load"),
-    "Select project",
-    choices = NULL
-  ),
-  actionButton(
-    ns("project_load"),
-    label = "Load project",
-    class = "btn-success"
+  tagList(
+    h3("Remote project"),
+    selectInput(
+      ns("project_selector_load"),
+      "Select project",
+      choices = NULL
+    ),
+    actionButton(
+      ns("project_load"),
+      label = "Load project",
+      class = "btn-success"
+    )
   )
-)
-
 }
 
 # creator UI
@@ -341,7 +334,6 @@ creator_UI_server <- function(ns) {
 # warnings ------
 
 warn_user <- function(warning) {
-  
   showModal(modalDialog(title = "Warning",
                         warning))
 }
@@ -349,9 +341,9 @@ warn_user <- function(warning) {
 # check permission to modify permissions
 
 check_modify_permission <- function(permission, msg) {
-     if (permission != 1) warn_user(msg)
-     req(permission == 1)
-     }
+  if (permission != 1) warn_user(msg)
+  req(permission == 1)
+}
 
 # filter data by view permissions
 

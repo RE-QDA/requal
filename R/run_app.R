@@ -36,7 +36,8 @@ run_app <- function(mode = "local",
                                    enable_admin = TRUE,
                                    fab_position = "none"
           ),
-          local = app_ui
+          local = app_ui, 
+          local_test = app_ui
           ),
       server = app_server,
       onStart = purrr::partial(eval, expr = make_globals, envir = globalenv()),

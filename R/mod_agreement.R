@@ -1,4 +1,6 @@
-utils::globalVariables(c("attribute_object", "attribute_value", "attribute_value1", "attribute_value2"))
+utils::globalVariables(c("attribute_object", "attribute_value", 
+                         "attribute_value1", "attribute_value2", 
+                         "jaccard", "mean_total_overlap"))
 
 #' agreement UI Function
 #'
