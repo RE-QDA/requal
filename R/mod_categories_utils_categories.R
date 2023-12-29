@@ -105,7 +105,6 @@ render_categories <- function(id, pool,
 }
 
 # Read categories--------------------------------------------------------
-
 read_db_categories <- function(pool, active_project, user) {
     category_id <- category_description <- category_name <- NULL
     
@@ -129,6 +128,16 @@ read_db_categories <- function(pool, active_project, user) {
     names(project_categories) <- project_categories_df$category_name
     
     return(project_categories)
+}
+
+read_category_edges <- function(pool, active_project){
+    dplyr::tbl(pool, "categories_codes_map") %>%
+        dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
+        dplyr::select(
+            category_id,
+            code_id
+        ) %>%
+        dplyr::collect()
 }
 
 # List categories--------------------------------------------------------
@@ -253,7 +262,6 @@ add_category_code_record <- function(pool,
 }
 
 # delete edge record -----
-
 delete_category_code_record <- function(pool,
                                         active_project,
                                         edge, 

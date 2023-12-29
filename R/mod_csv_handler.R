@@ -64,7 +64,7 @@ mod_download_csv_server <- function(id, glob){
       )
     })
     
-    observeEvent(c(glob$codebook, glob$category), {
+    observeEvent(c(glob$codebook, glob$category, glob$category_code_map), {
       output$download_codebook <- handle_download(
         paste0("requal_codebook_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"), 
         get_codebook_export_table(glob)
