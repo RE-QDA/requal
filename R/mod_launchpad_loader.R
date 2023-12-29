@@ -14,9 +14,9 @@ mod_launchpad_loader_ui <- function(id) {
 
   if (golem::get_golem_options(which = "mode") == "local") {
     loader_UI_local(ns)
-  } else if (golem::get_golem_options(which = "mode") == "server") {
+  } else if (golem::get_golem_options(which = "mode") %in% c("server", "local_test")) {
     loader_UI_server(ns)
-  }
+  } 
 }
     
 #' launchpad_loader Server Functions
@@ -111,8 +111,11 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
     # Server setup ####
     ###################
 
-    observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
-
+    observeEvent(req(golem::get_golem_options(which = "mode") %in% c("server", "local_test")), {
+      if(golem::get_golem_options("mode") == "local_test"){
+        glob$user$user_id <- as.integer(1)
+      }
+      
       updateSelectInput(session,
                           "project_selector_load",
                           choices = existing_projects # global variable obtained on app start
@@ -122,7 +125,7 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
       if (!isTruthy(glob$active_project)) {
         glob$pool <- pool
         con <- pool::poolCheckout(glob$pool)
-        print(DBI::dbListConnections(RPostgreSQL::PostgreSQL(), con))
+        # print(DBI::dbListConnections(RPostgreSQL::PostgreSQL(), con))
         pool::poolReturn(con)
 
         update_db_schema(glob$pool)
@@ -162,22 +165,23 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
         req(input$project_selector_load)
 
         # user control
-
-        existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
-          dplyr::pull(user_id)
-
-        if (!(glob$user$user_id %in% existing_user_id)) {
-          # create user in db if an uknown user logs in
-          users_df <- data.frame(
-            user_id = glob$user$user_id,
-            user_name = glob$user$name,
-            user_mail = glob$user$mail
-          )
-          DBI::dbWriteTable(glob$pool, "users", users_df,
-            append = TRUE, row.names = FALSE
-          )
-
-          create_default_user(glob$pool, input$project_selector_load, glob$user$user_id)
+        if(golem::get_golem_options(which = "mode") %in% c("server")){
+          existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
+            dplyr::pull(user_id)
+          
+          if (!(glob$user$user_id %in% existing_user_id)) {
+            # create user in db if an uknown user logs in
+            users_df <- data.frame(
+              user_id = glob$user$user_id,
+              user_name = glob$user$name,
+              user_mail = glob$user$mail
+            )
+            DBI::dbWriteTable(glob$pool, "users", users_df,
+                              append = TRUE, row.names = FALSE
+            )
+            
+            create_default_user(glob$pool, input$project_selector_load, glob$user$user_id)
+          } 
         }
 
         loc$active_project <- isolate(

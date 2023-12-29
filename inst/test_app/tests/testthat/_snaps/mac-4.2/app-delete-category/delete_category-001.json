@@ -1,0 +1,77 @@
+{
+  "output": {
+    "categories_ui_1-categories_ui": {
+      "html": "<div class=\"category-container\" data-category_id=\"1\" style=\"max-width: 500px\">\n  <div>\n    <div class=\"box box-solid collapsed-box bg-blue\" id=\"1\">\n      <div class=\"box-header with-border\">\n        <h3 class=\"box-title\">Kat1<\/h3>\n        <div class=\"box-tools pull-right\">\n          <button class=\"btn btn-box-tool btn-sm\" type=\"button\" data-widget=\"collapse\">\n            <i class=\"fa fa-plus\" role=\"presentation\" aria-label=\"plus icon\"><\/i>\n          <\/button>\n        <\/div>\n      <\/div>\n      <div class=\"box-body\">\n        <div>\n          \n          <p><\/p>\n          <p style=\"text-align: center; font-size: 80%;\">\n            <i>Drag &amp; drop codes below<\/i>\n          <\/p>\n        <\/div>\n        <div class=\"rank-list-container category-rank-list\">\n          <div class=\"rank-list\" id=\"categories_ui_1-rank-list_1\"><\/div>\n        <\/div>\n        <div id=\"htmlwidget-b85bf888dc62471906a9\" style=\"width:0px;height:0px;\" class=\"sortable html-widget\"><\/div>\n        <script type=\"application/json\" data-for=\"htmlwidget-b85bf888dc62471906a9\">{\"x\":{\"css_id\":\"categories_ui_1-rank-list_1\",\"options\":{\"animation\":150,\"emptyInsertThreshold\":12.5,\"group\":{\"name\":\"categories\",\"pull\":true,\"put\":true},\"onAdd\":\"function (evt) { check_categories(evt, this.el); }\",\"onRemove\":\"function (evt) { check_categories_delete(evt); }\",\"onSort\":\"function(evt) {\\n  if (typeof Shiny !== \\\"undefined\\\") {\\n    Shiny.setInputValue(\\\"categories_ui_1-category_list_1:sortablejs.rank_list\\\", $.map(  this.el.children, function(child) {  return     $(child).attr('data-rank-id') ||     $.trim(child.innerText);}))\\n  }\\n}\",\"onLoad\":\"function() {\\n  try {\\n    (function(evt) {\\n  if (typeof Shiny !== \\\"undefined\\\") {\\n    Shiny.setInputValue(\\\"categories_ui_1-category_list_1:sortablejs.rank_list\\\", $.map(  this.el.children, function(child) {  return     $(child).attr('data-rank-id') ||     $.trim(child.innerText);}))\\n  }\\n}).apply(this, arguments);\\n  } catch(e) {\\n    if (window.console && window.console.error) window.console.error(e);\\n  }\\n\\n  try {\\n    (function(evt) {\\n    var css_ids = [\\\"categories_ui_1-rank-list_1\\\"];\\n    setTimeout(function() {\\n      css_ids.map(function(id) {\\n        var el = window.document.getElementById(id);\\n        if (el) {\\n          Sortable.utils.toggleClass(el, 'rank-list-empty', el.children.length == 0);\\n        }\\n      })\\n    }, 0);\\n  }).apply(this, arguments);\\n  } catch(e) {\\n    if (window.console && window.console.error) window.console.error(e);\\n  }\\n}\"}},\"evals\":[\"options.onAdd\",\"options.onRemove\",\"options.onSort\",\"options.onLoad\"],\"jsHooks\":[]}<\/script>\n      <\/div>\n    <\/div>\n    <script type=\"application/json\" data-for=\"1\">{\"title\":\"Kat1\",\"solidHeader\":true,\"background\":\"blue\",\"collapsible\":true,\"closable\":false,\"gradient\":false}<\/script>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.15.3",
+          "src": {
+            "href": "font-awesome-5.15.3"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "htmlwidgets",
+          "version": "1.5.4",
+          "src": {
+            "href": "htmlwidgets-1.5.4"
+          },
+          "meta": null,
+          "script": "htmlwidgets.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "SortableJS",
+          "version": "1.14.0",
+          "src": {
+            "href": "SortableJS-1.14.0"
+          },
+          "meta": null,
+          "script": "sortable.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "sortable-binding",
+          "version": "0.4.5",
+          "src": {
+            "href": "sortable-binding-0.4.5"
+          },
+          "meta": null,
+          "script": "sortable.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "sortable-rank-list",
+          "version": "0.4.5",
+          "src": {
+            "href": "sortable-rank-list-0.4.5"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "rank_list.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    }
+  }
+}

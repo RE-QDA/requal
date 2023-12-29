@@ -14,7 +14,7 @@ mod_about_ui <- function(id){
         h2(
             tags$a(href="https://github.com/RE-QDA/requal",
                    tags$img(src="www/requal_logo.png", width = "5%"), target = "_blank"),
-            "ReQual CAQDAS"
+            "reQual CAQDAS"
         ), 
         
         textOutput(ns("version_project")),
@@ -44,7 +44,7 @@ mod_about_server <- function(id, glob){
         ns <- session$ns
         
         output$version_project <- renderText({
-            req(glob$active_project)
+            
             paste0(
                 "The current project was created with requal version ",
                 dplyr::tbl(glob$pool, "requal_version") %>%

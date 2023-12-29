@@ -16,7 +16,7 @@ mod_browser_ui <- function(id){
     selectInput(ns("browser_code"), 
                 "Select code: ", 
                 choices = ""), 
-    checkboxGroupInput(ns("browser_coders"), "Select coders:", 
+    rql_picker_UI(ns("browser_coders"), "Select coders:", 
                        choices = ""),
     actionButton(ns("calculate"), "Browse"),
     uiOutput(ns("document_viewer"))
@@ -34,16 +34,18 @@ mod_browser_server <- function(id, glob){
     
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
+
         documents <- glob$documents
-        if(!is.null(glob$user$data) && 
-           glob$user$data$data_other_view != 1){
-          user_docs <- dplyr::tbl(glob$pool, "documents") %>% 
-            dplyr::filter(user_id == !!glob$user$user_id) %>% 
+
+        if (!is.null(glob$user$data) &&
+          glob$user$data$data_other_view != 1) {
+          user_docs <- dplyr::tbl(glob$pool, "documents") %>%
+            dplyr::filter(user_id == !!glob$user$user_id) %>%
             dplyr::collect()
-        
-          if(nrow(user_docs)){
-            documents <- documents[documents %in% user_docs$doc_id] 
-          }else{
+
+          if (nrow(user_docs)) {
+            documents <- documents[documents %in% user_docs$doc_id]
+          } else {
             documents <- NULL
           }
         }
@@ -56,22 +58,20 @@ mod_browser_server <- function(id, glob){
         
         users <- get_users_in_project(glob$pool, glob$active_project)
           
-        if(!is.null(glob$user$data) && 
-           !is.null(glob$user$data$report_other_view) &&
-           glob$user$data$report_other_view != 1){
-          users <- users %>% 
+        if (!is.null(glob$user$data) &&
+          !is.null(glob$user$data$report_other_view) &&
+          glob$user$data$report_other_view != 1) {
+          users <- users %>%
             dplyr::filter(user_id == glob$user$user_id)
         }
-        
-        updateCheckboxGroupInput(
-          session = session, 
-          "browser_coders", 
-          choices = c(
-            stats::setNames(
-              users$user_id,
-              users$user_name
-            )
-          ), 
+
+        shinyWidgets::updatePickerInput(
+          session = session,
+          "browser_coders",
+          choices = stats::setNames(
+            users$user_id,
+            users$user_name
+          ),
           selected = users$user_id
         )
       }

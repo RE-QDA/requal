@@ -43,9 +43,16 @@ golem::add_module( name = "launchpad_creator" ) # Name of the module
 
 # Project menu
 golem::add_module( name = "project" ) # Name of the module
-golem::add_module( name = "doc_manager" ) # Name of the module
 golem::add_module( name = "user_manager" ) # Name of the module
 
+# Data menu
+golem::add_module( name = "data" ) # Name of the module
+golem::add_module( name = "doc_manager" ) # Name of the module
+golem::add_module( name = "cases_manager" ) # Name of the module
+
+# Attributes menu
+golem::add_module( name = "attributes" ) # Name of the module
+golem::add_module( name = "attributes_manager" ) # Name of the module
 
 
 # Codebook menu
@@ -72,6 +79,8 @@ golem::add_module( name = "agreement" )
 golem::add_module( name = "browser" )
 golem::add_module( name = "text_stats")
 golem::add_module( name = "summary" )
+golem::add_module( name = "rql_button" )
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*

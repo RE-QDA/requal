@@ -6,31 +6,42 @@
 #' @import shinydashboardPlus
 #' @noRd
 app_ui <- function(request, mode = NULL, access = NULL) {
-    
-    tagList(
-        # Leave this function for adding external resources
-        golem_add_external_resources(),
-        # Your application UI logic
-        dashboardPage(title = "reQual",
-                      options = list(sidebarExpandOnHover = FALSE),
-                      header = dashboardHeader(title = tags$span(
-                          tags$img(src="www/requal_logo.png", 
-                                   height="70%", style = "margin-right: 20px"), "reQual"),
-                          tags$li(mod_user_ui("user_ui_1")) %>% 
-                              tagAppendAttributes(class = "dropdown"),
-                          controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
-                          dropdownBlock2(
-                              id = "btn-memo",
-                              badgeStatus = NULL,
-                              icon = shiny::icon("sticky-note", verify_fa = FALSE),
-                              mod_memo_ui("memo_ui_1")
-                          ) %>% tagAppendAttributes(class = "memo") 
-                      ),
-                      sidebar = set_left_menu(),
-                      body = set_dashboard_body(),
-                      controlbar = set_controlbar()
-        )
+  tagList(
+    # Leave this function for adding external resources
+    golem_add_external_resources(),
+    # Your application UI logic
+    dashboardPage(
+      title = "reQual",
+      options = list(sidebarExpandOnHover = FALSE),
+      header = dashboardHeader(
+        title = tags$span(
+          tags$img(
+            src = "www/requal_logo.png",
+            height = "70%", style = "margin-right: 20px"
+          ), "reQual"
+        ),
+        controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
+        dropdownBlock2(
+          id = "btn-memo",
+          badgeStatus = NULL,
+          icon = shiny::icon("sticky-note", verify_fa = FALSE),
+          mod_memo_ui("memo_ui_1")
+        ) %>% tagAppendAttributes(class = "memo", style = "display:none;", title = "Free memo"),
+        tags$li(mod_user_ui("user_ui_1")) %>%
+          tagAppendAttributes(class = "dropdown"),
+        tags$li(actionLink(
+          inputId = ".shinymanager_logout",
+          label = NULL,
+          icon = icon("sign-out", verify_fa = FALSE),
+          title = "Logout"
+        )) %>%
+          tagAppendAttributes(class = "dropdown")
+      ),
+      sidebar = set_left_menu(),
+      body = set_dashboard_body(),
+      controlbar = set_controlbar()
     )
+  )
 }
 
 #' Add external Resources to the Application

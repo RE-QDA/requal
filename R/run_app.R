@@ -30,13 +30,14 @@ run_app <- function(mode = "local",
       ui = switch(mode,
           server = shinymanager::secure_app(app_ui,
                                    tags_top = tags$img(
-                                       src = "www/requal_logo.png",
+                                       src = rql_logo(),
                                        height = "30%", style = "margin-right: 20px"
                                    ),
                                    enable_admin = TRUE,
-                                   fab_position = "bottom-left"
+                                   fab_position = "none"
           ),
-          local = app_ui
+          local = app_ui, 
+          local_test = app_ui
           ),
       server = app_server,
       onStart = purrr::partial(eval, expr = make_globals, envir = globalenv()),

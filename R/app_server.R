@@ -29,18 +29,31 @@ app_server <- function(input, output, session) {
   mod_launchpad_loader_server("launchpad_loader_ui_1", glob)
 
   mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
-
+  
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
+    shinyjs::show(id = "btn-memo")
+    shinyjs::show(selector = "div.tab-content")
+    glob$users_observer <- 0
+    glob$segments_observer <- 0
   })
 
-  # documents  ----
+  # Project  ----
   mod_project_server("mod_project_ui_1", glob)
-  # output: glob$documents
-  mod_doc_manager_server("doc_manager_ui_1", glob)
-  # output: no output, permissions and membership written to DB
-  # ---- to prevent manipulation via UI
+  # Manage users ---- 
   mod_user_manager_server("user_manager_1", glob)
+  # output: no output, permissions and membership written to DB
+  # to prevent manipulation via UI
+  # About ----
+  mod_about_server("about_ui_1", glob)
+
+  # Data ----
+  mod_data_server("data_1", glob)
+
+
+  # attributes ----
+  mod_attributes_server("attributes_1", glob)
+
 
   # codebook  ----
   # output: glob$codebook
@@ -48,27 +61,40 @@ app_server <- function(input, output, session) {
   # output: glob$category
   mod_categories_server("categories_ui_1", glob)
   # workdesk ----
-  # output: glob$segments
+  # output: glob$segments_observer
   mod_document_code_server("document_code_ui_1", glob)
-
+  
   # analysis ----
   mod_analysis_server("analysis_ui_1", glob)
-  mod_download_handler_server("download_handler_ui_1", glob)
   mod_download_html_server("download_html_ui_1", glob)
 
   # reporting
   mod_reporting_server("reporting_ui_1", glob)
-  mod_user_attributes_server("user_attributes_ui_1", glob)
   mod_agreement_server("agreement_ui_1", glob)
   mod_browser_server("browser_ui_1", glob)
   mod_summary_server("summary_ui_1", glob)
 
-  # about -----
-  mod_about_server("about_ui_1", glob)
 
   # user
   mod_user_server("user_ui_1", glob)
 
   # memo
   mod_memo_server("memo_ui_1", glob)
+
+  # admin interface
+  output$fab_button_ui <- renderUI({
+        if (req(glob$user$is_admin)) {
+       shinymanager::fab_button(
+            actionButton(
+              inputId = ".shinymanager_admin",
+              label = "User database",
+              icon = icon("gears", verify_fa = FALSE)
+            ),
+            position = "bottom-left"
+          )
+    }
+  })
+  # shared
+  mod_download_csv_server("download_csv_ui_1", glob)
+
 }

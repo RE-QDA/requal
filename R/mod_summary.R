@@ -59,6 +59,7 @@ mod_summary_server <- function(id, glob) {
       glob$active_project
       glob$codebook
       glob$documents
+      glob$users_observer
     }, {
       if (isTruthy(glob$active_project)) {
         # list users

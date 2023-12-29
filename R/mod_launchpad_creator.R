@@ -14,7 +14,7 @@ mod_launchpad_creator_ui <- function(id) {
 
   if (golem::get_golem_options(which = "mode") == "local") {
     creator_UI_local(ns)
-  } else if (golem::get_golem_options(which = "mode") == "server") {
+  } else if (golem::get_golem_options(which = "mode") %in% c("server", "local_test")) {
     creator_UI_server(ns)
   }
 }
@@ -111,7 +111,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
     # Server setup ####
     ###################
 
-    observeEvent(req(golem::get_golem_options(which = "mode") == "server"), {
+    observeEvent(req(golem::get_golem_options(which = "mode") %in% c("server", "local_test")), {
       observeEvent(input$project_create, {
         req(input$project_name)
 

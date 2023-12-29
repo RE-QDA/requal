@@ -1,4 +1,6 @@
-utils::globalVariables(c("attribute_object", "attribute_value", "attribute_value1", "attribute_value2"))
+utils::globalVariables(c("attribute_object", "attribute_value", 
+                         "attribute_value1", "attribute_value2", 
+                         "jaccard", "mean_total_overlap"))
 
 #' agreement UI Function
 #'
@@ -29,7 +31,7 @@ mod_agreement_ui <- function(id) {
                             "Overlap by user attribute and code [segments]" = "by_attribute_segment_code"
                 )
     ),
-    checkboxGroupInput(ns("repro_coders"), "Select coders:", 
+    rql_picker_UI(ns("repro_coders"), "Select coders:", 
                        choices = ""),
     uiOutput(ns("attributes_select")),
     # selectInput(, 
@@ -50,7 +52,7 @@ mod_agreement_server <- function(id, glob) {
     
     agreement_message <- "Agreement measures cannot be computed for a single active coder."
     
-    observeEvent(glob$documents, {
+    observeEvent(c(glob$documents, glob$users_observer), {
       if (isTruthy(glob$active_project)) {
         users <- get_users_in_project(glob$pool, glob$active_project)
         
@@ -61,7 +63,7 @@ mod_agreement_server <- function(id, glob) {
             dplyr::filter(user_id == glob$user$user_id)
         }
         
-        updateCheckboxGroupInput(
+        shinyWidgets::updatePickerInput(
           session = session, 
           "repro_coders", 
           choices = c(

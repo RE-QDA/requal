@@ -4,7 +4,8 @@ load_segments_analysis <- function(pool,
                                   active_project,
                                   selected_codes,
                                   selected_categories,
-                                  selected_docs) {
+                                  selected_docs,
+                                  selected_users = NULL) {
 
     if (isTruthy(selected_codes) | isTruthy(selected_categories)) {
 
@@ -13,8 +14,7 @@ load_segments_analysis <- function(pool,
         dplyr::pull(code_id)
 
       code_filter <- as.integer(unique(c(category_edges[isTruthy(category_edges)], selected_codes[isTruthy(selected_codes)])))
-
-
+      
         segments_input <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
             dplyr::filter(code_id  %in% !!code_filter) %>%
@@ -28,6 +28,11 @@ load_segments_analysis <- function(pool,
                           user_id
                           ) %>%
             dplyr::collect()
+
+          if (!is.null(selected_users)) {
+            segments_input <- segments_input %>%
+             dplyr::filter(user_id  %in% !!as.integer(selected_users))
+            } 
 
             users <- dplyr::tbl(pool, "users") %>% 
                      dplyr::select(user_id, user_name) %>% 
@@ -45,7 +50,7 @@ load_segments_analysis <- function(pool,
 
 
 
-format_cutouts <- function(segment_text, segment_document, segment_code, segment_color) {
+format_segments <- function(segment_text, segment_document, segment_code, segment_color) {
 
 
   tags$div(
