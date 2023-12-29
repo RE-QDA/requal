@@ -136,7 +136,8 @@ set_left_menu <- function() {
                              tabName = "Report",
                              icon = icon("chart-bar")
                          ),
-                         uiOutput("fab_button_ui")
+                         uiOutput("fab_button_ui"), 
+                         id = "tab_menu"
 
                      ))
     

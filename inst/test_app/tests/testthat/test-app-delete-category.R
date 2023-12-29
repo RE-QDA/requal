@@ -10,19 +10,16 @@ test_that("{shinytest2} test delete category", {
     app$wait_for_idle()
     
     app$set_inputs(tab_menu = "Codebook")
-    
     app$set_inputs(`codebook_ui_1-codebook_tabset` = "categories")
-    app$wait_for_idle()
     
-    app$click("ctg_create_btn")
-    app$set_inputs(`categories_ui_1-category_name` = "Kategorie 1")
+    app$click("categories_ui_1-category_create-rql_button_id")
+    app$set_inputs(`categories_ui_1-category_name` = "Kat1")
     app$click("categories_ui_1-category_add")
     
-    app$set_inputs(`categories_ui_1-category_name` = "Asdf")
+    app$set_inputs(`categories_ui_1-category_name` = "Kat2")
     app$click("categories_ui_1-category_add")
-    # Update output value
-    app$click("ctg_create_btn")
-    app$click("ctg_delete_btn")
+    
+    app$click("categories_ui_1-category_delete-rql_button_id")
     app$set_inputs(`categories_ui_1-categories_to_del` = "2")
     app$click("categories_ui_1-category_remove")
     

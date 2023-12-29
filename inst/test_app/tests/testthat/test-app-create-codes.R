@@ -10,14 +10,13 @@ test_that("{shinytest2} testing create codebook", {
     
     app$set_inputs(tab_menu = "Codebook")
     
-    # Codes
-    # Creating code
-    app$click("code_create_btn")
+    app$click("codebook_ui_1-code_create_ui-rql_button_id")
     app$set_inputs(`codebook_ui_1-code_name` = "Code1")
     app$set_inputs(`codebook_ui_1-code_desc` = "Code description")
     app$click("codebook_ui_1-code_add")
-    app$click("code_create_btn")
-
+    app$click("codebook_ui_1-code_create_ui-rql_button_id")
+    
+    # Codes
     app$expect_values(output = "codebook_ui_1-codes_ui")
     
     # Categories
@@ -25,11 +24,11 @@ test_that("{shinytest2} testing create codebook", {
     
     app$set_inputs(`codebook_ui_1-codebook_tabset` = "categories")
     
-    app$click("ctg_create_btn")
+    app$click("categories_ui_1-category_create-rql_button_id")
     app$set_inputs(`categories_ui_1-category_name` = "Category 1")
     app$set_inputs(`categories_ui_1-category_desc` = "Description of a category")
     app$click("categories_ui_1-category_add")
-    app$click("ctg_create_btn")
+    app$click("categories_ui_1-category_create-rql_button_id")
     
     app$expect_values(output = "categories_ui_1-categories_ui")
     
