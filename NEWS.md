@@ -1,5 +1,6 @@
-# requal 1.0.1
+# requal 1.1.0
 
+- update UI
 - add codebook export
 - implement shinytest2 tests (see DEV-NOTES.md)
 

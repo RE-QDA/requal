@@ -41,10 +41,11 @@ get_codebook_export_table <- function(glob){
       category_name)) %>% 
     dplyr::select(-c(category_name, category_description))
   
-  dplyr::tbl(glob$pool, "categories_codes_map") %>% 
+  categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>% 
     dplyr::collect() %>% 
-    dplyr::inner_join(categories, by = "category_id") %>% 
-    dplyr::left_join(glob$codebook, by = "code_id") %>% 
+    dplyr::inner_join(categories, by = "category_id") 
+  
+  dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>% 
     dplyr::group_by(code_id, code_name, code_description) %>% 
     dplyr::summarise(categories = paste0(category_title, collapse = ", "))
 }
@@ -56,15 +57,19 @@ mod_download_csv_server <- function(id, glob){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     
-    output$download_analysis <- handle_download(
-      paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"), 
-      glob$segments_df
-    )
+    observeEvent(glob$segments_df, {
+      output$download_analysis <- handle_download(
+        paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"), 
+        glob$segments_df
+      )
+    })
     
-    output$download_codebook <- handle_download(
-      paste0("requal_codebook_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"), 
-      get_codebook_export_table(glob)
-    )
+    observeEvent(c(glob$codebook, glob$category, glob$category_code_map), {
+      output$download_codebook <- handle_download(
+        paste0("requal_codebook_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"), 
+        get_codebook_export_table(glob)
+      )
+    })
   })
 }
     
