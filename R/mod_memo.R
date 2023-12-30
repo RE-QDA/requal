@@ -14,7 +14,10 @@ mod_memo_ui <- function(id) {
     uiOutput(ns("new_memo_btn")) %>% 
         tagAppendAttributes(style = "display: inline-block; float: right"),
     hr(),
-    DT::dataTableOutput(ns("memo"))
+    DT::dataTableOutput(ns("memo")), 
+    hr(), 
+    downloadButton(ns("export_memo"), label = "Export memos") %>% 
+        tagAppendAttributes(style = "display: inline-block; float: right")
   ) %>% tagAppendAttributes(class = "scrollable80")
 }
 
@@ -149,5 +152,16 @@ mod_memo_server <- function(id, glob) {
 
       removeModal()
     })
+    
+    output$export_memo <- downloadHandler(
+        filename = function() {
+            paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv")
+        },
+        content = function(file) {
+            memos <- export_memos(glob$pool, glob$active_project)
+            write.csv(memos, file)
+        }
+    )
+    
   })
 }

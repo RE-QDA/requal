@@ -109,6 +109,21 @@ delete_memo_record <- function(pool, project, memo_id, user_id) {
     
 }
 
+export_memos <- function(pool, project) {
+    
+    dplyr::tbl(pool, "memos") %>%
+    dplyr::filter(.data$project_id == local(as.integer(project))) %>%
+    dplyr::select(
+        memo_id,
+        memo_text = text, 
+        user_id
+    ) %>%
+    dplyr::left_join(dplyr::tbl(pool, "users") %>% 
+                         dplyr::select(user_id, user_name), by = "user_id") %>% 
+    dplyr::select(-user_id) %>% 
+    dplyr::collect()
+
+}
 
 # dropdown2 function ----
 dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
