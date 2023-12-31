@@ -155,7 +155,7 @@ mod_memo_server <- function(id, glob) {
     
     output$export_memo <- downloadHandler(
         filename = function() {
-            paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv")
+            "requal_memo_export.csv"
         },
         content = function(file) {
             memos <- export_memos(glob$pool, glob$active_project)

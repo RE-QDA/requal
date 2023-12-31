@@ -1,3 +1,7 @@
+# requal 1.1.1
+
+- export memos
+
 # requal 1.1.0
 
 - update UI
