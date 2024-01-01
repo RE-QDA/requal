@@ -30,7 +30,7 @@ Instruction for local development of `reQual` server version.
 - [x] add code
 - [x] merge codes
 - [x] delete code
-- [ ] export codebook
+- [x] export codebook
 
 #### Categories
 - [x] add category

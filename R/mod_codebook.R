@@ -49,7 +49,7 @@ mod_codebook_ui <- function(id) {
         mod_categories_ui("categories_ui_1") 
       )
     ), 
-    uiOutput(ns("download"))
+    downloadButton(ns("export_codebook"), label = "CSV")
   )
 }
 
@@ -196,15 +196,15 @@ mod_codebook_server <- function(id, glob) {
         })
 
     
-    output$download <- renderUI({
-      if (nrow(req(glob$codebook)) > 0) {
-        tagList(
-          mod_download_csv_ui("download_csv_ui_1", "download_codebook"),
-        )
-      } else {
-        ""
-      }
-    })
+   output$export_codebook <- downloadHandler(
+     filename = function() {
+       "requal_codebook_export.csv"
+     },
+     content = function(file) {
+       codebook <- get_codebook_export_table(glob)
+       write.csv(codebook, file)
+     }
+   )
 
     # end of server module function
   })

@@ -32,5 +32,7 @@ test_that("{shinytest2} testing create codebook", {
     
     app$expect_values(output = "categories_ui_1-categories_ui")
     
+    app$expect_download("codebook_ui_1-export_codebook")
+    
     
 })
