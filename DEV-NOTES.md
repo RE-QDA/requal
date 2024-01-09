@@ -12,6 +12,8 @@ Instruction for local development of `reQual` server version.
 (defined in `app.R` which uses a database with empty project `tests/test_basic.requal`)
 - tests need to be run using `devtools::test()` (or Build > Test in RStudio) 
 
+- running test app interactively can be done using `app <- AppDriver$new(app_dir = "inst/test_app", name = "requaltest", seed = 123, height = 789, width = 1139)` and `app$view()`
+
 ## Test coverage
 
 ### Project
@@ -28,7 +30,7 @@ Instruction for local development of `reQual` server version.
 - [x] add code
 - [x] merge codes
 - [x] delete code
-- [ ] export codebook
+- [x] export codebook
 
 #### Categories
 - [x] add category
@@ -52,8 +54,9 @@ Instruction for local development of `reQual` server version.
 - [ ] loads
 
 ### Memos
-- [ ] create
-- [ ] edit
-- [ ] delete
+- [x] create
+- [x] edit
+- [x] delete
+- [x] export
 
 ### Users

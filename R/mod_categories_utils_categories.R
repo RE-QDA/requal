@@ -130,16 +130,6 @@ read_db_categories <- function(pool, active_project, user) {
     return(project_categories)
 }
 
-read_category_edges <- function(pool, active_project){
-    dplyr::tbl(pool, "categories_codes_map") %>%
-        dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
-        dplyr::select(
-            category_id,
-            code_id
-        ) %>%
-        dplyr::collect()
-}
-
 # List categories--------------------------------------------------------
 
 

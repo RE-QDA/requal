@@ -38,18 +38,8 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-57",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "grDevices",
-        "graphics",
-        "methods",
-        "stats",
-        "utils"
-      ],
-      "Hash": "71476c1d88d1ebdf31580e5a257d5d31"
+      "Version": "7.3-60",
+      "Source": "Repository"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -1105,17 +1095,8 @@
     },
     "nlme": {
       "Package": "nlme",
-      "Version": "3.1-157",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "graphics",
-        "lattice",
-        "stats",
-        "utils"
-      ],
-      "Hash": "dbca60742be0c9eddc5205e5c7ca1f44"
+      "Version": "3.1-164",
+      "Source": "Repository"
     },
     "openssl": {
       "Package": "openssl",

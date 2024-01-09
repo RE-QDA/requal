@@ -210,9 +210,6 @@ mod_categories_server <- function(id, glob) {
             user_id = glob$user$user_id,
             edge = input$edges_category
           )
-          
-          glob$category_code_map <- read_category_edges(
-            glob$pool, glob$active_project)
         } else {
           warn_user("You don't have permissions for modifying codes and categories created by others.")
           # TODO: delete code from category
@@ -225,9 +222,6 @@ mod_categories_server <- function(id, glob) {
           user_id = glob$user$user_id,
           edge = input$edges_category
         )
-        
-        glob$category_code_map <- read_category_edges(
-          glob$pool, glob$active_project)
       }
     })
 
@@ -239,9 +233,6 @@ mod_categories_server <- function(id, glob) {
         user_id = glob$user$user_id,
         edge = input$edges_category_delete
       )
-      
-      glob$category_code_map <- read_category_edges(
-        glob$pool, glob$active_project)
     })
 
     # return active categories details in glob$category ----
