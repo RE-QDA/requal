@@ -26,13 +26,13 @@ tagList(
 ),
 fluidRow(
   column(
-      width = 10,
+      width = 9,
       htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
       textOutput(ns("captured_range")),
       verbatimTextOutput(ns("printLabel"))
     ),
     column(
-      width = 2,
+      width = 3,
       tags$b("Codes"),
       br(),
       actionButton(ns("remove_codes"),

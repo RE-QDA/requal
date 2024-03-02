@@ -1,7 +1,6 @@
 library(shinytest2)
 
 test_that("{shinytest2} test delete code", {
-    
     app <- AppDriver$new(name = "requaltest", seed = 123, height = 789, width = 1139)
     
     app$click("launchpad_loader_ui_1-project_load")

@@ -1,7 +1,6 @@
 library(shinytest2)
 
 test_that("{shinytest2} test creating segment", {
-    
     app <- AppDriver$new(name = "workdesk2", seed = 123, 
                          height = 789, width = 1139, 
                          variant = platform_variant())

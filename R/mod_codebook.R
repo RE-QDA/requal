@@ -7,6 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
+#' @importFrom utils write.csv
 mod_codebook_ui <- function(id) {
   ns <- NS(id)
 
@@ -202,7 +203,7 @@ mod_codebook_server <- function(id, glob) {
      },
      content = function(file) {
        codebook <- get_codebook_export_table(glob)
-       write.csv(codebook, file)
+       utils::write.csv(codebook, file)
      }
    )
 

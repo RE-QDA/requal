@@ -1,7 +1,6 @@
 library(shinytest2)
 
 test_that("{shinytest2} test delete category", {
-    
     app <- AppDriver$new(name = "delete_category", seed = 123, 
                          height = 789, width = 1139,
                          variant = platform_variant())

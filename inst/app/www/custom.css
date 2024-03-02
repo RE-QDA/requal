@@ -27,12 +27,8 @@
     background: white;
 }
 .code-button {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.code-button:hover {
-    overflow: visible;
+  white-space: normal;
+  text-overflow: break-word;
 }
 
 .quote {
@@ -99,6 +95,10 @@ margin-top: 2px !important;
 margin-left: 0px !important; 
 margin-right: 0px !important; 
 margin-bottom: 5px !important; 
+}
+
+.box-title {
+  margin: 0px 65px 0px 0px !important;
 }
 
 .memo ul {
