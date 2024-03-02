@@ -128,7 +128,7 @@ permission_button <- function(class, color, title) {
 
 transform_user_table <- function(user_table) {
   user_table %>%
-    dplyr::mutate(across(-c(user_id, created_at, user_mail, user_name, user_login),
+    dplyr::mutate(dplyr::across(-c(user_id, created_at, user_mail, user_name, user_login),
       .fn = function(x) {
         dplyr::case_when(
           x == 1 & stringr::str_detect(dplyr::cur_column(), "other_modify") ~ permission_button("fas fa-users", "black", "Can modify others"),

@@ -24,6 +24,7 @@ mod_memo_ui <- function(id) {
 #' memo Server Functions
 #'
 #' @noRd
+#' @importFrom utils write.csv
 mod_memo_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -159,7 +160,7 @@ mod_memo_server <- function(id, glob) {
         },
         content = function(file) {
             memos <- export_memos(glob$pool, glob$active_project)
-            write.csv(memos, file)
+            utils::write.csv(memos, file)
         }
     )
     
