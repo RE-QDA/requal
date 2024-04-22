@@ -339,6 +339,15 @@ warn_user <- function(warning) {
                         warning))
 }
   
+# send message to interactive or Shiny session
+rql_message <- function(msg) {
+  if(interactive()){
+    message(msg)
+    } else if(shiny::isRunning()){
+     showNotification(msg)
+    }
+}
+  
 # check permission to modify permissions
 
 check_modify_permission <- function(permission, msg) {
