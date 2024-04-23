@@ -104,6 +104,9 @@ mod_user_manager_server <- function(id, glob) {
         x  <- 1 # apply new permissions
       }))
 
+      # Enforce that project owner can always modify permission
+      modified_permissions_df$permissions_modify[modified_permissions_df$project_owner == 1] <- 1
+      
       modify_permissions_record(
         pool = glob$pool,
         project_id = glob$active_project,
