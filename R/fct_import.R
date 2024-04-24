@@ -9,11 +9,10 @@ parse_qdpx <- function(path) {
       )
       on.exit(removeNotification(converting_msg), add = TRUE)
     browser()
-    # xml_file <- xml2::read_xml("~/Downloads/refi/Die-Hexen-und-der-Böse-Feind/project.qde")
-    # refi_ns <- c(qda = "urn:QDA-XML:project:1.0")
   import_dir <- paste0(tempdir(), .Platform$file.sep, "refiqda")
   utils::unzip(path, exdir = import_dir)
   refi_ns <- c(qda = "urn:QDA-XML:project:1.0")
+  # xml_file <- xml2::read_xml("~/Downloads/refi/Die-Hexen-und-der-Böse-Feind/project.qde")
   xml_file <- xml2::read_xml(paste0(import_dir, .Platform$file.sep, "project.qde"))
   xml_schema <- xml2::read_xml("www/refi.xsd")
   # check file against validation schema
@@ -77,6 +76,17 @@ parse_qdpx <- function(path) {
 # Parse codebook information ----
 .refi_get_codebook <- function(xml_file) {
   codes <- xml2::xml_find_all(xml_file, "//qda:Project/qda:CodeBook/qda:Codes//qda:Code", ns = refi_ns)
+  parent_guids <- purrr::map(codes, .f = function(x) {
+  xml2::xml_parent(x) |> 
+  xml2::xml_attr("guid")
+  } )
+  
+
+
+
+purrr::map(codes, xml2::xml_children) |> 
+purrr::map_int(length)
+xml2::xml_find_all(test[[1]], "/qda:Code")
 codes_paths <- lapply(codes, xml2::xml_path)
 # infer hierarchy from xml paths (path enumeration model)
 path_enum_model <- sapply(sapply(codes_paths, stringr::str_extract_all, "\\d"), paste0, collapse = "")
@@ -159,22 +169,21 @@ return(codes_converted)
 # Parse sources ----
 .refi_get_sources <- function(xml_file){
     sources <- xml2::xml_find_all(xml_file, "//qda:Project/qda:Sources", ns = refi_ns)
-    docs <- sources |> 
-    .refi_get_child("//qda:TextSource") 
-    doc_descriptions <- lapply(docs, .refi_get_child, "qda:Description") |> 
-    purrr::map_chr(.f = function(x) {
-      if (length(x) == 0) {
-        ""
-      } else {
-      xml2::xml_text(x)
-      }
-    }) 
-    doc_df <- sources |> .refi_get_child("//qda:TextSource") |> 
-        xml2::xml_attrs() |> 
-        (function(x) do.call(rbind, x))() |> 
-        tibble::as_tibble()  |> 
-        dplyr::mutate(doc_description = doc_descriptions)
-        #TODO: clean up
+    txt_df <- .refi_get_src_type(sources, src_type = "TextSource")
+    img_df <- .refi_get_src_type(sources, src_type = "PictureSource")
+    pdf_df <- .refi_get_src_type(sources, src_type = "PDFSource")
+    audio_df <- .refi_get_src_type(sources, src_type = "AudioSource")
+    video_df <- .refi_get_src_type(sources, src_type = "VideoSource")
+
+    #TODO when support for sources implemented
+    purrr::walk2(list(img_df, pdf_df, audio_df, video_df),
+                  list("Picture", "PDF", "Audio", "Video"),
+                  .f = function(x, y){
+                    msg <- paste0("Found ", nrow(x), " sources of type '", y, "' that cannot be imported into current version of reQual.")
+                    rql_message(msg)
+                  })
+    rql_message(paste0("Importing ", nrow(txt_df), " sources of type 'Text'."))
+    txt_df
 }
 
 # Parsing utils ----
@@ -182,5 +191,23 @@ return(codes_converted)
 node |> 
 xml2::xml_find_all(xpath,
 ns = ns) 
+}
+
+.refi_get_src_type <- function(sources, src_type = "TextSource"){
+src <- sources |> 
+    .refi_get_child(paste0("//qda:", src_type)) 
+  type_descriptions <- purrr::map(src, ~.refi_get_child(.x, "qda:Description")) |> 
+    purrr::map_chr(.f = function(x) {
+      if (length(x) == 0) {
+        ""
+      } else {
+      xml2::xml_text(x)
+      }
+    }) 
+    type_df <- sources |> .refi_get_child(paste0("//qda:", src_type)) |> 
+        xml2::xml_attrs() |> 
+        (function(x) do.call(rbind, x))() 
+        tibble::as_tibble(type_df)  |> 
+        dplyr::mutate(doc_description = type_descriptions)
 }
 

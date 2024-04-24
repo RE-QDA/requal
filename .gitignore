@@ -12,3 +12,6 @@ requal_users.sqlite
 # {shinytest2}: Ignore new debug snapshots for `$expect_values()`
 *_.new.png
 tests/test.requal
+
+# dev stuff
+test-iframe.R
