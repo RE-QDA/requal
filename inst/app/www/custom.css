@@ -36,7 +36,11 @@
     white-space: normal;
     text-overflow: clip;
 }
-
+.code-button:popover {
+  overflow: initial;
+  white-space: initial;
+  text-overflow: initial;
+}
 .quote {
 font-size: medium;
 line-height: 1;

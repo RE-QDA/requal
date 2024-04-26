@@ -10,6 +10,11 @@
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
 tagList(
+    tags$head(
+    tags$script(src = "https://code.jquery.com/ui/1.12.1/jquery-ui.js"),
+    tags$link(rel = "stylesheet", href = "resizableColumns.css"),
+    tags$script(src = "resizableColumns.js")
+  ),
   fluidRow(class = "module_tools", style = "width: 100%",
   div(style="display: flex; justify-content: space-between; width: 100%",
     selectInput(ns("doc_selector"),
@@ -24,6 +29,8 @@ tagList(
   )
   )
 ),
+tags$div(
+    id = "layout",
 fluidRow(
   column(
       width = 10,
@@ -33,6 +40,7 @@ fluidRow(
     ),
     column(
       width = 2,
+      tags$div(
       tags$b("Codes"),
       br(),
       actionButton(ns("remove_codes"),
@@ -43,7 +51,7 @@ fluidRow(
       br(), br(),
       uiOutput(ns("code_list"))
     ) %>% tagAppendAttributes(class = "scrollable90")
-  ),
+  ))),
   tags$script(
       src = "www/document_code_js.js"
     )
