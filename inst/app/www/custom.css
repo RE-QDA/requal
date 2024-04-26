@@ -33,6 +33,8 @@
 
 .code-button:hover {
     overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
 }
 
 .quote {
