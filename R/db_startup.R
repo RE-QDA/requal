@@ -555,11 +555,12 @@ add_cases_record <- function(pool, project_id, case_df, user_id) {
 }
 
 add_codes_record <- function(pool, project_id, codes_df, user_id) {
+  
   res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(.data$code_name == !!codes_df$code_name, 
-                    .data$project_id == !!as.numeric(project_id), 
+                    .data$project_id == !!as.integer(project_id), 
                     .data$user_id == !!user_id) %>%
       dplyr::pull(code_id)
     
