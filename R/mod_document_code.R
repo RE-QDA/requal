@@ -9,62 +9,87 @@
 #' @importFrom shiny NS tagList
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
-fluidPage(
- tags$head(
-  tags$script(HTML("
-    $(document).on('shinyjqui:resize', function(e, data) {
-      if (data.id === 'resizableDiv') {
-        var otherDiv = $('#otherDiv');
-        var resizableDiv = $('#resizableDiv');
-        var parentWidth = resizableDiv.parent().width();
-        var newWidth = resizableDiv.width() + data.size.delta.width;
-        var otherDivNewWidth = parentWidth - newWidth;
-        otherDiv.width(otherDivNewWidth);
-        resizableDiv.width(newWidth);
-      }
+  
+  fluidPage(
+    tags$head(
+      tags$script(src = "www/split.min.js"),
+      tags$script(HTML("
+  document.addEventListener('DOMContentLoaded', (event) => {
+    Split(['#split-1', '#split-2'], {
+      sizes: [80, 20],
+      minSize: [100, 100]
     });
-  "))
-),
-  fluidRow(class = "module_tools", style = "width: 100%",
-  div(style="display: flex;",
-  div(style="display: flex; justify-content: space-between; width: 100%",
-    selectInput(ns("doc_selector"),
-      label = "Select a document to code",
-      choices = "", selected = ""
+  });
+"))
     ),
-    div(style = "display: flex; align-items: center;", 
-      actionButton(ns("doc_refresh"),
-        label = "",
-        icon = icon("sync")
-    ) %>% tagAppendAttributes(title = "Reload document")
-  )),
-  div(style = "display: flex; align-items: right;",
-  textOutput(ns("captured_range"))
-  )
-  )
-),
-fluidRow(style = "height: 100%",
-  tags$div(style = "display: flex;",
-    tags$div(id = "otherDiv", style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-      htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable90")
-    ),
-    shinyjqui::jqui_resizable(tags$div(id = "resizableDiv", style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-      tags$b("Codes"),
-      br(),
-      actionButton(ns("remove_codes"),
-        "Remove code",
-        class = "btn-danger",
-        width = "100%"
+    
+    fluidRow(
+      class = "module_tools",
+      style = "width: 100% !important;",
+      column(
+        width = 8,
+        
+        selectInput(
+          ns("doc_selector"),
+          label = "Select a document to code",
+          choices = "", 
+          selected = ""
+        )
       ),
-      br(), br(),
-      uiOutput(ns("code_list"))
-    ) %>% tagAppendAttributes(class = "scrollable90"), options = list(handles = "w"))
+      
+      column(
+        width = 2,
+        style = "text-align: right;",
+        actionButton(
+          ns("doc_refresh"),
+          label = "",
+          icon = icon("sync")
+        ) %>% tagAppendAttributes(title = "Reload document")
+      ),
+      
+      column(
+        width = 2,
+        style = "text-align: left;",
+        textOutput(ns("captured_range"))
+      )
+    ),
+    
+    fluidRow(
+      style = "height: 90%",
+      
+      tags$div(
+        style = "display: flex;", 
+        class = "split",
+        
+        tags$div(
+          id = "split-1", 
+          style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
+          htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80")
+        ),
+        
+        tags$div(
+          id = "split-2", 
+          style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
+          
+          tags$b("Codes"),
+          br(),
+          
+          actionButton(
+            ns("remove_codes"),
+            "Remove code",
+            class = "btn-danger",
+            width = "100%"
+          ),
+          
+          br(), br(),
+          uiOutput(ns("code_list"))
+        ) %>% tagAppendAttributes(class = "scrollable80")
+      )
+    ),
+    
+    tags$script(src = "www/document_code_js.js")
   )
-),
-  tags$script(
-      src = "www/document_code_js.js"
-    )
-)
+
 }
 
 #' document_code Server Functions
@@ -147,8 +172,8 @@ mod_document_code_server <- function(id, glob) {
               ns = NS(id)
           )
         }
-
-        purrr::pmap(
+  sortable::rank_list(input_id = "codes_menu",
+    labels = purrr::pmap(
           list(
             loc$code_df$active_codebook$code_id,
             loc$code_df$active_codebook$code_name,
@@ -161,6 +186,7 @@ mod_document_code_server <- function(id, glob) {
             code_name = ..2,
             code_color = ..3,
             code_desc = ..4)
+          )
           )
 
       } else {
@@ -301,8 +327,20 @@ mod_document_code_server <- function(id, glob) {
     #  # Helper (to be commented out in prod): position counter ---------------
 
     output$captured_range <- renderText({
-      input$tag_position
+      req(isTruthy(input$tag_position))
+      splitted_range <- strsplit(input$tag_position, split = "-")
+      if (splitted_range[[1]][1] == splitted_range[[1]][2]) {
+        reported_range <- unique(splitted_range[[1]])
+        } else {
+           reported_range <- input$tag_position
+        }
+      paste("Range:", reported_range)
     })
+
+    
+    observeEvent(input$clicked_title, {
+  showNotification(input$clicked_title)
+})
 
     # returns glob$segments_observer
   })

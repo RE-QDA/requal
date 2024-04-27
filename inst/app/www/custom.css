@@ -139,3 +139,34 @@ width: 100% !important;
   padding-left: 20px;
   padding-right: 20px;
 }
+
+.split {
+  display: flex;
+  flex-direction: row;
+}
+
+.split > #split-1 {
+  padding-top: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  background-color: #ffffff !important;
+}
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
+}
+
+#rank-list-codes_menu {
+background-color: transparent;
+border: none;
+padding: 0px;
+margin-left: -0.3em;
+margin-right: -0.3em;
+display: flex;
+}

@@ -331,7 +331,7 @@ load_doc_to_display <- function(pool,
                                              code_color,
                                              '" title="',
                                              code_name,
-                                             '">')) %>% 
+                                              '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
             dplyr::bind_rows(
                 # start doc
                 tibble::tibble(position_start = 0,
