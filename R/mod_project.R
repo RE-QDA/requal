@@ -199,12 +199,12 @@ mod_project_server <- function(id, glob) {
         fileInput(ns("project_import_path"), NULL,
           multiple = FALSE,
           buttonLabel = "Select file",
-          placeholder = "Only .qdpx or .rqda",
-          accept = c(".rqda", ".qdpx")
+          placeholder = "Only .qdpx files",#TODO "Only .qdpx or .rqda",
+          accept = ".qdpx", #TODO c(".rqda", ".qdpx")
         ) %>% tagAppendAttributes(class = "required"),
         selectInput(ns("project_import_origin"),
           "Project origin",
-          choices = c("REFI-QDA", "RQDA")
+          choices = "REFI-QDA" #TODO c("REFI-QDA", "RQDA")
         ),
         actionButton(ns("project_import"), "Import project", class = "btn-danger")
       ),
