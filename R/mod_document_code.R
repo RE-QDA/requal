@@ -9,13 +9,24 @@
 #' @importFrom shiny NS tagList
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
-tagList(
-    tags$head(
-    tags$script(src = "https://code.jquery.com/ui/1.12.1/jquery-ui.js"),
-    tags$link(rel = "stylesheet", href = "resizableColumns.css"),
-    tags$script(src = "resizableColumns.js")
-  ),
+fluidPage(
+ tags$head(
+  tags$script(HTML("
+    $(document).on('shinyjqui:resize', function(e, data) {
+      if (data.id === 'resizableDiv') {
+        var otherDiv = $('#otherDiv');
+        var resizableDiv = $('#resizableDiv');
+        var parentWidth = resizableDiv.parent().width();
+        var newWidth = resizableDiv.width() + data.size.delta.width;
+        var otherDivNewWidth = parentWidth - newWidth;
+        otherDiv.width(otherDivNewWidth);
+        resizableDiv.width(newWidth);
+      }
+    });
+  "))
+),
   fluidRow(class = "module_tools", style = "width: 100%",
+  div(style="display: flex;",
   div(style="display: flex; justify-content: space-between; width: 100%",
     selectInput(ns("doc_selector"),
       label = "Select a document to code",
@@ -26,21 +37,18 @@ tagList(
         label = "",
         icon = icon("sync")
     ) %>% tagAppendAttributes(title = "Reload document")
+  )),
+  div(style = "display: flex; align-items: right;",
+  textOutput(ns("captured_range"))
   )
   )
 ),
-tags$div(
-    id = "layout",
-fluidRow(
-  column(
-      width = 10,
-      htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80"),
-      textOutput(ns("captured_range")),
-      verbatimTextOutput(ns("printLabel"))
+fluidRow(style = "height: 100%",
+  tags$div(style = "display: flex;",
+    tags$div(id = "otherDiv", style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
+      htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable90")
     ),
-    column(
-      width = 2,
-      tags$div(
+    shinyjqui::jqui_resizable(tags$div(id = "resizableDiv", style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
       tags$b("Codes"),
       br(),
       actionButton(ns("remove_codes"),
@@ -50,12 +58,13 @@ fluidRow(
       ),
       br(), br(),
       uiOutput(ns("code_list"))
-    ) %>% tagAppendAttributes(class = "scrollable90")
-  ))),
+    ) %>% tagAppendAttributes(class = "scrollable90"), options = list(handles = "w"))
+  )
+),
   tags$script(
       src = "www/document_code_js.js"
     )
-  )
+)
 }
 
 #' document_code Server Functions

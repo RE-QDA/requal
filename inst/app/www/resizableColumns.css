@@ -40,3 +40,22 @@
   .resizable-grid > .resizable-row-resizing > .resizable-column:not(.resizable-column-resizing) {
     opacity: 0.5;
   }
+
+  .resizable-grid > .resizable-row > .resizable-column > .resizable-column-handle .btn {
+    opacity: unset;
+    z-index: unset;
+    display: unset;
+    position: unset;
+    top: unset;
+    height: unset;
+    width: unset;
+    cursor: unset;
+    -webkit-touch-callout: unset;
+    -webkit-user-select: unset;
+    -khtml-user-select: unset;
+    -moz-user-select: unset;
+    -ms-user-select: unset;
+    user-select: unset;
+    -ms-touch-action: unset;
+    touch-action: unset;
+  }
