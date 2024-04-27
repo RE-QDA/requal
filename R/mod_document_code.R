@@ -13,6 +13,7 @@ mod_document_code_ui <- function(id) {
   fluidPage(
     tags$head(
       tags$script(src = "www/split.min.js"),
+      tags$script(src = "www/highlight_style.js"),
       tags$script(HTML("
   document.addEventListener('DOMContentLoaded', (event) => {
     Split(['#split-1', '#split-2'], {
@@ -40,6 +41,11 @@ mod_document_code_ui <- function(id) {
       column(
         width = 2,
         style = "text-align: right;",
+          actionButton(
+          ns("toggle_style"),
+          label = "",
+          icon = icon("highlighter")
+        ) %>% tagAppendAttributes(title = "Highlight style"),
         actionButton(
           ns("doc_refresh"),
           label = "",
@@ -100,7 +106,9 @@ mod_document_code_server <- function(id, glob) {
     ns <- session$ns
 
     loc <- reactiveValues()
-    
+    # Initialize loc$highlight
+    loc$highlight <- "background"
+
     # Selection of documents to code ------------------------------------------
     loc$doc_choices <- NULL
 
@@ -139,6 +147,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
+
         glob$segments_observer <- glob$segments_observer + 1
       
     })
@@ -341,6 +350,15 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$clicked_title, {
   showNotification(input$clicked_title)
 })
+
+observe(print(loc$highlight))
+  observeEvent(input$toggle_style, {
+  print(input$toggle_style)
+  print(loc$highlight)
+  loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
+    # Send a message to the client to toggle the style
+    session$sendCustomMessage('toggleStyle', message = loc$highlight)
+  })
 
     # returns glob$segments_observer
   })

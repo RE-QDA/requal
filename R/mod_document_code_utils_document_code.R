@@ -329,6 +329,8 @@ load_doc_to_display <- function(pool,
                                              code_id,
                                              '" class="segment" style="padding:0; background-color:',
                                              code_color,
+                                             '" data-color="',  
+                                             code_color, 
                                              '" title="',
                                              code_name,
                                               '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
