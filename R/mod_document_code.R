@@ -14,6 +14,7 @@ mod_document_code_ui <- function(id) {
     tags$head(
       tags$script(src = "www/split.min.js"),
       tags$script(src = "www/highlight_style.js"),
+      tags$script(src = "www/document_code_js.js"),
       tags$script(HTML("
   document.addEventListener('DOMContentLoaded', (event) => {
     Split(['#split-1', '#split-2'], {
@@ -91,9 +92,9 @@ mod_document_code_ui <- function(id) {
           uiOutput(ns("code_list"))
         ) %>% tagAppendAttributes(class = "scrollable80")
       )
-    ),
+    )
     
-    tags$script(src = "www/document_code_js.js")
+    
   )
 
 }
@@ -147,7 +148,6 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-
         glob$segments_observer <- glob$segments_observer + 1
       
     })
@@ -203,6 +203,9 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
+  observe(print(input$tag_position))
+    observe(print(input$selected_code))
+
     # Coding tools ------------------------------------------------------------
     observeEvent(input$selected_code, {
       req(input$selected_code, input$tag_position)
@@ -220,15 +223,17 @@ mod_document_code_server <- function(id, glob) {
             startOff,
             endOff
         )
-
-        loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            ns = NS(id)
-        )
+        print("enter highlight")
+      session$sendCustomMessage('highlight', message = "yellow")
+        print("past highlight")
+        # loc$text <- load_doc_to_display(
+        #     glob$pool, 
+        #     glob$active_project,
+        #     user = glob$user,
+        #     input$doc_selector,
+        #     loc$code_df$active_codebook,
+        #     ns = NS(id)
+        # )
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
@@ -329,6 +334,8 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
+            session$sendCustomMessage('toggleStyle', message = loc$highlight)
+
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
@@ -351,14 +358,15 @@ mod_document_code_server <- function(id, glob) {
   showNotification(input$clicked_title)
 })
 
-observe(print(loc$highlight))
   observeEvent(input$toggle_style, {
-  print(input$toggle_style)
-  print(loc$highlight)
   loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
     # Send a message to the client to toggle the style
     session$sendCustomMessage('toggleStyle', message = loc$highlight)
   })
+observeEvent(glob$segments_observer, {
+      session$sendCustomMessage('toggleStyle', message = loc$highlight)
+}
+)
 
     # returns glob$segments_observer
   })

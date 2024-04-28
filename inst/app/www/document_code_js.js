@@ -69,7 +69,7 @@ document.addEventListener('mouseup', function () {
       } 
       
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-        
+        console.log("tag_position" + tag_position_value)
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }
 
@@ -77,17 +77,31 @@ document.addEventListener('mouseup', function () {
 })
 
 // Auxiliary function to add highlight in the browser
-
 $( document ).ready(function() {
   Shiny.addCustomMessageHandler('highlight', function(arg_color) {
-  
-        var selection = window.getSelection().getRangeAt(0);
-        if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
-        var selectedText = selection.extractContents();
-        var mark = document.createElement("mark");
-        mark.style.background = arg_color;
-        mark.appendChild(selectedText);
-        selection.insertNode(mark);  
+    console.log(arg_color)
+    let arg_color = "red"
+    console.log(arg_color)
+    var selection = window.getSelection();
+    console.log(selection)
+    
+    var selectedElement = selection.anchorNode.parentNode;
+    console.log(selectedElement)
+    console.log(tagName)
+
+    if(selectedElement.tagName != "article") return;
+    for(var i = 0; i < selection.rangeCount; i++) {
+      var range = selection.getRangeAt(i);
+      console.log(range)
+      var selectedText = range.extractContents();
+      console.log(selectedText)
+      var mark = document.createElement("b");
+      console.log(mark)
+
+      mark.style.background = arg_color;
+      mark.appendChild(selectedText);
+      range.insertNode(mark);
+    }
   })
 });
 
