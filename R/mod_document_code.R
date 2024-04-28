@@ -148,6 +148,7 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
+        session$sendCustomMessage('toggleStyle', message = loc$highlight)
         glob$segments_observer <- glob$segments_observer + 1
       
     })
@@ -203,8 +204,6 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
-  observe(print(input$tag_position))
-    observe(print(input$selected_code))
 
     # Coding tools ------------------------------------------------------------
     observeEvent(input$selected_code, {
@@ -214,18 +213,22 @@ mod_document_code_server <- function(id, glob) {
       endOff <- parse_tag_pos(input$tag_position, "end")
 
       if (endOff - startOff > 1 & endOff > startOff) {
-        write_segment_db(
-            glob$pool, 
-            glob$active_project,
-            user_id = glob$user$user_id,
-            doc_id = input$doc_selector,
-            code_id = input$selected_code,
-            startOff,
-            endOff
-        )
-        print("enter highlight")
-      session$sendCustomMessage('highlight', message = "yellow")
-        print("past highlight")
+        # write_segment_db(
+        #     glob$pool, 
+        #     glob$active_project,
+        #     user_id = glob$user$user_id,
+        #     doc_id = input$doc_selector,
+        #     code_id = input$selected_code,
+        #     startOff,
+        #     endOff
+        # )
+       
+session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
+  startOffset = startOff,
+  endOffset = endOff,
+  newId = as.character(Sys.time())
+))        
+print("past highlight")
         # loc$text <- load_doc_to_display(
         #     glob$pool, 
         #     glob$active_project,
@@ -363,10 +366,8 @@ mod_document_code_server <- function(id, glob) {
     # Send a message to the client to toggle the style
     session$sendCustomMessage('toggleStyle', message = loc$highlight)
   })
-observeEvent(glob$segments_observer, {
-      session$sendCustomMessage('toggleStyle', message = loc$highlight)
-}
-)
+
+
 
     # returns glob$segments_observer
   })

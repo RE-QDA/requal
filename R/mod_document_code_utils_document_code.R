@@ -378,7 +378,7 @@ load_doc_to_display <- function(pool,
     }else{
         
         df_non_coded <- paste0(
-            "<article><p class='document_par'>",
+            "<article id='article'><p class='document_par'>",
             
             raw_text %>%
                 stringr::str_replace_all("[\\n\\r]",
