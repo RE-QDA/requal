@@ -327,9 +327,10 @@ load_doc_to_display <- function(pool,
             dplyr::mutate(tag_end = "</b>",
                           tag_start = paste0('<b id="',
                                              code_id,
-                                             '" class="segment" style="padding:0;',
+                                             '" class="segment" style="padding:0; background-color:',
+                                             code_color, ';',
                                              '" data-color="',  
-                                             code_color, 
+                                             code_color,                                              
                                              '" title="',
                                              code_name,
                                               '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
@@ -337,7 +338,7 @@ load_doc_to_display <- function(pool,
                 # start doc
                 tibble::tibble(position_start = 0,
                                position_type =  "segment_start",
-                               tag_start = "<article><p class='docpar'>"),
+                               tag_start = "<article id='article'><p class='docpar'>"),
                 # content
                 .,
                 # end doc
@@ -378,7 +379,7 @@ load_doc_to_display <- function(pool,
     }else{
         
         df_non_coded <- paste0(
-            "<article id='article'><p class='document_par'>",
+            "<article id='article'><p class='docpar'>",
             
             raw_text %>%
                 stringr::str_replace_all("[\\n\\r]",

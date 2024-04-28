@@ -80,11 +80,13 @@ Shiny.addCustomMessageHandler('wrapTextWithBold', function(message) {
   const startOffset = message.startOffset;
   const endOffset = message.endOffset;
   const newId = message.newId;
-  wrapTextWithBold(startOffset, endOffset, newId);
+  const color = message.color;
+  const title = message.title;
+  wrapTextWithBold(startOffset, endOffset, newId, color, title);
 });
 
 
-function wrapTextWithBold(startOffset, endOffset, newId) {
+function wrapTextWithBold(startOffset, endOffset, newId, color, title) {
   const container = document.querySelector('#article');
   if (!container) {
     console.error("Container not found");
@@ -99,7 +101,7 @@ function wrapTextWithBold(startOffset, endOffset, newId) {
       let bTagPositions = [];
       Array.from(p.childNodes).forEach(child => {
         if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'b') {
-          bTagPositions.push({pos: plainText.length, type: 'start', id: child.id});
+          bTagPositions.push({pos: plainText.length, type: 'start', id: child.id, color: child.getAttribute('data-color'), title: child.title});
           plainText += child.textContent;
           bTagPositions.push({pos: plainText.length, type: 'end', id: child.id});
         } else if (child.nodeType === Node.TEXT_NODE) {
@@ -110,7 +112,7 @@ function wrapTextWithBold(startOffset, endOffset, newId) {
       if (globalOffset <= endOffset && globalOffset + plainText.length >= startOffset) {
         const paragraphStart = Math.max(startOffset - globalOffset, 0);
         const paragraphEnd = Math.min(endOffset - globalOffset, plainText.length);
-        bTagPositions.push({pos: paragraphStart, type: 'start', id: newId});
+        bTagPositions.push({pos: paragraphStart, type: 'start', id: newId, color: color, title: title});
         bTagPositions.push({pos: paragraphEnd, type: 'end', id: newId});
       }
 
@@ -118,14 +120,35 @@ function wrapTextWithBold(startOffset, endOffset, newId) {
 
       let finalBTagPositions = [];
       let openTags = [];
+      let openColors = [];
+      let openTitles = [];
       for (let i = 0; i < bTagPositions.length - 1; i++) {
         if (bTagPositions[i].type === 'start') {
           openTags.push(bTagPositions[i].id);
+          openColors.push(bTagPositions[i].color);
+          openTitles.push(bTagPositions[i].title);
         } else {
-          openTags = openTags.filter(id => id !== bTagPositions[i].id);
+          const index = openTags.indexOf(bTagPositions[i].id);
+          openTags.splice(index, 1);
+          openColors.splice(index, 1);
+          openTitles.splice(index, 1);
         }
-        if (bTagPositions[i].pos !== bTagPositions[i+1].pos) {
-          finalBTagPositions.push({start: bTagPositions[i].pos, end: bTagPositions[i+1].pos, id: openTags.join(',')});
+        if (bTagPositions[i].pos !== bTagPositions[i+1].pos && openTags.length > 0) {
+          let avgColor = "rgb(0,0,0)";
+          if (openColors.length > 0) {
+            let r = 0, g = 0, b = 0;
+            openColors.forEach(color => {
+              let match = color.match(/\d+/g);
+              r += parseInt(match[0]);
+              g += parseInt(match[1]);
+              b += parseInt(match[2]);
+            });
+            r = Math.round(r / openColors.length);
+            g = Math.round(g / openColors.length);
+            b = Math.round(b / openColors.length);
+            avgColor = `rgb(${r},${g},${b})`;
+          }
+          finalBTagPositions.push({start: bTagPositions[i].pos, end: bTagPositions[i+1].pos, id: openTags.join('+'), color: avgColor, title: openTitles.join(' | ')});
         }
       }
 
@@ -136,7 +159,11 @@ function wrapTextWithBold(startOffset, endOffset, newId) {
           const before = document.createTextNode(plainText.slice(currentOffset, position.start));
           const middle = document.createElement('b');
           middle.id = position.id;
+          middle.title = position.title;
+          middle.setAttribute('data-color', position.color);
+          middle.classList.add('segment'); 
           middle.textContent = plainText.slice(position.start, position.end);
+          middle.setAttribute('onclick', "Shiny.setInputValue('document_code_ui_1-clicked_title', this.title, {priority: 'event'});");
           p.appendChild(before);
           p.appendChild(middle);
           currentOffset = position.end;

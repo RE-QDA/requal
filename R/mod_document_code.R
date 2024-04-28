@@ -148,9 +148,8 @@ mod_document_code_server <- function(id, glob) {
             loc$code_df$active_codebook,
             ns = NS(id)
         )
-        session$sendCustomMessage('toggleStyle', message = loc$highlight)
         glob$segments_observer <- glob$segments_observer + 1
-      
+
     })
     # Render selected text
     output$focal_text <- renderText({
@@ -212,23 +211,28 @@ mod_document_code_server <- function(id, glob) {
       startOff <- parse_tag_pos(input$tag_position, "start")
       endOff <- parse_tag_pos(input$tag_position, "end")
 
-      if (endOff - startOff > 1 & endOff > startOff) {
-        # write_segment_db(
-        #     glob$pool, 
-        #     glob$active_project,
-        #     user_id = glob$user$user_id,
-        #     doc_id = input$doc_selector,
-        #     code_id = input$selected_code,
-        #     startOff,
-        #     endOff
-        # )
-       
+      if (endOff >= startOff) {
+        write_segment_db(
+            glob$pool, 
+            glob$active_project,
+            user_id = glob$user$user_id,
+            doc_id = input$doc_selector,
+            code_id = input$selected_code,
+            startOff,
+            endOff
+        )
+       code_info <- glob$codebook |> 
+        dplyr::filter(code_id == input$selected_code) 
+ 
 session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
-  startOffset = startOff-1,
+  startOffset = startOff-1, #convert to javascript
   endOffset = endOff,
-  newId = as.character(Sys.time())
+  newId = input$selected_code,
+  color = code_info$code_color,
+  title = code_info$code_name
 ))        
-print("past highlight")
+    session$sendCustomMessage('toggleStyle', message = loc$highlight)
+
         # loc$text <- load_doc_to_display(
         #     glob$pool, 
         #     glob$active_project,
@@ -343,7 +347,7 @@ print("past highlight")
       }
     })
 
-    #  # Helper (to be commented out in prod): position counter ---------------
+    #  # Helper: position counter ---------------
 
     output$captured_range <- renderText({
       req(isTruthy(input$tag_position))
