@@ -83,6 +83,7 @@ Shiny.addCustomMessageHandler('wrapTextWithBold', function(message) {
   wrapTextWithBold(startOffset, endOffset, newId);
 });
 
+
 function wrapTextWithBold(startOffset, endOffset, newId) {
   const container = document.querySelector('#article');
   if (!container) {
@@ -94,63 +95,52 @@ function wrapTextWithBold(startOffset, endOffset, newId) {
 
   Array.from(container.childNodes).forEach((p) => {
     if (p.nodeType === Node.ELEMENT_NODE && p.tagName.toLowerCase() === 'p') {
-      // Create a copy of the text content without <b> tags and a list of <b> tag positions
       let plainText = '';
       let bTagPositions = [];
       Array.from(p.childNodes).forEach(child => {
-        if (child.nodeType === Node.TEXT_NODE) {
+        if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'b') {
+          bTagPositions.push({pos: plainText.length, type: 'start', id: child.id});
           plainText += child.textContent;
-        } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'b') {
-          bTagPositions.push({start: plainText.length, end: plainText.length + child.textContent.length, id: child.id});
+          bTagPositions.push({pos: plainText.length, type: 'end', id: child.id});
+        } else if (child.nodeType === Node.TEXT_NODE) {
           plainText += child.textContent;
         }
       });
 
-      // Calculate the positions of the new <b> tag
       if (globalOffset <= endOffset && globalOffset + plainText.length >= startOffset) {
         const paragraphStart = Math.max(startOffset - globalOffset, 0);
         const paragraphEnd = Math.min(endOffset - globalOffset, plainText.length);
-        const newBTagPosition = {start: paragraphStart, end: paragraphEnd, id: newId};
-        bTagPositions.push(newBTagPosition);
+        bTagPositions.push({pos: paragraphStart, type: 'start', id: newId});
+        bTagPositions.push({pos: paragraphEnd, type: 'end', id: newId});
       }
 
-      // Sort the list of <b> tag positions
-      bTagPositions.sort((a, b) => a.start - b.start);
+      bTagPositions.sort((a, b) => a.pos - b.pos || (a.type === 'end' ? -1 : 1));
 
-      // Merge overlapping <b> tag positions
-      let mergedBTagPositions = [];
-      if (bTagPositions.length > 0) {
-        let currentBTagPosition = bTagPositions[0];
-        for (let i = 1; i < bTagPositions.length; i++) {
-          if (bTagPositions[i].start <= currentBTagPosition.end) {
-            // Overlapping <b> tags, merge them into a single tag
-            if (bTagPositions[i].id !== currentBTagPosition.id) {
-              currentBTagPosition.end = bTagPositions[i].start;
-              mergedBTagPositions.push(currentBTagPosition);
-              currentBTagPosition = {start: bTagPositions[i].start, end: bTagPositions[i].end, id: currentBTagPosition.id + '+' + bTagPositions[i].id};
-            } else {
-              currentBTagPosition.end = Math.max(currentBTagPosition.end, bTagPositions[i].end);
-            }
-          } else {
-            // Non-overlapping <b> tag, add the current one to the list and start a new one
-            mergedBTagPositions.push(currentBTagPosition);
-            currentBTagPosition = bTagPositions[i];
-          }
+      let finalBTagPositions = [];
+      let openTags = [];
+      for (let i = 0; i < bTagPositions.length - 1; i++) {
+        if (bTagPositions[i].type === 'start') {
+          openTags.push(bTagPositions[i].id);
+        } else {
+          openTags = openTags.filter(id => id !== bTagPositions[i].id);
         }
-        mergedBTagPositions.push(currentBTagPosition);
+        if (bTagPositions[i].pos !== bTagPositions[i+1].pos) {
+          finalBTagPositions.push({start: bTagPositions[i].pos, end: bTagPositions[i+1].pos, id: openTags.join(',')});
+        }
       }
 
-      // Reconstitute the paragraph with the <b> tags
       p.innerHTML = '';
       let currentOffset = 0;
-      mergedBTagPositions.forEach((position) => {
-        const before = document.createTextNode(plainText.slice(currentOffset, position.start));
-        const middle = document.createElement('b');
-        middle.id = position.id;
-        middle.textContent = plainText.slice(position.start, position.end);
-        p.appendChild(before);
-        p.appendChild(middle);
-        currentOffset = position.end;
+      finalBTagPositions.forEach((position) => {
+        if (position.start !== position.end) {
+          const before = document.createTextNode(plainText.slice(currentOffset, position.start));
+          const middle = document.createElement('b');
+          middle.id = position.id;
+          middle.textContent = plainText.slice(position.start, position.end);
+          p.appendChild(before);
+          p.appendChild(middle);
+          currentOffset = position.end;
+        }
       });
       const after = document.createTextNode(plainText.slice(currentOffset));
       p.appendChild(after);

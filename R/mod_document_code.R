@@ -224,7 +224,7 @@ mod_document_code_server <- function(id, glob) {
         # )
        
 session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
-  startOffset = startOff,
+  startOffset = startOff-1,
   endOffset = endOff,
   newId = as.character(Sys.time())
 ))        
