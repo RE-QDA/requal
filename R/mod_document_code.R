@@ -14,6 +14,7 @@ mod_document_code_ui <- function(id) {
     tags$head(
       tags$script(src = "www/split.min.js"),
       tags$script(src = "www/highlight_style.js"),
+      tags$script(src = "www/document_code_js.js"),
       tags$script(HTML("
   document.addEventListener('DOMContentLoaded', (event) => {
     Split(['#split-1', '#split-2'], {
@@ -91,9 +92,9 @@ mod_document_code_ui <- function(id) {
           uiOutput(ns("code_list"))
         ) %>% tagAppendAttributes(class = "scrollable80")
       )
-    ),
+    )
     
-    tags$script(src = "www/document_code_js.js")
+    
   )
 
 }
@@ -198,6 +199,7 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
+
     # Coding tools ------------------------------------------------------------
     observeEvent(input$selected_code, {
       req(input$selected_code, input$tag_position)
@@ -205,7 +207,7 @@ mod_document_code_server <- function(id, glob) {
       startOff <- parse_tag_pos(input$tag_position, "start")
       endOff <- parse_tag_pos(input$tag_position, "end")
 
-      if (endOff - startOff > 1 & endOff > startOff) {
+      if (endOff >= startOff) {
         write_segment_db(
             glob$pool, 
             glob$active_project,
@@ -215,16 +217,27 @@ mod_document_code_server <- function(id, glob) {
             startOff,
             endOff
         )
+  #TODO JS implementation of coding
+  #     code_info <- glob$codebook |> 
+  #      dplyr::filter(code_id == input$selected_code) 
+ 
+ #session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
+ # startOffset = startOff-1, #convert to javascript
+ # endOffset = endOff,
+ # newId = input$selected_code,
+ # color = code_info$code_color,
+ # title = code_info$code_name
+ #))        
 
-        loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            highlight = loc$highlight,
-            ns = NS(id)
-        )
+         loc$text <- load_doc_to_display(
+             glob$pool, 
+             glob$active_project,
+             user = glob$user,
+             input$doc_selector,
+             loc$code_df$active_codebook,
+             highlight = loc$highlight,
+             ns = NS(id)
+         )
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
@@ -327,11 +340,13 @@ mod_document_code_server <- function(id, glob) {
             highlight = loc$highlight,
             ns = NS(id)
         )
+            session$sendCustomMessage('toggleStyle', message = loc$highlight)
+
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
 
-    #  # Helper (to be commented out in prod): position counter ---------------
+    #  # Helper: position counter ---------------
 
     output$captured_range <- renderText({
       req(isTruthy(input$tag_position))
@@ -349,12 +364,13 @@ mod_document_code_server <- function(id, glob) {
   showNotification(input$clicked_title)
 })
 
-observe(print(loc$highlight))
   observeEvent(input$toggle_style, {
   loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
     # Send a message to the client to toggle the style
     session$sendCustomMessage('toggleStyle', message = loc$highlight)
   })
+
+
 
     # returns glob$segments_observer
   })

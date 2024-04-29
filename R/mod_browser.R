@@ -170,7 +170,7 @@ mod_browser_server <- function(id, glob){
             tibble::tibble(
               position_start = 0,
               position_type = "segment_start",
-              tag_start = "<article><p class='docpar'>"
+              tag_start = "<article id='article'><p class='docpar'>"
             ),
             
             # content
