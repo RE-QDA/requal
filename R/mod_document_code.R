@@ -105,12 +105,15 @@ mod_document_code_ui <- function(id) {
 mod_document_code_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
     loc <- reactiveValues()
+
+    observeEvent(glob$active_project, {
     loc$highlight <- "background"
     loc$text <- ""
     loc$doc_choices <- NULL
     loc$codes_menu <- ""
+    })
+
 
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
