@@ -110,6 +110,7 @@ mod_document_code_server <- function(id, glob) {
     loc$highlight <- "background"
     loc$text <- ""
     loc$doc_choices <- NULL
+    loc$codes_menu <- ""
 
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
@@ -131,73 +132,53 @@ mod_document_code_server <- function(id, glob) {
         
       }
     })
+    # Doc sel or refresh ----
+    # Update loc$text when input$doc_selector or input$doc_refresh changes
+observeEvent(c(input$doc_selector, input$doc_refresh), {
+  req(isTruthy(input$doc_selector))
 
-    observeEvent(c(input$doc_selector, input$doc_refresh), {
-      req(isTruthy(input$doc_selector))
-      loc$text <- load_doc_to_display(
-        glob$pool, 
-        glob$active_project,
-        user = glob$user,
-        input$doc_selector,
-        loc$code_df$active_codebook,
-        highlight = loc$highlight,
-        ns = NS(id)
+  loc$text <- load_doc_to_display(
+    glob$pool, 
+    glob$active_project,
+    user = glob$user,
+    input$doc_selector,
+    loc$code_df$active_codebook,
+    highlight = loc$highlight,
+    ns = NS(id)
+  )
+})
+
+# Update loc$codes_menu when input$doc_refresh or glob$codebook changes
+observeEvent(c(input$doc_refresh, glob$codebook), {
+
+
+  loc$code_df$active_codebook <- list_db_codes(
+    glob$pool, 
+    glob$active_project,
+    user = glob$user
+  )
+
+  loc$codes_menu <- sortable::rank_list(input_id = "codes_menu",
+    labels = purrr::pmap(
+      list(
+        loc$code_df$active_codebook$code_id,
+        loc$code_df$active_codebook$code_name,
+        loc$code_df$active_codebook$code_color,
+        loc$code_df$active_codebook$code_description
+      ),
+      ~ generate_coding_tools(
+        ns = ns,
+        code_id = ..1,
+        code_name = ..2,
+        code_color = ..3,
+        code_desc = ..4)
       )
+    )
+})
 
-      glob$segments_observer <- glob$segments_observer + 1
-      
-    })
-
-    output$focal_text <- renderText({
-        loc$text
-    })
-
-    output$code_list <- renderUI({
-      if (isTruthy(glob$active_project)) {
-        if (isTruthy(glob$codebook)) {
-          loc$code_df$active_codebook <- glob$codebook
-        } else {
-          print("Before list_db_codes")
-          loc$code_df$active_codebook <- list_db_codes(
-            glob$pool, 
-            glob$active_project
-          )
-          print("After list_db_codes")
-        }
-
-        if (isTruthy(req(input$doc_selector))) {
-          loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            highlight = loc$highlight,
-            ns = NS(id)
-          )
-        }
-
-        sortable::rank_list(input_id = "codes_menu",
-          labels = purrr::pmap(
-            list(
-              loc$code_df$active_codebook$code_id,
-              loc$code_df$active_codebook$code_name,
-              loc$code_df$active_codebook$code_color,
-              loc$code_df$active_codebook$code_description
-            ),
-            ~ generate_coding_tools(
-              ns = ns,
-              code_id = ..1,
-              code_name = ..2,
-              code_color = ..3,
-              code_desc = ..4)
-            )
-          )
-
-      } else {
-        ""
-      }
-    })
+    # Display text and codes
+    output$focal_text <- renderText({loc$text})
+    output$code_list <- renderUI({loc$codes_menu})
 
 
     # Coding tools ------------------------------------------------------------
