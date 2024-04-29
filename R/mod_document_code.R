@@ -106,13 +106,10 @@ mod_document_code_server <- function(id, glob) {
     ns <- session$ns
 
     loc <- reactiveValues()
-    # Initialize loc$highlight
     loc$highlight <- "background"
-
-    # Selection of documents to code ------------------------------------------
+    loc$text <- ""
     loc$doc_choices <- NULL
 
-    # Refresh list of documents when documents are added/removed --------
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
         if(glob$user$data$data_other_view == 1){
@@ -134,68 +131,66 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
-    # Displayed text ----------------------------------------------------------
-    loc$text <- ""
-
     observeEvent(c(input$doc_selector, input$doc_refresh), {
       req(isTruthy(input$doc_selector))
-          loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            ns = NS(id)
-        )
+      loc$text <- load_doc_to_display(
+        glob$pool, 
+        glob$active_project,
+        user = glob$user,
+        input$doc_selector,
+        loc$code_df$active_codebook,
+        highlight = loc$highlight,
+        ns = NS(id)
+      )
 
-        glob$segments_observer <- glob$segments_observer + 1
+      glob$segments_observer <- glob$segments_observer + 1
       
     })
-    # Render selected text
+
     output$focal_text <- renderText({
         loc$text
     })
-
-
-
-    # List out available codes ------------------------------------------------
 
     output$code_list <- renderUI({
       if (isTruthy(glob$active_project)) {
         if (isTruthy(glob$codebook)) {
           loc$code_df$active_codebook <- glob$codebook
         } else {
+          print("Before list_db_codes")
           loc$code_df$active_codebook <- list_db_codes(
-              glob$pool, 
-              glob$active_project
+            glob$pool, 
+            glob$active_project
           )
+          print("After list_db_codes")
         }
 
         if (isTruthy(req(input$doc_selector))) {
           loc$text <- load_doc_to_display(
-              glob$pool, 
-              glob$active_project,
-              user = glob$user,
-              input$doc_selector,
-              loc$code_df$active_codebook,
-              ns = NS(id)
+            glob$pool, 
+            glob$active_project,
+            user = glob$user,
+            input$doc_selector,
+            loc$code_df$active_codebook,
+            highlight = loc$highlight,
+            ns = NS(id)
           )
         }
-  sortable::rank_list(input_id = "codes_menu",
-    labels = purrr::pmap(
-          list(
-            loc$code_df$active_codebook$code_id,
-            loc$code_df$active_codebook$code_name,
-            loc$code_df$active_codebook$code_color,
-            loc$code_df$active_codebook$code_description
-          ),
-          ~ generate_coding_tools(
-            ns = ns,
-            code_id = ..1,
-            code_name = ..2,
-            code_color = ..3,
-            code_desc = ..4)
-          )
+
+        sortable::rank_list(input_id = "codes_menu",
+          labels = purrr::pmap(
+            list(
+              loc$code_df$active_codebook$code_id,
+              loc$code_df$active_codebook$code_name,
+              loc$code_df$active_codebook$code_color,
+              loc$code_df$active_codebook$code_description
+            ),
+            ~ generate_coding_tools(
+              ns = ns,
+              code_id = ..1,
+              code_name = ..2,
+              code_color = ..3,
+              code_desc = ..4)
+            )
           )
 
       } else {
@@ -227,6 +222,7 @@ mod_document_code_server <- function(id, glob) {
             user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
+            highlight = loc$highlight,
             ns = NS(id)
         )
         glob$segments_observer <- glob$segments_observer + 1
@@ -280,6 +276,7 @@ mod_document_code_server <- function(id, glob) {
             user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
+            highlight = loc$highlight,
             ns = NS(id)
         )
         glob$segments_observer <- glob$segments_observer + 1
@@ -327,6 +324,7 @@ mod_document_code_server <- function(id, glob) {
             user = glob$user,
             input$doc_selector,
             loc$code_df$active_codebook,
+            highlight = loc$highlight,
             ns = NS(id)
         )
         glob$segments_observer <- glob$segments_observer + 1
@@ -353,8 +351,6 @@ mod_document_code_server <- function(id, glob) {
 
 observe(print(loc$highlight))
   observeEvent(input$toggle_style, {
-  print(input$toggle_style)
-  print(loc$highlight)
   loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
     # Send a message to the client to toggle the style
     session$sendCustomMessage('toggleStyle', message = loc$highlight)
