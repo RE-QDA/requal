@@ -162,11 +162,9 @@ mod_project_server <- function(id, glob) {
       showModal(
         modalDialog(
           title = "Are you sure?",
-          paste(
-            "You are about to delete the project",
-            loc$project_name,
-            "and lose all data associated with it!"
-          ),
+            tags$span("You are about to delete the project",
+            tags$b(loc$project_name),
+            "and lose all data associated with it!"),
           easyClose = TRUE,
           footer = tagList(
             modalButton("Dismiss"),

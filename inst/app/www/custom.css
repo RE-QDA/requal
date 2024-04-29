@@ -66,12 +66,15 @@ p.docpar {
 }
 
 .br {
-height: 0px;
-width: 0px;
+  height: 0px;
+  width: 0px;
 }
 
 b.segment {
-font-weight: normal;
+  font-weight: normal;
+  text-decoration-thickness: 5px !important; 
+  text-underline-offset: 3px !important;
+  font-weight: normal;
 }
 
 
