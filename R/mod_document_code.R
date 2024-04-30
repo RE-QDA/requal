@@ -87,7 +87,12 @@ mod_document_code_ui <- function(id) {
             class = "btn-danger",
             width = "100%"
           ),
-          
+tags$iframe(
+  src = "www/quickcode.html", 
+  height = 50, 
+  width = 55
+),
+actionButton(ns("test"), "try"),
           br(), br(),
           uiOutput(ns("code_list"))
         ) %>% tagAppendAttributes(class = "scrollable80")
@@ -107,6 +112,16 @@ mod_document_code_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
 
+loc$quickcode <- NULL
+observeEvent(input$test, {
+  browser()
+  i <- 0
+  while (length(loc$quickcode) < 1 | length(input$quickcode < 1)| loc$quickcode == input$quickcode | i < 5) {
+  session$sendCustomMessage(type = 'getIframeContent', message = list())
+  i  <- i+1
+ }
+  print(input$quickcode)
+})
     observeEvent(glob$active_project, {
     loc$highlight <- "background"
     loc$text <- ""

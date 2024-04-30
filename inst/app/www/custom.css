@@ -189,3 +189,7 @@ display: flex;
   text-decoration-style: dotted;
   text-decoration-color: red; 
 }
+.selected {
+  background-color: dodgerblue;
+  color: white;
+}
