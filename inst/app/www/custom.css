@@ -189,7 +189,6 @@ display: flex;
   text-decoration-style: dotted;
   text-decoration-color: red; 
 }
-.selected {
-  background-color: dodgerblue;
-  color: white;
+.quickcode {
+  height: calc(1.5em + .75rem + 2px);
 }

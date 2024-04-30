@@ -77,31 +77,14 @@ document.addEventListener('mouseup', function () {
 })
 
 
-function getIframeContent() {
-  return new Promise((resolve, reject) => {
-    var iframe = document.getElementsByTagName('iframe')[0];
-    var res = iframe.contentDocument.getElementById('quickCodeInput');
-    var quickodeValue = res.dataset.quickode;
-    resolve(quickodeValue);
-  });
-}
-
-getIframeContent().then((quickodeValue) => {
+Shiny.addCustomMessageHandler('getIframeContent', function(message) {
+  var iframe = document.getElementsByTagName('iframe')[0];
+  var res = iframe.contentDocument.getElementById('quickCodeInput');
+  var quickodeValue = res.dataset.quickode;
   Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
 });
 
-Shiny.addCustomMessageHandler('getIframeContent', function(message) {
-  getIframeContent().then((quickodeValue) => {
-    Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
-  });
+Shiny.addCustomMessageHandler('refreshIframe', function(message) {
+  var iframe = document.getElementById('myIframe');
+  iframe.src = iframe.src;
 });
-
-// Shiny.addCustomMessageHandler('getIframeContent', function(message) {
-//   console.log('here')
-//   var iframe = document.getElementsByTagName('iframe')[0];
-//   console.log(iframe)
-//   var res = iframe.contentDocument.getElementById('quickCodeInput');
-//   console.log(res)
-//   var quickodeValue = res.dataset.quickode;
-//   Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
-// });

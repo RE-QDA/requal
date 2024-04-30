@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
-  
+
   fluidPage(
     tags$head(
       tags$script(src = "www/split.min.js"),
@@ -24,25 +24,22 @@ mod_document_code_ui <- function(id) {
   });
 "))
     ),
-    
     fluidRow(
       class = "module_tools",
       style = "width: 100% !important;",
       column(
         width = 8,
-        
         selectInput(
           ns("doc_selector"),
           label = "Select a document to code",
-          choices = "", 
+          choices = "",
           selected = ""
         )
       ),
-      
       column(
         width = 2,
         style = "text-align: right;",
-          actionButton(
+        actionButton(
           ns("toggle_style"),
           label = "",
           icon = icon("highlighter")
@@ -53,55 +50,49 @@ mod_document_code_ui <- function(id) {
           icon = icon("sync")
         ) %>% tagAppendAttributes(title = "Reload document")
       ),
-      
       column(
         width = 2,
         style = "text-align: left;",
         textOutput(ns("captured_range"))
       )
     ),
-    
     fluidRow(
       style = "height: 90%",
-      
       tags$div(
-        style = "display: flex;", 
+        style = "display: flex;",
         class = "split",
-        
         tags$div(
-          id = "split-1", 
+          id = "split-1",
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
           htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80")
         ),
-        
         tags$div(
-          id = "split-2", 
+          id = "split-2",
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-          
           tags$b("Codes"),
           br(),
-          
           actionButton(
             ns("remove_codes"),
             "Remove code",
             class = "btn-danger",
             width = "100%"
           ),
-tags$iframe(
-  src = "www/quickcode.html", 
-  height = 50, 
-  width = 55
-),
-actionButton(ns("test"), "try"),
-          br(), br(),
+          tags$div(
+            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 1em; margin-bottom: 1em;",
+            tags$div(
+              style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
+              tags$iframe(
+                src = "www/quickcode.html",
+                style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
+              )
+            ),
+            actionButton(ns("quickcode_btn"), "Quick code", style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+          ),
           uiOutput(ns("code_list"))
         ) %>% tagAppendAttributes(class = "scrollable80")
       )
     )
-    
-    
   )
-
 }
 
 #' document_code Server Functions
@@ -112,91 +103,95 @@ mod_document_code_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
 
-loc$quickcode <- NULL
-observeEvent(input$test, {
-  browser()
-  i <- 0
-  while (length(loc$quickcode) < 1 | length(input$quickcode < 1)| loc$quickcode == input$quickcode | i < 5) {
-  session$sendCustomMessage(type = 'getIframeContent', message = list())
-  i  <- i+1
- }
-  print(input$quickcode)
-})
+   
+    observeEvent(input$quickcode_btn, {
+      session$sendCustomMessage(type = "getIframeContent", message = list())
+      session$sendCustomMessage(type = 'refreshIframe', message = list())
+
+    })
+    observeEvent(req(input$quickcode), {
+      print(input$quickcode)
+    })
     observeEvent(glob$active_project, {
-    loc$highlight <- "background"
-    loc$text <- ""
-    loc$doc_choices <- NULL
-    loc$codes_menu <- ""
+      loc$highlight <- "background"
+      loc$text <- ""
+      loc$doc_choices <- NULL
+      loc$codes_menu <- ""
     })
 
 
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
-        if(glob$user$data$data_other_view == 1){
+        if (glob$user$data$data_other_view == 1) {
           updateSelectInput(
             session = session,
             "doc_selector",
             choices = c("", glob$documents)
-          )  
-        }else{
-          visible_docs <- read_visible_docs(glob$pool, glob$active_project, 
-                                            glob$user$user_id)
+          )
+        } else {
+          visible_docs <- read_visible_docs(
+            glob$pool, glob$active_project,
+            glob$user$user_id
+          )
           updateSelectInput(
-            session = session, 
-            "doc_selector", 
+            session = session,
+            "doc_selector",
             choices = c("", visible_docs)
           )
         }
-        
       }
     })
     # Doc sel or refresh ----
     # Update loc$text when input$doc_selector or input$doc_refresh changes
-observeEvent(c(input$doc_selector, input$doc_refresh), {
-  req(isTruthy(input$doc_selector))
+    observeEvent(c(input$doc_selector, input$doc_refresh), {
+      req(isTruthy(input$doc_selector))
 
-  loc$text <- load_doc_to_display(
-    glob$pool, 
-    glob$active_project,
-    user = glob$user,
-    input$doc_selector,
-    loc$code_df$active_codebook,
-    highlight = loc$highlight,
-    ns = NS(id)
-  )
-})
-
-# Update loc$codes_menu when input$doc_refresh or glob$codebook changes
-observeEvent(c(input$doc_refresh, glob$codebook), {
-
-
-  loc$code_df$active_codebook <- list_db_codes(
-    glob$pool, 
-    glob$active_project,
-    user = glob$user
-  )
-
-  loc$codes_menu <- sortable::rank_list(input_id = "codes_menu",
-    labels = purrr::pmap(
-      list(
-        loc$code_df$active_codebook$code_id,
-        loc$code_df$active_codebook$code_name,
-        loc$code_df$active_codebook$code_color,
-        loc$code_df$active_codebook$code_description
-      ),
-      ~ generate_coding_tools(
-        ns = ns,
-        code_id = ..1,
-        code_name = ..2,
-        code_color = ..3,
-        code_desc = ..4)
+      loc$text <- load_doc_to_display(
+        glob$pool,
+        glob$active_project,
+        user = glob$user,
+        input$doc_selector,
+        loc$code_df$active_codebook,
+        highlight = loc$highlight,
+        ns = NS(id)
       )
-    )
-})
+    })
+
+    # Update loc$codes_menu when input$doc_refresh or glob$codebook changes
+    observeEvent(c(input$doc_refresh, glob$codebook), {
+      loc$code_df$active_codebook <- list_db_codes(
+        glob$pool,
+        glob$active_project,
+        user = glob$user
+      )
+
+      loc$codes_menu <- sortable::rank_list(
+        input_id = "codes_menu",
+        labels = purrr::pmap(
+          list(
+            loc$code_df$active_codebook$code_id,
+            loc$code_df$active_codebook$code_name,
+            loc$code_df$active_codebook$code_color,
+            loc$code_df$active_codebook$code_description
+          ),
+          ~ generate_coding_tools(
+            ns = ns,
+            code_id = ..1,
+            code_name = ..2,
+            code_color = ..3,
+            code_desc = ..4
+          )
+        )
+      )
+    })
 
     # Display text and codes
-    output$focal_text <- renderText({loc$text})
-    output$code_list <- renderUI({loc$codes_menu})
+    output$focal_text <- renderText({
+      loc$text
+    })
+    output$code_list <- renderUI({
+      loc$codes_menu
+    })
 
 
     # Coding tools ------------------------------------------------------------
@@ -208,35 +203,35 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
 
       if (endOff >= startOff) {
         write_segment_db(
-            glob$pool, 
-            glob$active_project,
-            user_id = glob$user$user_id,
-            doc_id = input$doc_selector,
-            code_id = input$selected_code,
-            startOff,
-            endOff
+          glob$pool,
+          glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = input$doc_selector,
+          code_id = input$selected_code,
+          startOff,
+          endOff
         )
-  #TODO JS implementation of coding
-  #     code_info <- glob$codebook |> 
-  #      dplyr::filter(code_id == input$selected_code) 
- 
- #session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
- # startOffset = startOff-1, #convert to javascript
- # endOffset = endOff,
- # newId = input$selected_code,
- # color = code_info$code_color,
- # title = code_info$code_name
- #))        
+        # TODO JS implementation of coding
+        #     code_info <- glob$codebook |>
+        #      dplyr::filter(code_id == input$selected_code)
 
-         loc$text <- load_doc_to_display(
-             glob$pool, 
-             glob$active_project,
-             user = glob$user,
-             input$doc_selector,
-             loc$code_df$active_codebook,
-             highlight = loc$highlight,
-             ns = NS(id)
-         )
+        # session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
+        # startOffset = startOff-1, #convert to javascript
+        # endOffset = endOff,
+        # newId = input$selected_code,
+        # color = code_info$code_color,
+        # title = code_info$code_name
+        # ))
+
+        loc$text <- load_doc_to_display(
+          glob$pool,
+          glob$active_project,
+          user = glob$user,
+          input$doc_selector,
+          loc$code_df$active_codebook,
+          highlight = loc$highlight,
+          ns = NS(id)
+        )
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
@@ -245,10 +240,10 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
     observeEvent(input$remove_codes, {
       req(glob$active_project)
       req(isTruthy(input$doc_selector))
-      
-      if(glob$user$data$annotation_other_modify == 0){
+
+      if (glob$user$data$annotation_other_modify == 0) {
         loc$marked_segments_df <- load_segment_codes_db(
-          glob$pool, 
+          glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
           active_doc = input$doc_selector,
@@ -256,10 +251,10 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
             input$tag_position,
             "start"
           )
-        )  
-      }else{
+        )
+      } else {
         loc$marked_segments_df <- load_segment_codes_db(
-          glob$pool, 
+          glob$pool,
           glob$active_project,
           user_id = NULL,
           active_doc = input$doc_selector,
@@ -269,34 +264,32 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
           )
         )
       }
-      
+
 
       if (nrow(loc$marked_segments_df) == 0) {
         NULL
       } else if (nrow(loc$marked_segments_df) == 1) {
         delete_segment_codes_db(
-            glob$pool, 
-            glob$active_project,
-            user_id = glob$user$user_id,
-            doc_id = input$doc_selector,
-            segment_id = loc$marked_segments_df$segment_id
+          glob$pool,
+          glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = input$doc_selector,
+          segment_id = loc$marked_segments_df$segment_id
         )
 
         loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            highlight = loc$highlight,
-            ns = NS(id)
+          glob$pool,
+          glob$active_project,
+          user = glob$user,
+          input$doc_selector,
+          loc$code_df$active_codebook,
+          highlight = loc$highlight,
+          ns = NS(id)
         )
         glob$segments_observer <- glob$segments_observer + 1
-        
       } else {
         showModal(
           modalDialog(
-
             checkboxGroupInput(ns("codes_to_remove"),
               label = "",
               choiceValues = loc$marked_segments_df$segment_id,
@@ -322,24 +315,24 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
     observeEvent(input$remove_codes_select, {
       if (isTruthy(input$codes_to_remove)) {
         delete_segment_codes_db(
-            glob$pool, 
-            glob$active_project,
-            user_id = glob$user$user_id,
-            doc_id = input$doc_selector,
-            segment_id = input$codes_to_remove
+          glob$pool,
+          glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = input$doc_selector,
+          segment_id = input$codes_to_remove
         )
         removeModal()
 
         loc$text <- load_doc_to_display(
-            glob$pool, 
-            glob$active_project,
-            user = glob$user,
-            input$doc_selector,
-            loc$code_df$active_codebook,
-            highlight = loc$highlight,
-            ns = NS(id)
+          glob$pool,
+          glob$active_project,
+          user = glob$user,
+          input$doc_selector,
+          loc$code_df$active_codebook,
+          highlight = loc$highlight,
+          ns = NS(id)
         )
-            session$sendCustomMessage('toggleStyle', message = loc$highlight)
+        session$sendCustomMessage("toggleStyle", message = loc$highlight)
 
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -352,22 +345,22 @@ observeEvent(c(input$doc_refresh, glob$codebook), {
       splitted_range <- strsplit(input$tag_position, split = "-")
       if (splitted_range[[1]][1] == splitted_range[[1]][2]) {
         reported_range <- unique(splitted_range[[1]])
-        } else {
-           reported_range <- input$tag_position
-        }
+      } else {
+        reported_range <- input$tag_position
+      }
       paste("Range:", reported_range)
     })
 
-    
-    observeEvent(input$clicked_title, {
-  showNotification(input$clicked_title)
-})
 
-  observeEvent(input$toggle_style, {
-  loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
-    # Send a message to the client to toggle the style
-    session$sendCustomMessage('toggleStyle', message = loc$highlight)
-  })
+    observeEvent(input$clicked_title, {
+      showNotification(input$clicked_title)
+    })
+
+    observeEvent(input$toggle_style, {
+      loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
+      # Send a message to the client to toggle the style
+      session$sendCustomMessage("toggleStyle", message = loc$highlight)
+    })
 
 
 
