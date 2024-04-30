@@ -198,6 +198,41 @@ parse_qdpx <- function(path) {
   )
 }
 
+# Parse selections ----
+.refi_get_selections <- function(xml_file, refi_ns, codebook) {
+  sources <- xml2::xml_find_all(xml_file, "//qda:TextSource", ns = refi_ns)
+  txt_sel <- sources  |> 
+  xml2::xml_find_all(".//qda:PlainTextSelection", ns = refi_ns)  |> 
+  purrr::map(xml2::xml_attrs)  |> 
+  purrr::map(dplyr::bind_rows)
+  txt_sel_desc <- purrr::map(sources, .refi_get_child, "//qda:PlainTextSelection/qda:Description")  |> 
+  purrr::map(xml2::xml_text)
+  txt_sel_coding <- purrr::map(sources, .refi_get_child, "/qda:Coding")  |> 
+  purrr::map(xml2::xml_attrs) |> purrr::map(dplyr::bind_rows) 
+  txt_sel_coding_ref <- purrr::map(sources, .refi_get_child, "//qda:PlainTextSelection/qda:Coding/qda:CodeRef")  |> 
+  purrr::map(xml2::xml_attrs) |> purrr::map(dplyr::bind_rows) |>  purrr::map(~dplyr::rename(.x, guid = targetGUID)) 
+  # i need to match coding refs to codebook
+  txt_sel_matched <- txt_sel_coding_ref |> purrr::map(~dplyr::right_join(.x, imp_project$codebook))
+
+txt_sel_matched[[1]] |> View()
+
+# Find all <TextSource> elements
+sources <- xml2::xml_find_all(xml_file, "//qda:TextSource", ns = refi_ns)
+source <- sources[[1]]
+# Extract <PlainTextSelection> elements from each <TextSource> element
+txt_sel <- purrr::map_df(sources, function(source) {
+  text_source <- xml2::xml_find_first(source, "./qda:Description", ns = refi_ns) |> xml2::xml_text()
+  selections <- xml2::xml_find_all(source, ".//qda:PlainTextSelection", ns = refi_ns) |>
+    purrr::map(xml2::xml_attrs) |>
+    dplyr::bind_rows() |> 
+    dplyr::mutate(text_source = text_source)
+  selections
+})
+txt_sel |> View()
+  # TODO PICK UP HERE
+  
+}
+
 # 1.2 Parsing utils ----
 .refi_get_child <- function(node, xpath, ns = c(qda = "urn:QDA-XML:project:1.0")) {
   node |>

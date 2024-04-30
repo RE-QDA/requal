@@ -172,3 +172,20 @@ margin-left: -0.3em;
 margin-right: -0.3em;
 display: flex;
 }
+
+
+.docpar::selection {
+  background: #ffffcc;
+  color: grey;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: red; 
+}
+
+.docpar b::selection {
+  background: #ffffcc;
+  color: grey;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: red; 
+}
