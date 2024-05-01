@@ -85,6 +85,6 @@ Shiny.addCustomMessageHandler('getIframeContent', function(message) {
 });
 
 Shiny.addCustomMessageHandler('refreshIframe', function(message) {
-  var iframe = document.getElementById('myIframe');
+  var iframe = document.getElementsByTagName('iframe')[0];
   iframe.src = iframe.src;
 });

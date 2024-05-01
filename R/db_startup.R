@@ -575,6 +575,37 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
   }
 }
 
+add_quickcode_record <- function(pool, project_id, codes_df, user_id) {
+  
+      # Make sure column exists to identify new quickcode
+      query <- "ALTER TABLE codes ADD COLUMN IF NOT EXISTS is_new_quickcode integer;"
+      DBI::dbExecute(pool, query)
+      # temporarily write into DB with original code_id
+      codes_df$is_new_quickcode <- 1
+  res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
+  if (res) {
+    written_code_id <- dplyr::tbl(pool, "codes") %>%
+      dplyr::filter(.data$project_id == !!as.integer(project_id), 
+                    .data$user_id == !!as.integer(user_id),
+                    is_new_quickcode == 1) %>%
+      dplyr::pull(code_id)
+    # remove helper column from DB
+      query <- "ALTER TABLE codes DROP COLUMN is_new_quickcode;"
+      res2 <- DBI::dbExecute(pool, query)
+    # just a check we are getting the latest id
+    written_code_id <- written_code_id[written_code_id == max(written_code_id)]
+    log_add_code_record(pool, project_id, codes_df %>%
+                          dplyr::mutate(
+                            is_new_quickcode = NULL,
+                            code_id = written_code_id), 
+                        user_id
+    )
+    return(written_code_id)
+  } else {
+    warning("code not added")
+  }
+}
+
 add_case_doc_record <- function(pool, project_id, case_doc_df, user_id) {
   res <- DBI::dbWriteTable(pool, "cases_documents_map", case_doc_df, append = TRUE, row.names = FALSE)
   if (res) {

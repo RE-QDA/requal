@@ -233,7 +233,6 @@ render_codes <- function(pool, active_project, user) {
             project_id = active_project, 
             user = user
         )
-        
         if (nrow(project_codes) == 0) {
             "No codes have been created."
         } else {
