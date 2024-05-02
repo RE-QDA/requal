@@ -88,8 +88,8 @@ mod_document_code_ui <- function(id) {
             ),
             actionButton(ns("quickcode_btn"), "Quick code", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
           ),
-          uiOutput(ns("code_list"))
-        ) %>% tagAppendAttributes(class = "scrollable80")
+          uiOutput(ns("code_list"))  %>% tagAppendAttributes(class = "scrollable80")
+        )
       )
     )
   )
