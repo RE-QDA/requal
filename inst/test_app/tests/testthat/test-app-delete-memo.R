@@ -25,6 +25,8 @@ test_that("{shinytest2} test", {
     
     app$click("memo_ui_1-delete_memo")
     
+    app$click("memo_ui_1-delete_memo_confirmation")
+    
     app$click(selector = ".fa-sticky-note")
     app$wait_for_idle()
     
