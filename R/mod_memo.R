@@ -29,6 +29,8 @@ mod_memo_server <- function(id, glob) {
     ns <- session$ns
 
     memo_list <- reactiveVal()
+    loc <- reactiveValues()
+    
     output$new_memo_btn <- renderUI({
       req(glob$user$data)
       if(glob$user$data$memo_modify == 1){
@@ -98,14 +100,14 @@ mod_memo_server <- function(id, glob) {
 
     # Display selected memo -----
     observeEvent(input$selected_memo, {
-      memo <- read_memo_by_id(glob$pool, glob$active_project, input$selected_memo)
-      can_modify <- find_memo_permission(memo$user_id, glob$user)
+      loc$memo <- read_memo_by_id(glob$pool, glob$active_project, input$selected_memo)
+      can_modify <- find_memo_permission(loc$memo$user_id, glob$user)
       
       showModal(
         modalDialog(
-          title = memo$memo_name,
+          title = loc$memo$memo_name,
           textAreaInput(ns("displayed_memo_text"), "Text",
-            value = memo$memo_text,
+            value = loc$memo$memo_text,
             width = "100%", height = "100%",
             placeholder = "First 50 characters of the first line will become a searchable title..."
           ) %>% tagAppendAttributes(style = "height: 50vh"),
@@ -113,7 +115,7 @@ mod_memo_server <- function(id, glob) {
             modalButton("Close"),
             if(can_modify){ 
               list(
-                actionButton(ns("save_changes"), "Save & Close"), 
+                actionButton(ns("save_changes"), "Save & Close", class = "btn-success"), 
                 actionButton(ns("delete_memo"), "Delete", class = "btn-danger")  
               )
             }
@@ -138,8 +140,30 @@ mod_memo_server <- function(id, glob) {
       removeModal()
     })
 
+    # Delete memo ----
+
     observeEvent(input$delete_memo, {
-      delete_memo_record(glob$pool, glob$active_project, input$selected_memo,
+  
+      showModal(
+        modalDialog(
+          title = "Are you sure?",
+            tags$span("You are about to delete the memo and lose its content:",
+            tags$b(loc$memo$memo_name)),
+          easyClose = TRUE,
+          footer = tagList(
+            modalButton("Dismiss"),
+            actionButton(ns("delete_memo_confirmation"),
+              "Yes, I am sure.",
+              class = "btn-danger"
+            )
+          ),
+          fade = TRUE
+        )
+      )
+    })
+
+    observeEvent(input$delete_memo_confirmation, {
+       delete_memo_record(glob$pool, glob$active_project, input$selected_memo,
         user_id = glob$user$user_id
       )
       
@@ -151,8 +175,10 @@ mod_memo_server <- function(id, glob) {
       memo_list(visible_memos)
 
       removeModal()
+  
     })
-    
+
+    # Memo export ----
     output$export_memo <- downloadHandler(
         filename = function() {
             "requal_memo_export.csv"
