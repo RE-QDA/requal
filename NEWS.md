@@ -1,6 +1,8 @@
 # requal 1.1.1
 
 - export memos
+- updated segment export (with segment start for easier narrative analysis)
+- added CITATION file
 
 # requal 1.1.0
 
