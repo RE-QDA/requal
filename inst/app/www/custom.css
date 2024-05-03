@@ -146,4 +146,7 @@ width: 100% !important;
   bottom: -5em;
 }
 
-
+/* logo style */
+.logo {
+  background-color: rgb(63, 79, 144) !important;
+}
