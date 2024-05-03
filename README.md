@@ -73,14 +73,15 @@ exported. More functions are coming up.
 
 ### Collaborative usage
 
-The collaborative capabilities of `requal` truly come to the fore in a
-team setting. This is facilitated by self-hosting an installation of
-`requal` on your own server. A server instance of `requal` not only
-supports multiple users but also provides fine-grained control over
-permission settings. This enables the formation of diverse teams and
-fosters real-time collaboration. With `requal`, you can discuss codes,
-evaluate agreement on codes, and estimate the sensitivity of coding to
-the attributes of your team members.
+requal is designed with reproducibility, openness, and transparency in
+mind, and these values are most evident when it’s used collaboratively.
+You can achieve this by self-hosting `requal` on your own server. A
+server instance of `requal` can support multiple users and offers
+fine-grained permission settings, making it easier to form diverse teams
+and collaborate in real time. This enables the formation of diverse
+teams and fosters real-time collaboration. With `requal`, you can
+discuss codes, evaluate agreement on codes, and estimate the sensitivity
+of coding to the attributes of your team members.
 
 However, setting up a server instance is not a simple task. It requires
 a basic level of system administration experience. If you need
