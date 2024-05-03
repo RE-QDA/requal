@@ -53,12 +53,8 @@ utils::globalVariables(c("project_name",
 
 set_dashboard_body <- function() {
     
-    shinydashboard::dashboardBody(
-        
-        shinyjs::useShinyjs(),
-        
+    shinydashboard::dashboardBody( 
         # css for control bar icon
-        
         tags$head(tags$style(HTML('
 #launchpad_icon{
   margin-right: 10px;
@@ -136,7 +132,6 @@ set_left_menu <- function() {
                              tabName = "Report",
                              icon = icon("chart-bar")
                          ),
-                         uiOutput("fab_button_ui"), 
                          id = "tab_menu"
 
                      ))
