@@ -78,10 +78,9 @@ mind, and these values are most evident when it’s used collaboratively.
 You can achieve this by self-hosting `requal` on your own server. A
 server instance of `requal` can support multiple users and offers
 fine-grained permission settings, making it easier to form diverse teams
-and collaborate in real time. This enables the formation of diverse
-teams and fosters real-time collaboration. With `requal`, you can
-discuss codes, evaluate agreement on codes, and estimate the sensitivity
-of coding to the attributes of your team members.
+and collaborate in real time. With `requal`, you can discuss codes,
+evaluate agreement on codes, and estimate the sensitivity of coding to
+the attributes of your team members.
 
 However, setting up a server instance is not a simple task. It requires
 a basic level of system administration experience. If you need
@@ -104,9 +103,8 @@ website](https://requal.fsv.cuni.cz/).
 > Always consult with your data stewards and/or research ethics
 > committee to determine the appropriate level of security control for
 > your dataset. In the future, we plan to provide support for data
-> de-identification. This will allow you to perform local
-> de-identification and collaboratively analyze the de-identified
-> dataset.
+> de-identification. This will allow you to perform de-identification
+> locally and collaboratively analyze the de-identified dataset online.
 
 ## Acknowledgement
 
