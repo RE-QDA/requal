@@ -1,13 +1,14 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ReQual
+# reQual
 
 <!-- badges: start -->
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/RE-QDA/requal/workflows/R-CMD-check/badge.svg)](https://github.com/RE-QDA/requal/actions)
+[![R-CMD-check](https://github.com/RE-QDA/requal/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RE-QDA/requal/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `requal` is to provide reproducibility support for
@@ -70,7 +71,43 @@ basic functionality for annotating documents in plain text with
 user-defined codes. The annotated text segments can be filtered and
 exported. More functions are coming up.
 
+### Collaborative usage
+
+`requal` is designed with reproducibility, openness, and transparency in
+mind, and these values are most evident when it’s used collaboratively.
+You can achieve this by self-hosting `requal` on your own server. A
+server instance of `requal` can support multiple users and offers
+fine-grained permission settings, making it easier to form diverse teams
+and collaborate in real time. With `requal`, you can discuss codes,
+evaluate agreement on codes, and estimate the sensitivity of coding to
+the attributes of your team members.
+
+However, setting up a server instance is not a simple task. It requires
+a basic level of system administration experience. If you need
+assistance, the IT department at your institution should be able to help
+set up an `requal` server instance by following these
+[instructions](https://github.com/RE-QDA/requal/wiki/Server-setup). To
+get a sense of how `requal` operates in server mode, take a look at the
+public demo available on the [reQual project
+website](https://requal.fsv.cuni.cz/).
+
+> NOTE: It is crucial to prioritize **data security** when hosting your
+> `requal` instance publicly over the internet. At the very least,
+> enabling the TLS protocol is a necessary precaution. However, be aware
+> that this measure alone will not fully protect you from knowledgeable
+> attackers. Consequently, it is important that you only analyze public,
+> GDPR-compliant, and non-confidential data via `requal` in server mode.
+> If you intend to use `requal` for collaborative work involving
+> confidential or sensitive data, ensure this is done behind adequate
+> firewalls or on internal networks established in secure locations.
+> Always consult with your data stewards and/or research ethics
+> committee to determine the appropriate level of security control for
+> your dataset. In the future, we plan to provide support for data
+> de-identification. This will allow you to perform de-identification
+> locally and collaboratively analyze the de-identified dataset online.
+
 ## Acknowledgement
 
 The application development has been supported by The Technology Agency
-of the Czech Republic, project n. TL05000054.
+of the Czech Republic, project n. TL05000054, and CLS INFRA Fellowship
+Programme.
