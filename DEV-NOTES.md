@@ -1,6 +1,6 @@
 ## DEV notes
 
-Instruction for local development of `reQual` server version.
+Instruction for local development of `requal` server version.
   
 - Run `create_db_users.R` to create mock users. 
 - Run `docker-compose up` to start up DB. 
