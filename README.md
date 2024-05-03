@@ -8,6 +8,7 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/RE-QDA/requal/workflows/R-CMD-check/badge.svg)](https://github.com/RE-QDA/requal/actions)
+[![R-CMD-check](https://github.com/RE-QDA/requal/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RE-QDA/requal/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `requal` is to provide reproducibility support for

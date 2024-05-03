@@ -32,17 +32,18 @@ mod_about_ui <- function(id){
           a(href = "https://www.tacr.cz/en/technology-agency-of-the-czech-republic", 
             "The Technology Agency of the Czech Republic",
             target = "_blank"), 
-          "project n. TL05000054."
-        )),
-        tags$li(
+          "project n. TL05000054"
+        ),
+               tags$li(
              a(href = "https://clsinfra.io/", 
             "CLS INFRA Fellowship programme",
             target = "_blank")
         )
+        )
         ),
         p(
           "If you use this software, please cite it as",
-          tags$cite(paste(citation("requal"), citation("requal")$note))
+          tags$cite(paste(cite("requal"), citation("requal")$note))
         )
         
         

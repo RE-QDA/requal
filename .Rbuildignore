@@ -11,3 +11,4 @@ $run_dev.*
 ^CODE_OF_CONDUCT\.md$
 ^\.github$
 _\.new\.png$
+^codecov\.yml$

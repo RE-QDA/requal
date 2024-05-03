@@ -192,3 +192,19 @@ display: flex;
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
 }
+/* initiates admin button as hidden */
+.mfb-component--bl {
+  display: none;
+}
+#\.shinymanager_logout {
+  display: none;
+}
+#\.shinymanager_admin {
+  position: relative;
+  bottom: -5em;
+}
+
+/* logo style */
+.logo {
+  background-color: rgb(63, 79, 144) !important;
+}
