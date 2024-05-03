@@ -7,6 +7,7 @@
 #' @noRd
 app_ui <- function(request, mode = NULL, access = NULL) {
   tagList(
+    shinyjs::useShinyjs(),
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic

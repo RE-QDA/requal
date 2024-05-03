@@ -133,3 +133,20 @@ width: 100% !important;
   padding-left: 20px;
   padding-right: 20px;
 }
+
+/* initiates admin button as hidden */
+.mfb-component--bl {
+  display: none;
+}
+#\.shinymanager_logout {
+  display: none;
+}
+#\.shinymanager_admin {
+  position: relative;
+  bottom: -5em;
+}
+
+/* logo style */
+.logo {
+  background-color: rgb(63, 79, 144) !important;
+}
