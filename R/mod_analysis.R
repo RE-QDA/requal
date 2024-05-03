@@ -235,7 +235,7 @@ mod_rql_button_server(
           shinyjs::enable("download_csv_ui_1-download", asis = TRUE)
           shinyjs::enable("download_html_ui_1-report", asis = TRUE)
           glob$segments_df <- loc$segments_df %>%
-            dplyr::select(doc_name, doc_id, segment_start, code_name, 
+            dplyr::select(doc_name, doc_id, segment_start, segmend_end, code_name, 
                           code_id, segment_text, user_name)
           glob$segments_taglist <- loc$segments_taglist
         } else {
