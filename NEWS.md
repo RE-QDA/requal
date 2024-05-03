@@ -4,6 +4,7 @@
 - updated segment export (with segment start for easier narrative analysis)
 - added CITATION file
 - logo update
+- citation information
 
 # requal 1.1.0
 

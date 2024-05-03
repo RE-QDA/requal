@@ -1,7 +1,7 @@
 bibentry(
   bibtype  = "Misc",
-  title    = "Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis",
+  title    = "requal: Shiny Application for Computer-Assisted Qualitative Data Analysis",
   author   = "Radim Hladík, Michael Škvrňák, Nina Fárová, Martin Hájek",
   year = 2024,
-  url = "https://requal.fsv.cuni.cz/"
+  url = "https://github.com/RE-QDA/requal"
 )
