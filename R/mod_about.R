@@ -22,7 +22,7 @@ mod_about_ui <- function(id) {
   version <- as.character(packageVersion("requal"))
   rql_url <- rql_citation$url
   # Construct the APA citation
-  apa_citation <- paste0(author_string, " (", year, "). ", tags$i(title), ". (Version", version, "). &lt;", rql_url, "&gt;")
+  apa_citation <- paste0(author_string, " (", year, "). ", tags$i(title), ". (Version ", version, "). &lt;", rql_url, "&gt;")
   # UI starts here ----
   tagList(
     h2(
