@@ -73,7 +73,7 @@ exported. More functions are coming up.
 
 ### Collaborative usage
 
-requal is designed with reproducibility, openness, and transparency in
+`requal` is designed with reproducibility, openness, and transparency in
 mind, and these values are most evident when it’s used collaboratively.
 You can achieve this by self-hosting `requal` on your own server. A
 server instance of `requal` can support multiple users and offers
