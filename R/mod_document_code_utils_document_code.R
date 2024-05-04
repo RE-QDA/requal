@@ -75,7 +75,8 @@ load_segments_db <- function(pool, active_project, user, doc_id) {
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project), 
                           .data$doc_id == as.integer(.env$doc_id)) %>%
-            dplyr::select(code_id,
+            dplyr::select(segment_id,
+                          code_id,
                           segment_start,
                           segment_end, 
                           user_id) %>%
@@ -87,7 +88,7 @@ load_segments_db <- function(pool, active_project, user, doc_id) {
         }
         
         return(segments %>% 
-                   dplyr::select(code_id, segment_start, segment_end))
+                   dplyr::select(segment_id, code_id, segment_start, segment_end))
         
     } else {""}
 }
@@ -230,6 +231,7 @@ calculate_code_overlap <- function(raw_segments) {
     names(vals) <- prevals$name
     
     res <- dplyr::tibble(
+        segment_id = NULL,
         code_id = NULL,
         segment_start = NULL,
         segment_end = NULL
@@ -268,8 +270,7 @@ calculate_code_overlap <- function(raw_segments) {
             dplyr::filter(
                 code_id != "",
                 !is.na(code_id)
-            ) %>%
-            dplyr::mutate(segment_id = 0:(dplyr::n() - 1))
+            ) 
     } else {
         res
     }
@@ -330,7 +331,9 @@ load_doc_to_display <- function(pool,
                                              highlight_style(highlight),
                                              code_color,
                                              '" data-color="',  
-                                             code_color,                                              
+                                             code_color,
+                                             '" data-segment_start="',  
+                                             position_start,                                              
                                              '" title="',
                                              code_name,
                                               '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 

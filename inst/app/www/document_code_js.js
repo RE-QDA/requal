@@ -88,3 +88,38 @@ Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   var iframe = document.getElementsByTagName('iframe')[0];
   iframe.src = iframe.src;
 });
+
+function findScrollElement(message) {
+  let targetStart = parseInt(message, 10);
+  console.log("Target Start:", targetStart);
+  let segments = document.querySelectorAll('article .segment');
+  let segmentStartValues = Array.from(segments).map(el => parseInt(el.dataset.segment_start, 10));
+  let index = segmentStartValues.findIndex(value => value => targetStart);
+  return segments[index]; // This could be undefined if no matching segment is found
+}
+
+$( document ).ready(function() {
+
+Shiny.addCustomMessageHandler('scrollToSegment', function(message) {
+  let el = findScrollElement(message);
+  if (el) { // Check if the element exists before trying to scroll into view
+      console.log("Scrolling to element:", el);
+      scrollToElementWithinContainer(el);
+  } else {
+      console.log("No element found to scroll to for message:", message);
+  }
+});
+});
+
+function scrollToElementWithinContainer(targetSelected) {
+  let container = document.querySelector('#document_code_ui_1-focal_text');
+  let target = targetSelected;
+
+  if (container && target) {
+      let targetPosition = target.getBoundingClientRect().top;
+      let containerPosition = container.getBoundingClientRect().top;
+      let scrollPosition = targetPosition - containerPosition + container.scrollTop;
+      
+      container.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+  }
+}

@@ -108,20 +108,22 @@ mod_document_code_server <- function(id, glob) {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
     loc$text_observer <- 0
+    loc$scroll <- 0
     })
 
     # Observers - definitions ----
-    # Observe click on coded text
+    ## Observe click on coded text ----
     observeEvent(input$clicked_title, {
       showNotification(input$clicked_title)
     })
-    # Observe choice of highlight style
+    ## Observe choice of highlight style ----
     observeEvent(input$toggle_style, {
       loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
       # Send a message to the client to toggle the style
       session$sendCustomMessage("toggleStyle", message = loc$highlight)
     })
 
+    ## Observe changes in documents
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
         if (glob$user$data$data_other_view == 1) {
@@ -143,7 +145,7 @@ mod_document_code_server <- function(id, glob) {
         }
       }
     })
-    # Doc sel or refresh ----
+    ## Doc sel or refresh ----
     # Update loc$text when input$doc_selector or input$doc_refresh changes
     observeEvent(c(input$doc_selector, 
                   input$doc_refresh), {
@@ -152,6 +154,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text_observer <- loc$text_observer + 1
     })
 
+    ## Observe refresh ----
     # Update loc$codes_menu when input$doc_refresh or glob$codebook changes
     observeEvent(input$doc_refresh, {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
@@ -184,6 +187,18 @@ mod_document_code_server <- function(id, glob) {
         )
       )
     })
+  ## Observe Analyze screen ----
+  # Listen to message from Analyze screen
+  observeEvent(glob$analyze_link, {
+  updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = glob$analyze_link$doc_id)
+  loc$codes_menu_observer  <- loc$codes_menu_observer + 1
+  loc$text_observer <- loc$text_observer + 1
+  loc$scroll <- loc$scroll + 1
+  })
+  observeEvent(loc$scroll , {
+      req(isTruthy(loc$scroll))
+      session$sendCustomMessage(type = 'scrollToSegment', message = glob$analyze_link$segment_start)
+  })
 
     # Render text and codes ----
     output$focal_text <- renderText({
