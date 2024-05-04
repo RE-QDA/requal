@@ -25,10 +25,8 @@ mod_document_code_ui <- function(id) {
 "))
     ),
     fluidRow(
-      class = "module_tools",
-      style = "width: 100% !important;",
       column(
-        width = 8,
+        width = 5,
         selectInput(
           ns("doc_selector"),
           label = "Select a document to code",
@@ -37,8 +35,8 @@ mod_document_code_ui <- function(id) {
         )
       ),
       column(
-        width = 2,
-        style = "text-align: right;",
+        width = 5,
+        div(style = "float: right;",
         actionButton(
           ns("toggle_style"),
           label = "",
@@ -49,11 +47,18 @@ mod_document_code_ui <- function(id) {
           label = "",
           icon = icon("sync")
         ) %>% tagAppendAttributes(title = "Reload document")
-      ),
+        )), 
       column(
         width = 2,
-        style = "text-align: left;",
+        div(style = "text-align: right;",
+          actionButton(
+          ns("code_columns"),
+          label = "",
+          icon = icon("table-columns")
+        ) %>% tagAppendAttributes(title = "Code columns"),
+        br(), "Selection:", br(),
         textOutput(ns("captured_range"))
+      )
       )
     ),
     fluidRow(
@@ -78,7 +83,7 @@ mod_document_code_ui <- function(id) {
             width = "100%"
           ),
           tags$div(
-            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 1em; margin-bottom: 1em;",
+            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
             tags$div(
               style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
               tags$iframe(
@@ -108,20 +113,22 @@ mod_document_code_server <- function(id, glob) {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
     loc$text_observer <- 0
+    loc$scroll <- 0
     })
 
     # Observers - definitions ----
-    # Observe click on coded text
+    ## Observe click on coded text ----
     observeEvent(input$clicked_title, {
       showNotification(input$clicked_title)
     })
-    # Observe choice of highlight style
+    ## Observe choice of highlight style ----
     observeEvent(input$toggle_style, {
       loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
       # Send a message to the client to toggle the style
       session$sendCustomMessage("toggleStyle", message = loc$highlight)
     })
 
+    ## Observe changes in documents
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
         if (glob$user$data$data_other_view == 1) {
@@ -143,7 +150,7 @@ mod_document_code_server <- function(id, glob) {
         }
       }
     })
-    # Doc sel or refresh ----
+    ## Doc sel or refresh ----
     # Update loc$text when input$doc_selector or input$doc_refresh changes
     observeEvent(c(input$doc_selector, 
                   input$doc_refresh), {
@@ -152,9 +159,15 @@ mod_document_code_server <- function(id, glob) {
         loc$text_observer <- loc$text_observer + 1
     })
 
+    ## Observe refresh ----
     # Update loc$codes_menu when input$doc_refresh or glob$codebook changes
     observeEvent(input$doc_refresh, {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
+    })
+
+    ## Code columns observer -----
+    observeEvent(input$code_columns, {
+      shinyjs::toggleClass(id = "codes_menu", "two_columns", asis = TRUE)
     })
 
     ## Codes menu observer ---- 
@@ -165,9 +178,8 @@ mod_document_code_server <- function(id, glob) {
         glob$active_project,
         user = glob$user
       )
-      loc$codes_menu <- sortable::rank_list(
-        input_id = "codes_menu",
-        labels = purrr::pmap(
+     
+      code_labels <- purrr::pmap(
           list(
             loc$codebook$code_id,
             loc$codebook$code_name,
@@ -180,10 +192,25 @@ mod_document_code_server <- function(id, glob) {
             code_name = ..2,
             code_color = ..3,
             code_desc = ..4
-          )
-        )
-      )
+          ))
+        
+      loc$codes_menu <- sortable::rank_list(
+        input_id = "codes_menu",
+        labels = code_labels
+      ) 
     })
+  ## Observe Analyze screen ----
+  # Listen to message from Analyze screen
+  observeEvent(glob$analyze_link, {
+  updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = glob$analyze_link$doc_id)
+  loc$codes_menu_observer  <- loc$codes_menu_observer + 1
+  loc$text_observer <- loc$text_observer + 1
+  loc$scroll <- loc$scroll + 1
+  })
+  observeEvent(loc$scroll , {
+      req(isTruthy(loc$scroll))
+      session$sendCustomMessage(type = 'scrollToSegment', message = glob$analyze_link$segment_start)
+  })
 
     # Render text and codes ----
     output$focal_text <- renderText({
@@ -397,7 +424,7 @@ mod_document_code_server <- function(id, glob) {
       } else {
         reported_range <- input$tag_position
       }
-      paste("Selection:", reported_range)
+      paste(reported_range)
     })
 
     # returns glob$segments_observer and glob$codebook

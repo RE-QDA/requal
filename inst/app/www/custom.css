@@ -182,13 +182,14 @@ display: flex;
   text-decoration-color: red; 
 }
 
-.docpar b::selection {
+/* .docpar b::selection {
   background: #ffffcc;
   color: grey;
   text-decoration-line: underline;
   text-decoration-style: dotted;
   text-decoration-color: red; 
-}
+} */
+
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
 }
@@ -208,3 +209,9 @@ display: flex;
 .logo {
   background-color: rgb(63, 79, 144) !important;
 }
+
+ /* codes menu column layout */
+ .two_columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Creates two columns of equal width */
+ }
