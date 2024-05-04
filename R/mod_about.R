@@ -30,14 +30,14 @@ mod_about_ui <- function(id) {
         href = "https://requal.fsv.cuni.cz/",
         tags$img(src = "www/requal_logo.png", width = "5%"), target = "_blank"
       ),
-      "reQual CAQDAS"
+      "requal CAQDAS"
     ),
     textOutput(ns("version_project")),
     textOutput(ns("version_package")),
     p(),
     p(
       "For help, consult ",
-      a("reQual Wiki", href = "https://github.com/RE-QDA/requal/wiki", target = "_blank"),
+      a("requal Wiki", href = "https://github.com/RE-QDA/requal/wiki", target = "_blank"),
       ".",
       br(),
       "Leave feedback on our ",

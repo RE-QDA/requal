@@ -392,7 +392,7 @@ update_db_schema <- function(pool) {
       
       purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
     }
-    message("Updated reQual schema.")
+    message("Updated requal schema.")
   } else {
     NULL
   }
@@ -423,7 +423,7 @@ update_db_schema <- function(pool) {
       
       purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
     }
-    message("Updated reQual schema.")
+    message("Updated requal schema.")
   } else {
     NULL
   }
@@ -578,8 +578,7 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
 add_quickcode_record <- function(pool, project_id, codes_df, user_id) {
   
       # Make sure column exists to identify new quickcode
-      query <- "ALTER TABLE codes ADD COLUMN IF NOT EXISTS is_new_quickcode integer;"
-      DBI::dbExecute(pool, query)
+      db_helper_column(pool, "codes", "is_new_quickcode", "add")
       # temporarily write into DB with original code_id
       codes_df$is_new_quickcode <- 1
   res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
@@ -590,8 +589,7 @@ add_quickcode_record <- function(pool, project_id, codes_df, user_id) {
                     is_new_quickcode == 1) %>%
       dplyr::pull(code_id)
     # remove helper column from DB
-      query <- "ALTER TABLE codes DROP COLUMN is_new_quickcode;"
-      res2 <- DBI::dbExecute(pool, query)
+      db_helper_column(pool, "codes", "is_new_quickcode", "drop")
     # just a check we are getting the latest id
     written_code_id <- written_code_id[written_code_id == max(written_code_id)]
     log_add_code_record(pool, project_id, codes_df %>%
@@ -660,3 +658,4 @@ make_globals <- quote({
     }
   }
 })
+
