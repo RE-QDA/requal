@@ -176,19 +176,19 @@ display: flex;
 
 .docpar::selection {
   background: #ffffcc;
-  color: grey;
+  color: black;
   text-decoration-line: underline;
   text-decoration-style: dotted;
   text-decoration-color: red; 
 }
 
-/* .docpar b::selection {
-  background: #ffffcc;
-  color: grey;
+.docpar b::selection {
+  background: rgb(255, 255, 204, 0.75);
+  color: black;
   text-decoration-line: underline;
   text-decoration-style: dotted;
   text-decoration-color: red; 
-} */
+}
 
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
