@@ -221,59 +221,36 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments) {
-    prevals <- raw_segments %>%
-        tidyr::pivot_longer(cols = c(
-            segment_start,
-            segment_end
-        )) %>%
-        dplyr::arrange(value)
-    vals <- prevals$value
-    names(vals) <- prevals$name
+    positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
+
+starts <- purrr::map(positions, .f = function(pos) {
+   raw_segments |> 
+   dplyr::filter(pos >= segment_start & pos < segment_end) |> 
+   dplyr::pull(code_id)
+})
+
+ends <- purrr::map(positions, .f = function(pos) {
+   raw_segments |> 
+   dplyr::filter(pos > segment_start & pos <= segment_end) |> 
+   dplyr::pull(code_id) 
+})
+
+
+labels_s_pos <- which(purrr::map_lgl(starts, .f = \(x) length(x) > 0))
+labels_e_pos <- which(purrr::map_lgl(ends, .f = \(x) length(x) > 0))
+labels <- unique(starts[labels_s_pos], ends[labels_e_pos])
+labels_keep <- purrr::map_chr(labels, paste0, collapse = "+")
+starts_keep <- positions[purrr::map_lgl(starts, .f = function(x) length(x) != 0)]
+ends_keep <- positions[purrr::map_lgl(ends, .f = function(x) length(x) != 0)]
+
+res <- tibble::tibble(
+  highlight_id = seq_along(labels_keep),
+  code_id = labels_keep,
+  segment_start = starts_keep,
+  segment_end = ends_keep
+)
+
     
-    res <- dplyr::tibble(
-        segment_id = NULL,
-        code_id = NULL,
-        segment_start = NULL,
-        segment_end = NULL
-    )
-    
-    for (i in seq_along(vals)) {
-        overlap_df <- raw_segments %>%
-            dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
-        if (names(vals[i]) == "segment_start") {
-            res <- dplyr::bind_rows(
-                res,
-                tibble::tibble(
-                    code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-                    segment_start = vals[i],
-                    segment_end = vals[i] - 1
-                )
-            )
-        } else {
-            res <- dplyr::bind_rows(
-                res,
-                tibble::tibble(
-                    code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-                    segment_start = vals[i] + 1,
-                    segment_end = min(overlap_df$segment_end)
-                )
-            )
-        }
-    }
-    
-    if (nrow(res)) {
-        prefinal <- res %>%
-            dplyr::mutate(
-                code_id = dplyr::lead(code_id),
-                segment_end = dplyr::lead(segment_end)
-            ) %>%
-            dplyr::filter(
-                code_id != "",
-                !is.na(code_id)
-            ) 
-    } else {
-        res
-    }
 }
 
 # Generate text to be displayed -----
@@ -293,7 +270,7 @@ load_doc_to_display <- function(pool,
                                        user,
                                        doc_selector) %>% 
         calculate_code_overlap()
-    
+        print(coded_segments)
     
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
@@ -318,16 +295,11 @@ load_doc_to_display <- function(pool,
         )
         
         content_df <- coded_segments %>% 
-            dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
-            dplyr::mutate(code_id = as.character(code_id)) %>% 
-            tidyr::pivot_longer(cols = c(segment_start, segment_end),
-                                values_to = "position_start", 
-                                names_to = "position_type",
-                                values_drop_na = TRUE) %>% 
+            dplyr::arrange(segment_start) %>% 
             dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
-            dplyr::mutate(tag_end = "</b>",
-                          tag_start = paste0('<b id="',
-                                             code_id,
+            dplyr::mutate(tag_end = "</span>",
+                          tag_start = paste0('<span id="',
+                                             paste0("highlight-", highlight_id),
                                              highlight_style(highlight),
                                              code_color,
                                              '" data-color="',  
@@ -339,41 +311,32 @@ load_doc_to_display <- function(pool,
                                               '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
             dplyr::bind_rows(
                 # start doc
-                tibble::tibble(position_start = 0,
-                               position_type =  "segment_start",
+                tibble::tibble(segment_start = as.integer(0),
+                               segment_end = as.integer(min(.$segment_start)),
                                tag_start = "<article id='article'><p class='docpar'>"),
                 # content
                 .,
                 # end doc
-                tibble::tibble(position_start = nchar(raw_text),
-                               position_type = "segment_end",
+                tibble::tibble(segment_start = as.integer(max(.$segment_end+1)),
+                               segment_end = as.integer(nchar(raw_text)+1),
                                tag_end = "</p></article>")
-            ) %>% 
-            dplyr::mutate(position_start = ifelse(position_type == "segment_end",
-                                                  position_start+1,
-                                                  position_start)) %>% 
-            dplyr::group_by(position_start, position_type) %>% 
-            dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
-                             tag_end = paste(tag_end, collapse = ""),
-                             .groups = "drop")  %>% 
-            dplyr::group_by(position_start) %>% 
-            dplyr::transmute(tag = ifelse(position_type == "segment_start",
-                                          tag_start, 
-                                          tag_end)) %>% 
-            dplyr::ungroup()  %>% 
-            dplyr::mutate(position_end = dplyr::lead(position_start-1, default = max(position_start))) 
-        
-        
-        html_content <- paste0(purrr::pmap_chr(list(content_df$position_start,
-                                                    content_df$position_end,
-                                                    content_df$tag),
-                                               ~paste0(..3, 
-                                                       substr(
-                                                           
-                                                           raw_text, 
-                                                           ..1, 
-                                                           ..2))),
-                               collapse = "") %>% 
+            )  %>% 
+            dplyr::mutate(segment_end = ifelse(
+                dplyr::lead(segment_start, default = nchar(raw_text)) == segment_end,
+                               segment_end - 1, segment_end)) |> 
+             dplyr::select(-c(highlight_id, code_id, code_name, code_color)) |> 
+            tidyr::replace_na(list(tag_start = "", tag_end = ""))
+
+        html_content <- paste0(purrr::pmap_chr(list(content_df$segment_start,
+                                                    content_df$segment_end,
+                                                    content_df$tag_start,
+                                                    content_df$tag_end),
+                                                    .f = function(txt_start,txt_end, open_tag, close_tag) {
+                                                 paste0(open_tag, 
+                                                       substr(raw_text, txt_start, txt_end),
+                                                       close_tag)
+                                                       }),
+                                                       collapse = "") %>% 
             stringr::str_replace_all("[\\n\\r]",
                                      "<span class='br'>\\&#8203</span></p><p class='docpar'>")
         

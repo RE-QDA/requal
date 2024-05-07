@@ -79,18 +79,84 @@ raw_segments <- tibble::tibble(
 
 # Assuming raw_segments is your tibble
 raw_segments <- tibble::tibble(
-  segment_id = c("1", "2", "3", "4", "5"),
-  code_id = c("A", "B", "A", "C", "E"),
-  segment_start = c(1, 2, 10, 15, 3),
-  segment_end =c(5, 6, 15, 20, 4)
+  segment_id = c(11, 21, 32, 39, 40, 42, 44, 46, 47, 50, 51, 61, 62, 63, 64, 65, 66),
+  code_id = c(84, 73, 88, 76, 74, 76, 74, 74, 76, 73, 76, 75, 77, 73, 74, 74, 73),
+  segment_start = c(4153, 2676, 1553, 3754, 3767, 1219, 1842, 2170, 2179, 475, 471, 485, 682, 696, 723, 37, 877),
+  segment_end = c(4733, 3443, 1850, 3760, 3767, 1223, 1952, 2183, 2191, 476, 471, 689, 713, 726, 742, 373, 1210)
+)
+raw_segments  <- raw_segments |> 
+dplyr::arrange(segment_start)
+positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
+
+starts <- purrr::map(positions, .f = function(pos) {
+   raw_segments |> 
+   dplyr::filter(pos >= segment_start & pos < segment_end) |> 
+   dplyr::pull(code_id) 
+})
+
+ends <- purrr::map(positions, .f = function(pos) {
+   raw_segments |> 
+   dplyr::filter(pos > segment_start & pos <= segment_end) |> 
+   dplyr::pull(code_id)
+})
+
+labels_s_pos <- which(purrr::map_lgl(starts, .f = \(x) length(x) > 0))
+labels_e_pos <- which(purrr::map_lgl(ends, .f = \(x) length(x) > 0))
+labels_matched <- unique(starts[labels_s_pos], ends[labels_e_pos])
+labels <- purrr::map_chr(labels_matched, paste0, collapse = "+")
+  
+labels <- unlist(labels[!purrr::map_lgl(labels, is.null)])
+labels_keep <- labels[labels != c(labels[-1], TRUE )]
+starts_keep <- positions[purrr::map_lgl(starts, .f = function(x) length(x)>0)]
+ends_keep <- positions[purrr::map_lgl(ends, .f = function(x) length(x)>0)]
+
+tibble::tibble(
+  code_id = labels_keep,
+  segment_start = seg_starts,
+  segment_end = seg_ends
 )
 
-is_within_range <- function(position, range) {
-  position >= range[1] & position <= range[2]
-}
-ranges <- purrr::map2(raw_segments$segment_start, raw_segments$segment_end, range)
 
-positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
+
+tags <- starts[-length(starts)]
+tags <- starts[-1]
+
+tags[nzchar(tags)]
+tibble::tibble(
+  code_id = tags[nzchar(tags)],
+  seg_starts,
+  seg_ends
+)
+ends[-1]
+length(starts[[6]])
+
+ranges <- purrr::map2(raw_segments$segment_start, raw_segments$segment_end, range)
+names(ranges) <- purrr::map2(ranges, raw_segments$code_id, stats::setNames)
+starts_at_position <- function(ranges, position) {
+    if (position == range[1] & position < range[2]) {
+      return(names(rang))
+    } else {
+       NULL
+  }
+}
+purrr::map(positions, .f = function(x){
+  browser()
+  purrr::map(ranges, ~starts_at_position(.x, x)
+  })
+ends_at_position <- function(range, position) {
+  position > range[1] & position = range[2]
+  
+}
+runs_at_position <- function(range, position) {
+  position > range[1] & position < range[2]
+}
+
+purrr::map(positions, .f = function(position){
+  browser()
+  raw_segments$code_id[raw_segments$segment_start >= position & raw_segments$segment_end < position]
+  purrr::map(ranges, starts_at_position, position)
+})
+
 duplicated_positions <- purrr::map(positions, .f = function(x){
   times <- sum(purrr::map_lgl(ranges, ~is_within_range(x, .x)))
   rep(x, times)
