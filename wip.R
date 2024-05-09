@@ -1,3 +1,13 @@
+pool <- pool::dbPool(
+      drv = RPostgreSQL::PostgreSQL(),
+      host = "localhost",
+      dbname = "requal",
+      user = "requal_admin",
+      password = "test"
+    )  
+user_id <- 1
+active_project <- 6
+
 xml_file <- xml2::read_xml("/Users/radimhladik/Downloads/refi/Die-Hexen-und-der-Böse-Feind/project.qde")
 xml2df <- function(xml_file, xpath, ns = "urn:QDA-XML:project:1.0") {
 qda_ns <- c(qda = ns)
@@ -312,3 +322,129 @@ print(result)
 
 # Print the result
 print(result)
+
+# push
+push <- function(x, values) (assign(as.character(substitute(x)), c(x, values), parent.frame()))
+
+# pop
+pop <- function(x) (assign(as.character(substitute(x)), x[-length(x)], parent.frame()))
+
+# example
+z <- 1:3
+push(z, 4)
+z
+pop(z)
+pop(z)
+z
+push(z, 5)
+z
+pop(z)
+pop(z)
+pop(z)
+pop(z)
+pop(z)
+push(z, 1:10)
+z
+
+library(shiny)
+library(htmltools)
+library(dplyr)
+doc_selector <- 77
+    coded_segments <- dplyr::tbl(pool, "segments") %>%
+            dplyr::filter(project_id == 12, 
+                          doc_id == 410) %>%
+            dplyr::select(segment_id,
+                          code_id,
+                          segment_start,
+                          segment_end, 
+                          user_id) %>%
+            dplyr::collect() |> 
+        calculate_code_overlap()
+text <- "Text \n Texts \n Texts \n kjdjs"
+text <- load_doc_db(pool, 12, 410)
+ptext <- strsplit(text, "[\n\r]")[[1]]
+end_index <- (purrr::map_int(ptext, nchar)  |> cumsum()) + seq_along(ptext)
+start_index <- c(1, head(end_index, -1) + 1)
+pindex <- tibble::tibble(
+  pid = seq_along(ptext),
+  pid_start = start_index,
+  pid_end = end_index
+  )
+### solve pids for coded segments
+segments_pid <- coded_segments |> 
+dplyr::mutate(
+  pid_i_start = purrr::map_int(segment_start, ~pindex$pid[which(.x >= pindex$pid_start & .x <= pindex$pid_end)]),
+  pid_i_end = purrr::map_int(segment_end, ~pindex$pid[which(.x >= pindex$pid_start & .x <= pindex$pid_end)]),
+  pid = purrr::map2(pid_i_start, pid_i_end, seq, 1)
+  ) |> 
+  tidyr::unnest(pid) |> 
+  dplyr::left_join(pindex, by = "pid") |> 
+  dplyr::select(pid, code_id, segment_start, segment_end, pid_start, pid_end)  |> 
+  dplyr::mutate(
+    segment_start = ifelse(segment_start < pid_start, pid_start, segment_start),
+    segment_end = ifelse(segment_end > pid_end, pid_end, segment_start),
+    )
+
+# find pids that must me updated
+target_pids <- unique(segments_pid$pid)
+
+update_par_content <- function(target_pid, ptext, segments_pid) {
+
+target_content <- ptext[[target_pid]]
+target_segment <- segments_pid |> 
+dplyr::filter(pid == target_pid) 
+
+indices <- sort(unique(
+  c(target_segment$segment_start, 
+  target_segment$segment_end, 
+  target_segment$pid_start[1], 
+  target_segment$pid_end[1]
+  )))
+if (length(indices) <= 1) {
+  indices <- c(  
+    target_segment$pid_start[1], 
+    target_segment$pid_end[1]
+    )
+}
+# indices in paragraph context
+indices <- (indices-target_segment$pid_start[1])+1
+# Indices to a list of ranges
+tag_ranges <- purrr::map(1:(length(indices) - 1), ~c(indices[.x], (indices[.x + 1]-1)))
+# make sure to get paragraph end
+tag_ranges[[length(tag_ranges)]][2] <- max(indices)
+
+updated_par <- purrr::map(tag_ranges, 
+            .f = function(tag_range) {
+              attributes_df <- target_segment |> 
+              dplyr::filter(segment_start == tag_range[1]) 
+              if (nrow(attributes_df)) {
+              span(class = "highlight", `data-highlight` = attributes_df$code_id, substr(target_content, tag_range[1], tag_range[2]))
+              } else {
+                 span(class = "no-highlight", substr(target_content, tag_range[1], tag_range[2]))
+              }
+            }
+)
+return(tagList(updated_par))
+
+}
+
+
+
+for (i in seq_along(target_pids)) {
+[[target_pids[i]]] <- update_par_content(target_pids[i], ptext, segments_pid) 
+}
+
+article <- tags$article((purrr::map2(ptext, seq_along(ptext), 
+~p(id = paste0("pid-", .y), class = "docpar", span(class = "text", .x)) |> 
+tagAppendChildren(span("\\&#8203", class = "br"))
+)))
+
+
+query <- tagQuery(article)$
+  find("p")
+  
+query |> div()
+query$children[[1]]
+tagList(query)
+test <- query
+test

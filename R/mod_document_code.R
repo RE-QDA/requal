@@ -69,7 +69,7 @@ mod_document_code_ui <- function(id) {
         tags$div(
           id = "split-1",
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-          htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80")
+          uiOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80")
         ),
         tags$div(
           id = "split-2",
@@ -159,7 +159,7 @@ mod_document_code_server <- function(id, glob) {
         loc$text_observer <- loc$text_observer + 1
     })
 
-    ## Observe refresh ----
+    ## Observe code refresh ----
     # Update loc$codes_menu when input$doc_refresh or glob$codebook changes
     observeEvent(input$doc_refresh, {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
@@ -213,7 +213,7 @@ mod_document_code_server <- function(id, glob) {
   })
 
     # Render text and codes ----
-    output$focal_text <- renderText({
+    output$focal_text <- renderUI({
       req(isTruthy(loc$text))
       loc$text
     })
