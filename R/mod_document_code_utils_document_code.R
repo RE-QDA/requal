@@ -383,9 +383,9 @@ load_doc_to_display <- function(pool,
             style = paste(highlight_style(highlight), attributes_df$code_color), 
             title = attributes_df$code_name,
             onclick = paste0("Shiny.setInputValue(\'", ns("clicked_title"), "\', this.title, {priority: \'event\'});"),
-            substr(target_content, tag_range[1], tag_range[2]))
+            substr(target_content, tag_range[1], tag_range[2]), .noWS="outside")
           } else {
-            span(class = "text", substr(target_content, tag_range[1], tag_range[2]))
+            span(class = "text", substr(target_content, tag_range[1], tag_range[2]), .noWS="outside")
           }
         }
       )
@@ -400,7 +400,7 @@ load_doc_to_display <- function(pool,
   tags$article(id = "article", purrr::map2(
       ptext, seq_along(ptext),
       ~ p(id = paste0("pid-", .y), class = "docpar", 
-      span(class = "text", .x)
+      span(class = "text", .x, .noWS="outside")
       )
     )
   )
