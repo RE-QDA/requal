@@ -174,7 +174,7 @@ display: flex;
 }
 
 
-.docpar::selection {
+.text::selection {
   background: #ffffcc;
   color: black;
   text-decoration-line: underline;
@@ -182,7 +182,7 @@ display: flex;
   text-decoration-color: red; 
 }
 
-.docpar .segment::selection {
+.text .segment::selection {
   background: rgb(255, 255, 204, 0.75);
   color: black;
   text-decoration-line: underline;

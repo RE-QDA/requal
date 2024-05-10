@@ -279,7 +279,7 @@ load_doc_to_display <- function(pool,
                                 highlight,
                                 ns) {
   position_type <- position_start <- tag_start <- tag_end <- NULL
-
+  
   ptext <- strsplit(load_doc_db(pool, active_project, doc_selector), "[\n\r]")[[1]]
     # replace new lines with invisible character
   ptext <- purrr::map2_chr(ptext, seq_along(ptext), function(x, i) {
@@ -341,7 +341,7 @@ load_doc_to_display <- function(pool,
       dplyr::left_join(pindex, by = "pid") |>
       dplyr::mutate(
         segment_start = ifelse(segment_start < pid_start, pid_start, segment_start),
-        segment_end = ifelse(segment_end > pid_end, pid_end, segment_start),
+        segment_end = ifelse(segment_end > pid_end, pid_end, segment_end),
       )
     
     # find pids that must me updated
@@ -366,18 +366,17 @@ load_doc_to_display <- function(pool,
           target_segment$pid_end[1]
         )
       }
-      # indices in paragraph context
-      indices <- (indices - target_segment$pid_start[1]) + 1
+
       # Indices to a list of ranges
       tag_ranges <- purrr::map(1:(length(indices) - 1), ~ c(indices[.x], (indices[.x + 1] - 1)))
       # make sure to get paragraph end
       tag_ranges[[length(tag_ranges)]][2] <- max(indices)
       
-      updated_par <- purrr::map2(tag_ranges, seq_along(tag_ranges),
-        .f = function(tag_range, range_rank) {
-   
-          if (nrow(target_segment) >= range_rank) {
-            attributes_df <- target_segment[range_rank,]
+      updated_par <- purrr::map(tag_ranges,
+        .f = function(tag_range) {
+            attributes_df <- target_segment |> 
+            dplyr::filter(segment_start == tag_range[1])
+          if (nrow(attributes_df)) {
             span(class = "text segment", 
             `data-code` = attributes_df$code_id, 
             `data-color` = attributes_df$code_color,
