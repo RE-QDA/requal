@@ -439,7 +439,8 @@ article <- tags$article((purrr::map2(ptext, seq_along(ptext),
 tagAppendChildren(span("\\&#8203", class = "br"))
 )))
 
-
+p(id = paste0("pid-"), class = "docpar", 
+      span(class = "text", "fdddsdf"), span(" ", class = "text br"))
 query <- tagQuery(article)$
   find("p")
   
@@ -448,3 +449,4 @@ query$children[[1]]
 tagList(query)
 test <- query
 test
+

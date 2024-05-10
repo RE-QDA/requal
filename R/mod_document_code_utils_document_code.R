@@ -279,8 +279,9 @@ load_doc_to_display <- function(pool,
                                 highlight,
                                 ns) {
   position_type <- position_start <- tag_start <- tag_end <- NULL
-  ptext <- strsplit(load_doc_db(pool, active_project, doc_selector), "[\n\r]")[[1]]
 
+  ptext <- strsplit(load_doc_db(pool, active_project, doc_selector), "[\n\r]")[[1]]
+  ptext <- purrr::map(ptext, paste0, HTML("\u200B"))
   coded_segments <- load_segments_db(
     pool,
     active_project,
@@ -366,9 +367,10 @@ load_doc_to_display <- function(pool,
       
       updated_par <- purrr::map2(tag_ranges, seq_along(tag_ranges),
         .f = function(tag_range, range_rank) {
+          # need to fix here for paragraphs with code and non-code text
           attributes_df <- target_segment[range_rank,]
           if (nrow(attributes_df)) {
-            span(class = "segment", 
+            span(class = "text segment", 
             `data-code` = attributes_df$code_id, 
             `data-color` = attributes_df$code_color,
             style = paste(highlight_style(highlight), attributes_df$code_color), 
@@ -376,7 +378,7 @@ load_doc_to_display <- function(pool,
             onclick = paste0("Shiny.setInputValue(\'", ns("clicked_title"), "\', this.title, {priority: \'event\'});"),
             substr(target_content, tag_range[1], tag_range[2]))
           } else {
-            span(class = "plaintext", substr(target_content, tag_range[1], tag_range[2]))
+            span(class = "text", substr(target_content, tag_range[1], tag_range[2]))
           }
         }
       )
@@ -390,9 +392,11 @@ load_doc_to_display <- function(pool,
   
   tags$article(id = "article", purrr::map2(
       ptext, seq_along(ptext),
-      ~ p(id = paste0("pid-", .y), class = "docpar", span(class = "text", .x)) |>
-        tagAppendChildren(span(HTML("&#8203"), class = "br"))
-    ))
+      ~ p(id = paste0("pid-", .y), class = "docpar", 
+      span(class = "text", .x)
+      )
+    )
+  )
 }
 
 
