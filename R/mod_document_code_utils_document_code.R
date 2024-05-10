@@ -281,7 +281,15 @@ load_doc_to_display <- function(pool,
   position_type <- position_start <- tag_start <- tag_end <- NULL
 
   ptext <- strsplit(load_doc_db(pool, active_project, doc_selector), "[\n\r]")[[1]]
-  ptext <- purrr::map(ptext, paste0, HTML("\u200B"))
+    # replace new lines with invisible character
+  ptext <- purrr::map2_chr(ptext, seq_along(ptext), function(x, i) {
+    if (i != length(ptext)) {
+      return(paste0(x, "\u200B"))
+    } else {
+      return(x)
+    }
+  })
+
   coded_segments <- load_segments_db(
     pool,
     active_project,

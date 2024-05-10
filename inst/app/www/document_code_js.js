@@ -50,10 +50,15 @@ function calculateOffset(root, container, offset) {
 $( document ).ready(function() {
 
   document.addEventListener('mouseup', function () {
-
-  var el = document.getElementById("article");
+    var selection = window.getSelection();
+    var el = document.getElementById("article");
+    console.log(!el.contains(selection.anchorNode))
+    // Check if the selection is within the "article" element
+    if (!el.contains(selection.anchorNode)) {
+      return;
+    }
   var offsets = getSelectionOffsetWithin(el);
-  const tagPositionValue = offsets.start + '-' + offsets.end;
+  const tagPositionValue = (offsets.start+1) + '-' + offsets.end;
   Shiny.setInputValue('document_code_ui_1-tag_position', tagPositionValue);
   console.log(tagPositionValue)
 })
