@@ -375,9 +375,9 @@ load_doc_to_display <- function(pool,
       
       updated_par <- purrr::map2(tag_ranges, seq_along(tag_ranges),
         .f = function(tag_range, range_rank) {
-          # need to fix here for paragraphs with code and non-code text
-          attributes_df <- target_segment[range_rank,]
-          if (nrow(attributes_df)) {
+   
+          if (nrow(target_segment) >= range_rank) {
+            attributes_df <- target_segment[range_rank,]
             span(class = "text segment", 
             `data-code` = attributes_df$code_id, 
             `data-color` = attributes_df$code_color,

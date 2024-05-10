@@ -53,10 +53,10 @@ $( document ).ready(function() {
     var selection = window.getSelection();
     var el = document.getElementById("article");
     console.log(!el.contains(selection.anchorNode))
-    // Check if the selection is within the "article" element
-    if (!el.contains(selection.anchorNode)) {
-      return;
-    }
+   // Check if the selection is within the "article" element
+   if (!el.contains(selection.anchorNode) || !el.contains(selection.focusNode)) {
+    return;
+  }
   var offsets = getSelectionOffsetWithin(el);
   const tagPositionValue = (offsets.start+1) + '-' + offsets.end;
   Shiny.setInputValue('document_code_ui_1-tag_position', tagPositionValue);
