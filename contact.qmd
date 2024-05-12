@@ -1,0 +1,19 @@
+
+---
+title: "Contacts"
+---
+
+## Contact, help & contribution
+
+Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal [here](http://github.com/RE-QDA/requal/files/11720758/Strategie.pdf). 
+
+- Need help? Visit the [Requal wiki](https://github.com/RE-QDA/requal/wiki)
+- Have an issue? Report it via our [GitHub](https://github.com/RE-QDA/requal).- - Have a question? Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia
+
+## Acknowledgement
+
+The application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.
+
+Cite Requal: 
+
+> Hladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version [...].

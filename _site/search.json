@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "requal",
+    "section": "",
+    "text": "Requal is an open-source application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the Shiny framework for the R project free software environment.\nRequal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Requal is a free and open-source qualitative data analysis software that improves the reproducibility of qualitative coding by increasing its transparency and reflexivity. Requal is a shiny application that runs in your browser and provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.\nServer version To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on our server:\nrequal.fsv.cuni.cz/demo/, user: demo, psw: requal123\nDesktop version To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\nDownload the current release of Requal from Releases. Install the remotes package by running install.packages(“remotes”) command in R console. Install the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard-drive. Development version (desktop) The development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(“devtools”) devtools::install_github(“RE-QDA/requal”) Usage (desktop) The Requal app can be launched from the R console with the following command:\nrequal::run_app(options = list(“launch.browser”)) Contact, help & contribution Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here\nNeed help? Visit our wiki.\nHave an issue? Report via GitHub.\nHave a question? Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia\nAcknowledgement The application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.\nCite Requal: Hladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contacts",
+    "section": "",
+    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help? Visit the Requal wiki\nHave an issue? Report it via our GitHub.- - Have a question? Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
+  },
+  {
+    "objectID": "contact.html#contact-help-contribution",
+    "href": "contact.html#contact-help-contribution",
+    "title": "Contacts",
+    "section": "",
+    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help? Visit the Requal wiki\nHave an issue? Report it via our GitHub.- - Have a question? Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
+  },
+  {
+    "objectID": "contact.html#acknowledgement",
+    "href": "contact.html#acknowledgement",
+    "title": "Contacts",
+    "section": "Acknowledgement",
+    "text": "Acknowledgement\nThe application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "get_started.html",
+    "href": "get_started.html",
+    "title": "Get started",
+    "section": "",
+    "text": "### Server version\nTo use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:\nhttps://requal.fsv.cuni.cz/demo\nuser: demo\npswd: requal123\n### Desktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases.\nInstall the remotes package by running install.packages(\"remotes\") command in R console.\nInstall the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard drive.\n\n\n\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"devtools\")\ndevtools::install_github(\"RE-QDA/requal\")"
+  },
+  {
+    "objectID": "get_started.html#installation",
+    "href": "get_started.html#installation",
+    "title": "Get started",
+    "section": "",
+    "text": "### Server version\nTo use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:\nhttps://requal.fsv.cuni.cz/demo\nuser: demo\npswd: requal123\n### Desktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases.\nInstall the remotes package by running install.packages(\"remotes\") command in R console.\nInstall the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard drive.\n\n\n\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"devtools\")\ndevtools::install_github(\"RE-QDA/requal\")"
+  },
+  {
+    "objectID": "get_started.html#usage-desktop",
+    "href": "get_started.html#usage-desktop",
+    "title": "Get started",
+    "section": "Usage (desktop)",
+    "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app(options = list(\"launch.browser\"))"
+  }
+]

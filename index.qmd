@@ -2,6 +2,6 @@
 title: "requal"
 ---
 
-This is a Quarto website.
+Requal is an open-source application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the [Shiny](https://www.rstudio.com/products/shiny/) framework for the [R project](https://www.r-project.org/) free software environment.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.
