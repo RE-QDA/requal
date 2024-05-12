@@ -15,7 +15,7 @@ website:
         text: Wiki
       - href: https://github.com/RE-QDA/requal
         icon: github
-        target: blank
+        target: _blank
 
 format:
   html:
