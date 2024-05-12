@@ -16,3 +16,6 @@ tests/test.requal
 # dev stuff
 test-iframe.R
 wip.R
+# gh-pages
+.quarto
+wiki/
