@@ -86,9 +86,16 @@
   {
     "objectID": "wiki/Requal-for-Linux.html",
     "href": "wiki/Requal-for-Linux.html",
-    "title": "Linux instructions",
+    "title": "requal",
     "section": "",
-    "text": "Linux instructions\nThe installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
+    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
+  },
+  {
+    "objectID": "wiki/Requal-for-Linux.html#linux-instructions",
+    "href": "wiki/Requal-for-Linux.html#linux-instructions",
+    "title": "requal",
+    "section": "",
+    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
   },
   {
     "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html",
