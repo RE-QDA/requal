@@ -13,6 +13,10 @@ requal_users.sqlite
 *_.new.png
 tests/test.requal
 
+#gh-pages
+wiki/
+.quarto
+
 # dev stuff
 test-iframe.R
 wip.R
