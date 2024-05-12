@@ -1,4 +1,5 @@
 ## How to install Requal
+
 To use Requal, you need to have the[ R language](https://www.r-project.org/) installed and running on your machine. You will also need a web browser with JavaScript support (i.e. any of the standard browsers like Firefox, Chrome, or Safari).
 Requal can be installed in two ways - via the R console or RStudio. For inexperienced users, we recommend using RStudio.
 
