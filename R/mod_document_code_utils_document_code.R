@@ -343,12 +343,13 @@ load_doc_to_display <- function(pool,
         segment_start = ifelse(segment_start < pid_start, pid_start, segment_start),
         segment_end = ifelse(segment_end > pid_end, pid_end, segment_end),
       )
-    
+    print("segments_pid")
+    print(segments_pid)    
     # find pids that must me updated
     target_pids <- unique(segments_pid$pid)
-
-    update_par_content <- function(target_pid, ptext, segments_pid) {
-      target_content <- ptext[target_pid]
+    print("target_pids")
+    print(target_pids)
+    update_par_content <- function(target_pid, target_content, segments_pid) {
       target_segment <- segments_pid |>
         dplyr::filter(pid == target_pid)
 
@@ -367,14 +368,23 @@ load_doc_to_display <- function(pool,
         )
       }
 
-      # Indices to a list of ranges
+      # indices in paragraph context
+      indices <- (indices - target_segment$pid_start[1]) + 1
+          print("indices")
+    print(indices) 
+      # Indices to a list of ranges #TODO
       tag_ranges <- purrr::map(1:(length(indices) - 1), ~ c(indices[.x], (indices[.x + 1] - 1)))
       # make sure to get paragraph end
       tag_ranges[[length(tag_ranges)]][2] <- max(indices)
-      
+  print("tag_ranges")
+            print(tag_ranges)
+
       updated_par <- purrr::map(tag_ranges,
         .f = function(tag_range) {
+          
             attributes_df <- target_segment |> 
+            # segment starts in paragraph context
+            dplyr::mutate(segment_start = segment_start - pid_start + 1) |> 
             dplyr::filter(segment_start == tag_range[1])
           if (nrow(attributes_df)) {
             span(class = "text segment", 
@@ -393,7 +403,7 @@ load_doc_to_display <- function(pool,
     }
     
     for (i in seq_along(target_pids)) {
-      ptext[target_pids[i]] <- update_par_content(target_pids[i], ptext, segments_pid)
+      ptext[target_pids[i]] <- update_par_content(target_pids[i], ptext[target_pids[i]], segments_pid)
     }
   } 
   
