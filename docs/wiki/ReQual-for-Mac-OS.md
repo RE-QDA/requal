@@ -1,3 +1,0 @@
-## Mac instructions
-
-The installation on the Mac Os machine is similar to [Windows](https://github.com/RE-QDA/requal/wiki/ReQual-for-Windows). The only difference is that you download R and RStudio for macOS. Note, it is necessary to use RStudio for running Requal if your documents (data) contain non-Latin letters, e.g. ě, š, č, ç.

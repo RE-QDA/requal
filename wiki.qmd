@@ -11,9 +11,9 @@ title: "Wiki"
 ## How to instal desktop version
 
 
-* [For Windows](wiki/ReQual-for-Windows.md)
-* [For Linux](wiki/ReQual-for-Linux.md)
-* [For MacOS](wiki/ReQual-for-Mac-OS.md)
+* [For Windows](wiki/Requal-for-Windows.md)
+* [For Linux](wiki/Requal-for-Linux.md)
+* [For MacOS](wiki/Requal-for-Mac-OS.md)
 
 ## How to install web version
 

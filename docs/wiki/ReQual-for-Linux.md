@@ -1,3 +1,0 @@
-## Linux instructions
-
-The installation on a Linux machine is similar to [Windows](https://github.com/RE-QDA/requal/wiki/ReQual-for-Windows). The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora.
