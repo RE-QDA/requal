@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>requal - Getting started</title>
+<title>requal – instalace-requalu-ve-windows</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -61,7 +61,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -71,10 +71,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./img/rql_logo.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../img/rql_logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">requal</span>
     </a>
   </div>
@@ -85,15 +85,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="../get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contact.html" rel="" target="">
+    <a class="nav-link" href="../contact.html" rel="" target="">
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./wiki.html" rel="" target="">
+    <a class="nav-link" href="../wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
   </li>  
 </ul>
@@ -112,73 +112,107 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
-  <ul class="collapse">
-  <li><a href="#server-version" id="toc-server-version" class="nav-link" data-scroll-target="#server-version">Server version</a></li>
-  <li><a href="#desktop-version" id="toc-desktop-version" class="nav-link" data-scroll-target="#desktop-version">Desktop version</a></li>
-  <li><a href="#development-version-desktop" id="toc-development-version-desktop" class="nav-link" data-scroll-target="#development-version-desktop">Development version (desktop)</a></li>
-  </ul></li>
-  <li><a href="#usage-desktop" id="toc-usage-desktop" class="nav-link" data-scroll-target="#usage-desktop">Usage (desktop)</a></li>
+  <li><a href="#jak-nainstalovat-requal" id="toc-jak-nainstalovat-requal" class="nav-link active" data-scroll-target="#jak-nainstalovat-requal">Jak nainstalovat reQual</a></li>
+  <li><a href="#windows-přes-rstudio" id="toc-windows-přes-rstudio" class="nav-link" data-scroll-target="#windows-přes-rstudio">Windows (přes RStudio)</a></li>
+  <li><a href="#windows-přes-konzoli-r" id="toc-windows-přes-konzoli-r" class="nav-link" data-scroll-target="#windows-přes-konzoli-r">Windows (přes konzoli R)</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Getting started</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="server-version" class="level3">
-<h3 class="anchored" data-anchor-id="server-version">Server version</h3>
-<p>To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:</p>
-<div class="center">
-<p><a href="https://requal.fsv.cuni.cz/demo">https://requal.fsv.cuni.cz/demo</a></p>
-<pre><code>user: demo
-pswd: requal123</code></pre>
-</div>
+<section id="jak-nainstalovat-requal" class="level2">
+<h2 class="anchored" data-anchor-id="jak-nainstalovat-requal">Jak nainstalovat reQual</h2>
+<p>Chcete-li používat reQual, musíte mít na svém počítači nainstalovaný a spuštěný<a href="https://www.r-project.org/">jazyk R</a>. Budete také potřebovat webový prohlížeč s podporou JavaScriptu (tj. některý ze standardních prohlížečů, jako je Firefox, Chrome nebo Safari). Program reQual lze nainstalovat dvěma způsoby - prostřednictvím konzole R nebo RStudia. Nezkušeným uživatelům doporučujeme použít RStudio.</p>
 </section>
-<section id="desktop-version" class="level3">
-<h3 class="anchored" data-anchor-id="desktop-version">Desktop version</h3>
-<p>To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e.&nbsp;any of the standard issue browsers like Firefox, Chrome, or Safari).</p>
-<p>You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):</p>
-<ol type="1">
-<li>Download the current release of Requal from Releases.</li>
-<li>Install the remotes package by running <code>install.packages("remotes")</code> command in R console.</li>
-<li>Install the Requal package by running <code>remotes::install_local(file.choose())</code> and selecting the downloaded release file on your hard drive.</li>
-</ol>
-</section>
-<section id="development-version-desktop" class="level3">
-<h3 class="anchored" data-anchor-id="development-version-desktop">Development version (desktop)</h3>
-<p>The development version contains the latest features, but might be less stable than a released version.</p>
-<p>You can install the development version of Requal from GitHub by running this code in R:</p>
-<pre><code>install.packages("devtools")
-devtools::install_github("RE-QDA/requal")</code></pre>
-</section>
-</section>
-<section id="usage-desktop" class="level2">
-<h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
-<p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
+<section id="windows-přes-rstudio" class="level2">
+<h2 class="anchored" data-anchor-id="windows-přes-rstudio">Windows (přes RStudio)</h2>
+<p><strong>Krok první.</strong> Nainstalujte R. Přejděte na stránku <em>https://cran.r-project.org/bin/windows/base/</em> a klikněte na <code>Stáhnout R pro Windows</code>. Stáhněte soubor a spusťte jej.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Requal start screen</figcaption>
+<p><img src="https://user-images.githubusercontent.com/101122661/198823997-4768df7b-883a-438d-bb43-1208b3a16859.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image7</figcaption>
+</figure>
+</div>
+<p>Během instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb.</p>
+<p><strong>Krok druhý.</strong> Nainstalujte RStudio. Přejděte na stránku <a href="http://www.rstudio.com/">www.rstudio.com</a> a stáhněte si bezplatnou verzi pro stolní počítače.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823998-95077cd7-4b47-40d4-8b22-b7b17dcf88fa.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image8</figcaption>
+</figure>
+</div>
+<p>Po stažení nainstalujte Rstudio a spusťte jej.</p>
+<p><strong>Třetí krok.</strong> Nainstalujte program reQual. Přejděte na stránku <em>https://github.com/RE-QDA/requal/releases</em> Klikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky a stáhněte si komprimovaný balíček, např. requal_0.9.1.tar.gz.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823966-ffe35417-2b91-44e8-8781-0142367a620c.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image1</figcaption>
+</figure>
+</div>
+<p>V konzoli RStudia nainstalujte balíček remotes příkazem <code>install.packages("remotes")</code>. Dále nainstalujte balíček requal spuštěním příkazu <code>remotes::install_local(file.choose())</code> a vyberte stažený soubor.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823995-e1e14baa-3192-4b4e-9857-7cea21cf5f53.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image6</figcaption>
+</figure>
+</div>
+<p>Pokud budete vyzváni k aktualizaci balíčků, proveďte aktualizaci “All” (zadejte 1).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823986-24d6ac69-645e-4bd6-90f7-01d5981fd2bd.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image3</figcaption>
+</figure>
+</div>
+<p>Instalace může trvat několik minut, protože je nutné stáhnout a nainstalovat řadu balíčků. Po dokončení instalace se zobrazí poslední řádek: <em>* DONE (requal)</em></p>
+<p><strong>Krok čtvrtý.</strong> Spusťte reQual z konzole RStudia následujícím příkazem: <code>requal::run_app(options = list("launch.browser"))</code></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823989-45049fcd-1475-4581-85f8-ff1f707db457.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image4</figcaption>
+</figure>
+</div>
+</section>
+<section id="windows-přes-konzoli-r" class="level2">
+<h2 class="anchored" data-anchor-id="windows-přes-konzoli-r">Windows (přes konzoli R)</h2>
+<p><strong>Krok první</strong>. Nainstalujte R. Přejděte na stránku https://cran.r-project.org/bin/windows/base/ a klikněte na <em>Download R for Windows</em>. Stáhněte soubor a spusťte jej.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823997-4768df7b-883a-438d-bb43-1208b3a16859.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image7</figcaption>
+</figure>
+</div>
+<p>Během instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb. Po dokončení spusťte R z nabídky Windows. Zobrazí se konzole R.</p>
+<p><img src="https://user-images.githubusercontent.com/101122661/198823999-a357ee0b-81a8-4a59-9126-1933e9acfd84.png" class="img-fluid" alt="image9"> <strong>Krok druhý.</strong> Nainstalujte reQual. Přejděte na stránku <em>https://github.com/RE-QDA/requal/releases</em></p>
+<p>Klikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky, stáhněte komprimovaný balíček, např. requal_0.5.4.tar.gz.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823966-ffe35417-2b91-44e8-8781-0142367a620c.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image1</figcaption>
+</figure>
+</div>
+<p>V konzoli R nainstalujte balíček remotes zadáním příkazu <code>install.packages("remotes")</code> a stisknutím klávesy Enter.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824000-f182cb9b-dcbb-4bce-8317-cd29ad6ade56.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image10</figcaption>
+</figure>
+</div>
+<p>Pokud se zobrazí dialogové okno, klikněte na Ano nebo přizpůsobte instalaci. Nainstalujte balíček requal příkazem <code>remotes::install_local(file.choose())</code> a vyberte stažený soubor.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823973-7f42c59f-afe8-49f3-8135-325d52061c54.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image2</figcaption>
+</figure>
+</div>
+<p>Instalace může trvat několik minut, protože je nutné stáhnout a nainstalovat několik balíčků. Po dokončení instalace se zobrazí poslední řádek: <em>* DONE (requal)</em></p>
+<p><strong>Třetí krok.</strong> Spusťte reQual z konzole R následujícím příkazem: <code>requal::run_app(options = list("launch.browser"))</code></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198823993-79978f5b-7269-4a50-a3d3-846c9df2f3d8.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image5</figcaption>
 </figure>
 </div>
 

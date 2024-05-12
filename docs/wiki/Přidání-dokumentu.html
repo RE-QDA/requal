@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>requal - Getting started</title>
+<title>requal – přidání-dokumentu</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -61,7 +61,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -71,10 +71,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./img/rql_logo.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../img/rql_logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">requal</span>
     </a>
   </div>
@@ -85,15 +85,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="../get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contact.html" rel="" target="">
+    <a class="nav-link" href="../contact.html" rel="" target="">
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./wiki.html" rel="" target="">
+    <a class="nav-link" href="../wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
   </li>  
 </ul>
@@ -112,75 +112,63 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
-  <ul class="collapse">
-  <li><a href="#server-version" id="toc-server-version" class="nav-link" data-scroll-target="#server-version">Server version</a></li>
-  <li><a href="#desktop-version" id="toc-desktop-version" class="nav-link" data-scroll-target="#desktop-version">Desktop version</a></li>
-  <li><a href="#development-version-desktop" id="toc-development-version-desktop" class="nav-link" data-scroll-target="#development-version-desktop">Development version (desktop)</a></li>
-  </ul></li>
-  <li><a href="#usage-desktop" id="toc-usage-desktop" class="nav-link" data-scroll-target="#usage-desktop">Usage (desktop)</a></li>
+  <li><a href="#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit" id="toc-vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit" class="nav-link active" data-scroll-target="#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit">Vytvoření nového dokumentu metodou kopírovat a vložit</a></li>
+  <li><a href="#vytvoření-nového-dokumentu---nahráním-textového-souboru" id="toc-vytvoření-nového-dokumentu---nahráním-textového-souboru" class="nav-link" data-scroll-target="#vytvoření-nového-dokumentu---nahráním-textového-souboru">Vytvoření nového dokumentu - nahráním textového souboru</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Getting started</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="server-version" class="level3">
-<h3 class="anchored" data-anchor-id="server-version">Server version</h3>
-<p>To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:</p>
-<div class="center">
-<p><a href="https://requal.fsv.cuni.cz/demo">https://requal.fsv.cuni.cz/demo</a></p>
-<pre><code>user: demo
-pswd: requal123</code></pre>
-</div>
-</section>
-<section id="desktop-version" class="level3">
-<h3 class="anchored" data-anchor-id="desktop-version">Desktop version</h3>
-<p>To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e.&nbsp;any of the standard issue browsers like Firefox, Chrome, or Safari).</p>
-<p>You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):</p>
-<ol type="1">
-<li>Download the current release of Requal from Releases.</li>
-<li>Install the remotes package by running <code>install.packages("remotes")</code> command in R console.</li>
-<li>Install the Requal package by running <code>remotes::install_local(file.choose())</code> and selecting the downloaded release file on your hard drive.</li>
-</ol>
-</section>
-<section id="development-version-desktop" class="level3">
-<h3 class="anchored" data-anchor-id="development-version-desktop">Development version (desktop)</h3>
-<p>The development version contains the latest features, but might be less stable than a released version.</p>
-<p>You can install the development version of Requal from GitHub by running this code in R:</p>
-<pre><code>install.packages("devtools")
-devtools::install_github("RE-QDA/requal")</code></pre>
-</section>
-</section>
-<section id="usage-desktop" class="level2">
-<h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
-<p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
+<p>Pokud chcete analyzovat data v nástroji reQual, musíte nejprve přidat dokumenty. Existují dva způsoby, jak přidat dokument do projektu: * dokument můžete vytvořit metodou kopírovat a vložit nebo * můžete nahrát textový soubor.</p>
+<section id="vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit" class="level2">
+<h2 class="anchored" data-anchor-id="vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit">Vytvoření nového dokumentu metodou kopírovat a vložit</h2>
+<p>Doporučujeme používat metodu kopírovat a vložit, protože obchází problém <a href="https://en.wikipedia.org/wiki/Character_encoding">kódování znaků</a>. <strong>Upozorňujeme, že reQual umí pracovat pouze s prostými textovými dokumenty (.txt soubory).</strong> Při přidávání dokumentu zmizí veškeré formátování, jako je kurzíva, podtržený text, odlišné písmo, odsazení nebo barvy.</p>
+<p>Při vytváření nového dokumentu pomocí kopírovat a vložit klikněte na kruhovou ikonu plus <code>+</code> v pravé části obrazovky. <img src="https://user-images.githubusercontent.com/54745940/195608089-c1367962-2d47-40f9-9379-95467ceb13cf.png" class="img-fluid" alt="image3-znacky"></p>
+<p>Pokud chcete, zadejte název dokumentu a jeho stručný popis. Otevřete dokument, který chcete přidat, zkopírujte jeho obsah a poté jej vložte do pole <code>Obsah dokumentu</code> ve spodní části dialogového okna. Chcete-li zkontrolovat, zda byl celý text správně zkopírován, zvětšete pole a posuňte se na konec. Pokud je vše v pořádku, stiskněte tlačítko <code>Vytvořit dokument</code>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Requal start screen</figcaption>
+<p><img src="https://user-images.githubusercontent.com/54745940/195608778-1ce7939a-0e9e-4b12-9622-f57698c168b8.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image5-znacky</figcaption>
 </figure>
 </div>
+<p>Na obrazovce projektu se objeví informace o dokumentu.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/54745940/195609173-152596ab-db44-4e41-a109-954923f0b2f6.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image8</figcaption>
+</figure>
+</div>
+</section>
+<section id="vytvoření-nového-dokumentu---nahráním-textového-souboru" class="level2">
+<h2 class="anchored" data-anchor-id="vytvoření-nového-dokumentu---nahráním-textového-souboru">Vytvoření nového dokumentu - nahráním textového souboru</h2>
+<p>Dalším způsobem přidání dokumentu je nahrání textového souboru. Nezapomeňte, že soubor musí být ve formátu prostého textu (.txt). Pokud je váš původní dokument ve formátu .docx, .odt, .pdf nebo .html, musíte jej před nahráním uložit jako prostý textový soubor, například mydocument.txt.</p>
+<p>Při nahrávání textového souboru klepněte na kruhovou ikonu nahrávání na pravé straně obrazovky.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/54745940/195609917-cea25b1e-9376-4d0b-ba64-f5429d34338f.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image1-znacky</figcaption>
+</figure>
+</div>
+<p>Zadejte název a stručný popis dokumentu. Pokud název dokumentu nezadáte, bude místo něj použit původní název souboru. Vyberte požadovaný dokument ze složky, ve které je uložen. Pokud znáte kódování souboru, vyberte jej ze seznamu. Pokud jeho kódování neznáte, ponechte ho tak, jak je. Chcete-li soubor nahrát, stiskněte tlačítko <code>Přidat dokument</code>.</p>
+<p>Na obrazovce projektu se zobrazí informace o dokumentu.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/54745940/195610428-14e08214-2a5d-433b-bc07-85add536cc37.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image2</figcaption>
+</figure>
+</div>
+<p>Pokud chcete zkontrolovat, zda byly nově přidané dokumenty vytvořeny správně, přejděte na obrazovku <code>Pracovní plocha</code> a vyberte je ze seznamu.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/54745940/195610648-05afd744-5212-4b7c-8b54-853a920df254.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image6</figcaption>
+</figure>
+</div>
+<p>Dokument se zobrazí.</p>
+<p><img src="https://user-images.githubusercontent.com/54745940/195610711-09c45d6b-beef-4cdf-9d6a-34d56b36af8c.png" class="img-fluid" alt="image4"> Pokud se některé znaky v dokumentu nezobrazují správně, máte špatné kódování. Chcete-li odstranit problémy s kódováním, podívejte se do našeho průvodce řešením problémů na wiki GitHub (připravuje se).</p>
 
 
 </section>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>requal - Getting started</title>
+<title>requal – práce-s-kódy</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -61,7 +61,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -71,10 +71,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./img/rql_logo.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../img/rql_logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">requal</span>
     </a>
   </div>
@@ -85,15 +85,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="../get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contact.html" rel="" target="">
+    <a class="nav-link" href="../contact.html" rel="" target="">
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./wiki.html" rel="" target="">
+    <a class="nav-link" href="../wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
   </li>  
 </ul>
@@ -112,73 +112,72 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
-  <ul class="collapse">
-  <li><a href="#server-version" id="toc-server-version" class="nav-link" data-scroll-target="#server-version">Server version</a></li>
-  <li><a href="#desktop-version" id="toc-desktop-version" class="nav-link" data-scroll-target="#desktop-version">Desktop version</a></li>
-  <li><a href="#development-version-desktop" id="toc-development-version-desktop" class="nav-link" data-scroll-target="#development-version-desktop">Development version (desktop)</a></li>
-  </ul></li>
-  <li><a href="#usage-desktop" id="toc-usage-desktop" class="nav-link" data-scroll-target="#usage-desktop">Usage (desktop)</a></li>
+  <li><a href="#vytvoření-nového-kódu" id="toc-vytvoření-nového-kódu" class="nav-link active" data-scroll-target="#vytvoření-nového-kódu">Vytvoření nového kódu</a></li>
+  <li><a href="#slučování-kódů" id="toc-slučování-kódů" class="nav-link" data-scroll-target="#slučování-kódů">Slučování kódů</a></li>
+  <li><a href="#odstranění-kódu" id="toc-odstranění-kódu" class="nav-link" data-scroll-target="#odstranění-kódu">Odstranění kódu</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Getting started</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="server-version" class="level3">
-<h3 class="anchored" data-anchor-id="server-version">Server version</h3>
-<p>To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:</p>
-<div class="center">
-<p><a href="https://requal.fsv.cuni.cz/demo">https://requal.fsv.cuni.cz/demo</a></p>
-<pre><code>user: demo
-pswd: requal123</code></pre>
-</div>
-</section>
-<section id="desktop-version" class="level3">
-<h3 class="anchored" data-anchor-id="desktop-version">Desktop version</h3>
-<p>To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e.&nbsp;any of the standard issue browsers like Firefox, Chrome, or Safari).</p>
-<p>You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):</p>
-<ol type="1">
-<li>Download the current release of Requal from Releases.</li>
-<li>Install the remotes package by running <code>install.packages("remotes")</code> command in R console.</li>
-<li>Install the Requal package by running <code>remotes::install_local(file.choose())</code> and selecting the downloaded release file on your hard drive.</li>
-</ol>
-</section>
-<section id="development-version-desktop" class="level3">
-<h3 class="anchored" data-anchor-id="development-version-desktop">Development version (desktop)</h3>
-<p>The development version contains the latest features, but might be less stable than a released version.</p>
-<p>You can install the development version of Requal from GitHub by running this code in R:</p>
-<pre><code>install.packages("devtools")
-devtools::install_github("RE-QDA/requal")</code></pre>
-</section>
-</section>
-<section id="usage-desktop" class="level2">
-<h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
-<p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
+<section id="vytvoření-nového-kódu" class="level2">
+<h2 class="anchored" data-anchor-id="vytvoření-nového-kódu">Vytvoření nového kódu</h2>
+<p>Nové kódy můžete vytvářet a již existující kódy spravovat na obrazovce <code>Codebook</code>, na kterou se dostanete kliknutím na <code>Codebook</code> v nabídce na levé straně obrazovky. Jsou zde dvě záložky: <code>Kódy</code> a <code>Kategorie</code>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Requal start screen</figcaption>
+<p><img src="https://user-images.githubusercontent.com/101122661/198824090-03eca8b5-10b6-4b40-8ef1-b7be739a670c.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image3</figcaption>
+</figure>
+</div>
+<p>Na kartě <code>Kódy</code> můžete spravovat kódy. Na pravé straně obrazovky jsou tři tlačítka. Chcete-li vytvořit nový kód, použijte horní tlačítko se znaménkem plus <code>+</code>. Zobrazí se dialogové okno, ve kterém musíte vyplnit název nového kódu a vybrat jeho barvu. Můžete přidat popis kódu.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824089-8c3171b5-0469-4545-bac9-3a4a53154814.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image2</figcaption>
+</figure>
+</div>
+<p>Po vytvoření kódu jej uvidíte na hlavní obrazovce ve svém <code>Codebook</code>. Klepnutím na ikonu <code>+</code> na panelu kódů se zobrazí popis kódu.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824091-d05cdb0b-eb45-47ac-9024-39e3ce7fe4a4.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image6</figcaption>
+</figure>
+</div>
+</section>
+<section id="slučování-kódů" class="level2">
+<h2 class="anchored" data-anchor-id="slučování-kódů">Slučování kódů</h2>
+<p>Slučování kódů lze použít, pokud se dva kódy překrývají, například <code>matka</code> a <code>otec</code>, a chcete je sloučit do nového kódu <code>rodič</code>. Nejprve vytvořte nový kód s názvem rodič. Potom klikněte na kruhovou ikonu se dvěma šipkami v pravé části obrazovky.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824094-8fad3729-a502-406b-871a-b20a057e20bc.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image9</figcaption>
+</figure>
+</div>
+<p>V dialogovém okně Sloučit kódy vyberte kód, ze kterého chcete sloučit, a kód, do kterého chcete sloučit. Operaci provedete stisknutím tlačítka <code>Sloučit</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824092-e6cbcd9b-0d3a-443c-be25-59867449967a.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image7</figcaption>
+</figure>
+</div>
+<p>Stejné kroky zopakujte pro sloučení druhého kódu. Vznikne tak jediný kód, který obsahuje všechny segmenty dříve kódované matkou a otcem. Po sloučení nelze původní kódy zobrazit ani se k nim jednotlivě vrátit. Chcete-li zachovat původní kódy vedle nového společného kódu, vytvořte místo sloučení kódů kategorii.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824093-b7518a73-5d4f-4a52-92ef-6e384add487c.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image8</figcaption>
+</figure>
+</div>
+</section>
+<section id="odstranění-kódu" class="level2">
+<h2 class="anchored" data-anchor-id="odstranění-kódu">Odstranění kódu</h2>
+<p>Kódy můžete odstranit pomocí tlačítka mínus <code>-</code> na pravé straně karty <code>Kódy</code>. Z rozbalovací nabídky vyberte požadovaný kód a klikněte na tlačítko <code>odstranit</code>. Kód bude smazán z vašeho <code>Codebook</code>. <strong>Při mazání kódu buďte opatrní - jakmile je kód smazán, není možné jej obnovit.</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://user-images.githubusercontent.com/101122661/198824088-fd509e1f-7de2-4b31-92bf-9899d23d7837.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image1</figcaption>
 </figure>
 </div>
 

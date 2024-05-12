@@ -11,8 +11,7 @@ website:
         text: Getting started
       - href: contact.qmd
         text: Contact
-      - href: https://github.com/RE-QDA/requal/wiki
-        target: blank
+      - href: wiki.qmd
         text: Wiki
 
 format:

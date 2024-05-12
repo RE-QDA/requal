@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>requal - Getting started</title>
+<title>requal – reproducibility-enhancing-modules</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +23,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -61,7 +61,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -71,10 +71,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./img/rql_logo.png" alt="" class="navbar-logo">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../img/rql_logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">requal</span>
     </a>
   </div>
@@ -85,15 +85,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="../get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./contact.html" rel="" target="">
+    <a class="nav-link" href="../contact.html" rel="" target="">
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./wiki.html" rel="" target="">
+    <a class="nav-link" href="../wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
   </li>  
 </ul>
@@ -112,75 +112,98 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
+  <li><a href="#summary" id="toc-summary" class="nav-link active" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#agreement" id="toc-agreement" class="nav-link" data-scroll-target="#agreement">Agreement</a>
   <ul class="collapse">
-  <li><a href="#server-version" id="toc-server-version" class="nav-link" data-scroll-target="#server-version">Server version</a></li>
-  <li><a href="#desktop-version" id="toc-desktop-version" class="nav-link" data-scroll-target="#desktop-version">Desktop version</a></li>
-  <li><a href="#development-version-desktop" id="toc-development-version-desktop" class="nav-link" data-scroll-target="#development-version-desktop">Development version (desktop)</a></li>
+  <li><a href="#total-overlap-character" id="toc-total-overlap-character" class="nav-link" data-scroll-target="#total-overlap-character">Total overlap [character]</a></li>
+  <li><a href="#overlap-by-code-character" id="toc-overlap-by-code-character" class="nav-link" data-scroll-target="#overlap-by-code-character">Overlap by code [character]</a></li>
+  <li><a href="#overlap-by-coder-character" id="toc-overlap-by-coder-character" class="nav-link" data-scroll-target="#overlap-by-coder-character">Overlap by coder [character]</a></li>
+  <li><a href="#overlap-by-coder-and-code-character" id="toc-overlap-by-coder-and-code-character" class="nav-link" data-scroll-target="#overlap-by-coder-and-code-character">Overlap by coder and code [character]</a></li>
+  <li><a href="#overlap-by-user-attribute-and-code-character" id="toc-overlap-by-user-attribute-and-code-character" class="nav-link" data-scroll-target="#overlap-by-user-attribute-and-code-character">Overlap by user attribute and code [character]</a></li>
+  <li><a href="#segment-matching" id="toc-segment-matching" class="nav-link" data-scroll-target="#segment-matching">Segment matching</a></li>
   </ul></li>
-  <li><a href="#usage-desktop" id="toc-usage-desktop" class="nav-link" data-scroll-target="#usage-desktop">Usage (desktop)</a></li>
+  <li><a href="#text-overlap" id="toc-text-overlap" class="nav-link" data-scroll-target="#text-overlap">Text overlap</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Getting started</h1>
-</div>
 
 
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-</header>
-
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="server-version" class="level3">
-<h3 class="anchored" data-anchor-id="server-version">Server version</h3>
-<p>To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:</p>
-<div class="center">
-<p><a href="https://requal.fsv.cuni.cz/demo">https://requal.fsv.cuni.cz/demo</a></p>
-<pre><code>user: demo
-pswd: requal123</code></pre>
-</div>
-</section>
-<section id="desktop-version" class="level3">
-<h3 class="anchored" data-anchor-id="desktop-version">Desktop version</h3>
-<p>To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e.&nbsp;any of the standard issue browsers like Firefox, Chrome, or Safari).</p>
-<p>You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):</p>
-<ol type="1">
-<li>Download the current release of Requal from Releases.</li>
-<li>Install the remotes package by running <code>install.packages("remotes")</code> command in R console.</li>
-<li>Install the Requal package by running <code>remotes::install_local(file.choose())</code> and selecting the downloaded release file on your hard drive.</li>
-</ol>
-</section>
-<section id="development-version-desktop" class="level3">
-<h3 class="anchored" data-anchor-id="development-version-desktop">Development version (desktop)</h3>
-<p>The development version contains the latest features, but might be less stable than a released version.</p>
-<p>You can install the development version of Requal from GitHub by running this code in R:</p>
-<pre><code>install.packages("devtools")
-devtools::install_github("RE-QDA/requal")</code></pre>
-</section>
-</section>
-<section id="usage-desktop" class="level2">
-<h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
-<p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
+<p>On the <code>Report</code> page you will find several modules to increase researcher reflexivity and coding transparency. These modules only work in the web version of reQual, as it allows coding by multiple coders and comparison between them.</p>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>The first tab <code>Summary</code> provides an overview of the number of segments tagged by each code in each document. If we want to know how often and where a particular coder used the codes, we only select her in the <code>Select users</code> menu. Similarly, we can limit the selection to only certain codes or documents if there are many of them and the overall table is too large.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Requal start screen</figcaption>
+<p><img src="https://github.com/RE-QDA/requal/assets/54745940/aa384d03-72ed-440c-8d8d-c33e869d23aa.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image</figcaption>
 </figure>
 </div>
+</section>
+<section id="agreement" class="level2">
+<h2 class="anchored" data-anchor-id="agreement">Agreement</h2>
+<p>The <code>Agreement</code> tab offers the possibility to make the agreement between codes, coders and their attributes visible. When we expand the <code>Select metrics</code> menu, we see two sets of controls to choose from. The first one shows the agreement calculated based on the number of overlapping letters (characters), the second one shows the agreement based on the overlap of the marked segments regardless of the number of characters (segment). The calculation is done using <a href="https://en.wikipedia.org/wiki/Jaccard_index">Jaccard’s similarity coefficient</a>, which is calculated as the ratio of the number of identically coded characters to the number of all coded characters without the overlaps.</p>
+<p>We can illustrate the difference between agreement in characters and agreement in segments by an example:</p>
+<ul>
+<li>Coder A marks: But it’s just me, the problem with me is that I don’t drink beer, I don’t like it (55 characters).<br>
+</li>
+<li>Coder B marks: But just me, the problem with me is that I don’t drink beer, I don’t like it. I’m not an alcoholic. (71 characters)</li>
+</ul>
+<p>The character agreement will be 0.77 according to the calculation 55/(55+71-55) = 0.77<br>
+The agreement in segments will be 1.00 according to the calculation 1/(1+1-1) = 1.00</p>
+<ul>
+<li>Coder A indicates: But just me, the problem with me is that I don’t drink beer, I don’t like it. (55 characters)<br>
+</li>
+<li>Coder B indicates: But it’s just me, the problem with me is that I don’t drink beer, (…) I’m not an alcoholic. (43 + 16 = 59 characters)</li>
+</ul>
+<p>The agreement in characters will be 0.77 according to the calculation 43/(55+59-43) = 0.61<br>
+The match in segments will be 1.00 based on the calculation 1/(1+2-1) = 0.50</p>
+<p>From these examples we can see that each criterion is sensitive to different coding qualities. While the number of common characters is more of a mechanical measure of agreement, the agreement in segments is more reflective of the meaning component of coding the data.</p>
+<section id="total-overlap-character" class="level3">
+<h3 class="anchored" data-anchor-id="total-overlap-character">Total overlap [character]</h3>
+<p>Calculates the total coding overlap in characters across all documents for the selected coders. This table provides an overview of the total overlap of coders in the project.</p>
+</section>
+<section id="overlap-by-code-character" class="level3">
+<h3 class="anchored" data-anchor-id="overlap-by-code-character">Overlap by code [character]</h3>
+<p>Calculates the coding agreement in characters across all documents for each code and for the selected coders. This table provides an overview of whether the overlap varies by code. It allows the identification of problematic codes.</p>
+</section>
+<section id="overlap-by-coder-character" class="level3">
+<h3 class="anchored" data-anchor-id="overlap-by-coder-character">Overlap by coder [character]</h3>
+<p>Displays a heatmap that compares pairs of coders based on their character agreement across all documents and all codes. The lighter the color, the higher the agreement. This table allows identification of pairs of coders that are ” aligned” overall, and those that are least aligned.</p>
+</section>
+<section id="overlap-by-coder-and-code-character" class="level3">
+<h3 class="anchored" data-anchor-id="overlap-by-coder-and-code-character">Overlap by coder and code [character]</h3>
+<p>Displays a heatmap for each code separately, comparing pairs of coders based on their agreement in characters across all documents. The lighter the color, the higher the agreement. This table allows you to see if the coder pair matching is similar across all codes, or if and how the matching differs for different codes.</p>
+</section>
+<section id="overlap-by-user-attribute-and-code-character" class="level3">
+<h3 class="anchored" data-anchor-id="overlap-by-user-attribute-and-code-character">Overlap by user attribute and code [character]</h3>
+<p>Displays a heatmap for the selected user (encoder) attribute that compares each group of coders based on their agreement in characters for each code in all documents. The lighter the color, the higher the agreement. This table may reveal codes that are sensitive to any of the coders’ attributes. For example, in the diagram we see that for code 2, there are more matches between males and females than between males, which shows that the gender of the coders does not play a role in this code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://github.com/RE-QDA/requal/assets/54745940/902e2fd9-b033-4d44-b6ba-18ab475bbcb0.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image</figcaption>
+</figure>
+</div>
+</section>
+<section id="segment-matching" class="level3">
+<h3 class="anchored" data-anchor-id="segment-matching">Segment matching</h3>
+<p>The same set of indicators exists for agreement in segments. Their interpretation is the same, with the only difference that matching is not counted in identically coded characters, but in overlapping segments.</p>
+</section>
+</section>
+<section id="text-overlap" class="level2">
+<h2 class="anchored" data-anchor-id="text-overlap">Text overlap</h2>
+<p>If we want to examine the coding agreement in more detail, we use the <code>Text overlap</code> tab. In the menu, we select which document we want to display, which code, and possibly certain coders, if we want information about, for example, a two-coder agreement.</p>
+<p>Clicking the <code>Browse</code> button will show us the coders overlaps for the given code and document. The lighter the color, the higher the agreement between the coders.</p>
+<p>When we hover the mouse over a highlighted segment, the names of the coders who coded it are displayed. This provides a good basis for a team discussion about coding. For example, about how long segments to code or how distinct instances of a phenomenon to code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://github.com/RE-QDA/requal/assets/54745940/45c1f4bb-d4d9-4984-940c-d5effd7b90a9.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">image</figcaption>
+</figure>
+</div>
+<p>Tip! This module can also be used to allow users with permissions to view the report to see how individual coders coded, e.g.&nbsp;in a class project.</p>
 
 
 </section>

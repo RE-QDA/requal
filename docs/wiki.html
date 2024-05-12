@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>requal - Getting started</title>
+<title>requal - Wiki</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -85,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
@@ -93,7 +93,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./wiki.html" rel="" target="">
+    <a class="nav-link active" href="./wiki.html" rel="" target="" aria-current="page">
  <span class="menu-text">Wiki</span></a>
   </li>  
 </ul>
@@ -112,13 +112,16 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installation" id="toc-installation" class="nav-link active" data-scroll-target="#installation">Installation</a>
+  <li><a href="#requal-wiki-en" id="toc-requal-wiki-en" class="nav-link active" data-scroll-target="#requal-wiki-en"><strong>reQual WIKI (EN)</strong></a>
   <ul class="collapse">
-  <li><a href="#server-version" id="toc-server-version" class="nav-link" data-scroll-target="#server-version">Server version</a></li>
-  <li><a href="#desktop-version" id="toc-desktop-version" class="nav-link" data-scroll-target="#desktop-version">Desktop version</a></li>
-  <li><a href="#development-version-desktop" id="toc-development-version-desktop" class="nav-link" data-scroll-target="#development-version-desktop">Development version (desktop)</a></li>
+  <li><a href="#how-to-instal-desktop-version" id="toc-how-to-instal-desktop-version" class="nav-link" data-scroll-target="#how-to-instal-desktop-version">How to instal desktop version</a></li>
+  <li><a href="#how-to-install-web-version" id="toc-how-to-install-web-version" class="nav-link" data-scroll-target="#how-to-install-web-version">How to install web version</a></li>
+  <li><a href="#working-with-your-project" id="toc-working-with-your-project" class="nav-link" data-scroll-target="#working-with-your-project">Working with your project</a></li>
+  <li><a href="#working-with-your-documents" id="toc-working-with-your-documents" class="nav-link" data-scroll-target="#working-with-your-documents">Working with your documents</a></li>
+  <li><a href="#working-with-your-codebook" id="toc-working-with-your-codebook" class="nav-link" data-scroll-target="#working-with-your-codebook">Working with your codebook</a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
+  <li><a href="#reports" id="toc-reports" class="nav-link" data-scroll-target="#reports">Reports</a></li>
   </ul></li>
-  <li><a href="#usage-desktop" id="toc-usage-desktop" class="nav-link" data-scroll-target="#usage-desktop">Usage (desktop)</a></li>
   </ul>
 </nav>
     </div>
@@ -127,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Getting started</h1>
+<h1 class="title">Wiki</h1>
 </div>
 
 
@@ -142,47 +145,67 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<section id="server-version" class="level3">
-<h3 class="anchored" data-anchor-id="server-version">Server version</h3>
-<p>To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:</p>
-<div class="center">
-<p><a href="https://requal.fsv.cuni.cz/demo">https://requal.fsv.cuni.cz/demo</a></p>
-<pre><code>user: demo
-pswd: requal123</code></pre>
-</div>
+<section id="requal-wiki-en" class="level1">
+<h1><strong>reQual WIKI (EN)</strong></h1>
+<ul>
+<li><a href="./wiki/Home.html">About Requal</a></li>
+<li><a href="https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl.md">Youtube tutorials</a></li>
+</ul>
+<section id="how-to-instal-desktop-version" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-instal-desktop-version">How to instal desktop version</h2>
+<ul>
+<li><a href="wiki/ReQual-for-Windows.md">For Windows</a></li>
+<li><a href="wiki/ReQual-for-Linux.md">For Linux</a></li>
+<li><a href="wiki/ReQual-for-Mac-OS.md">For MacOS</a></li>
+</ul>
 </section>
-<section id="desktop-version" class="level3">
-<h3 class="anchored" data-anchor-id="desktop-version">Desktop version</h3>
-<p>To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e.&nbsp;any of the standard issue browsers like Firefox, Chrome, or Safari).</p>
-<p>You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):</p>
-<ol type="1">
-<li>Download the current release of Requal from Releases.</li>
-<li>Install the remotes package by running <code>install.packages("remotes")</code> command in R console.</li>
-<li>Install the Requal package by running <code>remotes::install_local(file.choose())</code> and selecting the downloaded release file on your hard drive.</li>
-</ol>
+<section id="how-to-install-web-version" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-install-web-version">How to install web version</h2>
+<ul>
+<li><a href="./wiki/Server-setup.html">Server setup</a></li>
+<li><a href="./wiki/User-management-in-admin-mode-(server).html">User management in admin mode</a></li>
+</ul>
 </section>
-<section id="development-version-desktop" class="level3">
-<h3 class="anchored" data-anchor-id="development-version-desktop">Development version (desktop)</h3>
-<p>The development version contains the latest features, but might be less stable than a released version.</p>
-<p>You can install the development version of Requal from GitHub by running this code in R:</p>
-<pre><code>install.packages("devtools")
-devtools::install_github("RE-QDA/requal")</code></pre>
+<section id="working-with-your-project" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-your-project">Working with your project</h2>
+<ul>
+<li><a href="./wiki/Working-with-your-project.html">Create your project</a></li>
+<li><a href="./wiki/How-to-open-your-project.html">Open your project</a></li>
+<li><a href="./wiki/User-management-in-a-project.html">User management in a project</a></li>
+<li><a href="./wiki/User-attributes.html">User attributes</a></li>
+</ul>
 </section>
+<section id="working-with-your-documents" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-your-documents">Working with your documents</h2>
+<ul>
+<li><a href="./wiki/How-to-add-documents.html">Adding documents</a></li>
+<li><a href="./wiki/How-to-remove-documents.html">Removing documents</a></li>
+</ul>
 </section>
-<section id="usage-desktop" class="level2">
-<h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
-<p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Requal start screen</figcaption>
-</figure>
-</div>
+<section id="working-with-your-codebook" class="level2">
+<h2 class="anchored" data-anchor-id="working-with-your-codebook">Working with your codebook</h2>
+<ul>
+<li><a href="./wiki/Working-with-Codes.html">Codes</a></li>
+<li><a href="./wiki/Coding-data.html">Coding data</a></li>
+<li><a href="./wiki/Working-with-categories.html">Categories</a></li>
+<li><a href="./wiki/Working-with-Memos.html">Memos</a></li>
+</ul>
+</section>
+<section id="analysis" class="level2">
+<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
+<ul>
+<li><a href="./wiki/Analysis.html">Viewing and exporting coded segments</a></li>
+</ul>
+</section>
+<section id="reports" class="level2">
+<h2 class="anchored" data-anchor-id="reports">Reports</h2>
+<ul>
+<li><a href="./wiki/Reproducibility-enhancing-modules.html">Reproducibility enhancing modules</a></li>
+<li><a href="./wiki/Log-Tab.html">Log</a></li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

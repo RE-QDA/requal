@@ -1,0 +1,50 @@
+---
+title: "Wiki"
+---
+
+# **reQual WIKI (EN)** 
+
+* [About Requal](wiki/Home.md)
+* [Youtube tutorials](https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl.md)
+
+
+## How to instal desktop version
+
+
+* [For Windows](wiki/ReQual-for-Windows.md)
+* [For Linux](wiki/ReQual-for-Linux.md)
+* [For MacOS](wiki/ReQual-for-Mac-OS.md)
+
+## How to install web version
+
+* [Server setup](wiki/Server-setup.md)
+* [User management in admin mode](wiki/User-management-in-admin-mode-(server).md)
+
+## Working with your project
+
+* [Create your project](wiki/Working-with-your-project.md)
+* [Open your project](wiki/How-to-open-your-project.md)
+* [User management in a project](wiki/User-management-in-a-project.md)
+* [User attributes](wiki/User-attributes.md)
+
+## Working with your documents
+
+* [Adding documents](wiki/How-to-add-documents.md)
+* [Removing documents](wiki/How-to-remove-documents.md)
+
+## Working with your codebook
+
+
+* [Codes](wiki/Working-with-Codes.md)
+* [Coding data](wiki/Coding-data.md) 
+* [Categories](wiki/Working-with-categories.md)
+* [Memos](wiki/Working-with-Memos.md)
+
+## Analysis
+
+* [Viewing and exporting coded segments](wiki/Analysis.md)
+
+## Reports
+
+* [Reproducibility enhancing modules](wiki/Reproducibility-enhancing-modules.md)
+* [Log](wiki/Log-Tab.md)
