@@ -4,13 +4,15 @@ project:
 website:
   title: "requal"
   navbar:
+    logo: img/rql_logo.png
     left:
-      - href: index.qmd
-        text: About
       - href: get_started.qmd
         text: Getting started
       - href: contact.qmd
         text: Contact
+      - href: https://github.com/RE-QDA/requal/wiki
+        target: blank
+        text: Wiki
 
 format:
   html:

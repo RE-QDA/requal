@@ -1,12 +1,14 @@
 ---
-title: "Get started"
+title: "Getting started"
 ---
 
 ## Installation
 
-### Server version
+### Server version
 
 To use the server version, you need to install Requal on a server or ask your organization's IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:
+
+:::{.center}
 
 [https://requal.fsv.cuni.cz/demo](https://requal.fsv.cuni.cz/demo)
 
@@ -15,8 +17,9 @@ To use the server version, you need to install Requal on a server or ask your or
 user: demo
 pswd: requal123
 ```
+:::
 
-### Desktop version
+### Desktop version
 
 To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
 
@@ -44,3 +47,5 @@ After installation, the Requal app can be launched from the R console with the f
 ```
 requal::run_app(options = list("launch.browser"))
 ```
+
+![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)

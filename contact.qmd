@@ -1,14 +1,17 @@
-
 ---
-title: "Contacts"
+title: "Contact"
 ---
 
-## Contact, help & contribution
+## Help & contribution
 
 Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal [here](http://github.com/RE-QDA/requal/files/11720758/Strategie.pdf). 
 
-- Need help? Visit the [Requal wiki](https://github.com/RE-QDA/requal/wiki)
-- Have an issue? Report it via our [GitHub](https://github.com/RE-QDA/requal).- - Have a question? Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia
+- Need help?
+  - Visit the [Requal wiki](https://github.com/RE-QDA/requal/wiki)
+- Have an issue?
+  - Report it via our [GitHub](https://github.com/RE-QDA/requal).
+- Have a question?
+  - Email to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia
 
 ## Acknowledgement
 
