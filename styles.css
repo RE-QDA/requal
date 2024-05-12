@@ -2,3 +2,16 @@
 .center {
     text-align: center;
 }
+
+.blockquote {
+    color:rgb(79, 133, 204);
+    background-color:rgb(233, 242, 248);
+}
+
+.figure-caption {
+    display: none;
+}
+
+pre {
+    background-color:rgb(233, 242, 248);
+}

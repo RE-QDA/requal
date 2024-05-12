@@ -2,7 +2,7 @@
 title: "Wiki"
 ---
 
-# **reQual WIKI (EN)** 
+# **Requal WIKI ** 
 
 * [About Requal](wiki/Home.md)
 * [Youtube tutorials](https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl.md)
@@ -33,7 +33,6 @@ title: "Wiki"
 * [Removing documents](wiki/How-to-remove-documents.md)
 
 ## Working with your codebook
-
 
 * [Codes](wiki/Working-with-Codes.md)
 * [Coding data](wiki/Coding-data.md) 

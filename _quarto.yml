@@ -13,10 +13,13 @@ website:
         text: Contact
       - href: wiki.qmd
         text: Wiki
+      - href: https://github.com/RE-QDA/requal
+        icon: github
+        target: blank
 
 format:
   html:
-    theme: cosmo
+    theme: morph
     css: styles.css
     toc: true
 
