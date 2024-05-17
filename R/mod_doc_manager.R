@@ -1,6 +1,6 @@
 #' doc_manager UI Function
 #'
-#' @description This module accept document inputs and writes them to ReQual database.
+#' @description This module accept document inputs and writes them to Requal database.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'

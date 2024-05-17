@@ -392,7 +392,7 @@ update_db_schema <- function(pool) {
       
       purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
     }
-    message("Updated reQual schema.")
+    message("Updated requal schema.")
   } else {
     NULL
   }
@@ -423,7 +423,7 @@ update_db_schema <- function(pool) {
       
       purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
     }
-    message("Updated reQual schema.")
+    message("Updated requal schema.")
   } else {
     NULL
   }

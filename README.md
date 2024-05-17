@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# reQual
+# requal
 
 <!-- badges: start -->
 
@@ -88,7 +88,7 @@ assistance, the IT department at your institution should be able to help
 set up an `requal` server instance by following these
 [instructions](https://github.com/RE-QDA/requal/wiki/Server-setup). To
 get a sense of how `requal` operates in server mode, take a look at the
-public demo available on the [reQual project
+public demo available on the [requal project
 website](https://requal.fsv.cuni.cz/).
 
 > NOTE: It is crucial to prioritize **data security** when hosting your

@@ -12,14 +12,14 @@ app_ui <- function(request, mode = NULL, access = NULL) {
     golem_add_external_resources(),
     # Your application UI logic
     dashboardPage(
-      title = "reQual",
+      title = "requal",
       options = list(sidebarExpandOnHover = FALSE),
       header = dashboardHeader(
         title = tags$span(
           tags$img(
             src = "www/requal_logo.png",
             height = "70%", style = "margin-right: 20px"
-          ), "reQual"
+          ), "requal"
         ),
         controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
         dropdownBlock2(
@@ -62,7 +62,7 @@ golem_add_external_resources <- function() {
     favicon(),
     bundle_resources(
       path = app_sys("app/www"),
-      app_title = "reQual"
+      app_title = "requal"
     ),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
