@@ -1,3 +1,5 @@
+utils::globalVariables(c("project_description"))
+
 #' project UI Function
 #'
 #' @description A shiny Module.

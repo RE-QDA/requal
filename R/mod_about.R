@@ -10,7 +10,7 @@
 mod_about_ui <- function(id) {
   ns <- NS(id)
   # Citation info ----
-  rql_citation <- citation("requal")
+  rql_citation <- utils::citation("requal")
   # Extract authors
   authors <- sapply(as.character(rql_citation$author), function(x) strsplit(x, " ")) # Split the author names into first and last names
   # Format the authors as "Last name, Initial."
@@ -68,7 +68,7 @@ mod_about_ui <- function(id) {
     p("To cite package", tags$code("requal"), "in publications use:"),
     HTML(apa_citation), p(),
     p("A BibTeX entry for LaTeX users:"),
-    tags$pre(paste(toBibtex(citation("requal")), collapse = "\n"))
+    tags$pre(paste(utils::toBibtex(utils::citation("requal")), collapse = "\n"))
   )
 }
 

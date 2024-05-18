@@ -198,11 +198,11 @@ mod_codebook_server <- function(id, glob) {
     
    output$export_codebook <- downloadHandler(
      filename = function() {
-       "requal_codebook_export.csv"
+       "requal_codebook.csv"
      },
      content = function(file) {
        codebook <- get_codebook_export_table(glob)
-       write.csv(codebook, file)
+       utils::write.csv(codebook, file)
      }
    )
 
