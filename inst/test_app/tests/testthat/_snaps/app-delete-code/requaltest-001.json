@@ -1,13 +1,13 @@
 {
   "output": {
     "codebook_ui_1-codes_ui": {
-      "html": "<div data-code_id=\"1\" class=\"code_item\" style=\"max-width: 500px\">\n  <div class=\"box box-solid collapsed-box bg-light-blue\" id=\"1\">\n    <div class=\"box-header with-border\">\n      <h3 class=\"box-title\">Code1<\/h3>\n      <div class=\"box-tools pull-right\">\n        <span class=\"label label-warning custom_label\" style=\"background-color:rgb(255, 255, 0) !important;\">code<\/span>\n        <button class=\"btn btn-box-tool btn-md\" type=\"button\" data-widget=\"collapse\">\n          <i class=\"fa fa-plus\" role=\"presentation\" aria-label=\"plus icon\"><\/i>\n        <\/button>\n      <\/div>\n    <\/div>\n    <div class=\"box-body\">\n      Code description\n      \n    <\/div>\n  <\/div>\n  <script type=\"application/json\" data-for=\"1\">{\"title\":\"Code1\",\"solidHeader\":true,\"background\":\"light-blue\",\"collapsible\":true,\"closable\":false,\"gradient\":false}<\/script>\n<\/div>",
+      "html": "<div data-code_id=\"1\" class=\"code_item\" style=\"max-width: 500px\">\n  <div class=\"box box-solid collapsed-box bg-light-blue\" id=\"1\">\n    <div class=\"box-header with-border\">\n      <h3 class=\"box-title\">Code1<\/h3>\n      <div class=\"box-tools pull-right\">\n        <span class=\"label label-warning custom_label\" style=\"background-color:rgb(255, 255, 0) !important;\">code<\/span>\n        <button class=\"btn btn-box-tool btn-md\" type=\"button\" data-widget=\"collapse\">\n          <i class=\"fas fa-plus\" role=\"presentation\" aria-label=\"plus icon\"><\/i>\n        <\/button>\n      <\/div>\n    <\/div>\n    <div class=\"box-body\">\n      Code description\n      \n    <\/div>\n  <\/div>\n  <script type=\"application/json\" data-for=\"1\">{\"title\":\"Code1\",\"solidHeader\":true,\"background\":\"light-blue\",\"collapsible\":true,\"closable\":false,\"gradient\":false}<\/script>\n<\/div>",
       "deps": [
         {
           "name": "font-awesome",
-          "version": "5.15.3",
+          "version": "6.4.2",
           "src": {
-            "href": "font-awesome-5.15.3"
+            "href": "font-awesome-6.4.2"
           },
           "meta": null,
           "script": null,
