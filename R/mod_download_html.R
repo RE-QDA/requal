@@ -43,7 +43,7 @@ mod_download_html_server <- function(id, glob){
                                         winslash = "/", mustWork = FALSE)
             fileConn<-file(tempReport)
             writeLines(c("---",
-                         "title: 'reQual report'",
+                         "title: 'requal report'",
                          "output: html_document",
                          "---",
                          "```{r, echo=FALSE}",

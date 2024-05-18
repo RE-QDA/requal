@@ -8,7 +8,7 @@ test_that("{shinytest2} test", {
     
     app$wait_for_idle()
     
-    app$click(selector = ".fa-sticky-note")
+    app$click(selector = ".fa-note-sticky")
     
     app$wait_for_idle()
     
@@ -16,7 +16,7 @@ test_that("{shinytest2} test", {
     app$set_inputs(`memo_ui_1-memo_text` = "Memo")
     app$click("memo_ui_1-save_close")
     
-    app$click(selector = ".fa-sticky-note")
+    app$click(selector = ".fa-note-sticky")
     
     app$wait_for_idle()
     

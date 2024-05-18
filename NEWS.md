@@ -1,3 +1,18 @@
+# requal 1.1.2 Thuringothyris
+
+__Release notes:__  
+
+- Export functions
+  - Export enabled for memos and codebooks. Segments export now includes character positions.
+- Citation information
+  - Updated citation information for proper referencing.
+- User Interface
+  - Minor UI updates plus a new logo.
+- Improved testing
+  - Certain behaviors are now formally tested with the integration of `shinytest2`.
+- Permission controls in server mode
+  - Project owners will no longer be able to inadvertently revoke their own permission privileges.
+
 # requal 1.1.1
 
 - export memos

@@ -10,7 +10,7 @@
 mod_about_ui <- function(id) {
   ns <- NS(id)
   # Citation info ----
-  rql_citation <- citation("requal")
+  rql_citation <- utils::citation("requal")
   # Extract authors
   authors <- sapply(as.character(rql_citation$author), function(x) strsplit(x, " ")) # Split the author names into first and last names
   # Format the authors as "Last name, Initial."
@@ -30,14 +30,14 @@ mod_about_ui <- function(id) {
         href = "https://requal.fsv.cuni.cz/",
         tags$img(src = "www/requal_logo.png", width = "5%"), target = "_blank"
       ),
-      "reQual CAQDAS"
+      "requal CAQDAS"
     ),
     textOutput(ns("version_project")),
     textOutput(ns("version_package")),
     p(),
     p(
       "For help, consult ",
-      a("reQual Wiki", href = "https://github.com/RE-QDA/requal/wiki", target = "_blank"),
+      a("requal Wiki", href = "https://github.com/RE-QDA/requal/wiki", target = "_blank"),
       ".",
       br(),
       "Leave feedback on our ",
@@ -68,7 +68,7 @@ mod_about_ui <- function(id) {
     p("To cite package", tags$code("requal"), "in publications use:"),
     HTML(apa_citation), p(),
     p("A BibTeX entry for LaTeX users:"),
-    tags$pre(paste(toBibtex(citation("requal")), collapse = "\n"))
+    tags$pre(paste(utils::toBibtex(utils::citation("requal")), collapse = "\n"))
   )
 }
 
