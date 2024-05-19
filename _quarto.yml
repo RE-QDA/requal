@@ -9,10 +9,10 @@ website:
   navbar:
     logo: img/rql_logo.png
     left:
-      - href: news.qmd
-        text: News
       - href: get_started.qmd
         text: Getting started
+      - href: posts.qmd
+        text: Posts
       - href: contact.qmd
         text: Contact
       - href: wiki.qmd

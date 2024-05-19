@@ -1,0 +1,11 @@
+---
+title: "Requal posts"
+include-in-header:
+      - text: |
+          <style>h1 {display: none}</style>
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+---

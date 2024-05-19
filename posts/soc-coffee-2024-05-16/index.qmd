@@ -1,0 +1,11 @@
+---
+title: "Requal at Sociological Coffee"
+description: "Martin Hájek presented Requal at Charles University."
+author: "requal"
+date: "2024-05-16"
+categories:
+  - events
+  - presentation
+---
+
+Martin Hájek presented Requal at [Sociological Coffee](https://fhs.cuni.cz/FHS-1001.html?event=27829&lang=cz) held by the [Department of Sociology](https://fhs.cuni.cz/FHS-2497.html) of the Faculty of Humanities, Charles University.

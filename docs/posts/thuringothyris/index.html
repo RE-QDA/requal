@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="requal">
+<meta name="dcterms.date" content="2024-05-18">
+<meta name="description" content="Announcement of a new Requal release.">
 
-<title>requal – nastavení-serveru</title>
+<title>requal - Thuringothyris (v1.1.2)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,23 +26,23 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../img/favicon.ico" rel="icon">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../img/favicon.ico" rel="icon">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -62,7 +65,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -72,10 +75,10 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../img/rql_logo.png" alt="" class="navbar-logo">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../img/rql_logo.png" alt="" class="navbar-logo">
     </a>
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">requal</span>
     </a>
   </div>
@@ -86,19 +89,19 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../get_started.html" rel="" target="">
+    <a class="nav-link" href="../../get_started.html" rel="" target="">
  <span class="menu-text">Getting started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../posts.html" rel="" target="">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
  <span class="menu-text">Posts</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../contact.html" rel="" target="">
+    <a class="nav-link" href="../../contact.html" rel="" target="">
  <span class="menu-text">Contact</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../wiki.html" rel="" target="">
+    <a class="nav-link" href="../../wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
   </li>  
   <li class="nav-item compact">
@@ -123,71 +126,55 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#požadavky" id="toc-požadavky" class="nav-link active" data-scroll-target="#požadavky">Požadavky</a></li>
-  <li><a href="#nastavení-aplikace-shiny" id="toc-nastavení-aplikace-shiny" class="nav-link" data-scroll-target="#nastavení-aplikace-shiny">Nastavení aplikace Shiny</a></li>
-  <li><a href="#zabezpečení" id="toc-zabezpečení" class="nav-link" data-scroll-target="#zabezpečení">Zabezpečení</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Thuringothyris (v1.1.2)</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">release</div>
+    <div class="quarto-category">announcements</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Announcement of a new Requal release.
+  </div>
+</div>
 
 
-<section id="požadavky" class="level2">
-<h2 class="anchored" data-anchor-id="požadavky">Požadavky</h2>
-<p>Chcete-li spustit reQual jako Shiny aplikaci na serveru, je třeba nejprve připravit prostředí. Konkrétní kroky nastavení se mohou lišit v závislosti na operačním systému. Podle příslušných pokynů níže nainstalujte na serveru požadované systémové závislosti:</p>
-<ul>
-<li><a href="https://cran.r-project.org/">R</a></li>
-<li><a href="https://support.posit.co/hc/en-us/articles/234653607-Getting-Started-with-Posit-Workbench-RStudio-Server">RStudio Server</a></li>
-<li><a href="https://posit.co/download/shiny-server/">Shiny Server</a></li>
-<li><a href="https://www.postgresql.org/docs/current/tutorial-install.html">PostgreSQL</a></li>
-<li>volitelné: <a href="https://pandoc.org/installing.html">Pandoc</a> (instalace Pandocu umožní export ve formátu <code>html</code>).</li>
-</ul>
-</section>
-<section id="nastavení-aplikace-shiny" class="level2">
-<h2 class="anchored" data-anchor-id="nastavení-aplikace-shiny">Nastavení aplikace Shiny</h2>
-<ul>
-<li>Vytvořte databázi PostgreSQL, která bude sloužit jako úložiště dat pro <code>requal</code>. V této fázi stačí databázi pouze vytvořit. Aplikace <code>requal</code> bude definovat schéma databáze při svém prvním spuštění.</li>
-<li>Vytvořte adresář v rámci cesty k serveru Shiny (např. <code>/srv/shiny-server/requal</code>). Ten bude domovským adresářem vaší aplikace. Tento adresář otevřete jako projekt <code>R</code> nebo do něj přejděte pomocí příkazu <code>setwd("/srv/shiny-server/requal")</code> v <code>R</code>.</li>
-<li>Pro správu instalace <code>requal</code> doporučujeme použít balíček <code>renv</code>. Tento přístup umožňuje izolovat každou instanci aplikace <code>requal</code> a provozovat více verzí na stejném serveru.</li>
-<li>Pro instalaci balíčku <code>requal</code> použijte následující skript:</li>
-</ul>
-<pre><code># install.packages("renv")
-renv::install("RE-QDA/requal")
-renv::snapshot(prompt = FALSE)
-renv::isolate()</code></pre>
-<ul>
-<li>Chcete-li aktualizovat <code>requal</code>, spusťte výše uvedený skript.</li>
-<li>V adresáři vaší aplikace vytvořte soubor <code>R</code> s názvem <code>app.R</code>.</li>
-<li>Soubor <code>app.R</code> naplňte následujícími údaji:</li>
-</ul>
-<pre><code>requal::run_app(
-  mode = "server",
-  dbname = "YOUR_DATABASE_NAME",
-  dbusername = "YOUR_DATABASE_OWNER",
-  dbpassword = "YOUR_DATABASE_PASSWORD",
-  credentials_path = "USER_DATABASE_NAME.sqlite",
-  credentials_pass = "USER_DATABASE_PASSWORD".
-)</code></pre>
-<ul>
-<li>Po instalaci <code>requal</code> a konfiguraci aplikace restartujte službu Shiny Server pomocí terminálového příkazu:</li>
-</ul>
-<pre><code>sudo systemctl restart shiny-server</code></pre>
-<p>Vaše instance aplikace <code>requal</code> by nyní měla být přístupná prostřednictvím serveru Shiny Server.</p>
-</section>
-<section id="zabezpečení" class="level2">
-<h2 class="anchored" data-anchor-id="zabezpečení">Zabezpečení</h2>
-<p>Jako správce instalace můžete určit úroveň správy přístupu k aplikaci (např. omezení přístupu na VPN chráněnou firewallem).</p>
-<p>Chcete-li dodat hesla z vašeho úložiště tajných informací, použijte balíček <code>keyring</code>. Další informace naleznete v <a href="https://r-lib.github.io/keyring/index.html">keyring documentation</a>.</p>
-<p>Zpracování uživatelských přihlašovacích jmen a hesel pomocí balíčku <code>requal</code> je vysvětleno v <a href="https://datastorm-open.github.io/shinymanager/">dokumentaci k balíčku <code>shinymanager</code></a>. Podrobnější informace naleznete v ní.</p>
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>requal </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">May 18, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<p>The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.</p>
+<p>For more details, you can read the full <a href="https://github.com/RE-QDA/requal/releases/tag/v1.1.2">Thuringothyris release notes</a>.</p>
+<p>To update your Requal installation, download the <a href="https://github.com/RE-QDA/requal/releases/download/v1.1.2/requal_1.1.2.tar.gz">requal_1.1.2.tar.gz</a> file from the <a href="https://github.com/RE-QDA/requal/releases">Releases page</a>. Then, run the <code>remotes::install_local(file.choose())</code> command in the <a href="https://www.r-project.org/">R</a> console.</p>
+<p><em>Source: <a href="https://github.com/RE-QDA/requal/discussions/145">https://github.com/RE-QDA/requal/discussions/145</a></em></p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

@@ -21,6 +21,671 @@
     "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen"
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "Requal logo\n\n\nRequal is an open-source CAQDAS application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the Shiny framework for the R project free software environment."
+  },
+  {
+    "objectID": "wiki/How-to-add-documents.html",
+    "href": "wiki/How-to-add-documents.html",
+    "title": "requal",
+    "section": "",
+    "text": "If you want to analyse data in reQual you must first add documents. There are two ways to add a document to your project: * You can create a document by copy and paste method * Upload a text file."
+  },
+  {
+    "objectID": "wiki/How-to-add-documents.html#creating-a-new-document---copypaste-method",
+    "href": "wiki/How-to-add-documents.html#creating-a-new-document---copypaste-method",
+    "title": "requal",
+    "section": "Creating a new document - copy&paste method",
+    "text": "Creating a new document - copy&paste method\nWe recommend the copy & paste method as it bypasses the character encoding problem. Note that reQual can work only with plain text documents (.txt files). All formatting such as italics, underlined text, distinct fonts, indentation or colours will disappear when adding a document.\nWhen creating a new document by copy & paste, click on the circular plus icon + on the right side of the screen. \nType your document name and its brief description if you’d like. Open the document you want to add, copy the contents and then paste it into the box Document content at the bottom of the dialog window. To check that all the text has been copied correctly, enlarge the box and scroll to the end. If everything is okay, press the Create Document button.\n\n\n\nimage5-znacky\n\n\nInformation about the document will appear on the project screen.\n\n\n\nimage8"
+  },
+  {
+    "objectID": "wiki/How-to-add-documents.html#creating-a-new-document---by-uploading-a-text-file",
+    "href": "wiki/How-to-add-documents.html#creating-a-new-document---by-uploading-a-text-file",
+    "title": "requal",
+    "section": "Creating a new document - by uploading a text file",
+    "text": "Creating a new document - by uploading a text file\nAnother way to add a document is to upload a text file. Remember that the file must be in the plain text format (.txt). If your original document is in .docx, .odt, .pdf or .html format, you must save it as a plain text file, such as mydocument.txt, before uploading it.\nWhen uploading a text file, tap the circular upload icon on the right side of the screen.\n\n\n\nimage1-znacky\n\n\nEnter the name and a brief description of the document. If you do not enter a document name, the original file name will be used instead. Select the document you want from the folder where it is saved. If you know the encoding of the file, select it from the list. If you do not know its encoding, leave it as it is. To upload the file, press the Add Document button.\nInformation about the document will appear on the project screen.\n\n\n\nimage2\n\n\nIf you want to check that your newly added documents have been created correctly, go to the Workdesk screen and select them from the list.\n\n\n\nimage6\n\n\nThe document will show.\n If some of the characters in your document do not appear correctly, you have the wrong encoding. To fix encoding issues, see our troubleshooting guide on the GitHub wiki (in preparation)."
+  },
+  {
+    "objectID": "wiki/Práce-s-kódy.html",
+    "href": "wiki/Práce-s-kódy.html",
+    "title": "requal",
+    "section": "",
+    "text": "Nové kódy můžete vytvářet a již existující kódy spravovat na obrazovce Codebook, na kterou se dostanete kliknutím na Codebook v nabídce na levé straně obrazovky. Jsou zde dvě záložky: Kódy a Kategorie.\n\n\n\nimage3\n\n\nNa kartě Kódy můžete spravovat kódy. Na pravé straně obrazovky jsou tři tlačítka. Chcete-li vytvořit nový kód, použijte horní tlačítko se znaménkem plus +. Zobrazí se dialogové okno, ve kterém musíte vyplnit název nového kódu a vybrat jeho barvu. Můžete přidat popis kódu.\n\n\n\nimage2\n\n\nPo vytvoření kódu jej uvidíte na hlavní obrazovce ve svém Codebook. Klepnutím na ikonu + na panelu kódů se zobrazí popis kódu.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/Práce-s-kódy.html#vytvoření-nového-kódu",
+    "href": "wiki/Práce-s-kódy.html#vytvoření-nového-kódu",
+    "title": "requal",
+    "section": "",
+    "text": "Nové kódy můžete vytvářet a již existující kódy spravovat na obrazovce Codebook, na kterou se dostanete kliknutím na Codebook v nabídce na levé straně obrazovky. Jsou zde dvě záložky: Kódy a Kategorie.\n\n\n\nimage3\n\n\nNa kartě Kódy můžete spravovat kódy. Na pravé straně obrazovky jsou tři tlačítka. Chcete-li vytvořit nový kód, použijte horní tlačítko se znaménkem plus +. Zobrazí se dialogové okno, ve kterém musíte vyplnit název nového kódu a vybrat jeho barvu. Můžete přidat popis kódu.\n\n\n\nimage2\n\n\nPo vytvoření kódu jej uvidíte na hlavní obrazovce ve svém Codebook. Klepnutím na ikonu + na panelu kódů se zobrazí popis kódu.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/Práce-s-kódy.html#slučování-kódů",
+    "href": "wiki/Práce-s-kódy.html#slučování-kódů",
+    "title": "requal",
+    "section": "Slučování kódů",
+    "text": "Slučování kódů\nSlučování kódů lze použít, pokud se dva kódy překrývají, například matka a otec, a chcete je sloučit do nového kódu rodič. Nejprve vytvořte nový kód s názvem rodič. Potom klikněte na kruhovou ikonu se dvěma šipkami v pravé části obrazovky.\n\n\n\nimage9\n\n\nV dialogovém okně Sloučit kódy vyberte kód, ze kterého chcete sloučit, a kód, do kterého chcete sloučit. Operaci provedete stisknutím tlačítka Sloučit.\n\n\n\nimage7\n\n\nStejné kroky zopakujte pro sloučení druhého kódu. Vznikne tak jediný kód, který obsahuje všechny segmenty dříve kódované matkou a otcem. Po sloučení nelze původní kódy zobrazit ani se k nim jednotlivě vrátit. Chcete-li zachovat původní kódy vedle nového společného kódu, vytvořte místo sloučení kódů kategorii.\n\n\n\nimage8"
+  },
+  {
+    "objectID": "wiki/Práce-s-kódy.html#odstranění-kódu",
+    "href": "wiki/Práce-s-kódy.html#odstranění-kódu",
+    "title": "requal",
+    "section": "Odstranění kódu",
+    "text": "Odstranění kódu\nKódy můžete odstranit pomocí tlačítka mínus - na pravé straně karty Kódy. Z rozbalovací nabídky vyberte požadovaný kód a klikněte na tlačítko odstranit. Kód bude smazán z vašeho Codebook. Při mazání kódu buďte opatrní - jakmile je kód smazán, není možné jej obnovit.\n\n\n\nimage1"
+  },
+  {
+    "objectID": "wiki/Export.html",
+    "href": "wiki/Export.html",
+    "title": "requal",
+    "section": "",
+    "text": "Kódované segmenty na obrazovce Analýza. * Ve střední části obrazovky vidíte kódované segmenty. * V pravé části najdete tři filtry. Textové segmenty můžete filtrovat podle kódu, kategorie kódů nebo podle dokumentu.\n\n\n\nimage13"
+  },
+  {
+    "objectID": "wiki/Export.html#po-dokončení-kódování",
+    "href": "wiki/Export.html#po-dokončení-kódování",
+    "title": "requal",
+    "section": "",
+    "text": "Kódované segmenty na obrazovce Analýza. * Ve střední části obrazovky vidíte kódované segmenty. * V pravé části najdete tři filtry. Textové segmenty můžete filtrovat podle kódu, kategorie kódů nebo podle dokumentu.\n\n\n\nimage13"
+  },
+  {
+    "objectID": "wiki/Export.html#práce-s-filtry",
+    "href": "wiki/Export.html#práce-s-filtry",
+    "title": "requal",
+    "section": "Práce s filtry",
+    "text": "Práce s filtry\nVe výchozím nastavení jsou vybrány všechny kódy, kategorie a dokumenty, proto jsou zobrazeny všechny kódované segmenty. Klepnutím na položku filtru můžete vybrat jednu položku ze seznamu filtrů. V případě, že chcete vybrat více položek, podržte klávesu Ctrl (control) a klikněte na každou položku nebo klikněte a přetáhněte myší nad položkami, které chcete vybrat. reQual nabízí tři filtry:\n\nFiltr podle kódu\nFiltr podle kategorie\nFiltr podle dokumentu\n\nPokud chcete vypnout filtry pro kódy nebo kategorie, vyberte prázdnou položku v horní části seznamu. Nezapomeňte zachovat výběr alespoň jednoho dokumentu a jednoho kódu nebo kategorie, aby se zobrazily alespoň nějaké segmenty.\n\n\n\nfilters"
+  },
+  {
+    "objectID": "wiki/Export.html#export-analýzy",
+    "href": "wiki/Export.html#export-analýzy",
+    "title": "requal",
+    "section": "Export analýzy",
+    "text": "Export analýzy\nVybrané segmenty můžete stáhnout kliknutím na tlačítko CSV nebo HTML ve spodní části stránky. Segmenty budou staženy v souboru spolu s informacemi o dokumentu a kódu.\n\n\n\nScreenshot 2022-12-30 at 11-33-12 ReQual\n\n\nPokud stáhnete soubor HTML, bude mít název report.html a můžete jej otevřít v libovolném webovém prohlížeči. Toto je jeho příklad:\n\n\n\nScreenshot 2022-12-30 at 11-17-28 reQual report\n\n\nPokud stáhnete soubor CSV, bude v názvu souboru uvedeno datum a čas exportu, například requal_export-2022-11-26-160754.csv. Pokud chcete soubory CSV prozkoumat nebo upravit, můžete pracovat s několika programy, například MSExcel, Google Sheets, LibreOffice nebo Numbers."
+  },
+  {
+    "objectID": "wiki/Export.html#analytická-tabulka---popis",
+    "href": "wiki/Export.html#analytická-tabulka---popis",
+    "title": "requal",
+    "section": "Analytická tabulka - popis",
+    "text": "Analytická tabulka - popis\nJak vidíte, exportovaná tabulka se skládá z pěti sloupců: * doc_name - v tomto sloupci můžete vyhledat název analyzovaného dokumentu. * doc_id - identifikace dokumentu v databázi * code_name - v tomto sloupci jsou uvedeny názvy kódů, které jste použili při analýze * code_id - identifikace kódu v databázi * segment_text - nejdůležitější sloupec pro vaši analýzu, protože v něm vidíte segmenty, které jste vybrali pro vybrané kódy nebo kategorie.\n\n\n\nSnímek obrazovky z 2022-12-30 11-39-48"
+  },
+  {
+    "objectID": "wiki/User-attributes.html",
+    "href": "wiki/User-attributes.html",
+    "title": "requal",
+    "section": "",
+    "text": "On the Report screen, User attributes tab, we can define specific user attributes to monitor if they have any effect on the coding.\nIn a project, we can specify any attributes and their values according to the project needs. For example, we may specify gender in a project where we expect gender to be relevant to coding, other times we may be interested in the coders’ experience with migration or drugs if the data is from that area. The attribute should be named concisely and understandably. In the second field we enter the values that the attribute can take. Keep in mind that some users will not want to fill in a particular attribute or it will not match the offer and therefore there should be a value of “other” or “not provided”.\nIn the pie charts, we can see the distribution of attributes in the project’s user file.\n\n\n\nimage\n\n\nEach user fills in the attributes in their profile. This is opened by clicking on the icon next to their name in the top right. Below the list of permissions is the Edit button, which when clicked will bring up a window with the option to enter attributes.\n\n\n\nimage"
+  },
+  {
+    "objectID": "wiki/Logování.html",
+    "href": "wiki/Logování.html",
+    "title": "requal",
+    "section": "",
+    "text": "Na navigačním panelu najdete položku Report. Na obrazovce Report je pět karet: * Summary * Agreement * Browse coded docs * User attributes * Logs\nPrvní čtyři lze použít v případě, že se na kódování podílelo více kodérů. Záložka Logs obsahuje podrobnosti a informace o všech změnách ve vašem projektu. Například v logu našeho projektu bylo poslední změnou přidání poznámky uživatelem babička. Záznamy v protokolu můžete filtrovat podle akce, uživatele, detailu nebo času změny (created_at).\n Celý protokol lze exportovat kliknutím na tlačítko CSV v dolní části stránky.  Log lze použít jako doklad o průběhu výzkumu, ať už jste student nebo akademický pracovník."
+  },
+  {
+    "objectID": "wiki/Server-setup.html",
+    "href": "wiki/Server-setup.html",
+    "title": "requal",
+    "section": "",
+    "text": "To run the Requal as a Shiny application on a server, it’s necessary to first prepare the environment. The specific setup steps might differ based on your operating system. Follow the relevant instructions below to install the required system dependencies on your server:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\noptional: Pandoc (installation of Pandoc will enable exports in html format)"
+  },
+  {
+    "objectID": "wiki/Server-setup.html#requirements",
+    "href": "wiki/Server-setup.html#requirements",
+    "title": "requal",
+    "section": "",
+    "text": "To run the Requal as a Shiny application on a server, it’s necessary to first prepare the environment. The specific setup steps might differ based on your operating system. Follow the relevant instructions below to install the required system dependencies on your server:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\noptional: Pandoc (installation of Pandoc will enable exports in html format)"
+  },
+  {
+    "objectID": "wiki/Server-setup.html#requal-shiny-application-setup",
+    "href": "wiki/Server-setup.html#requal-shiny-application-setup",
+    "title": "requal",
+    "section": "reQual Shiny Application Setup",
+    "text": "reQual Shiny Application Setup\n\nEstablish a PostgreSQL database to act as the data storage for requal. At this stage, you only need to create the database. The requal application will define the database schema upon its initial launch.\nCreate a directory within your Shiny Server path (e.g., /srv/shiny-server/requal). This will be the home of your application. Open this directory as an R project or navigate to it using setwd(\"/srv/shiny-server/requal\") in R.\nWe advise using the renv package for managing the requal installation. This approach enables you to isolate each requal application instance and operate multiple versions on the same server.\nUse the following script to install requal:\n\n# install.packages(\"renv\")\nrenv::install(\"RE-QDA/requal\")\nrenv::snapshot(prompt = FALSE)\nrenv::isolate()\n\nTo update requal, run the script above.\nGenerate an R file named app.R in your application’s directory.\nPopulate the app.R with:\n\nrequal::run_app(\n  mode = \"server\",\n  dbname = \"YOUR_DATABASE_NAME\",\n  dbusername = \"YOUR_DATABASE_OWNER\",\n  dbpassword = \"YOUR_DATABASE_PASSWORD\",\n  credentials_path = \"USER_DATABASE_NAME.sqlite\",\n  credentials_pass = \"USER_DATABASE_PASSWORD\"\n)\n\nAfter installing requal and configuring your application, reboot the Shiny Server service using the terminal command:\n\nsudo systemctl restart shiny-server\nYour requal application instance should now be accessible via the Shiny Server."
+  },
+  {
+    "objectID": "wiki/Server-setup.html#security",
+    "href": "wiki/Server-setup.html#security",
+    "title": "requal",
+    "section": "Security",
+    "text": "Security\nAs the administrator of the installation, you can dictate the level of access management to the application (e.g., restricting access to a firewall-protected VPN).\nTo supply passwords from your secrets’ store, use the keyring package. Consult the keyring documentation for more information.\nThe handling of user logins and passwords by requal is explained in the shinymanager documentation. Please refer to it for more details."
+  },
+  {
+    "objectID": "wiki/Analysis.html",
+    "href": "wiki/Analysis.html",
+    "title": "requal",
+    "section": "",
+    "text": "Once your data are coded, you can find coded parts in the Analysis screen. * On the middle part of the screen you can see all segments coded. * On the right side, you can find three filters. You can filter text segments by code, category of codes, or by document.\n\n\n\nimage13"
+  },
+  {
+    "objectID": "wiki/Analysis.html#after-you-are-done-with-coding",
+    "href": "wiki/Analysis.html#after-you-are-done-with-coding",
+    "title": "requal",
+    "section": "",
+    "text": "Once your data are coded, you can find coded parts in the Analysis screen. * On the middle part of the screen you can see all segments coded. * On the right side, you can find three filters. You can filter text segments by code, category of codes, or by document.\n\n\n\nimage13"
+  },
+  {
+    "objectID": "wiki/Analysis.html#working-with-filters",
+    "href": "wiki/Analysis.html#working-with-filters",
+    "title": "requal",
+    "section": "Working with filters",
+    "text": "Working with filters\nAs default, all codes, categories and documents are selected, therefore all coded segments are displayed. You can select only one item from the filter list by clicking on it. In case you want to select multiple items hold the Ctrl (control) key and click on each item or click and drag over the items you want to select. reQual offers three filters:\n\nFilter by code\nFilter by category\nFilter by document\n\nIf you want to turn off filters for codes or categories, select the empty item from the top of the list. Remember to keep selection of at least one document and one code or category to see text segments for analysis.\n\n\n\nfilters"
+  },
+  {
+    "objectID": "wiki/Analysis.html#downloading-your-analysis",
+    "href": "wiki/Analysis.html#downloading-your-analysis",
+    "title": "requal",
+    "section": "Downloading your analysis",
+    "text": "Downloading your analysis\nYou can download selected segments by clicking the CSV or HTML button at the bottom of the page with the coded segments. Segments will be downloaded in a file together with document and code information.\n\n\n\nScreenshot 2022-12-30 at 11-33-12 ReQual\n\n\nIf you download an HTML file, it will be named report.html and you can open it in any web browser. This is an example of it:\n\n\n\nScreenshot 2022-12-30 at 11-17-28 reQual report\n\n\nIf you download a CSV file, the name of the file will indicate the date and time of the export, for example requal_export-2022-11-26-160754.csv. There are several programs to work with when you want to explore or edit CSV files, e.g. MSExcel, Google Sheets, LibreOffice or Numbers."
+  },
+  {
+    "objectID": "wiki/Analysis.html#analysis-table---description",
+    "href": "wiki/Analysis.html#analysis-table---description",
+    "title": "requal",
+    "section": "Analysis table - description",
+    "text": "Analysis table - description\nAs you can see the exported table consists of five columns: * doc_name - in this column you can look up the name of the analysed document * doc_id - a database identification of the document * code_name - this column shows the names of the codes you used during the analysis * code_id - a database identification of the code * segment_text - the most important column for your analysis, because you can see the segments you selected for chosen codes or categories.\n\n\n\nSnímek obrazovky z 2022-12-30 11-39-48"
+  },
+  {
+    "objectID": "wiki/Přidání-dokumentu.html",
+    "href": "wiki/Přidání-dokumentu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Pokud chcete analyzovat data v nástroji reQual, musíte nejprve přidat dokumenty. Existují dva způsoby, jak přidat dokument do projektu: * dokument můžete vytvořit metodou kopírovat a vložit nebo * můžete nahrát textový soubor."
+  },
+  {
+    "objectID": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit",
+    "href": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit",
+    "title": "requal",
+    "section": "Vytvoření nového dokumentu metodou kopírovat a vložit",
+    "text": "Vytvoření nového dokumentu metodou kopírovat a vložit\nDoporučujeme používat metodu kopírovat a vložit, protože obchází problém kódování znaků. Upozorňujeme, že reQual umí pracovat pouze s prostými textovými dokumenty (.txt soubory). Při přidávání dokumentu zmizí veškeré formátování, jako je kurzíva, podtržený text, odlišné písmo, odsazení nebo barvy.\nPři vytváření nového dokumentu pomocí kopírovat a vložit klikněte na kruhovou ikonu plus + v pravé části obrazovky. \nPokud chcete, zadejte název dokumentu a jeho stručný popis. Otevřete dokument, který chcete přidat, zkopírujte jeho obsah a poté jej vložte do pole Obsah dokumentu ve spodní části dialogového okna. Chcete-li zkontrolovat, zda byl celý text správně zkopírován, zvětšete pole a posuňte se na konec. Pokud je vše v pořádku, stiskněte tlačítko Vytvořit dokument.\n\n\n\nimage5-znacky\n\n\nNa obrazovce projektu se objeví informace o dokumentu.\n\n\n\nimage8"
+  },
+  {
+    "objectID": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu---nahráním-textového-souboru",
+    "href": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu---nahráním-textového-souboru",
+    "title": "requal",
+    "section": "Vytvoření nového dokumentu - nahráním textového souboru",
+    "text": "Vytvoření nového dokumentu - nahráním textového souboru\nDalším způsobem přidání dokumentu je nahrání textového souboru. Nezapomeňte, že soubor musí být ve formátu prostého textu (.txt). Pokud je váš původní dokument ve formátu .docx, .odt, .pdf nebo .html, musíte jej před nahráním uložit jako prostý textový soubor, například mydocument.txt.\nPři nahrávání textového souboru klepněte na kruhovou ikonu nahrávání na pravé straně obrazovky.\n\n\n\nimage1-znacky\n\n\nZadejte název a stručný popis dokumentu. Pokud název dokumentu nezadáte, bude místo něj použit původní název souboru. Vyberte požadovaný dokument ze složky, ve které je uložen. Pokud znáte kódování souboru, vyberte jej ze seznamu. Pokud jeho kódování neznáte, ponechte ho tak, jak je. Chcete-li soubor nahrát, stiskněte tlačítko Přidat dokument.\nNa obrazovce projektu se zobrazí informace o dokumentu.\n\n\n\nimage2\n\n\nPokud chcete zkontrolovat, zda byly nově přidané dokumenty vytvořeny správně, přejděte na obrazovku Pracovní plocha a vyberte je ze seznamu.\n\n\n\nimage6\n\n\nDokument se zobrazí.\n Pokud se některé znaky v dokumentu nezobrazují správně, máte špatné kódování. Chcete-li odstranit problémy s kódováním, podívejte se do našeho průvodce řešením problémů na wiki GitHub (připravuje se)."
+  },
+  {
+    "objectID": "wiki/User-management-in-a-project.html",
+    "href": "wiki/User-management-in-a-project.html",
+    "title": "requal",
+    "section": "",
+    "text": "To manage users in a project, you must log in as a project administrator. This permission is granted to the user in the user management module.\nOpen the project you want to manage. On the project page, select the Manage users tab. The list of users in the project will be displayed.\nIf you click on the plus sign to the right of a user, their permissions will be displayed.\n\n\n\nimage\n\n\nTo add a user to the project, click the plus icon. A box will appear and when you click it, you will see a list of all users. If you don’t see the users you want listed, these users have not yet been added to reQual in the user management module. On the other hand, if they are in the list, you can select one or more of them and click the Add User button to add them.\n\n\n\nimage\n\n\nWhen a new user is among the project users, you need to check their permissions and modify them if necessary. Finally, it is important to remember to save the permission change. Users can view their permissions by clicking on the icon next to their name in the top right.\n\n\n\nimage\n\n\nIn terms of permissions, we can most often encounter three types of users. * Project Administrator, who created the project and who has all the permissions. * Team Member, who has similar permissions as the administrator, but can only change what he/she put into the project (documents, codes, categories, notes). * Coder, typically a student working on a coding task, who can see others’ documents, codes, and categories, enter her attributes, tag segments, and create notes.\nTo remove a user from a project, click the minus icon, select the user you want to remove, and click the Remove User button."
+  },
+  {
+    "objectID": "wiki/Nastavení-serveru.html",
+    "href": "wiki/Nastavení-serveru.html",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li spustit reQual jako Shiny aplikaci na serveru, je třeba nejprve připravit prostředí. Konkrétní kroky nastavení se mohou lišit v závislosti na operačním systému. Podle příslušných pokynů níže nainstalujte na serveru požadované systémové závislosti:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\nvolitelné: Pandoc (instalace Pandocu umožní export ve formátu html)."
+  },
+  {
+    "objectID": "wiki/Nastavení-serveru.html#požadavky",
+    "href": "wiki/Nastavení-serveru.html#požadavky",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li spustit reQual jako Shiny aplikaci na serveru, je třeba nejprve připravit prostředí. Konkrétní kroky nastavení se mohou lišit v závislosti na operačním systému. Podle příslušných pokynů níže nainstalujte na serveru požadované systémové závislosti:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\nvolitelné: Pandoc (instalace Pandocu umožní export ve formátu html)."
+  },
+  {
+    "objectID": "wiki/Nastavení-serveru.html#nastavení-aplikace-shiny",
+    "href": "wiki/Nastavení-serveru.html#nastavení-aplikace-shiny",
+    "title": "requal",
+    "section": "Nastavení aplikace Shiny",
+    "text": "Nastavení aplikace Shiny\n\nVytvořte databázi PostgreSQL, která bude sloužit jako úložiště dat pro requal. V této fázi stačí databázi pouze vytvořit. Aplikace requal bude definovat schéma databáze při svém prvním spuštění.\nVytvořte adresář v rámci cesty k serveru Shiny (např. /srv/shiny-server/requal). Ten bude domovským adresářem vaší aplikace. Tento adresář otevřete jako projekt R nebo do něj přejděte pomocí příkazu setwd(\"/srv/shiny-server/requal\") v R.\nPro správu instalace requal doporučujeme použít balíček renv. Tento přístup umožňuje izolovat každou instanci aplikace requal a provozovat více verzí na stejném serveru.\nPro instalaci balíčku requal použijte následující skript:\n\n# install.packages(\"renv\")\nrenv::install(\"RE-QDA/requal\")\nrenv::snapshot(prompt = FALSE)\nrenv::isolate()\n\nChcete-li aktualizovat requal, spusťte výše uvedený skript.\nV adresáři vaší aplikace vytvořte soubor R s názvem app.R.\nSoubor app.R naplňte následujícími údaji:\n\nrequal::run_app(\n  mode = \"server\",\n  dbname = \"YOUR_DATABASE_NAME\",\n  dbusername = \"YOUR_DATABASE_OWNER\",\n  dbpassword = \"YOUR_DATABASE_PASSWORD\",\n  credentials_path = \"USER_DATABASE_NAME.sqlite\",\n  credentials_pass = \"USER_DATABASE_PASSWORD\".\n)\n\nPo instalaci requal a konfiguraci aplikace restartujte službu Shiny Server pomocí terminálového příkazu:\n\nsudo systemctl restart shiny-server\nVaše instance aplikace requal by nyní měla být přístupná prostřednictvím serveru Shiny Server."
+  },
+  {
+    "objectID": "wiki/Nastavení-serveru.html#zabezpečení",
+    "href": "wiki/Nastavení-serveru.html#zabezpečení",
+    "title": "requal",
+    "section": "Zabezpečení",
+    "text": "Zabezpečení\nJako správce instalace můžete určit úroveň správy přístupu k aplikaci (např. omezení přístupu na VPN chráněnou firewallem).\nChcete-li dodat hesla z vašeho úložiště tajných informací, použijte balíček keyring. Další informace naleznete v keyring documentation.\nZpracování uživatelských přihlašovacích jmen a hesel pomocí balíčku requal je vysvětleno v dokumentaci k balíčku shinymanager. Podrobnější informace naleznete v ní."
+  },
+  {
+    "objectID": "wiki/Otevření-projektu.html",
+    "href": "wiki/Otevření-projektu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li otevřít již existující projekt, musíte vybrat soubor, do kterého byl projekt uložen.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nVyberte svůj projekt ze seznamu a poté klikněte na Vybrat nebo na soubor prostě dvakrát klikněte. Po návratu na kartu Načíst stiskněte zelené tlačítko Načíst projekt.\n\n\n\nimage8\n\n\nVáš projekt je nyní načten. Můžete na něm začít pracovat!\n\n\n\nimage3"
+  },
+  {
+    "objectID": "wiki/Otevření-projektu.html#načíst-již-existující-projekt",
+    "href": "wiki/Otevření-projektu.html#načíst-již-existující-projekt",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li otevřít již existující projekt, musíte vybrat soubor, do kterého byl projekt uložen.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nVyberte svůj projekt ze seznamu a poté klikněte na Vybrat nebo na soubor prostě dvakrát klikněte. Po návratu na kartu Načíst stiskněte zelené tlačítko Načíst projekt.\n\n\n\nimage8\n\n\nVáš projekt je nyní načten. Můžete na něm začít pracovat!\n\n\n\nimage3"
+  },
+  {
+    "objectID": "wiki/Kodování-dat.html",
+    "href": "wiki/Kodování-dat.html",
+    "title": "Jak kódovat data",
+    "section": "",
+    "text": "Jak kódovat data\nDokumenty můžete kódovat na obrazovce Workdesk. Nejprve vyberte z rozevíracího seznamu dokument, který chcete kódovat. Kódy budou k dispozici v pravé části obrazovky.\n\n\n\nScreenshot 2022-12-30 at 13-29-07 ReQual\n\n\nChcete-li kódovat segment textu, vyberte myší segment a klikněte na kód, kterým chcete segment označit.\n\n\n\nezgif com-gif-maker\n\n\nSegmenty se mohou překrývat. Barvy kódu se pak smíchají.\n\n\n\nScreenshot 2022-12-30 at 13-40-48 ReQual\n\n\n\n\nJak odstranit kódování segmentu\n\nText označený jedním kódem\nKlikněte na kódovaný segment a stiskněte tlačítko Odstranit kód.\n\n\nText označený několika kódy\nKlikněte na kódovaný segment. Zobrazí se dialogové okno. Vyberte kód, který má být odstraněn. Potvrďte stisknutím tlačítka Odebrat vybrané.\n\n\n\nScreenshot 2022-12-30 at 13-42-13 ReQual"
+  },
+  {
+    "objectID": "wiki/Requal-for-Mac-OS.html",
+    "href": "wiki/Requal-for-Mac-OS.html",
+    "title": "requal",
+    "section": "",
+    "text": "The installation on the Mac Os machine is similar to Windows. The only difference is that you download R and RStudio for macOS. Note, it is necessary to use RStudio for running Requal if your documents (data) contain non-Latin letters, e.g. ě, š, č, ç."
+  },
+  {
+    "objectID": "wiki/Requal-for-Mac-OS.html#mac-instructions",
+    "href": "wiki/Requal-for-Mac-OS.html#mac-instructions",
+    "title": "requal",
+    "section": "",
+    "text": "The installation on the Mac Os machine is similar to Windows. The only difference is that you download R and RStudio for macOS. Note, it is necessary to use RStudio for running Requal if your documents (data) contain non-Latin letters, e.g. ě, š, č, ç."
+  },
+  {
+    "objectID": "wiki/Reproducibility-enhancing-modules.html",
+    "href": "wiki/Reproducibility-enhancing-modules.html",
+    "title": "requal",
+    "section": "",
+    "text": "On the Report page you will find several modules to increase researcher reflexivity and coding transparency. These modules only work in the web version of reQual, as it allows coding by multiple coders and comparison between them."
+  },
+  {
+    "objectID": "wiki/Reproducibility-enhancing-modules.html#summary",
+    "href": "wiki/Reproducibility-enhancing-modules.html#summary",
+    "title": "requal",
+    "section": "Summary",
+    "text": "Summary\nThe first tab Summary provides an overview of the number of segments tagged by each code in each document. If we want to know how often and where a particular coder used the codes, we only select her in the Select users menu. Similarly, we can limit the selection to only certain codes or documents if there are many of them and the overall table is too large.\n\n\n\nimage"
+  },
+  {
+    "objectID": "wiki/Reproducibility-enhancing-modules.html#agreement",
+    "href": "wiki/Reproducibility-enhancing-modules.html#agreement",
+    "title": "requal",
+    "section": "Agreement",
+    "text": "Agreement\nThe Agreement tab offers the possibility to make the agreement between codes, coders and their attributes visible. When we expand the Select metrics menu, we see two sets of controls to choose from. The first one shows the agreement calculated based on the number of overlapping letters (characters), the second one shows the agreement based on the overlap of the marked segments regardless of the number of characters (segment). The calculation is done using Jaccard’s similarity coefficient, which is calculated as the ratio of the number of identically coded characters to the number of all coded characters without the overlaps.\nWe can illustrate the difference between agreement in characters and agreement in segments by an example:\n\nCoder A marks: But it’s just me, the problem with me is that I don’t drink beer, I don’t like it (55 characters).\n\nCoder B marks: But just me, the problem with me is that I don’t drink beer, I don’t like it. I’m not an alcoholic. (71 characters)\n\nThe character agreement will be 0.77 according to the calculation 55/(55+71-55) = 0.77\nThe agreement in segments will be 1.00 according to the calculation 1/(1+1-1) = 1.00\n\nCoder A indicates: But just me, the problem with me is that I don’t drink beer, I don’t like it. (55 characters)\n\nCoder B indicates: But it’s just me, the problem with me is that I don’t drink beer, (…) I’m not an alcoholic. (43 + 16 = 59 characters)\n\nThe agreement in characters will be 0.77 according to the calculation 43/(55+59-43) = 0.61\nThe match in segments will be 1.00 based on the calculation 1/(1+2-1) = 0.50\nFrom these examples we can see that each criterion is sensitive to different coding qualities. While the number of common characters is more of a mechanical measure of agreement, the agreement in segments is more reflective of the meaning component of coding the data.\n\nTotal overlap [character]\nCalculates the total coding overlap in characters across all documents for the selected coders. This table provides an overview of the total overlap of coders in the project.\n\n\nOverlap by code [character]\nCalculates the coding agreement in characters across all documents for each code and for the selected coders. This table provides an overview of whether the overlap varies by code. It allows the identification of problematic codes.\n\n\nOverlap by coder [character]\nDisplays a heatmap that compares pairs of coders based on their character agreement across all documents and all codes. The lighter the color, the higher the agreement. This table allows identification of pairs of coders that are ” aligned” overall, and those that are least aligned.\n\n\nOverlap by coder and code [character]\nDisplays a heatmap for each code separately, comparing pairs of coders based on their agreement in characters across all documents. The lighter the color, the higher the agreement. This table allows you to see if the coder pair matching is similar across all codes, or if and how the matching differs for different codes.\n\n\nOverlap by user attribute and code [character]\nDisplays a heatmap for the selected user (encoder) attribute that compares each group of coders based on their agreement in characters for each code in all documents. The lighter the color, the higher the agreement. This table may reveal codes that are sensitive to any of the coders’ attributes. For example, in the diagram we see that for code 2, there are more matches between males and females than between males, which shows that the gender of the coders does not play a role in this code.\n\n\n\nimage\n\n\n\n\nSegment matching\nThe same set of indicators exists for agreement in segments. Their interpretation is the same, with the only difference that matching is not counted in identically coded characters, but in overlapping segments."
+  },
+  {
+    "objectID": "wiki/Reproducibility-enhancing-modules.html#text-overlap",
+    "href": "wiki/Reproducibility-enhancing-modules.html#text-overlap",
+    "title": "requal",
+    "section": "Text overlap",
+    "text": "Text overlap\nIf we want to examine the coding agreement in more detail, we use the Text overlap tab. In the menu, we select which document we want to display, which code, and possibly certain coders, if we want information about, for example, a two-coder agreement.\nClicking the Browse button will show us the coders overlaps for the given code and document. The lighter the color, the higher the agreement between the coders.\nWhen we hover the mouse over a highlighted segment, the names of the coders who coded it are displayed. This provides a good basis for a team discussion about coding. For example, about how long segments to code or how distinct instances of a phenomenon to code.\n\n\n\nimage\n\n\nTip! This module can also be used to allow users with permissions to view the report to see how individual coders coded, e.g. in a class project."
+  },
+  {
+    "objectID": "wiki/Coding-data.html",
+    "href": "wiki/Coding-data.html",
+    "title": "How to code your data",
+    "section": "",
+    "text": "How to code your data\nYou can code documents on the Workdesk screen. First, select the document you want to code from the drop-down list and it will load on the screen. The codes will be available on the right side of the screen.\n\n\n\nScreenshot 2022-12-30 at 13-29-07 ReQual\n\n\nTo code a segment of the text select the segment and click on the code you want to attach to the segment.\n\n\n\nezgif com-gif-maker\n\n\nSegments may overlap. Code colours will be mixed.\n\n\n\nScreenshot 2022-12-30 at 13-40-48 ReQual\n\n\n\n\nHow to delete coding of a segment\n\nText marked with one code\nClick on the coded segment and hit on the Remove code button.\n\n\nText marked with several codes\nClick on the coded segment. A dialog box appears. Select the code to be removed. Confirm by hitting the Remove Selected button.\n\n\n\nScreenshot 2022-12-30 at 13-42-13 ReQual"
+  },
+  {
+    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html",
+    "href": "wiki/HowtoRequal:--Working-with-Codes.html",
+    "title": "requal",
+    "section": "",
+    "text": "You can create new codes and manage already existing codes on the Codebook card where you get by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: * Codes * Categories\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. Use the upper button with a plus sign + to create new code. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#creating-a-new-code",
+    "href": "wiki/HowtoRequal:--Working-with-Codes.html#creating-a-new-code",
+    "title": "requal",
+    "section": "",
+    "text": "You can create new codes and manage already existing codes on the Codebook card where you get by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: * Codes * Categories\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. Use the upper button with a plus sign + to create new code. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#merging-codes",
+    "href": "wiki/HowtoRequal:--Working-with-Codes.html#merging-codes",
+    "title": "requal",
+    "section": "Merging codes",
+    "text": "Merging codes\nMerging codes can be used if there are two codes that overlap, for example mother and father, and you want to merge them into a new code parent. First, create a new code called parent. Second, click on the circular icon with two arrows on the right side of the screen.\n\n\n\nimage9\n\n\nIn the dialogue window, select the code that you want to merge from and the code you want to merge into. Hit on Merge to execute the operation.\n\n\n\nimage7\n\n\nRepeat the same steps to merge the second code. This creates a single code that contains all segments previously coded with mother and father.\n\n\n\nimage8"
+  },
+  {
+    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#deleting-a-code",
+    "href": "wiki/HowtoRequal:--Working-with-Codes.html#deleting-a-code",
+    "title": "requal",
+    "section": "Deleting a code",
+    "text": "Deleting a code\nYou can delete codes with the minus button - on the right side of the Codes tab. Select the desired code from the drop-down menu and click on delete. The code will be deleted from your Codebook. When deleting a code, be careful - once a code is deleted, there is no way to recover it.\n\n\n\nimage1"
+  },
+  {
+    "objectID": "wiki/O-Requalu.html",
+    "href": "wiki/O-Requalu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Requal je nástroj pro analýzu kvalitativních dat navržený s ohledem na jednoduchost a reprodukovatelnost. Je postaven na základech R a Shiny a využívá schopnosti těchto technologií, aby poskytl uživatelsky přívětivé rozhraní pro kódování a analýzu textových dat.\nTento software je výsledkem spolupráce sociologů Univerzity Karlovy a Akademie věd ČR.\n\nNaším cílem je prostřednictvím této wiki poskytnout ucelený návod, jak se v programu Requal orientovat a jak jej efektivně používat. Dozvíte se, jak vytvářet a spravovat kódy a kategorie, které zajistí strukturu vaší analýzy dat. Poradíme vám také, jak spravovat dokumenty v prostředí Requal. Requal pracuje ve dvou režimech: offline “lokálním” režimu a online “serverovém” režimu. Ten druhý poskytuje prostředí pro týmovou spolupráci. Wiki obsahuje pokročilé pokyny pro správce systému, jak nastavit vlastní serverovou instalaci systému Requal a spustit jej v režimu serveru.\nExistují dva způsoby, jak pracovat s Requal - desktopová aplikace a webová aplikace. Pro individuální uživatele doporučujeme si nainstalovat desktopovou aplikaci, pro týmy nebo výuku je vhodnější webová (serverová) aplikace. Verze se od sebe neliší až na to, že pouze webová aplikace obsahuje moduly posilující reprodukovatelnost kódování. Na druhou stranu k používání webové aplikace potřebujete mít server, na kterém bude instalovaná Instalace\nInformace o tom, jaké strategie zvyšování reprodukovatelnosti jsme v Requalu použili, naleznete v přiložené zprávě: Strategie.pdf"
+  },
+  {
+    "objectID": "wiki/Requal-for-Windows.html",
+    "href": "wiki/Requal-for-Windows.html",
+    "title": "requal",
+    "section": "",
+    "text": "To use Requal, you need to have theR language installed and running on your machine. You will also need a web browser with JavaScript support (i.e. any of the standard browsers like Firefox, Chrome, or Safari). Requal can be installed in two ways - via the R console or RStudio. For inexperienced users, we recommend using RStudio."
+  },
+  {
+    "objectID": "wiki/Requal-for-Windows.html#how-to-install-requal",
+    "href": "wiki/Requal-for-Windows.html#how-to-install-requal",
+    "title": "requal",
+    "section": "",
+    "text": "To use Requal, you need to have theR language installed and running on your machine. You will also need a web browser with JavaScript support (i.e. any of the standard browsers like Firefox, Chrome, or Safari). Requal can be installed in two ways - via the R console or RStudio. For inexperienced users, we recommend using RStudio."
+  },
+  {
+    "objectID": "wiki/Requal-for-Windows.html#windows-via-rstudio",
+    "href": "wiki/Requal-for-Windows.html#windows-via-rstudio",
+    "title": "requal",
+    "section": "Windows (via RStudio)",
+    "text": "Windows (via RStudio)\nStep one. Instal R. Go to https://cran.r-project.org/bin/windows/base/ and click on Download R for Windows. Download the file and run it.\n\n\n\nimage7\n\n\nDuring installation you can agree with all default options or customise the installation according to your needs.\nStep two. Install RStudio. Go to www.rstudio.com and download a free desktop version.\n\n\n\nimage8\n\n\nOnce downloaded, install Rstudio and launch it.\nStep three. Install Requal. Go to https://github.com/RE-QDA/requal/releases Click on the newest release (0.5.4) and then scroll down at the bottom of the table, and download the compressed package, e.g. requal_0.5.4.tar.gz\n\n\n\nimage1\n\n\nIn the RStudio console, install the remotes package by running install.packages(\"remotes\")command. Next, install the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard-drive.\n\n\n\nimage6\n\n\nIf you are asked to update packages, update All (enter 1).\n\n\n\nimage3\n\n\nThe installation may take a few minutes as it is necessary to download and install several packages. After the installation, the last line reads: * DONE (requal)\nStep four. Launch Requal from the RStudio console with the following command: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Requal-for-Windows.html#windows-via-r-console",
+    "href": "wiki/Requal-for-Windows.html#windows-via-r-console",
+    "title": "requal",
+    "section": "Windows (via R console)",
+    "text": "Windows (via R console)\nStep one. Instal R. Go to https://cran.r-project.org/bin/windows/base/ and click on Download R for Windows. Download the file and run it.\n\n\n\nimage7\n\n\nDuring installation you can agree with all default options or customise the installation according to your needs. When completed, launch R from the Windows menu. You will see the R console.\n\n\n\nimage9\n\n\nStep two. Install Requal. Go to https://github.com/RE-QDA/requal/releases\nClick on the newest release (0.5.4) and then scroll down at the bottom of the table, download the compressed package, e.g. requal_0.5.4.tar.gz.\n\n\n\nimage1\n\n\nIn the R console, install the remotes package by typing the command install.packages(\"remotes\") and hit Enter on your keyboard.\n\n\n\nimage10\n\n\nIf a dialog box appears, click on yes or customise the installation. Install the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard-drive.\n\n\n\nimage2\n\n\nThe installation may take a few minutes as it is necessary to download and install several packages. After the installation, the last line reads: * DONE (requal)\nStep three. Launch Requal from the R console with the following command: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage5"
+  },
+  {
+    "objectID": "wiki/Práce-s-kategoriemi.html",
+    "href": "wiki/Práce-s-kategoriemi.html",
+    "title": "O kategoriích",
+    "section": "",
+    "text": "Záložka Kategorie na obrazovce Codebook slouží ke správě kategorií. Kategorie je skupina kódů, které mají něco společného. Například místo sloučení kódů matky a otce do kódu rodiče můžete vytvořit kategorii nazvanou rodič, která bude obsahovat oba kódy. Kategorii vytvoříte stejným způsobem jako kód. Na kartě Kategorie klikněte vpravo na ikonu plus + a zadejte název a popis kategorie.\n\n\n\nimage5\n\n\nChcete-li kód přesunout do kategorie, nejprve kategorii rozbalíte kliknutím na ikonu plus + vedle názvu kategorie. Zobrazí se okno Přetáhni a pusť kódy níže. Poté přesuňte požadované kódy přetažením do tohoto pole. Stejným způsobem lze kódy z kategorie odstranit přetažením z rámečku.\n\n\n\nimage10\n\n\n\n\nChcete-li odstranit kategorii, klikněte na tlačítko s ikonou mínusu - na pravé straně karty Kategorie. Vyberte kategorii, kterou chcete odstranit, a akci dokončete tlačítkem Odstranit. Všimněte si, že odstranění kategorie nemá žádný vliv na kódy přiřazené ke kategorii - ty zůstávají v číselníku.\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Práce-s-kategoriemi.html#odstranění-kategorií",
+    "href": "wiki/Práce-s-kategoriemi.html#odstranění-kategorií",
+    "title": "O kategoriích",
+    "section": "",
+    "text": "Chcete-li odstranit kategorii, klikněte na tlačítko s ikonou mínusu - na pravé straně karty Kategorie. Vyberte kategorii, kterou chcete odstranit, a akci dokončete tlačítkem Odstranit. Všimněte si, že odstranění kategorie nemá žádný vliv na kódy přiřazené ke kategorii - ty zůstávají v číselníku.\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Log-Tab.html",
+    "href": "wiki/Log-Tab.html",
+    "title": "requal",
+    "section": "",
+    "text": "In the navigation panel, you can find Report. There are five tabs on the Report screen: * Summary * Agreement * Browse coded docs * User attributes * Logs\nThe first two can be used in case multiple coders were involved in coding. The Logs tab contains details and information of all changes in your project. For instance, in the log of our project, the last change was the addition of a memo by user babička. You can filter log records by action, user, detail or the time of the change (created_at).\n The whole log can be exported by clicking the CSV button at the bottom of the page.  Log can be used as an evidence of the research process whether you are student or academic."
+  },
+  {
+    "objectID": "posts/soc-coffee-2024-05-16/index.html",
+    "href": "posts/soc-coffee-2024-05-16/index.html",
+    "title": "Requal at Sociological Coffee",
+    "section": "",
+    "text": "Martin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University."
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact",
+    "section": "",
+    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help?\n\nVisit the Requal wiki\n\nHave an issue?\n\nReport it via our GitHub.\n\nHave a question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
+  },
+  {
+    "objectID": "contact.html#help-contribution",
+    "href": "contact.html#help-contribution",
+    "title": "Contact",
+    "section": "",
+    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help?\n\nVisit the Requal wiki\n\nHave an issue?\n\nReport it via our GitHub.\n\nHave a question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
+  },
+  {
+    "objectID": "contact.html#acknowledgement",
+    "href": "contact.html#acknowledgement",
+    "title": "Contact",
+    "section": "Acknowledgement",
+    "text": "Acknowledgement\nThe application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "posts/thuringothyris/index.html",
+    "href": "posts/thuringothyris/index.html",
+    "title": "Thuringothyris (v1.1.2)",
+    "section": "",
+    "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: https://github.com/RE-QDA/requal/discussions/145"
+  },
+  {
+    "objectID": "wiki/Working-with-your-project.html",
+    "href": "wiki/Working-with-your-project.html",
+    "title": "requal",
+    "section": "",
+    "text": "When starting a new Requal session you land on the Project screen.\n\n\n\nimage1\n\n\nOn the right side of the screen, a dialogue window with two tabs - Load and Create - pops up. If the box doesn’t appear automatically, you can open it anytime by clicking on the three dots ⋮ in the right upper corner of the screen.\n\n\n\nimage4\n\n\nTo set up a new project select the Create tab.\n\n\n\nimage7\n\n\nFill in the project name and then hit the Folder button to set the place in your computer where you want your project to be saved.\n\n\n\nimage2\n\n\nFinally, briefly describe your project in the field Project description.\n\n\n\nimage6\n\n\nHit the Create project button to execute the operation.\nVoilà! There you go. Now you can check your project name and description!\n\n\n\nimage9"
+  },
+  {
+    "objectID": "wiki/Working-with-your-project.html#how-to-create-a-new-project",
+    "href": "wiki/Working-with-your-project.html#how-to-create-a-new-project",
+    "title": "requal",
+    "section": "",
+    "text": "When starting a new Requal session you land on the Project screen.\n\n\n\nimage1\n\n\nOn the right side of the screen, a dialogue window with two tabs - Load and Create - pops up. If the box doesn’t appear automatically, you can open it anytime by clicking on the three dots ⋮ in the right upper corner of the screen.\n\n\n\nimage4\n\n\nTo set up a new project select the Create tab.\n\n\n\nimage7\n\n\nFill in the project name and then hit the Folder button to set the place in your computer where you want your project to be saved.\n\n\n\nimage2\n\n\nFinally, briefly describe your project in the field Project description.\n\n\n\nimage6\n\n\nHit the Create project button to execute the operation.\nVoilà! There you go. Now you can check your project name and description!\n\n\n\nimage9"
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-ve-Windows.html",
+    "href": "wiki/Instalace-reQualu-ve-Windows.html",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li používat reQual, musíte mít na svém počítači nainstalovaný a spuštěnýjazyk R. Budete také potřebovat webový prohlížeč s podporou JavaScriptu (tj. některý ze standardních prohlížečů, jako je Firefox, Chrome nebo Safari). Program reQual lze nainstalovat dvěma způsoby - prostřednictvím konzole R nebo RStudia. Nezkušeným uživatelům doporučujeme použít RStudio."
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#jak-nainstalovat-requal",
+    "href": "wiki/Instalace-reQualu-ve-Windows.html#jak-nainstalovat-requal",
+    "title": "requal",
+    "section": "",
+    "text": "Chcete-li používat reQual, musíte mít na svém počítači nainstalovaný a spuštěnýjazyk R. Budete také potřebovat webový prohlížeč s podporou JavaScriptu (tj. některý ze standardních prohlížečů, jako je Firefox, Chrome nebo Safari). Program reQual lze nainstalovat dvěma způsoby - prostřednictvím konzole R nebo RStudia. Nezkušeným uživatelům doporučujeme použít RStudio."
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-rstudio",
+    "href": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-rstudio",
+    "title": "requal",
+    "section": "Windows (přes RStudio)",
+    "text": "Windows (přes RStudio)\nKrok první. Nainstalujte R. Přejděte na stránku https://cran.r-project.org/bin/windows/base/ a klikněte na Stáhnout R pro Windows. Stáhněte soubor a spusťte jej.\n\n\n\nimage7\n\n\nBěhem instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb.\nKrok druhý. Nainstalujte RStudio. Přejděte na stránku www.rstudio.com a stáhněte si bezplatnou verzi pro stolní počítače.\n\n\n\nimage8\n\n\nPo stažení nainstalujte Rstudio a spusťte jej.\nTřetí krok. Nainstalujte program reQual. Přejděte na stránku https://github.com/RE-QDA/requal/releases Klikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky a stáhněte si komprimovaný balíček, např. requal_0.9.1.tar.gz.\n\n\n\nimage1\n\n\nV konzoli RStudia nainstalujte balíček remotes příkazem install.packages(\"remotes\"). Dále nainstalujte balíček requal spuštěním příkazu remotes::install_local(file.choose()) a vyberte stažený soubor.\n\n\n\nimage6\n\n\nPokud budete vyzváni k aktualizaci balíčků, proveďte aktualizaci “All” (zadejte 1).\n\n\n\nimage3\n\n\nInstalace může trvat několik minut, protože je nutné stáhnout a nainstalovat řadu balíčků. Po dokončení instalace se zobrazí poslední řádek: * DONE (requal)\nKrok čtvrtý. Spusťte reQual z konzole RStudia následujícím příkazem: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-konzoli-r",
+    "href": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-konzoli-r",
+    "title": "requal",
+    "section": "Windows (přes konzoli R)",
+    "text": "Windows (přes konzoli R)\nKrok první. Nainstalujte R. Přejděte na stránku https://cran.r-project.org/bin/windows/base/ a klikněte na Download R for Windows. Stáhněte soubor a spusťte jej.\n\n\n\nimage7\n\n\nBěhem instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb. Po dokončení spusťte R z nabídky Windows. Zobrazí se konzole R.\n Krok druhý. Nainstalujte reQual. Přejděte na stránku https://github.com/RE-QDA/requal/releases\nKlikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky, stáhněte komprimovaný balíček, např. requal_0.5.4.tar.gz.\n\n\n\nimage1\n\n\nV konzoli R nainstalujte balíček remotes zadáním příkazu install.packages(\"remotes\") a stisknutím klávesy Enter.\n\n\n\nimage10\n\n\nPokud se zobrazí dialogové okno, klikněte na Ano nebo přizpůsobte instalaci. Nainstalujte balíček requal příkazem remotes::install_local(file.choose()) a vyberte stažený soubor.\n\n\n\nimage2\n\n\nInstalace může trvat několik minut, protože je nutné stáhnout a nainstalovat několik balíčků. Po dokončení instalace se zobrazí poslední řádek: * DONE (requal)\nTřetí krok. Spusťte reQual z konzole R následujícím příkazem: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage5"
+  },
+  {
+    "objectID": "wiki/How-to-open-your-project.html",
+    "href": "wiki/How-to-open-your-project.html",
+    "title": "requal",
+    "section": "",
+    "text": "To open an already existing project you need to select the file where your project has been saved.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nChoose your project from the list and then click on Select or just double click on the file. When back in the Load tab, hit the green Load project button.\n\n\n\nimage8\n\n\nYour project is now loaded. You can start working on it!\n\n\n\nimage3"
+  },
+  {
+    "objectID": "wiki/How-to-open-your-project.html#load-already-existing-project",
+    "href": "wiki/How-to-open-your-project.html#load-already-existing-project",
+    "title": "requal",
+    "section": "",
+    "text": "To open an already existing project you need to select the file where your project has been saved.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nChoose your project from the list and then click on Select or just double click on the file. When back in the Load tab, hit the green Load project button.\n\n\n\nimage8\n\n\nYour project is now loaded. You can start working on it!\n\n\n\nimage3"
+  },
+  {
+    "objectID": "wiki/Správa-uživatelů-v-projektu.html",
+    "href": "wiki/Správa-uživatelů-v-projektu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Abyste mohli spravovat uživatele, musíte se přihlásit jako správce projektu. Takové oprávnění je uživateli přiděleno v modulu správy uživatelů.\nOtevřeme projekt, který chceme spravovat. Na stránce projektu vybereme kartu Manage users. Zobrazí se seznam uživatelů v projektu.\nKdyž kliknete na znaménko plus vpravo od uživatele, zobrazí se jeho oprávnění.\n\n\n\nimage\n\n\nChcete-li do projektu přidat uživatele, klikněte na ikonu plus. Zobrazí se pole, do kterého když kliknete, zobrazí se vám seznam všech uživatelů. Pokud požadované uživatele v seznamu nevidíte, tito uživatelé ještě nebyli přidáni do reQualu v modulu správa uživatelů v admin rozhraní. Na druhou stranu, pokud jsou v seznamu, můžete vybrat jednoho nebo více z nich a kliknutím na tlačítko Add users je přidat.\n\n\n\nSnímek obrazovky z 2023-05-26 21-21-23\n\n\nKdyž je nový uživatel mezi uživateli projektu, musíte zkontrolovat jeho oprávnění a případně je upravit. Na závěr je důležité nezapomenout změnu oprávnění uložit. Uživatelé mohou svá oprávnění zobrazit kliknutím na ikonu vedle svého jména vpravo nahoře.\n\n\n\nimage\n\n\nZ hlediska oprávnění se můžeme nejčastěji setkat s třemi druhy uživatelů. * Správkyně projektu, která projekt vytvořila a která má všechna oprávnění. * Členka týmu, která má podobná oprávnění jako správce, ale může měnit pouze to, co sám do projektu vložila (dokumenty, kódy, kategorie, poznámky). * Kodérka, typicky studentka pracující na kódovací úloze, která může vidět dokumenty, kódy a kategorie ostatních, zadat své atributy, označovat segmenty a vytvářet poznámky.\nChcete-li uživatele z projektu odebrat, klikněte na ikonu mínusu, vyberte uživatele, kterého chcete odebrat, a klikněte na tlačítko Remove users."
+  },
+  {
+    "objectID": "wiki/Working-with-Codes.html",
+    "href": "wiki/Working-with-Codes.html",
+    "title": "requal",
+    "section": "",
+    "text": "You can create new codes and manage already existing codes on the Codebook screen, which you can get to by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: Codes and Categories.\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. To create a new code, use the top button with the plus sign +. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/Working-with-Codes.html#creating-a-new-code",
+    "href": "wiki/Working-with-Codes.html#creating-a-new-code",
+    "title": "requal",
+    "section": "",
+    "text": "You can create new codes and manage already existing codes on the Codebook screen, which you can get to by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: Codes and Categories.\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. To create a new code, use the top button with the plus sign +. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
+  },
+  {
+    "objectID": "wiki/Working-with-Codes.html#merging-codes",
+    "href": "wiki/Working-with-Codes.html#merging-codes",
+    "title": "requal",
+    "section": "Merging codes",
+    "text": "Merging codes\nMerging codes can be used if there are two codes that overlap, for example mother and father, and you want to merge them into a new code parent. First, create a new code called parent. Second, click on the circular icon with two arrows on the right side of the screen.\n\n\n\nimage9\n\n\nIn the Merge codes dialogue window, select the code that you want to merge from and the code you want to merge into. Hit Merge to execute the operation.\n\n\n\nimage7\n\n\nRepeat the same steps to merge the second code. This creates a single code that contains all segments previously coded with mother and father. After merging, you cannot view the original codes or return to them individually. To keep the original codes next to the new common code, create a category instead of merging the codes.\n\n\n\nimage8"
+  },
+  {
+    "objectID": "wiki/Working-with-Codes.html#deleting-a-code",
+    "href": "wiki/Working-with-Codes.html#deleting-a-code",
+    "title": "requal",
+    "section": "Deleting a code",
+    "text": "Deleting a code\nYou can delete codes with the minus button - on the right side of the Codes tab. Select the desired code from the drop down menu and click delete. The code will be deleted from your Codebook. When deleting a code, be careful - once a code is deleted, there is no way to recover it.\n\n\n\nimage1"
+  },
+  {
+    "objectID": "wiki/How-to-remove-documents.html",
+    "href": "wiki/How-to-remove-documents.html",
+    "title": "requal",
+    "section": "",
+    "text": "When removing a document from the project, click on the circular minus icon - on the right side of the Project screen.\n\n\n\nimage7-znacky\n\n\nSelect the document you wish to delete and press Remove. The document will be removed from your project.\nBe aware that you will also lose all coded segments with the document and there is no way to undo the action. So think twice before deleting a document."
+  },
+  {
+    "objectID": "wiki/How-to-remove-documents.html#removing-your-documents",
+    "href": "wiki/How-to-remove-documents.html#removing-your-documents",
+    "title": "requal",
+    "section": "",
+    "text": "When removing a document from the project, click on the circular minus icon - on the right side of the Project screen.\n\n\n\nimage7-znacky\n\n\nSelect the document you wish to delete and press Remove. The document will be removed from your project.\nBe aware that you will also lose all coded segments with the document and there is no way to undo the action. So think twice before deleting a document."
+  },
+  {
+    "objectID": "wiki/Odstranění-dokumentu.html",
+    "href": "wiki/Odstranění-dokumentu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Při odstraňování dokumentu z projektu klikněte na kruhovou ikonu mínusu - na pravé straně obrazovky Projekt.\n\n\n\nimage7-znacky\n\n\nVyberte dokument, který chcete odstranit, a stiskněte tlačítko Odstranit. Dokument bude z projektu odstraněn.\nUvědomte si, že spolu s dokumentem ztratíte i všechny kódované segmenty a akci nelze vrátit zpět. Než tedy dokument odstraníte, dvakrát si to rozmyslete."
+  },
+  {
+    "objectID": "wiki/Odstranění-dokumentu.html#odstranění-dokumentů",
+    "href": "wiki/Odstranění-dokumentu.html#odstranění-dokumentů",
+    "title": "requal",
+    "section": "",
+    "text": "Při odstraňování dokumentu z projektu klikněte na kruhovou ikonu mínusu - na pravé straně obrazovky Projekt.\n\n\n\nimage7-znacky\n\n\nVyberte dokument, který chcete odstranit, a stiskněte tlačítko Odstranit. Dokument bude z projektu odstraněn.\nUvědomte si, že spolu s dokumentem ztratíte i všechny kódované segmenty a akci nelze vrátit zpět. Než tedy dokument odstraníte, dvakrát si to rozmyslete."
+  },
+  {
+    "objectID": "wiki/Atributy-kodérů.html",
+    "href": "wiki/Atributy-kodérů.html",
+    "title": "requal",
+    "section": "",
+    "text": "Na obrazovce Report, kartě User attributes můžeme definovat konkrétní atributy uživatelů, abychom mohli monitorovat, zda mají nějaký vliv na kódování.\nV projektu můžeme zadat jakékoliv atributy a jejich hodnoty podle potřeby projektu. Můžeme zadat např. gender v projektu, kde očekáváme relevanci genderu pro kódování, jindy nás může zajímat zkušenost kodérů s migrací či drogami, pokud budou data z této oblasti. Atribut je třeba pojmenovat krátce a srozumitelně. Do druhého pole zadáme hodnoty, které atribut může nabývat. Mějme na paměti, že někteří uživatelé nebudou chtít určitý atribut vyplnit nebo nebude odpovídat nabídce a proto by měla existovat hodnota “jiný” nebo “nezadáno”.\nV koláčových grafech vidíme rozložení atributů v souboru uživatelů projektu.\n\n\n\nimage\n\n\nKaždý uživatel vyplňuje atributy ve svém profilu. Ten si otevře kliknutím na ikonu vedle svého jména vpravo nahoře. Pod seznamem oprávnění je tlačítko Edit, po jehož stisknutí se objeví okno s možností zadání atributů.\n\n\n\nimage"
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-v-Linuxu.html",
+    "href": "wiki/Instalace-reQualu-v-Linuxu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Instalace v počítači se systémem Linux probíhá podobně jako v systému Windows. Jediný rozdíl je v tom, že si stáhnete R nebo RStudio pro svůj operační systém Linux, např. Ubuntu nebo Fedora."
+  },
+  {
+    "objectID": "wiki/Working-with-categories.html",
+    "href": "wiki/Working-with-categories.html",
+    "title": "About categories",
+    "section": "",
+    "text": "The Categories tab on the Codebook screen is used to manage categories. A category is a group of codes that have something in common. For example, instead of merging the mother and father codes into the parent code, you can make a category called parent containing both codes. You create a category in the same way as a code. On the Categories tab, click the plus icon + on the right and enter a name and description for the category.\n\n\n\nimage5\n\n\nTo move a code to the category, you first unfold the category by clicking the plus sign + next to the category name. Drag & drop codes below box will appear. Then move desired codes by dragging it to that box. In the same way, codes can be removed from the category by dragging them out of the box.\n\n\n\nimage10\n\n\n\n\nTo remove a category, click on the button with the minus icon - on the right side of the Categories tab. Select the category you want to remove and finish the action with the Remove button. Note, that deleting a category has no effect on the codes assigned to the category - they remain in the codebook.\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Working-with-categories.html#deleting-categories",
+    "href": "wiki/Working-with-categories.html#deleting-categories",
+    "title": "About categories",
+    "section": "",
+    "text": "To remove a category, click on the button with the minus icon - on the right side of the Categories tab. Select the category you want to remove and finish the action with the Remove button. Note, that deleting a category has no effect on the codes assigned to the category - they remain in the codebook.\n\n\n\nimage4"
+  },
+  {
+    "objectID": "wiki/Práce-s-poznámkami.html",
+    "href": "wiki/Práce-s-poznámkami.html",
+    "title": "Jak pracovat s poznámkami",
+    "section": "",
+    "text": "Jak pracovat s poznámkami\nKlikněte na ikonu poznámky vedle svého uživatelského jména v horní liště.\n\n\n\nmemos-1-znacky\n\n\nZobrazí se okno Memos. Vytvořte novou poznámku stisknutím tlačítka Nová poznámka.\n\n\n\nmemos-2\n\n\nZadejte svou poznámku. Tlačítkem Uložit a zavřít ji uložte.\n\n\n\nmemos-3\n\n\nK poznámkám svého projektu máte přístup kdykoli. Při otevření poznámky můžete poznámky upravovat nebo mazat."
+  },
+  {
+    "objectID": "wiki/Správa-uživatelů-v-admin-rozhraní-(server).html",
+    "href": "wiki/Správa-uživatelů-v-admin-rozhraní-(server).html",
+    "title": "requal",
+    "section": "",
+    "text": "Správa uživatelů je implementována v modulu správce. Chcete-li se k němu dostat, přihlaste se jako správce a klikněte na ikonu ozubeného kola v levém dolním rohu obrazovky. Tím se zobrazí správa uživatelů, kde můžete vidět všechny uživatele. Všimněte si, že správcem je pouze jeden uživatel, což je doporučený postup. \nChcete-li přidat nového uživatele, klikněte na modrý pruh označený jako Add user. \nV otevřeném okně vyplňte přihlašovací jméno uživatele. Pokud chcete uživatele časově omezit, zadejte také data, jinak je smažte. Zrušte zaškrtnutí políčka admin, vyplňte pořadové číslo (ID), což je číslo o jednu jednotku vyšší než číslo posledního uživatele. Zadejte jméno uživatele,. Zadání e-mailové adresy je nepovinné. Pokud bude uživatel zároveň správcem projektu, tj. bude moci vytvářet a mazat projekty, zadejte do pole Project admin hodnotu TRUE (pravda); pokud ne, zadejte hodnotu False (nepravda). Můžete použít předvyplněné heslo nebo zadat vlastní. Nakonec vyberte, zda si uživatel bude muset po prvním přihlášení změnit heslo.\n\n\n\nuser-info\n\n\nPokud jste hotovi, klikněte na tlačítko Confirm new user a nový uživatel bude vytvořen.\nV tomto modulu můžete také uživatele z reQualu odebrat. Uvědomte si, že pokud odstraníte posledního uživatele, musí mít další nový uživatel vyšší ID než odstraněný, aby se zabránilo existenci dvou uživatelů se stejným ID v databázi. V níže uvedené tabulce můžete změnit nebo obnovit hesla. Kliknutím na tlačítko editovat můžete upravit profil uživatele.\nChcete-li opustit modul správce, vypněte okno prohlížeče a přihlašte se znovu. Doporučujeme nové přihlášení a zakládání projektů jako konkrétní uživatel, nikoliv admin."
+  },
+  {
+    "objectID": "wiki/Instalace-reQualu-v-MacOS.html",
+    "href": "wiki/Instalace-reQualu-v-MacOS.html",
+    "title": "requal",
+    "section": "",
+    "text": "Instalace v počítači se systémem Mac OS probíhá podobně jako v systému Windows. Jediný rozdíl je v tom, že si stáhnete R a RStudio pro MacOS. Upozorňujeme, že pro spuštění reQual je nutné použít RStudio, pokud vaše dokumenty (data) obsahují jiné znaky než latinku, např. ě, š, č, ç."
+  },
+  {
+    "objectID": "wiki/Home.html",
+    "href": "wiki/Home.html",
+    "title": "requal",
+    "section": "",
+    "text": "Requal is a qualitative data analysis tool designed with simplicity and reproducibility in mind. It’s built upon the foundations of R and Shiny, harnessing the power of these technologies to provide a user-friendly interface for coding and analyzing textual data.\nThis software is a product of collaborative efforts between sociologists at Charles University and the Czech Academy of Sciences.\n\nOur aim with this wiki is to provide a comprehensive guide on how to navigate and use Requal effectively. You will learn how to create and manage codes and categories, providing structure to your data analysis. We will also guide you on managing documents within the Requal environment. Requal operates in two modes: offline “local” mode and online “server” mode. The latter provides collaborative team environment. The wiki includes advanced instructions for system administrators on how to setup your own server installation of Requal and run it in server mode.\nThere are two ways to work with Requal - using desktop application or web application. For individual users we recommend installing the desktop application, for teams or classes the web (server) application is more suitable. The versions do not differ from each other except that only the web application contains modules to enhance the reproducibility of the coding. On the other hand, to use the web application you need a server on which to install Server setup\nWe wrote a report summarising and explaining the logic behind Requal here (in Czech only): Strategie.pdf"
+  },
+  {
+    "objectID": "wiki/Vytvoření-projektu.html",
+    "href": "wiki/Vytvoření-projektu.html",
+    "title": "requal",
+    "section": "",
+    "text": "Při spuštění nové relace reQual se dostanete na obrazovku Projekt.\n\n\n\nimage1\n\n\nV pravé části obrazovky se objeví dialogové okno se dvěma záložkami - Načíst a Vytvořit. Pokud se okno nezobrazí automaticky, můžete jej kdykoli otevřít klepnutím na tři tečky ⋮ v pravém horním rohu obrazovky.\n\n\n\nimage4\n\n\nChcete-li nastavit nový projekt, vyberte kartu Vytvořit.\n\n\n\nimage7\n\n\nVyplňte název projektu a poté stiskněte tlačítko Složka a nastavte místo v počítači, kam se má projekt uložit.\n\n\n\nimage2\n\n\nNakonec svůj projekt stručně popište v poli Popis projektu.\n\n\n\nimage6\n\n\nStisknutím tlačítka Vytvořit projekt provedete operaci.\nVoilà! A je to.\n\n\n\nimage9"
+  },
+  {
+    "objectID": "wiki/Vytvoření-projektu.html#jak-vytvořit-nový-projekt",
+    "href": "wiki/Vytvoření-projektu.html#jak-vytvořit-nový-projekt",
+    "title": "requal",
+    "section": "",
+    "text": "Při spuštění nové relace reQual se dostanete na obrazovku Projekt.\n\n\n\nimage1\n\n\nV pravé části obrazovky se objeví dialogové okno se dvěma záložkami - Načíst a Vytvořit. Pokud se okno nezobrazí automaticky, můžete jej kdykoli otevřít klepnutím na tři tečky ⋮ v pravém horním rohu obrazovky.\n\n\n\nimage4\n\n\nChcete-li nastavit nový projekt, vyberte kartu Vytvořit.\n\n\n\nimage7\n\n\nVyplňte název projektu a poté stiskněte tlačítko Složka a nastavte místo v počítači, kam se má projekt uložit.\n\n\n\nimage2\n\n\nNakonec svůj projekt stručně popište v poli Popis projektu.\n\n\n\nimage6\n\n\nStisknutím tlačítka Vytvořit projekt provedete operaci.\nVoilà! A je to.\n\n\n\nimage9"
+  },
+  {
+    "objectID": "wiki/Working-with-Memos.html",
+    "href": "wiki/Working-with-Memos.html",
+    "title": "How to work with memos",
+    "section": "",
+    "text": "How to work with memos\nClick on the sticky note icon next to your user name in the top bar.\n\n\n\nmemos-1-znacky\n\n\nThe Memos window will pop-up. Create a new memo by hitting the New memo button.\n\n\n\nmemos-2\n\n\nType your memo. Use the Save & Close button to store it.\n\n\n\nmemos-3\n\n\nYou can access your project’s memos anytime. You can edit or delete memos when opening the memo."
+  },
+  {
+    "objectID": "wiki/How-to-delete-your-files.html",
+    "href": "wiki/How-to-delete-your-files.html",
+    "title": "requal",
+    "section": "",
+    "text": "Click on the circular - icon on the right side of the screen\nSelect the file you wish to delete\nAnd finally click on Remove"
+  },
+  {
+    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html",
+    "href": "wiki/Moduly-posilující-reprodukovatelnost.html",
+    "title": "requal",
+    "section": "",
+    "text": "Na stránce Report naleznete několik modulů zvyšujících výzkumnickou reflexivitu a transparenci kódování. Tyto moduly fungují pouze ve webové verzi reQualu, protože ta umožňuje kódování vícero kodéry a jejich srovnání."
+  },
+  {
+    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#summary",
+    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#summary",
+    "title": "requal",
+    "section": "Summary",
+    "text": "Summary\nPrvní karta Summary poskytuje přehled o množství označených segmentů jednotlivými kódy v jednotlivých dokumentech. Pokud bychom chtěli vědět, jak často a kde použila kódy určitá kodérka, vybereme pouze jí v nabídkce Select users. Podobně můžeme omezit výběr jen na určité kódy nebo dokumenty v případě, že jich je hodně a celková tabulka je příliš rozsáhlá.\n\n\n\nimage"
+  },
+  {
+    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#agreement",
+    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#agreement",
+    "title": "requal",
+    "section": "Agreement",
+    "text": "Agreement\nKarta Agreement nabízí možnost zviditelnění shody mezi kódy, kodéry a jejich atributy. Když rozbalíme nabídku Select metrics, máme na výběr dvě sady kontrol. První ukazuje shodu spočítanou na základě počtu překrývajících se písmen (znaků), druhý shodu na základě překryvu označených segmentů bez ohledu na počet znaků (segment). Výpočet je proveden pomocí Jaccardova koeficientu podobnosti, který se vypočítá jako poměr počtu shodně kódovaných znaků vůči počtu všech kódovaných znaků.\nRozdíl mezi shodou ve znacích a shodnou v segmentech si můžeme ukázat na příkladu:\n\nKodérka A označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. (55 znaků)\n\nKodérka B označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. Alkoholik nejsem. (71 znaků)\n\nShoda ve znacích bude 0.77 podle výpočtu 55/(55+71-55) = 0.77\nShoda v segmentech bude 1.00 podle výpočtu 1/(1+1-1) = 1.00\n\nKodérka A označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. (55 znaků)\n\nKodérka B označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, (…) Alkoholik nejsem. (43 + 16 = 59 znaků)\n\nShoda ve znacích bude 0.77 podle výpočtu 43/(55+59-43) = 0.61\nShoda v segmentech bude 1.00 podle výpočtu 1/(1+2-1) = 0.50\nZ příkladů vidíme, že každé kritérium je citlivé na jiné vlastnosti kódování. Zatímco počet společných znaků je spíše mechanická míra shody, společné segmenty více odrážejí významovou složku čtení dat.\n\nTotal overlap [character]\nSpočítá celkovou shodu kódování ve znacích ve všech dokumentech pro vybrané kodéry. Tato tabulka poskytuje přehled o celkové shodě kodérů v projektu.\n\n\nOverlap by code [character]\nSpočítá shodu kodování ve znacích ve všech dokumentech pro jednotlivé kódy a pro vybrané kodéry. Shoda je vážená, aby zohledňovala ??? Tato tabulka poskytuje přehled o tom jestli se liší shody v jednotlivých kódech. Umožňuje identifikovat problematické kódy.\n\n\nOverlap by coder [character]\nZobrazí heatmapu, ve které jsou porovnány dvojice kodérů na základě jejich shody ve znacích ve všech dokumentech a všech kódech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka umožňuje identifikaci dvojic kodérů, kteří jsou celkově “sladěni”, a těch, kteří se naopak shodují nejméně.\n\n\nOverlap by coder and code [character]\nZobrazí heatmapu pro každý kód zvlášť, ve které jsou porovnány dvojice kodérů na základě jejich shody ve znacích ve všech dokumentech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka umožňuje zjistit, jestli jsou shody dvojic kodérů podobné ve všech kódech nebo jestli se shoda pro různé kódy liší a jak.\n\n\nOverlap by user attribute and code [character]\nZobrazí heatmapu pro zvolený atribut uživatelů (kodérů), ve které jsou porovnány jednotlivé skupiny kodérů na základě jejich shody ve znacích pro jednotlivé kódy ve všech dokumentech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka může odhalit kódy, které jsou citlivé na některý z atributů kodérů. Na obrázku například vidíme, že pro code 2 se více shodují muži s ženami než muži mezi sebou, což ukazuje, že gender kodérů v tomto kódu nehraje roli.\n\n\n\nimage\n\n\n\n\nShoda v segmentech\nStejná sada ukazatelů existuje pro shodu v segmentech. Jejich intepretace je stejná, jen s tím rozdílem, že shody se nepočítají v identicky kódovaných znacích, ale v překrývajících se segmentech."
+  },
+  {
+    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#text-overlap",
+    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#text-overlap",
+    "title": "requal",
+    "section": "Text overlap",
+    "text": "Text overlap\nChceme-li shodu v kódování prozkoumat ještě podrobněji, použijeme kartu Text overlap. V nabídce vyberte, který dokument chcete zobrazit, který kód a případně určité kodéry, pokud bychom chtěli informaci třeba o shodě dvou kodérů.\nPo kliknutí na tlačítko Browse se nám zobrazí překryvy označených dat kodérů pro daný kód a dokument. Čím světlejší je barva, tím vyšší je shoda mezi kodéry.\nKdyž najedeme myší na zvýrazněný segment, zobrazí se jména kodérů, kteří jej kódovali. To poskytuje dobrý základ pro týmovou diskusi o kódování. Například o tom, jak dlouhé segmenty kódovat nebo jak výrazné případy jevu kódovat.\n\n\n\nimage\n\n\nTip! Tento modul lze také použít k tomu, aby uživatelé s právy k prohlížení reportu mohli sledovat, jak kódovali jednotliví kodéři, např. ve školním projektu."
+  },
+  {
+    "objectID": "wiki/Requal-for-Linux.html",
+    "href": "wiki/Requal-for-Linux.html",
+    "title": "requal",
+    "section": "",
+    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
+  },
+  {
+    "objectID": "wiki/Requal-for-Linux.html#linux-instructions",
+    "href": "wiki/Requal-for-Linux.html#linux-instructions",
+    "title": "requal",
+    "section": "",
+    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
+  },
+  {
+    "objectID": "wiki/User-management-in-admin-mode-(server).html",
+    "href": "wiki/User-management-in-admin-mode-(server).html",
+    "title": "requal",
+    "section": "",
+    "text": "User management is implemented in the admin module. To access it, log in as administrator and click on the gear icon in the bottom left of the screen. This will display the user management where you can see all users.\n\n\n\nadmin-mode-entry\n\n\nNote that only one user is an administrator, which is a recommended practice. To add a new user, click on the blue bar labelled Add a user.\n\n\n\nadd-user\n\n\nIn the window that opens, fill in the user’s login name. If you want to restrict the user by time, enter the dates as well, otherwise delete them. Uncheck admin, fill in the serial ID number, which is the number one unit higher than the last user’s number. Type in the user’s name. Entering an email address is optional. If the user will also be a project administrator, that is, will be able to create and delete projects, type TRUE in the Project admin field; if not, type False. You can use a pre-filled password or enter your own. Finally, select whether the user will need to change the password after the first login.\n\n\n\nuser-info\n\n\nIf you are done, click Confirm user and a new user will be created.\nIn this module you can also remove a user from Requal. Be aware that if you remove the last user the next new user must have the user ID higher than the removed one to prevent an existence of two users with the same ID in the database. In the table below, you can change or reset passwords. Clicking on Edit, you can edit a user profile.\nTo leave the admin module, hover your mouse over the plus icon at the bottom left corner and click on Go to application or Logout. We recommend logging out and logging back in and setting up projects as a specific user, not admin."
+  },
+  {
     "objectID": "wiki.html",
     "href": "wiki.html",
     "title": "Wiki",
@@ -77,661 +742,10 @@
     "text": "Reproducibility enhancing modules\nLog"
   },
   {
-    "objectID": "wiki/User-management-in-admin-mode-(server).html",
-    "href": "wiki/User-management-in-admin-mode-(server).html",
-    "title": "requal",
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Requal posts",
     "section": "",
-    "text": "User management is implemented in the admin module. To access it, log in as administrator and click on the gear icon in the bottom left of the screen. This will display the user management where you can see all users.\n\n\n\nadmin-mode-entry\n\n\nNote that only one user is an administrator, which is a recommended practice. To add a new user, click on the blue bar labelled Add a user.\n\n\n\nadd-user\n\n\nIn the window that opens, fill in the user’s login name. If you want to restrict the user by time, enter the dates as well, otherwise delete them. Uncheck admin, fill in the serial ID number, which is the number one unit higher than the last user’s number. Type in the user’s name. Entering an email address is optional. If the user will also be a project administrator, that is, will be able to create and delete projects, type TRUE in the Project admin field; if not, type False. You can use a pre-filled password or enter your own. Finally, select whether the user will need to change the password after the first login.\n\n\n\nuser-info\n\n\nIf you are done, click Confirm user and a new user will be created.\nIn this module you can also remove a user from Requal. Be aware that if you remove the last user the next new user must have the user ID higher than the removed one to prevent an existence of two users with the same ID in the database. In the table below, you can change or reset passwords. Clicking on Edit, you can edit a user profile.\nTo leave the admin module, hover your mouse over the plus icon at the bottom left corner and click on Go to application or Logout. We recommend logging out and logging back in and setting up projects as a specific user, not admin."
-  },
-  {
-    "objectID": "wiki/Requal-for-Linux.html",
-    "href": "wiki/Requal-for-Linux.html",
-    "title": "requal",
-    "section": "",
-    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
-  },
-  {
-    "objectID": "wiki/Requal-for-Linux.html#linux-instructions",
-    "href": "wiki/Requal-for-Linux.html#linux-instructions",
-    "title": "requal",
-    "section": "",
-    "text": "The installation on a Linux machine is similar to Windows. The only difference is that you download R or RStudio for your linux operating system, e.g. Ubuntu or Fedora."
-  },
-  {
-    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html",
-    "href": "wiki/Moduly-posilující-reprodukovatelnost.html",
-    "title": "requal",
-    "section": "",
-    "text": "Na stránce Report naleznete několik modulů zvyšujících výzkumnickou reflexivitu a transparenci kódování. Tyto moduly fungují pouze ve webové verzi reQualu, protože ta umožňuje kódování vícero kodéry a jejich srovnání."
-  },
-  {
-    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#summary",
-    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#summary",
-    "title": "requal",
-    "section": "Summary",
-    "text": "Summary\nPrvní karta Summary poskytuje přehled o množství označených segmentů jednotlivými kódy v jednotlivých dokumentech. Pokud bychom chtěli vědět, jak často a kde použila kódy určitá kodérka, vybereme pouze jí v nabídkce Select users. Podobně můžeme omezit výběr jen na určité kódy nebo dokumenty v případě, že jich je hodně a celková tabulka je příliš rozsáhlá.\n\n\n\nimage"
-  },
-  {
-    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#agreement",
-    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#agreement",
-    "title": "requal",
-    "section": "Agreement",
-    "text": "Agreement\nKarta Agreement nabízí možnost zviditelnění shody mezi kódy, kodéry a jejich atributy. Když rozbalíme nabídku Select metrics, máme na výběr dvě sady kontrol. První ukazuje shodu spočítanou na základě počtu překrývajících se písmen (znaků), druhý shodu na základě překryvu označených segmentů bez ohledu na počet znaků (segment). Výpočet je proveden pomocí Jaccardova koeficientu podobnosti, který se vypočítá jako poměr počtu shodně kódovaných znaků vůči počtu všech kódovaných znaků.\nRozdíl mezi shodou ve znacích a shodnou v segmentech si můžeme ukázat na příkladu:\n\nKodérka A označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. (55 znaků)\n\nKodérka B označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. Alkoholik nejsem. (71 znaků)\n\nShoda ve znacích bude 0.77 podle výpočtu 55/(55+71-55) = 0.77\nShoda v segmentech bude 1.00 podle výpočtu 1/(1+1-1) = 1.00\n\nKodérka A označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, mně nechutná. (55 znaků)\n\nKodérka B označí: Ale prostě já, u mě je ten problém, že já pivo nepiju, (…) Alkoholik nejsem. (43 + 16 = 59 znaků)\n\nShoda ve znacích bude 0.77 podle výpočtu 43/(55+59-43) = 0.61\nShoda v segmentech bude 1.00 podle výpočtu 1/(1+2-1) = 0.50\nZ příkladů vidíme, že každé kritérium je citlivé na jiné vlastnosti kódování. Zatímco počet společných znaků je spíše mechanická míra shody, společné segmenty více odrážejí významovou složku čtení dat.\n\nTotal overlap [character]\nSpočítá celkovou shodu kódování ve znacích ve všech dokumentech pro vybrané kodéry. Tato tabulka poskytuje přehled o celkové shodě kodérů v projektu.\n\n\nOverlap by code [character]\nSpočítá shodu kodování ve znacích ve všech dokumentech pro jednotlivé kódy a pro vybrané kodéry. Shoda je vážená, aby zohledňovala ??? Tato tabulka poskytuje přehled o tom jestli se liší shody v jednotlivých kódech. Umožňuje identifikovat problematické kódy.\n\n\nOverlap by coder [character]\nZobrazí heatmapu, ve které jsou porovnány dvojice kodérů na základě jejich shody ve znacích ve všech dokumentech a všech kódech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka umožňuje identifikaci dvojic kodérů, kteří jsou celkově “sladěni”, a těch, kteří se naopak shodují nejméně.\n\n\nOverlap by coder and code [character]\nZobrazí heatmapu pro každý kód zvlášť, ve které jsou porovnány dvojice kodérů na základě jejich shody ve znacích ve všech dokumentech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka umožňuje zjistit, jestli jsou shody dvojic kodérů podobné ve všech kódech nebo jestli se shoda pro různé kódy liší a jak.\n\n\nOverlap by user attribute and code [character]\nZobrazí heatmapu pro zvolený atribut uživatelů (kodérů), ve které jsou porovnány jednotlivé skupiny kodérů na základě jejich shody ve znacích pro jednotlivé kódy ve všech dokumentech. Čím je barva světlejší, tím je shoda vyšší. Tato tabulka může odhalit kódy, které jsou citlivé na některý z atributů kodérů. Na obrázku například vidíme, že pro code 2 se více shodují muži s ženami než muži mezi sebou, což ukazuje, že gender kodérů v tomto kódu nehraje roli.\n\n\n\nimage\n\n\n\n\nShoda v segmentech\nStejná sada ukazatelů existuje pro shodu v segmentech. Jejich intepretace je stejná, jen s tím rozdílem, že shody se nepočítají v identicky kódovaných znacích, ale v překrývajících se segmentech."
-  },
-  {
-    "objectID": "wiki/Moduly-posilující-reprodukovatelnost.html#text-overlap",
-    "href": "wiki/Moduly-posilující-reprodukovatelnost.html#text-overlap",
-    "title": "requal",
-    "section": "Text overlap",
-    "text": "Text overlap\nChceme-li shodu v kódování prozkoumat ještě podrobněji, použijeme kartu Text overlap. V nabídce vyberte, který dokument chcete zobrazit, který kód a případně určité kodéry, pokud bychom chtěli informaci třeba o shodě dvou kodérů.\nPo kliknutí na tlačítko Browse se nám zobrazí překryvy označených dat kodérů pro daný kód a dokument. Čím světlejší je barva, tím vyšší je shoda mezi kodéry.\nKdyž najedeme myší na zvýrazněný segment, zobrazí se jména kodérů, kteří jej kódovali. To poskytuje dobrý základ pro týmovou diskusi o kódování. Například o tom, jak dlouhé segmenty kódovat nebo jak výrazné případy jevu kódovat.\n\n\n\nimage\n\n\nTip! Tento modul lze také použít k tomu, aby uživatelé s právy k prohlížení reportu mohli sledovat, jak kódovali jednotliví kodéři, např. ve školním projektu."
-  },
-  {
-    "objectID": "wiki/How-to-delete-your-files.html",
-    "href": "wiki/How-to-delete-your-files.html",
-    "title": "requal",
-    "section": "",
-    "text": "Click on the circular - icon on the right side of the screen\nSelect the file you wish to delete\nAnd finally click on Remove"
-  },
-  {
-    "objectID": "wiki/Working-with-Memos.html",
-    "href": "wiki/Working-with-Memos.html",
-    "title": "How to work with memos",
-    "section": "",
-    "text": "How to work with memos\nClick on the sticky note icon next to your user name in the top bar.\n\n\n\nmemos-1-znacky\n\n\nThe Memos window will pop-up. Create a new memo by hitting the New memo button.\n\n\n\nmemos-2\n\n\nType your memo. Use the Save & Close button to store it.\n\n\n\nmemos-3\n\n\nYou can access your project’s memos anytime. You can edit or delete memos when opening the memo."
-  },
-  {
-    "objectID": "wiki/Vytvoření-projektu.html",
-    "href": "wiki/Vytvoření-projektu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Při spuštění nové relace reQual se dostanete na obrazovku Projekt.\n\n\n\nimage1\n\n\nV pravé části obrazovky se objeví dialogové okno se dvěma záložkami - Načíst a Vytvořit. Pokud se okno nezobrazí automaticky, můžete jej kdykoli otevřít klepnutím na tři tečky ⋮ v pravém horním rohu obrazovky.\n\n\n\nimage4\n\n\nChcete-li nastavit nový projekt, vyberte kartu Vytvořit.\n\n\n\nimage7\n\n\nVyplňte název projektu a poté stiskněte tlačítko Složka a nastavte místo v počítači, kam se má projekt uložit.\n\n\n\nimage2\n\n\nNakonec svůj projekt stručně popište v poli Popis projektu.\n\n\n\nimage6\n\n\nStisknutím tlačítka Vytvořit projekt provedete operaci.\nVoilà! A je to.\n\n\n\nimage9"
-  },
-  {
-    "objectID": "wiki/Vytvoření-projektu.html#jak-vytvořit-nový-projekt",
-    "href": "wiki/Vytvoření-projektu.html#jak-vytvořit-nový-projekt",
-    "title": "requal",
-    "section": "",
-    "text": "Při spuštění nové relace reQual se dostanete na obrazovku Projekt.\n\n\n\nimage1\n\n\nV pravé části obrazovky se objeví dialogové okno se dvěma záložkami - Načíst a Vytvořit. Pokud se okno nezobrazí automaticky, můžete jej kdykoli otevřít klepnutím na tři tečky ⋮ v pravém horním rohu obrazovky.\n\n\n\nimage4\n\n\nChcete-li nastavit nový projekt, vyberte kartu Vytvořit.\n\n\n\nimage7\n\n\nVyplňte název projektu a poté stiskněte tlačítko Složka a nastavte místo v počítači, kam se má projekt uložit.\n\n\n\nimage2\n\n\nNakonec svůj projekt stručně popište v poli Popis projektu.\n\n\n\nimage6\n\n\nStisknutím tlačítka Vytvořit projekt provedete operaci.\nVoilà! A je to.\n\n\n\nimage9"
-  },
-  {
-    "objectID": "wiki/Home.html",
-    "href": "wiki/Home.html",
-    "title": "requal",
-    "section": "",
-    "text": "Requal is a qualitative data analysis tool designed with simplicity and reproducibility in mind. It’s built upon the foundations of R and Shiny, harnessing the power of these technologies to provide a user-friendly interface for coding and analyzing textual data.\nThis software is a product of collaborative efforts between sociologists at Charles University and the Czech Academy of Sciences.\n\nOur aim with this wiki is to provide a comprehensive guide on how to navigate and use Requal effectively. You will learn how to create and manage codes and categories, providing structure to your data analysis. We will also guide you on managing documents within the Requal environment. Requal operates in two modes: offline “local” mode and online “server” mode. The latter provides collaborative team environment. The wiki includes advanced instructions for system administrators on how to setup your own server installation of Requal and run it in server mode.\nThere are two ways to work with Requal - using desktop application or web application. For individual users we recommend installing the desktop application, for teams or classes the web (server) application is more suitable. The versions do not differ from each other except that only the web application contains modules to enhance the reproducibility of the coding. On the other hand, to use the web application you need a server on which to install Server setup\nWe wrote a report summarising and explaining the logic behind Requal here (in Czech only): Strategie.pdf"
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-v-MacOS.html",
-    "href": "wiki/Instalace-reQualu-v-MacOS.html",
-    "title": "requal",
-    "section": "",
-    "text": "Instalace v počítači se systémem Mac OS probíhá podobně jako v systému Windows. Jediný rozdíl je v tom, že si stáhnete R a RStudio pro MacOS. Upozorňujeme, že pro spuštění reQual je nutné použít RStudio, pokud vaše dokumenty (data) obsahují jiné znaky než latinku, např. ě, š, č, ç."
-  },
-  {
-    "objectID": "wiki/Správa-uživatelů-v-admin-rozhraní-(server).html",
-    "href": "wiki/Správa-uživatelů-v-admin-rozhraní-(server).html",
-    "title": "requal",
-    "section": "",
-    "text": "Správa uživatelů je implementována v modulu správce. Chcete-li se k němu dostat, přihlaste se jako správce a klikněte na ikonu ozubeného kola v levém dolním rohu obrazovky. Tím se zobrazí správa uživatelů, kde můžete vidět všechny uživatele. Všimněte si, že správcem je pouze jeden uživatel, což je doporučený postup. \nChcete-li přidat nového uživatele, klikněte na modrý pruh označený jako Add user. \nV otevřeném okně vyplňte přihlašovací jméno uživatele. Pokud chcete uživatele časově omezit, zadejte také data, jinak je smažte. Zrušte zaškrtnutí políčka admin, vyplňte pořadové číslo (ID), což je číslo o jednu jednotku vyšší než číslo posledního uživatele. Zadejte jméno uživatele,. Zadání e-mailové adresy je nepovinné. Pokud bude uživatel zároveň správcem projektu, tj. bude moci vytvářet a mazat projekty, zadejte do pole Project admin hodnotu TRUE (pravda); pokud ne, zadejte hodnotu False (nepravda). Můžete použít předvyplněné heslo nebo zadat vlastní. Nakonec vyberte, zda si uživatel bude muset po prvním přihlášení změnit heslo.\n\n\n\nuser-info\n\n\nPokud jste hotovi, klikněte na tlačítko Confirm new user a nový uživatel bude vytvořen.\nV tomto modulu můžete také uživatele z reQualu odebrat. Uvědomte si, že pokud odstraníte posledního uživatele, musí mít další nový uživatel vyšší ID než odstraněný, aby se zabránilo existenci dvou uživatelů se stejným ID v databázi. V níže uvedené tabulce můžete změnit nebo obnovit hesla. Kliknutím na tlačítko editovat můžete upravit profil uživatele.\nChcete-li opustit modul správce, vypněte okno prohlížeče a přihlašte se znovu. Doporučujeme nové přihlášení a zakládání projektů jako konkrétní uživatel, nikoliv admin."
-  },
-  {
-    "objectID": "wiki/Práce-s-poznámkami.html",
-    "href": "wiki/Práce-s-poznámkami.html",
-    "title": "Jak pracovat s poznámkami",
-    "section": "",
-    "text": "Jak pracovat s poznámkami\nKlikněte na ikonu poznámky vedle svého uživatelského jména v horní liště.\n\n\n\nmemos-1-znacky\n\n\nZobrazí se okno Memos. Vytvořte novou poznámku stisknutím tlačítka Nová poznámka.\n\n\n\nmemos-2\n\n\nZadejte svou poznámku. Tlačítkem Uložit a zavřít ji uložte.\n\n\n\nmemos-3\n\n\nK poznámkám svého projektu máte přístup kdykoli. Při otevření poznámky můžete poznámky upravovat nebo mazat."
-  },
-  {
-    "objectID": "wiki/Working-with-categories.html",
-    "href": "wiki/Working-with-categories.html",
-    "title": "About categories",
-    "section": "",
-    "text": "The Categories tab on the Codebook screen is used to manage categories. A category is a group of codes that have something in common. For example, instead of merging the mother and father codes into the parent code, you can make a category called parent containing both codes. You create a category in the same way as a code. On the Categories tab, click the plus icon + on the right and enter a name and description for the category.\n\n\n\nimage5\n\n\nTo move a code to the category, you first unfold the category by clicking the plus sign + next to the category name. Drag & drop codes below box will appear. Then move desired codes by dragging it to that box. In the same way, codes can be removed from the category by dragging them out of the box.\n\n\n\nimage10\n\n\n\n\nTo remove a category, click on the button with the minus icon - on the right side of the Categories tab. Select the category you want to remove and finish the action with the Remove button. Note, that deleting a category has no effect on the codes assigned to the category - they remain in the codebook.\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Working-with-categories.html#deleting-categories",
-    "href": "wiki/Working-with-categories.html#deleting-categories",
-    "title": "About categories",
-    "section": "",
-    "text": "To remove a category, click on the button with the minus icon - on the right side of the Categories tab. Select the category you want to remove and finish the action with the Remove button. Note, that deleting a category has no effect on the codes assigned to the category - they remain in the codebook.\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-v-Linuxu.html",
-    "href": "wiki/Instalace-reQualu-v-Linuxu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Instalace v počítači se systémem Linux probíhá podobně jako v systému Windows. Jediný rozdíl je v tom, že si stáhnete R nebo RStudio pro svůj operační systém Linux, např. Ubuntu nebo Fedora."
-  },
-  {
-    "objectID": "wiki/Atributy-kodérů.html",
-    "href": "wiki/Atributy-kodérů.html",
-    "title": "requal",
-    "section": "",
-    "text": "Na obrazovce Report, kartě User attributes můžeme definovat konkrétní atributy uživatelů, abychom mohli monitorovat, zda mají nějaký vliv na kódování.\nV projektu můžeme zadat jakékoliv atributy a jejich hodnoty podle potřeby projektu. Můžeme zadat např. gender v projektu, kde očekáváme relevanci genderu pro kódování, jindy nás může zajímat zkušenost kodérů s migrací či drogami, pokud budou data z této oblasti. Atribut je třeba pojmenovat krátce a srozumitelně. Do druhého pole zadáme hodnoty, které atribut může nabývat. Mějme na paměti, že někteří uživatelé nebudou chtít určitý atribut vyplnit nebo nebude odpovídat nabídce a proto by měla existovat hodnota “jiný” nebo “nezadáno”.\nV koláčových grafech vidíme rozložení atributů v souboru uživatelů projektu.\n\n\n\nimage\n\n\nKaždý uživatel vyplňuje atributy ve svém profilu. Ten si otevře kliknutím na ikonu vedle svého jména vpravo nahoře. Pod seznamem oprávnění je tlačítko Edit, po jehož stisknutí se objeví okno s možností zadání atributů.\n\n\n\nimage"
-  },
-  {
-    "objectID": "wiki/Odstranění-dokumentu.html",
-    "href": "wiki/Odstranění-dokumentu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Při odstraňování dokumentu z projektu klikněte na kruhovou ikonu mínusu - na pravé straně obrazovky Projekt.\n\n\n\nimage7-znacky\n\n\nVyberte dokument, který chcete odstranit, a stiskněte tlačítko Odstranit. Dokument bude z projektu odstraněn.\nUvědomte si, že spolu s dokumentem ztratíte i všechny kódované segmenty a akci nelze vrátit zpět. Než tedy dokument odstraníte, dvakrát si to rozmyslete."
-  },
-  {
-    "objectID": "wiki/Odstranění-dokumentu.html#odstranění-dokumentů",
-    "href": "wiki/Odstranění-dokumentu.html#odstranění-dokumentů",
-    "title": "requal",
-    "section": "",
-    "text": "Při odstraňování dokumentu z projektu klikněte na kruhovou ikonu mínusu - na pravé straně obrazovky Projekt.\n\n\n\nimage7-znacky\n\n\nVyberte dokument, který chcete odstranit, a stiskněte tlačítko Odstranit. Dokument bude z projektu odstraněn.\nUvědomte si, že spolu s dokumentem ztratíte i všechny kódované segmenty a akci nelze vrátit zpět. Než tedy dokument odstraníte, dvakrát si to rozmyslete."
-  },
-  {
-    "objectID": "wiki/How-to-remove-documents.html",
-    "href": "wiki/How-to-remove-documents.html",
-    "title": "requal",
-    "section": "",
-    "text": "When removing a document from the project, click on the circular minus icon - on the right side of the Project screen.\n\n\n\nimage7-znacky\n\n\nSelect the document you wish to delete and press Remove. The document will be removed from your project.\nBe aware that you will also lose all coded segments with the document and there is no way to undo the action. So think twice before deleting a document."
-  },
-  {
-    "objectID": "wiki/How-to-remove-documents.html#removing-your-documents",
-    "href": "wiki/How-to-remove-documents.html#removing-your-documents",
-    "title": "requal",
-    "section": "",
-    "text": "When removing a document from the project, click on the circular minus icon - on the right side of the Project screen.\n\n\n\nimage7-znacky\n\n\nSelect the document you wish to delete and press Remove. The document will be removed from your project.\nBe aware that you will also lose all coded segments with the document and there is no way to undo the action. So think twice before deleting a document."
-  },
-  {
-    "objectID": "wiki/Working-with-Codes.html",
-    "href": "wiki/Working-with-Codes.html",
-    "title": "requal",
-    "section": "",
-    "text": "You can create new codes and manage already existing codes on the Codebook screen, which you can get to by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: Codes and Categories.\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. To create a new code, use the top button with the plus sign +. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/Working-with-Codes.html#creating-a-new-code",
-    "href": "wiki/Working-with-Codes.html#creating-a-new-code",
-    "title": "requal",
-    "section": "",
-    "text": "You can create new codes and manage already existing codes on the Codebook screen, which you can get to by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: Codes and Categories.\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. To create a new code, use the top button with the plus sign +. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/Working-with-Codes.html#merging-codes",
-    "href": "wiki/Working-with-Codes.html#merging-codes",
-    "title": "requal",
-    "section": "Merging codes",
-    "text": "Merging codes\nMerging codes can be used if there are two codes that overlap, for example mother and father, and you want to merge them into a new code parent. First, create a new code called parent. Second, click on the circular icon with two arrows on the right side of the screen.\n\n\n\nimage9\n\n\nIn the Merge codes dialogue window, select the code that you want to merge from and the code you want to merge into. Hit Merge to execute the operation.\n\n\n\nimage7\n\n\nRepeat the same steps to merge the second code. This creates a single code that contains all segments previously coded with mother and father. After merging, you cannot view the original codes or return to them individually. To keep the original codes next to the new common code, create a category instead of merging the codes.\n\n\n\nimage8"
-  },
-  {
-    "objectID": "wiki/Working-with-Codes.html#deleting-a-code",
-    "href": "wiki/Working-with-Codes.html#deleting-a-code",
-    "title": "requal",
-    "section": "Deleting a code",
-    "text": "Deleting a code\nYou can delete codes with the minus button - on the right side of the Codes tab. Select the desired code from the drop down menu and click delete. The code will be deleted from your Codebook. When deleting a code, be careful - once a code is deleted, there is no way to recover it.\n\n\n\nimage1"
-  },
-  {
-    "objectID": "wiki/Správa-uživatelů-v-projektu.html",
-    "href": "wiki/Správa-uživatelů-v-projektu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Abyste mohli spravovat uživatele, musíte se přihlásit jako správce projektu. Takové oprávnění je uživateli přiděleno v modulu správy uživatelů.\nOtevřeme projekt, který chceme spravovat. Na stránce projektu vybereme kartu Manage users. Zobrazí se seznam uživatelů v projektu.\nKdyž kliknete na znaménko plus vpravo od uživatele, zobrazí se jeho oprávnění.\n\n\n\nimage\n\n\nChcete-li do projektu přidat uživatele, klikněte na ikonu plus. Zobrazí se pole, do kterého když kliknete, zobrazí se vám seznam všech uživatelů. Pokud požadované uživatele v seznamu nevidíte, tito uživatelé ještě nebyli přidáni do reQualu v modulu správa uživatelů v admin rozhraní. Na druhou stranu, pokud jsou v seznamu, můžete vybrat jednoho nebo více z nich a kliknutím na tlačítko Add users je přidat.\n\n\n\nSnímek obrazovky z 2023-05-26 21-21-23\n\n\nKdyž je nový uživatel mezi uživateli projektu, musíte zkontrolovat jeho oprávnění a případně je upravit. Na závěr je důležité nezapomenout změnu oprávnění uložit. Uživatelé mohou svá oprávnění zobrazit kliknutím na ikonu vedle svého jména vpravo nahoře.\n\n\n\nimage\n\n\nZ hlediska oprávnění se můžeme nejčastěji setkat s třemi druhy uživatelů. * Správkyně projektu, která projekt vytvořila a která má všechna oprávnění. * Členka týmu, která má podobná oprávnění jako správce, ale může měnit pouze to, co sám do projektu vložila (dokumenty, kódy, kategorie, poznámky). * Kodérka, typicky studentka pracující na kódovací úloze, která může vidět dokumenty, kódy a kategorie ostatních, zadat své atributy, označovat segmenty a vytvářet poznámky.\nChcete-li uživatele z projektu odebrat, klikněte na ikonu mínusu, vyberte uživatele, kterého chcete odebrat, a klikněte na tlačítko Remove users."
-  },
-  {
-    "objectID": "wiki/How-to-open-your-project.html",
-    "href": "wiki/How-to-open-your-project.html",
-    "title": "requal",
-    "section": "",
-    "text": "To open an already existing project you need to select the file where your project has been saved.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nChoose your project from the list and then click on Select or just double click on the file. When back in the Load tab, hit the green Load project button.\n\n\n\nimage8\n\n\nYour project is now loaded. You can start working on it!\n\n\n\nimage3"
-  },
-  {
-    "objectID": "wiki/How-to-open-your-project.html#load-already-existing-project",
-    "href": "wiki/How-to-open-your-project.html#load-already-existing-project",
-    "title": "requal",
-    "section": "",
-    "text": "To open an already existing project you need to select the file where your project has been saved.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nChoose your project from the list and then click on Select or just double click on the file. When back in the Load tab, hit the green Load project button.\n\n\n\nimage8\n\n\nYour project is now loaded. You can start working on it!\n\n\n\nimage3"
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-ve-Windows.html",
-    "href": "wiki/Instalace-reQualu-ve-Windows.html",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li používat reQual, musíte mít na svém počítači nainstalovaný a spuštěnýjazyk R. Budete také potřebovat webový prohlížeč s podporou JavaScriptu (tj. některý ze standardních prohlížečů, jako je Firefox, Chrome nebo Safari). Program reQual lze nainstalovat dvěma způsoby - prostřednictvím konzole R nebo RStudia. Nezkušeným uživatelům doporučujeme použít RStudio."
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#jak-nainstalovat-requal",
-    "href": "wiki/Instalace-reQualu-ve-Windows.html#jak-nainstalovat-requal",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li používat reQual, musíte mít na svém počítači nainstalovaný a spuštěnýjazyk R. Budete také potřebovat webový prohlížeč s podporou JavaScriptu (tj. některý ze standardních prohlížečů, jako je Firefox, Chrome nebo Safari). Program reQual lze nainstalovat dvěma způsoby - prostřednictvím konzole R nebo RStudia. Nezkušeným uživatelům doporučujeme použít RStudio."
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-rstudio",
-    "href": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-rstudio",
-    "title": "requal",
-    "section": "Windows (přes RStudio)",
-    "text": "Windows (přes RStudio)\nKrok první. Nainstalujte R. Přejděte na stránku https://cran.r-project.org/bin/windows/base/ a klikněte na Stáhnout R pro Windows. Stáhněte soubor a spusťte jej.\n\n\n\nimage7\n\n\nBěhem instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb.\nKrok druhý. Nainstalujte RStudio. Přejděte na stránku www.rstudio.com a stáhněte si bezplatnou verzi pro stolní počítače.\n\n\n\nimage8\n\n\nPo stažení nainstalujte Rstudio a spusťte jej.\nTřetí krok. Nainstalujte program reQual. Přejděte na stránku https://github.com/RE-QDA/requal/releases Klikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky a stáhněte si komprimovaný balíček, např. requal_0.9.1.tar.gz.\n\n\n\nimage1\n\n\nV konzoli RStudia nainstalujte balíček remotes příkazem install.packages(\"remotes\"). Dále nainstalujte balíček requal spuštěním příkazu remotes::install_local(file.choose()) a vyberte stažený soubor.\n\n\n\nimage6\n\n\nPokud budete vyzváni k aktualizaci balíčků, proveďte aktualizaci “All” (zadejte 1).\n\n\n\nimage3\n\n\nInstalace může trvat několik minut, protože je nutné stáhnout a nainstalovat řadu balíčků. Po dokončení instalace se zobrazí poslední řádek: * DONE (requal)\nKrok čtvrtý. Spusťte reQual z konzole RStudia následujícím příkazem: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-konzoli-r",
-    "href": "wiki/Instalace-reQualu-ve-Windows.html#windows-přes-konzoli-r",
-    "title": "requal",
-    "section": "Windows (přes konzoli R)",
-    "text": "Windows (přes konzoli R)\nKrok první. Nainstalujte R. Přejděte na stránku https://cran.r-project.org/bin/windows/base/ a klikněte na Download R for Windows. Stáhněte soubor a spusťte jej.\n\n\n\nimage7\n\n\nBěhem instalace můžete souhlasit se všemi výchozími možnostmi nebo si instalaci přizpůsobit podle svých potřeb. Po dokončení spusťte R z nabídky Windows. Zobrazí se konzole R.\n Krok druhý. Nainstalujte reQual. Přejděte na stránku https://github.com/RE-QDA/requal/releases\nKlikněte na nejnovější verzi a poté sjeďte dolů na konec tabulky, stáhněte komprimovaný balíček, např. requal_0.5.4.tar.gz.\n\n\n\nimage1\n\n\nV konzoli R nainstalujte balíček remotes zadáním příkazu install.packages(\"remotes\") a stisknutím klávesy Enter.\n\n\n\nimage10\n\n\nPokud se zobrazí dialogové okno, klikněte na Ano nebo přizpůsobte instalaci. Nainstalujte balíček requal příkazem remotes::install_local(file.choose()) a vyberte stažený soubor.\n\n\n\nimage2\n\n\nInstalace může trvat několik minut, protože je nutné stáhnout a nainstalovat několik balíčků. Po dokončení instalace se zobrazí poslední řádek: * DONE (requal)\nTřetí krok. Spusťte reQual z konzole R následujícím příkazem: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage5"
-  },
-  {
-    "objectID": "wiki/Working-with-your-project.html",
-    "href": "wiki/Working-with-your-project.html",
-    "title": "requal",
-    "section": "",
-    "text": "When starting a new Requal session you land on the Project screen.\n\n\n\nimage1\n\n\nOn the right side of the screen, a dialogue window with two tabs - Load and Create - pops up. If the box doesn’t appear automatically, you can open it anytime by clicking on the three dots ⋮ in the right upper corner of the screen.\n\n\n\nimage4\n\n\nTo set up a new project select the Create tab.\n\n\n\nimage7\n\n\nFill in the project name and then hit the Folder button to set the place in your computer where you want your project to be saved.\n\n\n\nimage2\n\n\nFinally, briefly describe your project in the field Project description.\n\n\n\nimage6\n\n\nHit the Create project button to execute the operation.\nVoilà! There you go. Now you can check your project name and description!\n\n\n\nimage9"
-  },
-  {
-    "objectID": "wiki/Working-with-your-project.html#how-to-create-a-new-project",
-    "href": "wiki/Working-with-your-project.html#how-to-create-a-new-project",
-    "title": "requal",
-    "section": "",
-    "text": "When starting a new Requal session you land on the Project screen.\n\n\n\nimage1\n\n\nOn the right side of the screen, a dialogue window with two tabs - Load and Create - pops up. If the box doesn’t appear automatically, you can open it anytime by clicking on the three dots ⋮ in the right upper corner of the screen.\n\n\n\nimage4\n\n\nTo set up a new project select the Create tab.\n\n\n\nimage7\n\n\nFill in the project name and then hit the Folder button to set the place in your computer where you want your project to be saved.\n\n\n\nimage2\n\n\nFinally, briefly describe your project in the field Project description.\n\n\n\nimage6\n\n\nHit the Create project button to execute the operation.\nVoilà! There you go. Now you can check your project name and description!\n\n\n\nimage9"
-  },
-  {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact",
-    "section": "",
-    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help?\n\nVisit the Requal wiki\n\nHave an issue?\n\nReport it via our GitHub.\n\nHave a question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
-  },
-  {
-    "objectID": "contact.html#help-contribution",
-    "href": "contact.html#help-contribution",
-    "title": "Contact",
-    "section": "",
-    "text": "Read our brochure (only in Czech) about reproducibility enhancing strategies used in Requal here.\n\nNeed help?\n\nVisit the Requal wiki\n\nHave an issue?\n\nReport it via our GitHub.\n\nHave a question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia"
-  },
-  {
-    "objectID": "contact.html#acknowledgement",
-    "href": "contact.html#acknowledgement",
-    "title": "Contact",
-    "section": "Acknowledgement",
-    "text": "Acknowledgement\nThe application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
-  },
-  {
-    "objectID": "news.html",
-    "href": "news.html",
-    "title": "News",
-    "section": "",
-    "text": "New Requal release: Thuringothyris (v1.1.2). 2024-05-18\nMartin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University. 2024-05-16"
-  },
-  {
-    "objectID": "wiki/Log-Tab.html",
-    "href": "wiki/Log-Tab.html",
-    "title": "requal",
-    "section": "",
-    "text": "In the navigation panel, you can find Report. There are five tabs on the Report screen: * Summary * Agreement * Browse coded docs * User attributes * Logs\nThe first two can be used in case multiple coders were involved in coding. The Logs tab contains details and information of all changes in your project. For instance, in the log of our project, the last change was the addition of a memo by user babička. You can filter log records by action, user, detail or the time of the change (created_at).\n The whole log can be exported by clicking the CSV button at the bottom of the page.  Log can be used as an evidence of the research process whether you are student or academic."
-  },
-  {
-    "objectID": "wiki/Práce-s-kategoriemi.html",
-    "href": "wiki/Práce-s-kategoriemi.html",
-    "title": "O kategoriích",
-    "section": "",
-    "text": "Záložka Kategorie na obrazovce Codebook slouží ke správě kategorií. Kategorie je skupina kódů, které mají něco společného. Například místo sloučení kódů matky a otce do kódu rodiče můžete vytvořit kategorii nazvanou rodič, která bude obsahovat oba kódy. Kategorii vytvoříte stejným způsobem jako kód. Na kartě Kategorie klikněte vpravo na ikonu plus + a zadejte název a popis kategorie.\n\n\n\nimage5\n\n\nChcete-li kód přesunout do kategorie, nejprve kategorii rozbalíte kliknutím na ikonu plus + vedle názvu kategorie. Zobrazí se okno Přetáhni a pusť kódy níže. Poté přesuňte požadované kódy přetažením do tohoto pole. Stejným způsobem lze kódy z kategorie odstranit přetažením z rámečku.\n\n\n\nimage10\n\n\n\n\nChcete-li odstranit kategorii, klikněte na tlačítko s ikonou mínusu - na pravé straně karty Kategorie. Vyberte kategorii, kterou chcete odstranit, a akci dokončete tlačítkem Odstranit. Všimněte si, že odstranění kategorie nemá žádný vliv na kódy přiřazené ke kategorii - ty zůstávají v číselníku.\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Práce-s-kategoriemi.html#odstranění-kategorií",
-    "href": "wiki/Práce-s-kategoriemi.html#odstranění-kategorií",
-    "title": "O kategoriích",
-    "section": "",
-    "text": "Chcete-li odstranit kategorii, klikněte na tlačítko s ikonou mínusu - na pravé straně karty Kategorie. Vyberte kategorii, kterou chcete odstranit, a akci dokončete tlačítkem Odstranit. Všimněte si, že odstranění kategorie nemá žádný vliv na kódy přiřazené ke kategorii - ty zůstávají v číselníku.\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Requal-for-Windows.html",
-    "href": "wiki/Requal-for-Windows.html",
-    "title": "requal",
-    "section": "",
-    "text": "To use Requal, you need to have theR language installed and running on your machine. You will also need a web browser with JavaScript support (i.e. any of the standard browsers like Firefox, Chrome, or Safari). Requal can be installed in two ways - via the R console or RStudio. For inexperienced users, we recommend using RStudio."
-  },
-  {
-    "objectID": "wiki/Requal-for-Windows.html#how-to-install-requal",
-    "href": "wiki/Requal-for-Windows.html#how-to-install-requal",
-    "title": "requal",
-    "section": "",
-    "text": "To use Requal, you need to have theR language installed and running on your machine. You will also need a web browser with JavaScript support (i.e. any of the standard browsers like Firefox, Chrome, or Safari). Requal can be installed in two ways - via the R console or RStudio. For inexperienced users, we recommend using RStudio."
-  },
-  {
-    "objectID": "wiki/Requal-for-Windows.html#windows-via-rstudio",
-    "href": "wiki/Requal-for-Windows.html#windows-via-rstudio",
-    "title": "requal",
-    "section": "Windows (via RStudio)",
-    "text": "Windows (via RStudio)\nStep one. Instal R. Go to https://cran.r-project.org/bin/windows/base/ and click on Download R for Windows. Download the file and run it.\n\n\n\nimage7\n\n\nDuring installation you can agree with all default options or customise the installation according to your needs.\nStep two. Install RStudio. Go to www.rstudio.com and download a free desktop version.\n\n\n\nimage8\n\n\nOnce downloaded, install Rstudio and launch it.\nStep three. Install Requal. Go to https://github.com/RE-QDA/requal/releases Click on the newest release (0.5.4) and then scroll down at the bottom of the table, and download the compressed package, e.g. requal_0.5.4.tar.gz\n\n\n\nimage1\n\n\nIn the RStudio console, install the remotes package by running install.packages(\"remotes\")command. Next, install the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard-drive.\n\n\n\nimage6\n\n\nIf you are asked to update packages, update All (enter 1).\n\n\n\nimage3\n\n\nThe installation may take a few minutes as it is necessary to download and install several packages. After the installation, the last line reads: * DONE (requal)\nStep four. Launch Requal from the RStudio console with the following command: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage4"
-  },
-  {
-    "objectID": "wiki/Requal-for-Windows.html#windows-via-r-console",
-    "href": "wiki/Requal-for-Windows.html#windows-via-r-console",
-    "title": "requal",
-    "section": "Windows (via R console)",
-    "text": "Windows (via R console)\nStep one. Instal R. Go to https://cran.r-project.org/bin/windows/base/ and click on Download R for Windows. Download the file and run it.\n\n\n\nimage7\n\n\nDuring installation you can agree with all default options or customise the installation according to your needs. When completed, launch R from the Windows menu. You will see the R console.\n\n\n\nimage9\n\n\nStep two. Install Requal. Go to https://github.com/RE-QDA/requal/releases\nClick on the newest release (0.5.4) and then scroll down at the bottom of the table, download the compressed package, e.g. requal_0.5.4.tar.gz.\n\n\n\nimage1\n\n\nIn the R console, install the remotes package by typing the command install.packages(\"remotes\") and hit Enter on your keyboard.\n\n\n\nimage10\n\n\nIf a dialog box appears, click on yes or customise the installation. Install the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard-drive.\n\n\n\nimage2\n\n\nThe installation may take a few minutes as it is necessary to download and install several packages. After the installation, the last line reads: * DONE (requal)\nStep three. Launch Requal from the R console with the following command: requal::run_app(options = list(\"launch.browser\"))\n\n\n\nimage5"
-  },
-  {
-    "objectID": "wiki/O-Requalu.html",
-    "href": "wiki/O-Requalu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Requal je nástroj pro analýzu kvalitativních dat navržený s ohledem na jednoduchost a reprodukovatelnost. Je postaven na základech R a Shiny a využívá schopnosti těchto technologií, aby poskytl uživatelsky přívětivé rozhraní pro kódování a analýzu textových dat.\nTento software je výsledkem spolupráce sociologů Univerzity Karlovy a Akademie věd ČR.\n\nNaším cílem je prostřednictvím této wiki poskytnout ucelený návod, jak se v programu Requal orientovat a jak jej efektivně používat. Dozvíte se, jak vytvářet a spravovat kódy a kategorie, které zajistí strukturu vaší analýzy dat. Poradíme vám také, jak spravovat dokumenty v prostředí Requal. Requal pracuje ve dvou režimech: offline “lokálním” režimu a online “serverovém” režimu. Ten druhý poskytuje prostředí pro týmovou spolupráci. Wiki obsahuje pokročilé pokyny pro správce systému, jak nastavit vlastní serverovou instalaci systému Requal a spustit jej v režimu serveru.\nExistují dva způsoby, jak pracovat s Requal - desktopová aplikace a webová aplikace. Pro individuální uživatele doporučujeme si nainstalovat desktopovou aplikaci, pro týmy nebo výuku je vhodnější webová (serverová) aplikace. Verze se od sebe neliší až na to, že pouze webová aplikace obsahuje moduly posilující reprodukovatelnost kódování. Na druhou stranu k používání webové aplikace potřebujete mít server, na kterém bude instalovaná Instalace\nInformace o tom, jaké strategie zvyšování reprodukovatelnosti jsme v Requalu použili, naleznete v přiložené zprávě: Strategie.pdf"
-  },
-  {
-    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html",
-    "href": "wiki/HowtoRequal:--Working-with-Codes.html",
-    "title": "requal",
-    "section": "",
-    "text": "You can create new codes and manage already existing codes on the Codebook card where you get by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: * Codes * Categories\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. Use the upper button with a plus sign + to create new code. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#creating-a-new-code",
-    "href": "wiki/HowtoRequal:--Working-with-Codes.html#creating-a-new-code",
-    "title": "requal",
-    "section": "",
-    "text": "You can create new codes and manage already existing codes on the Codebook card where you get by clicking on Codebook the in the menu on the left side of the screen. There are two tabs there: * Codes * Categories\n\n\n\nimage3\n\n\nIn the Codes tab, you can manage codes. On the right side of the screen, there are three buttons. Use the upper button with a plus sign + to create new code. A dialogue window pops up where you have to fill in the name of the new code and select its colour. You can add a description of the code.\n\n\n\nimage2\n\n\nWhen the code is created you will see it on the main screen in your Codebook. Tapping the + icon on the code bar will show the code description.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#merging-codes",
-    "href": "wiki/HowtoRequal:--Working-with-Codes.html#merging-codes",
-    "title": "requal",
-    "section": "Merging codes",
-    "text": "Merging codes\nMerging codes can be used if there are two codes that overlap, for example mother and father, and you want to merge them into a new code parent. First, create a new code called parent. Second, click on the circular icon with two arrows on the right side of the screen.\n\n\n\nimage9\n\n\nIn the dialogue window, select the code that you want to merge from and the code you want to merge into. Hit on Merge to execute the operation.\n\n\n\nimage7\n\n\nRepeat the same steps to merge the second code. This creates a single code that contains all segments previously coded with mother and father.\n\n\n\nimage8"
-  },
-  {
-    "objectID": "wiki/HowtoRequal:--Working-with-Codes.html#deleting-a-code",
-    "href": "wiki/HowtoRequal:--Working-with-Codes.html#deleting-a-code",
-    "title": "requal",
-    "section": "Deleting a code",
-    "text": "Deleting a code\nYou can delete codes with the minus button - on the right side of the Codes tab. Select the desired code from the drop-down menu and click on delete. The code will be deleted from your Codebook. When deleting a code, be careful - once a code is deleted, there is no way to recover it.\n\n\n\nimage1"
-  },
-  {
-    "objectID": "wiki/Coding-data.html",
-    "href": "wiki/Coding-data.html",
-    "title": "How to code your data",
-    "section": "",
-    "text": "How to code your data\nYou can code documents on the Workdesk screen. First, select the document you want to code from the drop-down list and it will load on the screen. The codes will be available on the right side of the screen.\n\n\n\nScreenshot 2022-12-30 at 13-29-07 ReQual\n\n\nTo code a segment of the text select the segment and click on the code you want to attach to the segment.\n\n\n\nezgif com-gif-maker\n\n\nSegments may overlap. Code colours will be mixed.\n\n\n\nScreenshot 2022-12-30 at 13-40-48 ReQual\n\n\n\n\nHow to delete coding of a segment\n\nText marked with one code\nClick on the coded segment and hit on the Remove code button.\n\n\nText marked with several codes\nClick on the coded segment. A dialog box appears. Select the code to be removed. Confirm by hitting the Remove Selected button.\n\n\n\nScreenshot 2022-12-30 at 13-42-13 ReQual"
-  },
-  {
-    "objectID": "wiki/Reproducibility-enhancing-modules.html",
-    "href": "wiki/Reproducibility-enhancing-modules.html",
-    "title": "requal",
-    "section": "",
-    "text": "On the Report page you will find several modules to increase researcher reflexivity and coding transparency. These modules only work in the web version of reQual, as it allows coding by multiple coders and comparison between them."
-  },
-  {
-    "objectID": "wiki/Reproducibility-enhancing-modules.html#summary",
-    "href": "wiki/Reproducibility-enhancing-modules.html#summary",
-    "title": "requal",
-    "section": "Summary",
-    "text": "Summary\nThe first tab Summary provides an overview of the number of segments tagged by each code in each document. If we want to know how often and where a particular coder used the codes, we only select her in the Select users menu. Similarly, we can limit the selection to only certain codes or documents if there are many of them and the overall table is too large.\n\n\n\nimage"
-  },
-  {
-    "objectID": "wiki/Reproducibility-enhancing-modules.html#agreement",
-    "href": "wiki/Reproducibility-enhancing-modules.html#agreement",
-    "title": "requal",
-    "section": "Agreement",
-    "text": "Agreement\nThe Agreement tab offers the possibility to make the agreement between codes, coders and their attributes visible. When we expand the Select metrics menu, we see two sets of controls to choose from. The first one shows the agreement calculated based on the number of overlapping letters (characters), the second one shows the agreement based on the overlap of the marked segments regardless of the number of characters (segment). The calculation is done using Jaccard’s similarity coefficient, which is calculated as the ratio of the number of identically coded characters to the number of all coded characters without the overlaps.\nWe can illustrate the difference between agreement in characters and agreement in segments by an example:\n\nCoder A marks: But it’s just me, the problem with me is that I don’t drink beer, I don’t like it (55 characters).\n\nCoder B marks: But just me, the problem with me is that I don’t drink beer, I don’t like it. I’m not an alcoholic. (71 characters)\n\nThe character agreement will be 0.77 according to the calculation 55/(55+71-55) = 0.77\nThe agreement in segments will be 1.00 according to the calculation 1/(1+1-1) = 1.00\n\nCoder A indicates: But just me, the problem with me is that I don’t drink beer, I don’t like it. (55 characters)\n\nCoder B indicates: But it’s just me, the problem with me is that I don’t drink beer, (…) I’m not an alcoholic. (43 + 16 = 59 characters)\n\nThe agreement in characters will be 0.77 according to the calculation 43/(55+59-43) = 0.61\nThe match in segments will be 1.00 based on the calculation 1/(1+2-1) = 0.50\nFrom these examples we can see that each criterion is sensitive to different coding qualities. While the number of common characters is more of a mechanical measure of agreement, the agreement in segments is more reflective of the meaning component of coding the data.\n\nTotal overlap [character]\nCalculates the total coding overlap in characters across all documents for the selected coders. This table provides an overview of the total overlap of coders in the project.\n\n\nOverlap by code [character]\nCalculates the coding agreement in characters across all documents for each code and for the selected coders. This table provides an overview of whether the overlap varies by code. It allows the identification of problematic codes.\n\n\nOverlap by coder [character]\nDisplays a heatmap that compares pairs of coders based on their character agreement across all documents and all codes. The lighter the color, the higher the agreement. This table allows identification of pairs of coders that are ” aligned” overall, and those that are least aligned.\n\n\nOverlap by coder and code [character]\nDisplays a heatmap for each code separately, comparing pairs of coders based on their agreement in characters across all documents. The lighter the color, the higher the agreement. This table allows you to see if the coder pair matching is similar across all codes, or if and how the matching differs for different codes.\n\n\nOverlap by user attribute and code [character]\nDisplays a heatmap for the selected user (encoder) attribute that compares each group of coders based on their agreement in characters for each code in all documents. The lighter the color, the higher the agreement. This table may reveal codes that are sensitive to any of the coders’ attributes. For example, in the diagram we see that for code 2, there are more matches between males and females than between males, which shows that the gender of the coders does not play a role in this code.\n\n\n\nimage\n\n\n\n\nSegment matching\nThe same set of indicators exists for agreement in segments. Their interpretation is the same, with the only difference that matching is not counted in identically coded characters, but in overlapping segments."
-  },
-  {
-    "objectID": "wiki/Reproducibility-enhancing-modules.html#text-overlap",
-    "href": "wiki/Reproducibility-enhancing-modules.html#text-overlap",
-    "title": "requal",
-    "section": "Text overlap",
-    "text": "Text overlap\nIf we want to examine the coding agreement in more detail, we use the Text overlap tab. In the menu, we select which document we want to display, which code, and possibly certain coders, if we want information about, for example, a two-coder agreement.\nClicking the Browse button will show us the coders overlaps for the given code and document. The lighter the color, the higher the agreement between the coders.\nWhen we hover the mouse over a highlighted segment, the names of the coders who coded it are displayed. This provides a good basis for a team discussion about coding. For example, about how long segments to code or how distinct instances of a phenomenon to code.\n\n\n\nimage\n\n\nTip! This module can also be used to allow users with permissions to view the report to see how individual coders coded, e.g. in a class project."
-  },
-  {
-    "objectID": "wiki/Requal-for-Mac-OS.html",
-    "href": "wiki/Requal-for-Mac-OS.html",
-    "title": "requal",
-    "section": "",
-    "text": "The installation on the Mac Os machine is similar to Windows. The only difference is that you download R and RStudio for macOS. Note, it is necessary to use RStudio for running Requal if your documents (data) contain non-Latin letters, e.g. ě, š, č, ç."
-  },
-  {
-    "objectID": "wiki/Requal-for-Mac-OS.html#mac-instructions",
-    "href": "wiki/Requal-for-Mac-OS.html#mac-instructions",
-    "title": "requal",
-    "section": "",
-    "text": "The installation on the Mac Os machine is similar to Windows. The only difference is that you download R and RStudio for macOS. Note, it is necessary to use RStudio for running Requal if your documents (data) contain non-Latin letters, e.g. ě, š, č, ç."
-  },
-  {
-    "objectID": "wiki/Kodování-dat.html",
-    "href": "wiki/Kodování-dat.html",
-    "title": "Jak kódovat data",
-    "section": "",
-    "text": "Jak kódovat data\nDokumenty můžete kódovat na obrazovce Workdesk. Nejprve vyberte z rozevíracího seznamu dokument, který chcete kódovat. Kódy budou k dispozici v pravé části obrazovky.\n\n\n\nScreenshot 2022-12-30 at 13-29-07 ReQual\n\n\nChcete-li kódovat segment textu, vyberte myší segment a klikněte na kód, kterým chcete segment označit.\n\n\n\nezgif com-gif-maker\n\n\nSegmenty se mohou překrývat. Barvy kódu se pak smíchají.\n\n\n\nScreenshot 2022-12-30 at 13-40-48 ReQual\n\n\n\n\nJak odstranit kódování segmentu\n\nText označený jedním kódem\nKlikněte na kódovaný segment a stiskněte tlačítko Odstranit kód.\n\n\nText označený několika kódy\nKlikněte na kódovaný segment. Zobrazí se dialogové okno. Vyberte kód, který má být odstraněn. Potvrďte stisknutím tlačítka Odebrat vybrané.\n\n\n\nScreenshot 2022-12-30 at 13-42-13 ReQual"
-  },
-  {
-    "objectID": "wiki/Otevření-projektu.html",
-    "href": "wiki/Otevření-projektu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li otevřít již existující projekt, musíte vybrat soubor, do kterého byl projekt uložen.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nVyberte svůj projekt ze seznamu a poté klikněte na Vybrat nebo na soubor prostě dvakrát klikněte. Po návratu na kartu Načíst stiskněte zelené tlačítko Načíst projekt.\n\n\n\nimage8\n\n\nVáš projekt je nyní načten. Můžete na něm začít pracovat!\n\n\n\nimage3"
-  },
-  {
-    "objectID": "wiki/Otevření-projektu.html#načíst-již-existující-projekt",
-    "href": "wiki/Otevření-projektu.html#načíst-již-existující-projekt",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li otevřít již existující projekt, musíte vybrat soubor, do kterého byl projekt uložen.\n\n\n\nimage1\n\n\n\n\n\nimage10\n\n\nVyberte svůj projekt ze seznamu a poté klikněte na Vybrat nebo na soubor prostě dvakrát klikněte. Po návratu na kartu Načíst stiskněte zelené tlačítko Načíst projekt.\n\n\n\nimage8\n\n\nVáš projekt je nyní načten. Můžete na něm začít pracovat!\n\n\n\nimage3"
-  },
-  {
-    "objectID": "wiki/Nastavení-serveru.html",
-    "href": "wiki/Nastavení-serveru.html",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li spustit reQual jako Shiny aplikaci na serveru, je třeba nejprve připravit prostředí. Konkrétní kroky nastavení se mohou lišit v závislosti na operačním systému. Podle příslušných pokynů níže nainstalujte na serveru požadované systémové závislosti:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\nvolitelné: Pandoc (instalace Pandocu umožní export ve formátu html)."
-  },
-  {
-    "objectID": "wiki/Nastavení-serveru.html#požadavky",
-    "href": "wiki/Nastavení-serveru.html#požadavky",
-    "title": "requal",
-    "section": "",
-    "text": "Chcete-li spustit reQual jako Shiny aplikaci na serveru, je třeba nejprve připravit prostředí. Konkrétní kroky nastavení se mohou lišit v závislosti na operačním systému. Podle příslušných pokynů níže nainstalujte na serveru požadované systémové závislosti:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\nvolitelné: Pandoc (instalace Pandocu umožní export ve formátu html)."
-  },
-  {
-    "objectID": "wiki/Nastavení-serveru.html#nastavení-aplikace-shiny",
-    "href": "wiki/Nastavení-serveru.html#nastavení-aplikace-shiny",
-    "title": "requal",
-    "section": "Nastavení aplikace Shiny",
-    "text": "Nastavení aplikace Shiny\n\nVytvořte databázi PostgreSQL, která bude sloužit jako úložiště dat pro requal. V této fázi stačí databázi pouze vytvořit. Aplikace requal bude definovat schéma databáze při svém prvním spuštění.\nVytvořte adresář v rámci cesty k serveru Shiny (např. /srv/shiny-server/requal). Ten bude domovským adresářem vaší aplikace. Tento adresář otevřete jako projekt R nebo do něj přejděte pomocí příkazu setwd(\"/srv/shiny-server/requal\") v R.\nPro správu instalace requal doporučujeme použít balíček renv. Tento přístup umožňuje izolovat každou instanci aplikace requal a provozovat více verzí na stejném serveru.\nPro instalaci balíčku requal použijte následující skript:\n\n# install.packages(\"renv\")\nrenv::install(\"RE-QDA/requal\")\nrenv::snapshot(prompt = FALSE)\nrenv::isolate()\n\nChcete-li aktualizovat requal, spusťte výše uvedený skript.\nV adresáři vaší aplikace vytvořte soubor R s názvem app.R.\nSoubor app.R naplňte následujícími údaji:\n\nrequal::run_app(\n  mode = \"server\",\n  dbname = \"YOUR_DATABASE_NAME\",\n  dbusername = \"YOUR_DATABASE_OWNER\",\n  dbpassword = \"YOUR_DATABASE_PASSWORD\",\n  credentials_path = \"USER_DATABASE_NAME.sqlite\",\n  credentials_pass = \"USER_DATABASE_PASSWORD\".\n)\n\nPo instalaci requal a konfiguraci aplikace restartujte službu Shiny Server pomocí terminálového příkazu:\n\nsudo systemctl restart shiny-server\nVaše instance aplikace requal by nyní měla být přístupná prostřednictvím serveru Shiny Server."
-  },
-  {
-    "objectID": "wiki/Nastavení-serveru.html#zabezpečení",
-    "href": "wiki/Nastavení-serveru.html#zabezpečení",
-    "title": "requal",
-    "section": "Zabezpečení",
-    "text": "Zabezpečení\nJako správce instalace můžete určit úroveň správy přístupu k aplikaci (např. omezení přístupu na VPN chráněnou firewallem).\nChcete-li dodat hesla z vašeho úložiště tajných informací, použijte balíček keyring. Další informace naleznete v keyring documentation.\nZpracování uživatelských přihlašovacích jmen a hesel pomocí balíčku requal je vysvětleno v dokumentaci k balíčku shinymanager. Podrobnější informace naleznete v ní."
-  },
-  {
-    "objectID": "wiki/User-management-in-a-project.html",
-    "href": "wiki/User-management-in-a-project.html",
-    "title": "requal",
-    "section": "",
-    "text": "To manage users in a project, you must log in as a project administrator. This permission is granted to the user in the user management module.\nOpen the project you want to manage. On the project page, select the Manage users tab. The list of users in the project will be displayed.\nIf you click on the plus sign to the right of a user, their permissions will be displayed.\n\n\n\nimage\n\n\nTo add a user to the project, click the plus icon. A box will appear and when you click it, you will see a list of all users. If you don’t see the users you want listed, these users have not yet been added to reQual in the user management module. On the other hand, if they are in the list, you can select one or more of them and click the Add User button to add them.\n\n\n\nimage\n\n\nWhen a new user is among the project users, you need to check their permissions and modify them if necessary. Finally, it is important to remember to save the permission change. Users can view their permissions by clicking on the icon next to their name in the top right.\n\n\n\nimage\n\n\nIn terms of permissions, we can most often encounter three types of users. * Project Administrator, who created the project and who has all the permissions. * Team Member, who has similar permissions as the administrator, but can only change what he/she put into the project (documents, codes, categories, notes). * Coder, typically a student working on a coding task, who can see others’ documents, codes, and categories, enter her attributes, tag segments, and create notes.\nTo remove a user from a project, click the minus icon, select the user you want to remove, and click the Remove User button."
-  },
-  {
-    "objectID": "wiki/Přidání-dokumentu.html",
-    "href": "wiki/Přidání-dokumentu.html",
-    "title": "requal",
-    "section": "",
-    "text": "Pokud chcete analyzovat data v nástroji reQual, musíte nejprve přidat dokumenty. Existují dva způsoby, jak přidat dokument do projektu: * dokument můžete vytvořit metodou kopírovat a vložit nebo * můžete nahrát textový soubor."
-  },
-  {
-    "objectID": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit",
-    "href": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu-metodou-kopírovat-a-vložit",
-    "title": "requal",
-    "section": "Vytvoření nového dokumentu metodou kopírovat a vložit",
-    "text": "Vytvoření nového dokumentu metodou kopírovat a vložit\nDoporučujeme používat metodu kopírovat a vložit, protože obchází problém kódování znaků. Upozorňujeme, že reQual umí pracovat pouze s prostými textovými dokumenty (.txt soubory). Při přidávání dokumentu zmizí veškeré formátování, jako je kurzíva, podtržený text, odlišné písmo, odsazení nebo barvy.\nPři vytváření nového dokumentu pomocí kopírovat a vložit klikněte na kruhovou ikonu plus + v pravé části obrazovky. \nPokud chcete, zadejte název dokumentu a jeho stručný popis. Otevřete dokument, který chcete přidat, zkopírujte jeho obsah a poté jej vložte do pole Obsah dokumentu ve spodní části dialogového okna. Chcete-li zkontrolovat, zda byl celý text správně zkopírován, zvětšete pole a posuňte se na konec. Pokud je vše v pořádku, stiskněte tlačítko Vytvořit dokument.\n\n\n\nimage5-znacky\n\n\nNa obrazovce projektu se objeví informace o dokumentu.\n\n\n\nimage8"
-  },
-  {
-    "objectID": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu---nahráním-textového-souboru",
-    "href": "wiki/Přidání-dokumentu.html#vytvoření-nového-dokumentu---nahráním-textového-souboru",
-    "title": "requal",
-    "section": "Vytvoření nového dokumentu - nahráním textového souboru",
-    "text": "Vytvoření nového dokumentu - nahráním textového souboru\nDalším způsobem přidání dokumentu je nahrání textového souboru. Nezapomeňte, že soubor musí být ve formátu prostého textu (.txt). Pokud je váš původní dokument ve formátu .docx, .odt, .pdf nebo .html, musíte jej před nahráním uložit jako prostý textový soubor, například mydocument.txt.\nPři nahrávání textového souboru klepněte na kruhovou ikonu nahrávání na pravé straně obrazovky.\n\n\n\nimage1-znacky\n\n\nZadejte název a stručný popis dokumentu. Pokud název dokumentu nezadáte, bude místo něj použit původní název souboru. Vyberte požadovaný dokument ze složky, ve které je uložen. Pokud znáte kódování souboru, vyberte jej ze seznamu. Pokud jeho kódování neznáte, ponechte ho tak, jak je. Chcete-li soubor nahrát, stiskněte tlačítko Přidat dokument.\nNa obrazovce projektu se zobrazí informace o dokumentu.\n\n\n\nimage2\n\n\nPokud chcete zkontrolovat, zda byly nově přidané dokumenty vytvořeny správně, přejděte na obrazovku Pracovní plocha a vyberte je ze seznamu.\n\n\n\nimage6\n\n\nDokument se zobrazí.\n Pokud se některé znaky v dokumentu nezobrazují správně, máte špatné kódování. Chcete-li odstranit problémy s kódováním, podívejte se do našeho průvodce řešením problémů na wiki GitHub (připravuje se)."
-  },
-  {
-    "objectID": "wiki/Analysis.html",
-    "href": "wiki/Analysis.html",
-    "title": "requal",
-    "section": "",
-    "text": "Once your data are coded, you can find coded parts in the Analysis screen. * On the middle part of the screen you can see all segments coded. * On the right side, you can find three filters. You can filter text segments by code, category of codes, or by document.\n\n\n\nimage13"
-  },
-  {
-    "objectID": "wiki/Analysis.html#after-you-are-done-with-coding",
-    "href": "wiki/Analysis.html#after-you-are-done-with-coding",
-    "title": "requal",
-    "section": "",
-    "text": "Once your data are coded, you can find coded parts in the Analysis screen. * On the middle part of the screen you can see all segments coded. * On the right side, you can find three filters. You can filter text segments by code, category of codes, or by document.\n\n\n\nimage13"
-  },
-  {
-    "objectID": "wiki/Analysis.html#working-with-filters",
-    "href": "wiki/Analysis.html#working-with-filters",
-    "title": "requal",
-    "section": "Working with filters",
-    "text": "Working with filters\nAs default, all codes, categories and documents are selected, therefore all coded segments are displayed. You can select only one item from the filter list by clicking on it. In case you want to select multiple items hold the Ctrl (control) key and click on each item or click and drag over the items you want to select. reQual offers three filters:\n\nFilter by code\nFilter by category\nFilter by document\n\nIf you want to turn off filters for codes or categories, select the empty item from the top of the list. Remember to keep selection of at least one document and one code or category to see text segments for analysis.\n\n\n\nfilters"
-  },
-  {
-    "objectID": "wiki/Analysis.html#downloading-your-analysis",
-    "href": "wiki/Analysis.html#downloading-your-analysis",
-    "title": "requal",
-    "section": "Downloading your analysis",
-    "text": "Downloading your analysis\nYou can download selected segments by clicking the CSV or HTML button at the bottom of the page with the coded segments. Segments will be downloaded in a file together with document and code information.\n\n\n\nScreenshot 2022-12-30 at 11-33-12 ReQual\n\n\nIf you download an HTML file, it will be named report.html and you can open it in any web browser. This is an example of it:\n\n\n\nScreenshot 2022-12-30 at 11-17-28 reQual report\n\n\nIf you download a CSV file, the name of the file will indicate the date and time of the export, for example requal_export-2022-11-26-160754.csv. There are several programs to work with when you want to explore or edit CSV files, e.g. MSExcel, Google Sheets, LibreOffice or Numbers."
-  },
-  {
-    "objectID": "wiki/Analysis.html#analysis-table---description",
-    "href": "wiki/Analysis.html#analysis-table---description",
-    "title": "requal",
-    "section": "Analysis table - description",
-    "text": "Analysis table - description\nAs you can see the exported table consists of five columns: * doc_name - in this column you can look up the name of the analysed document * doc_id - a database identification of the document * code_name - this column shows the names of the codes you used during the analysis * code_id - a database identification of the code * segment_text - the most important column for your analysis, because you can see the segments you selected for chosen codes or categories.\n\n\n\nSnímek obrazovky z 2022-12-30 11-39-48"
-  },
-  {
-    "objectID": "wiki/Server-setup.html",
-    "href": "wiki/Server-setup.html",
-    "title": "requal",
-    "section": "",
-    "text": "To run the Requal as a Shiny application on a server, it’s necessary to first prepare the environment. The specific setup steps might differ based on your operating system. Follow the relevant instructions below to install the required system dependencies on your server:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\noptional: Pandoc (installation of Pandoc will enable exports in html format)"
-  },
-  {
-    "objectID": "wiki/Server-setup.html#requirements",
-    "href": "wiki/Server-setup.html#requirements",
-    "title": "requal",
-    "section": "",
-    "text": "To run the Requal as a Shiny application on a server, it’s necessary to first prepare the environment. The specific setup steps might differ based on your operating system. Follow the relevant instructions below to install the required system dependencies on your server:\n\nR\nRStudio Server\nShiny Server\nPostgreSQL\noptional: Pandoc (installation of Pandoc will enable exports in html format)"
-  },
-  {
-    "objectID": "wiki/Server-setup.html#requal-shiny-application-setup",
-    "href": "wiki/Server-setup.html#requal-shiny-application-setup",
-    "title": "requal",
-    "section": "reQual Shiny Application Setup",
-    "text": "reQual Shiny Application Setup\n\nEstablish a PostgreSQL database to act as the data storage for requal. At this stage, you only need to create the database. The requal application will define the database schema upon its initial launch.\nCreate a directory within your Shiny Server path (e.g., /srv/shiny-server/requal). This will be the home of your application. Open this directory as an R project or navigate to it using setwd(\"/srv/shiny-server/requal\") in R.\nWe advise using the renv package for managing the requal installation. This approach enables you to isolate each requal application instance and operate multiple versions on the same server.\nUse the following script to install requal:\n\n# install.packages(\"renv\")\nrenv::install(\"RE-QDA/requal\")\nrenv::snapshot(prompt = FALSE)\nrenv::isolate()\n\nTo update requal, run the script above.\nGenerate an R file named app.R in your application’s directory.\nPopulate the app.R with:\n\nrequal::run_app(\n  mode = \"server\",\n  dbname = \"YOUR_DATABASE_NAME\",\n  dbusername = \"YOUR_DATABASE_OWNER\",\n  dbpassword = \"YOUR_DATABASE_PASSWORD\",\n  credentials_path = \"USER_DATABASE_NAME.sqlite\",\n  credentials_pass = \"USER_DATABASE_PASSWORD\"\n)\n\nAfter installing requal and configuring your application, reboot the Shiny Server service using the terminal command:\n\nsudo systemctl restart shiny-server\nYour requal application instance should now be accessible via the Shiny Server."
-  },
-  {
-    "objectID": "wiki/Server-setup.html#security",
-    "href": "wiki/Server-setup.html#security",
-    "title": "requal",
-    "section": "Security",
-    "text": "Security\nAs the administrator of the installation, you can dictate the level of access management to the application (e.g., restricting access to a firewall-protected VPN).\nTo supply passwords from your secrets’ store, use the keyring package. Consult the keyring documentation for more information.\nThe handling of user logins and passwords by requal is explained in the shinymanager documentation. Please refer to it for more details."
-  },
-  {
-    "objectID": "wiki/Logování.html",
-    "href": "wiki/Logování.html",
-    "title": "requal",
-    "section": "",
-    "text": "Na navigačním panelu najdete položku Report. Na obrazovce Report je pět karet: * Summary * Agreement * Browse coded docs * User attributes * Logs\nPrvní čtyři lze použít v případě, že se na kódování podílelo více kodérů. Záložka Logs obsahuje podrobnosti a informace o všech změnách ve vašem projektu. Například v logu našeho projektu bylo poslední změnou přidání poznámky uživatelem babička. Záznamy v protokolu můžete filtrovat podle akce, uživatele, detailu nebo času změny (created_at).\n Celý protokol lze exportovat kliknutím na tlačítko CSV v dolní části stránky.  Log lze použít jako doklad o průběhu výzkumu, ať už jste student nebo akademický pracovník."
-  },
-  {
-    "objectID": "wiki/User-attributes.html",
-    "href": "wiki/User-attributes.html",
-    "title": "requal",
-    "section": "",
-    "text": "On the Report screen, User attributes tab, we can define specific user attributes to monitor if they have any effect on the coding.\nIn a project, we can specify any attributes and their values according to the project needs. For example, we may specify gender in a project where we expect gender to be relevant to coding, other times we may be interested in the coders’ experience with migration or drugs if the data is from that area. The attribute should be named concisely and understandably. In the second field we enter the values that the attribute can take. Keep in mind that some users will not want to fill in a particular attribute or it will not match the offer and therefore there should be a value of “other” or “not provided”.\nIn the pie charts, we can see the distribution of attributes in the project’s user file.\n\n\n\nimage\n\n\nEach user fills in the attributes in their profile. This is opened by clicking on the icon next to their name in the top right. Below the list of permissions is the Edit button, which when clicked will bring up a window with the option to enter attributes.\n\n\n\nimage"
-  },
-  {
-    "objectID": "wiki/Export.html",
-    "href": "wiki/Export.html",
-    "title": "requal",
-    "section": "",
-    "text": "Kódované segmenty na obrazovce Analýza. * Ve střední části obrazovky vidíte kódované segmenty. * V pravé části najdete tři filtry. Textové segmenty můžete filtrovat podle kódu, kategorie kódů nebo podle dokumentu.\n\n\n\nimage13"
-  },
-  {
-    "objectID": "wiki/Export.html#po-dokončení-kódování",
-    "href": "wiki/Export.html#po-dokončení-kódování",
-    "title": "requal",
-    "section": "",
-    "text": "Kódované segmenty na obrazovce Analýza. * Ve střední části obrazovky vidíte kódované segmenty. * V pravé části najdete tři filtry. Textové segmenty můžete filtrovat podle kódu, kategorie kódů nebo podle dokumentu.\n\n\n\nimage13"
-  },
-  {
-    "objectID": "wiki/Export.html#práce-s-filtry",
-    "href": "wiki/Export.html#práce-s-filtry",
-    "title": "requal",
-    "section": "Práce s filtry",
-    "text": "Práce s filtry\nVe výchozím nastavení jsou vybrány všechny kódy, kategorie a dokumenty, proto jsou zobrazeny všechny kódované segmenty. Klepnutím na položku filtru můžete vybrat jednu položku ze seznamu filtrů. V případě, že chcete vybrat více položek, podržte klávesu Ctrl (control) a klikněte na každou položku nebo klikněte a přetáhněte myší nad položkami, které chcete vybrat. reQual nabízí tři filtry:\n\nFiltr podle kódu\nFiltr podle kategorie\nFiltr podle dokumentu\n\nPokud chcete vypnout filtry pro kódy nebo kategorie, vyberte prázdnou položku v horní části seznamu. Nezapomeňte zachovat výběr alespoň jednoho dokumentu a jednoho kódu nebo kategorie, aby se zobrazily alespoň nějaké segmenty.\n\n\n\nfilters"
-  },
-  {
-    "objectID": "wiki/Export.html#export-analýzy",
-    "href": "wiki/Export.html#export-analýzy",
-    "title": "requal",
-    "section": "Export analýzy",
-    "text": "Export analýzy\nVybrané segmenty můžete stáhnout kliknutím na tlačítko CSV nebo HTML ve spodní části stránky. Segmenty budou staženy v souboru spolu s informacemi o dokumentu a kódu.\n\n\n\nScreenshot 2022-12-30 at 11-33-12 ReQual\n\n\nPokud stáhnete soubor HTML, bude mít název report.html a můžete jej otevřít v libovolném webovém prohlížeči. Toto je jeho příklad:\n\n\n\nScreenshot 2022-12-30 at 11-17-28 reQual report\n\n\nPokud stáhnete soubor CSV, bude v názvu souboru uvedeno datum a čas exportu, například requal_export-2022-11-26-160754.csv. Pokud chcete soubory CSV prozkoumat nebo upravit, můžete pracovat s několika programy, například MSExcel, Google Sheets, LibreOffice nebo Numbers."
-  },
-  {
-    "objectID": "wiki/Export.html#analytická-tabulka---popis",
-    "href": "wiki/Export.html#analytická-tabulka---popis",
-    "title": "requal",
-    "section": "Analytická tabulka - popis",
-    "text": "Analytická tabulka - popis\nJak vidíte, exportovaná tabulka se skládá z pěti sloupců: * doc_name - v tomto sloupci můžete vyhledat název analyzovaného dokumentu. * doc_id - identifikace dokumentu v databázi * code_name - v tomto sloupci jsou uvedeny názvy kódů, které jste použili při analýze * code_id - identifikace kódu v databázi * segment_text - nejdůležitější sloupec pro vaši analýzu, protože v něm vidíte segmenty, které jste vybrali pro vybrané kódy nebo kategorie.\n\n\n\nSnímek obrazovky z 2022-12-30 11-39-48"
-  },
-  {
-    "objectID": "wiki/Práce-s-kódy.html",
-    "href": "wiki/Práce-s-kódy.html",
-    "title": "requal",
-    "section": "",
-    "text": "Nové kódy můžete vytvářet a již existující kódy spravovat na obrazovce Codebook, na kterou se dostanete kliknutím na Codebook v nabídce na levé straně obrazovky. Jsou zde dvě záložky: Kódy a Kategorie.\n\n\n\nimage3\n\n\nNa kartě Kódy můžete spravovat kódy. Na pravé straně obrazovky jsou tři tlačítka. Chcete-li vytvořit nový kód, použijte horní tlačítko se znaménkem plus +. Zobrazí se dialogové okno, ve kterém musíte vyplnit název nového kódu a vybrat jeho barvu. Můžete přidat popis kódu.\n\n\n\nimage2\n\n\nPo vytvoření kódu jej uvidíte na hlavní obrazovce ve svém Codebook. Klepnutím na ikonu + na panelu kódů se zobrazí popis kódu.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/Práce-s-kódy.html#vytvoření-nového-kódu",
-    "href": "wiki/Práce-s-kódy.html#vytvoření-nového-kódu",
-    "title": "requal",
-    "section": "",
-    "text": "Nové kódy můžete vytvářet a již existující kódy spravovat na obrazovce Codebook, na kterou se dostanete kliknutím na Codebook v nabídce na levé straně obrazovky. Jsou zde dvě záložky: Kódy a Kategorie.\n\n\n\nimage3\n\n\nNa kartě Kódy můžete spravovat kódy. Na pravé straně obrazovky jsou tři tlačítka. Chcete-li vytvořit nový kód, použijte horní tlačítko se znaménkem plus +. Zobrazí se dialogové okno, ve kterém musíte vyplnit název nového kódu a vybrat jeho barvu. Můžete přidat popis kódu.\n\n\n\nimage2\n\n\nPo vytvoření kódu jej uvidíte na hlavní obrazovce ve svém Codebook. Klepnutím na ikonu + na panelu kódů se zobrazí popis kódu.\n\n\n\nimage6"
-  },
-  {
-    "objectID": "wiki/Práce-s-kódy.html#slučování-kódů",
-    "href": "wiki/Práce-s-kódy.html#slučování-kódů",
-    "title": "requal",
-    "section": "Slučování kódů",
-    "text": "Slučování kódů\nSlučování kódů lze použít, pokud se dva kódy překrývají, například matka a otec, a chcete je sloučit do nového kódu rodič. Nejprve vytvořte nový kód s názvem rodič. Potom klikněte na kruhovou ikonu se dvěma šipkami v pravé části obrazovky.\n\n\n\nimage9\n\n\nV dialogovém okně Sloučit kódy vyberte kód, ze kterého chcete sloučit, a kód, do kterého chcete sloučit. Operaci provedete stisknutím tlačítka Sloučit.\n\n\n\nimage7\n\n\nStejné kroky zopakujte pro sloučení druhého kódu. Vznikne tak jediný kód, který obsahuje všechny segmenty dříve kódované matkou a otcem. Po sloučení nelze původní kódy zobrazit ani se k nim jednotlivě vrátit. Chcete-li zachovat původní kódy vedle nového společného kódu, vytvořte místo sloučení kódů kategorii.\n\n\n\nimage8"
-  },
-  {
-    "objectID": "wiki/Práce-s-kódy.html#odstranění-kódu",
-    "href": "wiki/Práce-s-kódy.html#odstranění-kódu",
-    "title": "requal",
-    "section": "Odstranění kódu",
-    "text": "Odstranění kódu\nKódy můžete odstranit pomocí tlačítka mínus - na pravé straně karty Kódy. Z rozbalovací nabídky vyberte požadovaný kód a klikněte na tlačítko odstranit. Kód bude smazán z vašeho Codebook. Při mazání kódu buďte opatrní - jakmile je kód smazán, není možné jej obnovit.\n\n\n\nimage1"
-  },
-  {
-    "objectID": "wiki/How-to-add-documents.html",
-    "href": "wiki/How-to-add-documents.html",
-    "title": "requal",
-    "section": "",
-    "text": "If you want to analyse data in reQual you must first add documents. There are two ways to add a document to your project: * You can create a document by copy and paste method * Upload a text file."
-  },
-  {
-    "objectID": "wiki/How-to-add-documents.html#creating-a-new-document---copypaste-method",
-    "href": "wiki/How-to-add-documents.html#creating-a-new-document---copypaste-method",
-    "title": "requal",
-    "section": "Creating a new document - copy&paste method",
-    "text": "Creating a new document - copy&paste method\nWe recommend the copy & paste method as it bypasses the character encoding problem. Note that reQual can work only with plain text documents (.txt files). All formatting such as italics, underlined text, distinct fonts, indentation or colours will disappear when adding a document.\nWhen creating a new document by copy & paste, click on the circular plus icon + on the right side of the screen. \nType your document name and its brief description if you’d like. Open the document you want to add, copy the contents and then paste it into the box Document content at the bottom of the dialog window. To check that all the text has been copied correctly, enlarge the box and scroll to the end. If everything is okay, press the Create Document button.\n\n\n\nimage5-znacky\n\n\nInformation about the document will appear on the project screen.\n\n\n\nimage8"
-  },
-  {
-    "objectID": "wiki/How-to-add-documents.html#creating-a-new-document---by-uploading-a-text-file",
-    "href": "wiki/How-to-add-documents.html#creating-a-new-document---by-uploading-a-text-file",
-    "title": "requal",
-    "section": "Creating a new document - by uploading a text file",
-    "text": "Creating a new document - by uploading a text file\nAnother way to add a document is to upload a text file. Remember that the file must be in the plain text format (.txt). If your original document is in .docx, .odt, .pdf or .html format, you must save it as a plain text file, such as mydocument.txt, before uploading it.\nWhen uploading a text file, tap the circular upload icon on the right side of the screen.\n\n\n\nimage1-znacky\n\n\nEnter the name and a brief description of the document. If you do not enter a document name, the original file name will be used instead. Select the document you want from the folder where it is saved. If you know the encoding of the file, select it from the list. If you do not know its encoding, leave it as it is. To upload the file, press the Add Document button.\nInformation about the document will appear on the project screen.\n\n\n\nimage2\n\n\nIf you want to check that your newly added documents have been created correctly, go to the Workdesk screen and select them from the list.\n\n\n\nimage6\n\n\nThe document will show.\n If some of the characters in your document do not appear correctly, you have the wrong encoding. To fix encoding issues, see our troubleshooting guide on the GitHub wiki (in preparation)."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Home",
-    "section": "",
-    "text": "Requal logo\n\n\nRequal is an open-source CAQDAS application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the Shiny framework for the R project free software environment."
+    "text": "Thuringothyris (v1.1.2)\n\n\n\n\n\n\n\nrelease\n\n\nannouncements\n\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n  \n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\n\nevents\n\n\npresentation\n\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
   }
 ]
