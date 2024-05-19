@@ -315,7 +315,7 @@ load_doc_to_display <- function(pool,
                                 blend_colors,
                                 code_names)
         )
-        
+       
         content_df <- coded_segments %>% 
             dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
             dplyr::mutate(code_id = as.character(code_id)) %>% 
@@ -363,11 +363,11 @@ load_doc_to_display <- function(pool,
                                                     content_df$position_end,
                                                     content_df$tag),
                                                ~paste0(..3, 
-                                                       substr(
+                                                       htmltools::htmlEscape(substr(
                                                            
                                                            raw_text, 
                                                            ..1, 
-                                                           ..2))),
+                                                           ..2)))),
                                collapse = "") %>% 
             stringr::str_replace_all("[\\n\\r]",
                                      "<span class='br'>\\&#8203</span></p><p class='docpar'>")
@@ -379,7 +379,7 @@ load_doc_to_display <- function(pool,
         df_non_coded <- paste0(
             "<article><p class='document_par'>",
             
-            raw_text %>%
+            htmltools::htmlEscape(raw_text) %>%
                 stringr::str_replace_all("[\\n\\r]",
                                          "<span class='br'>\\&#8203</span></p><p class='docpar'>"),
             
