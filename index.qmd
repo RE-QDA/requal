@@ -7,6 +7,6 @@ include-in-header:
 
 ![Requal logo](img/rql_logo.png)
 
-Requal is an open-source [CAQDAS](https://en.wikipedia.org/wiki/Computer-assisted_qualitative_data_analysis_software) application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the [Shiny](https://www.rstudio.com/products/shiny/) framework for the [R project](https://www.r-project.org/) free software environment. 
+Requal is a free and open-source [CAQDAS](https://en.wikipedia.org/wiki/Computer-assisted_qualitative_data_analysis_software) application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is built with the [Shiny](https://www.rstudio.com/products/shiny/) framework for the [R](https://www.r-project.org/) language environment.
 
 <a rel="me" class="mastodon-verification" href="https://sciences.social/@requal"></a>

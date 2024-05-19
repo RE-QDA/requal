@@ -25,7 +25,7 @@
     "href": "index.html",
     "title": "Home",
     "section": "",
-    "text": "Requal logo\n\n\nRequal is an open-source CAQDAS application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is fueled by the Shiny framework for the R project free software environment."
+    "text": "Requal logo\n\n\nRequal is a free and open-source CAQDAS application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, and reflexivity. The application operates cross-platform in web browsers and is built with the Shiny framework for the R language environment."
   },
   {
     "objectID": "wiki/How-to-add-documents.html",
