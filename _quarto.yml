@@ -15,6 +15,7 @@ website:
         text: Posts
       - href: contact.qmd
         text: Contact
+    right:
       - href: https://github.com/RE-QDA/requal/wiki
         icon: book
         target: _blank
