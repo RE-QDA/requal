@@ -8,6 +8,12 @@
     background-color:rgb(233, 242, 248);
 }
 
+.news-date {
+    font-family: monospace;
+    font-size: small;
+    background: azure;
+}
+
 .figure-caption {
     display: none;
 }

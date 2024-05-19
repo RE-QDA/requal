@@ -2,4 +2,5 @@
 title: "News"
 ---
 
-- [New Requal release: Thuringothyris (v1.1.2)](https://github.com/RE-QDA/requal/discussions/145) 2024-05-18
+- [New Requal release: Thuringothyris (v1.1.2)](https://github.com/RE-QDA/requal/discussions/145). [2024-05-18]{class="news-date"}
+- Martin Hájek presented Requal at [Sociological Coffee](https://fhs.cuni.cz/FHS-1001.html?event=27829&lang=cz) held by the [Department of Sociology](https://fhs.cuni.cz/FHS-2497.html) of the Faculty of Humanities, Charles University. [2024-05-16]{class="news-date"}
