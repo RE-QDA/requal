@@ -14,4 +14,4 @@ For more details, you can read the full [Thuringothyris release notes](https://g
 
 To update your Requal installation, download the [requal_1.1.2.tar.gz](https://github.com/RE-QDA/requal/releases/download/v1.1.2/requal_1.1.2.tar.gz) file from the [Releases page](https://github.com/RE-QDA/requal/releases). Then, run the `remotes::install_local(file.choose())` command in the [R](https://www.r-project.org/) console.
 
-_Source: [https://github.com/RE-QDA/requal/discussions/145](https://github.com/RE-QDA/requal/discussions/145)_
+_Source: [Requal GitHub Discussions](https://github.com/RE-QDA/requal/discussions/145)_

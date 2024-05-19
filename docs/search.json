@@ -431,7 +431,7 @@
     "href": "posts/thuringothyris/index.html",
     "title": "Thuringothyris (v1.1.2)",
     "section": "",
-    "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: https://github.com/RE-QDA/requal/discussions/145"
+    "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
   },
   {
     "objectID": "wiki/Working-with-your-project.html",
