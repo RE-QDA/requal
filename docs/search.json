@@ -21,13 +21,6 @@
     "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen"
   },
   {
-    "objectID": "get_started.html#other-foss-caqdas",
-    "href": "get_started.html#other-foss-caqdas",
-    "title": "Getting started",
-    "section": "Other FOSS CAQDAS",
-    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight approach to coding text for further analysis with R.\nROCK - R implementation of quantitative ethnography approach to qualitative data with focus on reproducibility."
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Home",
@@ -432,6 +425,13 @@
     "title": "Contact",
     "section": "Acknowledgement",
     "text": "Acknowledgement\nThe application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054.\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "contact.html#other-foss-caqdas",
+    "href": "contact.html#other-foss-caqdas",
+    "title": "Contact",
+    "section": "Other FOSS CAQDAS",
+    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight approach to coding text for further analysis with R.\nROCK - R implementation of quantitative ethnography approach to qualitative data with focus on reproducibility."
   },
   {
     "objectID": "posts/thuringothyris/index.html",

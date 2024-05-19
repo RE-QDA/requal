@@ -52,13 +52,3 @@ requal::run_app()
 
 ![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)
 
-## Other FOSS CAQDAS
-
-Requal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:
-
-- [RQDA](https://rqda.r-forge.r-project.org/) - this deserves a special mention as our original source of motivation and inspiration for QDA in R.
-- [Taguette](https://www.taguette.org/) - straightforward and collaborative coding.
-- [QualCoder](https://qualcoder.wordpress.com/) - feature-rich alternative to proprietary CAQDAS.
-- [OpenQDA](https://openqda.org/) - open-source collaborative CAQDAS in the cloud.
-- [QCoder](https://github.com/ropenscilabs/qcoder) - lightweight approach to coding text for further analysis with R.
-- [ROCK](https://r-packages.gitlab.io/rock/) - R implementation of quantitative ethnography approach to qualitative data with focus on reproducibility.
