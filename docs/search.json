@@ -25,7 +25,7 @@
     "href": "get_started.html#other-foss-caqdas",
     "title": "Getting started",
     "section": "Other FOSS CAQDAS",
-    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative coding.\nQualCoder - feature rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight approach to coding text for further analysis with R.\nROCK - R implementation of quantitative ethnography approach to qualitative data with focus on reproducibility."
+    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight approach to coding text for further analysis with R.\nROCK - R implementation of quantitative ethnography approach to qualitative data with focus on reproducibility."
   },
   {
     "objectID": "index.html",
@@ -753,6 +753,6 @@
     "href": "posts.html",
     "title": "Requal posts",
     "section": "",
-    "text": "Thuringothyris (v1.1.2)\n\n\n\n\n\n\n\nreleases\n\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n  \n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\n\nevents\n\n\npresentation\n\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
+    "text": "Thuringothyris (v1.1.2)\n\n\n\n\n\n\n\nreleases\n\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n  \n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
   }
 ]

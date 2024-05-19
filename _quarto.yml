@@ -15,10 +15,11 @@ website:
         text: Posts
       - href: contact.qmd
         text: Contact
-      - href: wiki.qmd
-        text: Wiki
+      - href: https://github.com/RE-QDA/requal/wiki
+        icon: book
+        target: _blank
       - href: https://github.com/RE-QDA/requal/discussions
-        icon: chat
+        icon: chat-text
         target: _blank
       - href: https://github.com/RE-QDA/requal
         icon: github
