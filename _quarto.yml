@@ -4,15 +4,21 @@ project:
 
 website:
   title: "requal"
+  favicon: img/favicon.ico
   navbar:
     logo: img/rql_logo.png
     left:
+      - href: news.qmd
+        text: News
       - href: get_started.qmd
         text: Getting started
       - href: contact.qmd
         text: Contact
       - href: wiki.qmd
         text: Wiki
+      - href: https://github.com/RE-QDA/requal/discussions
+        icon: chat
+        target: _blank
       - href: https://github.com/RE-QDA/requal
         icon: github
         target: _blank

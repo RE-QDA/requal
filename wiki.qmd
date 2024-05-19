@@ -5,7 +5,7 @@ title: "Wiki"
 # **Requal WIKI ** 
 
 * [About Requal](wiki/Home.md)
-* [Youtube tutorials](https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl.md)
+* [Youtube tutorials](https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl)
 
 
 ## How to instal desktop version

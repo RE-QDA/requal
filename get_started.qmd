@@ -2,6 +2,8 @@
 title: "Getting started"
 ---
 
+Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.
+
 ## Installation
 
 ### Server version
@@ -45,7 +47,7 @@ devtools::install_github("RE-QDA/requal")
 After installation, the Requal app can be launched from the R console with the following command:
 
 ```
-requal::run_app(options = list("launch.browser"))
+requal::run_app()
 ```
 
 ![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)

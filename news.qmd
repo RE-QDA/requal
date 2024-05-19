@@ -1,0 +1,5 @@
+---
+title: "News"
+---
+
+- [New Requal release: Thuringothyris (v1.1.2)](https://github.com/RE-QDA/requal/discussions/145) 2024-05-18

@@ -30,6 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./img/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -85,6 +86,10 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
+    <a class="nav-link" href="./news.html" rel="" target="">
+ <span class="menu-text">News</span></a>
+  </li>  
+  <li class="nav-item">
     <a class="nav-link active" href="./get_started.html" rel="" target="" aria-current="page">
  <span class="menu-text">Getting started</span></a>
   </li>  
@@ -95,6 +100,11 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link" href="./wiki.html" rel="" target="">
  <span class="menu-text">Wiki</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/RE-QDA/requal/discussions" rel="" target="_blank"><i class="bi bi-chat" role="img">
+</i> 
+ <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
     <a class="nav-link" href="https://github.com/RE-QDA/requal" rel="" target="_blank"><i class="bi bi-github" role="img">
@@ -147,6 +157,7 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.</p>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <section id="server-version" class="level3">
@@ -179,7 +190,7 @@ devtools::install_github("RE-QDA/requal")</code></pre>
 <section id="usage-desktop" class="level2">
 <h2 class="anchored" data-anchor-id="usage-desktop">Usage (desktop)</h2>
 <p>After installation, the Requal app can be launched from the R console with the following command:</p>
-<pre><code>requal::run_app(options = list("launch.browser"))</code></pre>
+<pre><code>requal::run_app()</code></pre>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png" class="img-fluid figure-img"></p>
