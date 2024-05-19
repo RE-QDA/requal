@@ -4,8 +4,7 @@ description: "Announcement of a new Requal release."
 author: "requal"
 date: "2024-05-18"
 categories:
-  - release
-  - announcements
+  - releases
 ---
 
 The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris  is intended as a precursor to the upcoming more substantial enhancements.
