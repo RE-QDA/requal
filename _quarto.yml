@@ -1,7 +1,8 @@
 project:
   type: website
   output-dir: docs
-
+execute:
+  freeze: auto
 website:
   title: "requal"
   favicon: img/favicon.ico
@@ -22,12 +23,13 @@ website:
       - href: https://github.com/RE-QDA/requal
         icon: github
         target: _blank
-
 format:
   html:
     theme: morph
     css: styles.css
     toc: true
+
+
 
 
 
