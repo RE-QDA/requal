@@ -138,7 +138,7 @@ width: 100% !important;
 .mfb-component--bl {
   display: none;
 }
-#\.shinymanager_logout {
+#\.shinymanager_logout.mfb-component__button--child {
   display: none;
 }
 #\.shinymanager_admin {
