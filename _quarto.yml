@@ -19,12 +19,18 @@ website:
       - href: https://github.com/RE-QDA/requal/wiki
         icon: book
         target: _blank
+        rel: opener
+        aria-label: "Wiki"
       - href: https://github.com/RE-QDA/requal/discussions
         icon: chat-text
         target: _blank
+        rel: opener
+        aria-label: "Discussions"
       - href: https://github.com/RE-QDA/requal
         icon: github
         target: _blank
+        rel: opener
+        aria-label: "GitHub"
 format:
   html:
     theme: morph
