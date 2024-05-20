@@ -31,3 +31,5 @@ Requal is a proud member of the community of free and open source software for c
 - [OpenQDA](https://openqda.org/) - open-source collaborative CAQDAS in the cloud.
 - [QCoder](https://github.com/ropenscilabs/qcoder) - lightweight tool for coding text and its further analysis with R.
 - [ROCK](https://r-packages.gitlab.io/rock/) - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.
+- [Iramuteq](http://www.iramuteq.org/) - graphical user interface for geometrical text analyses in R.
+- [CATMA](https://catma.de/) - annotation and query software tuned for literary and historical documents.
