@@ -9,7 +9,7 @@ categories:
 
 The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris  is intended as a precursor to the upcoming more substantial enhancements.
 
-For more details, you can read the full [Thuringothyris release notes](https://github.com/RE-QDA/requal/releases/tag/v1.1.2).
+For more details, you can read the full [Thuringothyris release notes](https://github.com/RE-QDA/requal/releases/tag/v1.1.2.9002).
 
 To update your Requal installation, download the [requal_1.1.2.9002.tar.gz](https://github.com/RE-QDA/requal/releases/download/v1.1.2.9002/requal_1.1.2.9002.tar.gz) file from the [Releases page](https://github.com/RE-QDA/requal/releases). Then, run the `remotes::install_local(file.choose())` command in the [R](https://www.r-project.org/) console.
 
