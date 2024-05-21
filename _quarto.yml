@@ -31,6 +31,8 @@ website:
         target: _blank
         rel: opener
         aria-label: "GitHub"
+  google-analytics: "G-QL51WZFP8F"
+  cookie-consent: true
 format:
   html:
     theme: morph
