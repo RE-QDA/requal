@@ -106,7 +106,7 @@ website](https://requal.fsv.cuni.cz/).
 > de-identification. This will allow you to perform de-identification
 > locally and collaboratively analyze the de-identified dataset online.
 
-## Acknowledgement
+## Acknowledgment
 
 The application development has been supported by The Technology Agency
 of the Czech Republic, project n. TL05000054, and CLS INFRA Fellowship

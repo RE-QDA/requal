@@ -1,3 +1,5 @@
+utils::globalVariables(c("memo_title"))
+
 # list existing memos ------
 list_memo_records <- function(pool, project) {
     dplyr::tbl(pool, "memos") %>%

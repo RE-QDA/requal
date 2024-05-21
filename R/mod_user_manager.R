@@ -97,10 +97,10 @@ mod_user_manager_server <- function(id, glob) {
       
       modified_permissions_df <- loc$users_permissions_df %>%
       dplyr::filter(user_id %in% input$members_permissions) %>%
-      dplyr::mutate(across(matches("modify|view"), .fns = function(x) {
+      dplyr::mutate(dplyr::across(dplyr::matches("modify|view"), .fns = function(x) {
         x  <- 0 # reset permissions
       })) %>%
-      dplyr::mutate(across(all_of(input$permissions_list), .fns = function(x) {
+      dplyr::mutate(dplyr::across(dplyr::all_of(input$permissions_list), .fns = function(x) {
         x  <- 1 # apply new permissions
       }))
 

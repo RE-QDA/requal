@@ -185,7 +185,7 @@ mod_memo_server <- function(id, glob) {
         },
         content = function(file) {
             memos <- export_memos(glob$pool, glob$active_project)
-            write.csv(memos, file)
+            utils::write.csv(memos, file)
         }
     )
     
