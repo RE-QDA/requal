@@ -87,6 +87,16 @@ app_server <- function(input, output, session) {
         shinyjs::show(selector = ".mfb-component--bl")
         }
   })
+
+  # observe screens
+    observeEvent(input$analyze_link,{
+      updateTabsetPanel(session, "tab_menu", input$analyze_link$tab_menu)
+      glob$analyze_link <- list(
+        doc_id = input$analyze_link$doc_id,
+        segment_start = input$analyze_link$segment_start
+        )
+  })
+
   # shared
   mod_download_csv_server("download_csv_ui_1", glob)
 

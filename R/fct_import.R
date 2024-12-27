@@ -143,7 +143,7 @@ parse_qdpx <- function(path) {
       }
     )) |>
     dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) |>
-    # so far no support for non-codable codes in reQual
+    # so far no support for non-codable codes in requal
     dplyr::filter(isCodable) |>
     dplyr::select(
       code_name = name,
@@ -305,13 +305,15 @@ import_project <- function(content, user_id, active_project, pool) {
 # 2.1 Import helpers ----
 # Import project info ----
 .import_project_info <- function(project_info, user_id, active_project, pool){
-  DBI::dbExecute(pool,
-               glue::glue_sql("UPDATE projects
-                                SET project_name = {project_info$project_name}, 
-                                    project_description = {project_info$project_description}
-                                WHERE project_id = {active_project}", .con = pool)
-             )
+  db_update_value(pool, 
+        table = "projects", 
+        col_val = list(
+          c(project_name = project_info$project_name),
+          c(project_description = project_info$project_description)
+        ), 
+        by_col_val = c(project_id = active_project))
 }
+
 
 # Import codebook ----
 .import_codebook <- function(codebook, user_id, active_project, pool){
@@ -335,10 +337,8 @@ codebook <- codebook |>
         clear_tbl_project(pool, "codes", active_project)
 
       # Make sure column exists for parent information
-      query <- "ALTER TABLE codes ADD COLUMN IF NOT EXISTS code_parent_id integer;"
-      DBI::dbExecute(pool, query)
-      query <- "ALTER TABLE codes ADD COLUMN IF NOT EXISTS original_code_id integer;"
-      DBI::dbExecute(pool, query)
+      db_helper_column(pool, "codes", "code_parent_id", "add")      
+      db_helper_column(pool, "codes", "original_code_id", "add")
       # temporarily write into DB with original code_id
       codebook_renamed <- codebook |>
         dplyr::rename(original_code_id = code_id)
@@ -368,8 +368,7 @@ codebook <- codebook |>
         }
       )
       # remove helper column from DB
-      query <- "ALTER TABLE codes DROP COLUMN original_code_id;"
-      DBI::dbExecute(pool, query)
+      db_helper_column(pool, "codes", "original_code_id", "drop")
       # TODO log
 }
 
