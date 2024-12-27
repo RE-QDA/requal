@@ -6,9 +6,8 @@ golem::detach_all_attached()
 # rm(list=ls(all.names = TRUE))
 
 # Document and reload your package
-r
+golem::document_and_reload()
 
-# Run the application
 (run_app(
   mode = "server",
   dbname = "requal",
@@ -18,13 +17,13 @@ r
   credentials_path = "requal_users.sqlite",
   credentials_pass = "test",
   options = list("launch.browser")
-))
+ ))
 
 
 # (run_app(
-#   mode = "local",
-#   options = list("launch.browser")
-# ))
+#  mode = "local",
+#  options = list("launch.browser")
+#))
 
 
 # (run_app(
