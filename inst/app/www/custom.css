@@ -209,3 +209,9 @@ display: flex;
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
 }
+
+  /* codes menu column layout */
+  .two_columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Creates two columns of equal width */
+   }

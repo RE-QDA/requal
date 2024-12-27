@@ -30,12 +30,12 @@ mod_project_ui <- function(id) {
               label = "Delete project",
               icon = "trash",
               inputId = ns("project_delete_menu")
-            )) %>% tagAppendAttributes(style = "padding-right: 25px;"),
-            mod_rql_button_ui(ns("project_import_tool"),
-              label = "Import project",
-              icon = "file-import",
-              inputId = ns("project_import_menu")
-            )
+            )) %>% tagAppendAttributes(style = "padding-right: 25px;") #,
+            #mod_rql_button_ui(ns("project_import_tool"),
+            #  label = "Import project",
+            #  icon = "file-import",
+            #  inputId = ns("project_import_menu")
+            #)
           ),
           fluidRow(
             class = "module_content",
@@ -191,57 +191,57 @@ mod_project_server <- function(id, glob) {
       session$reload()
     })
 
-    # Project import UI ----
-    mod_rql_button_server(
-      id = "project_import_tool",
-      custom_title = "Import project",
-      custom_tagList = tagList(
-        fileInput(ns("project_import_path"), NULL,
-          multiple = FALSE,
-          buttonLabel = "Select file",
-          placeholder = "Only .qdpx files",#TODO "Only .qdpx or .rqda",
-          accept = ".qdpx", #TODO c(".rqda", ".qdpx")
-        ) %>% tagAppendAttributes(class = "required"),
-        selectInput(ns("project_import_origin"),
-          "Project origin",
-          choices = "REFI-QDA" #TODO c("REFI-QDA", "RQDA")
-        ),
-        actionButton(ns("project_import"), "Import project", class = "btn-danger")
-      ),
-      glob,
-      permission = "project_owner"
-    )
+    # # Project import UI ----
+    # mod_rql_button_server(
+    #   id = "project_import_tool",
+    #   custom_title = "Import project",
+    #   custom_tagList = tagList(
+    #     fileInput(ns("project_import_path"), NULL,
+    #       multiple = FALSE,
+    #       buttonLabel = "Select file",
+    #       placeholder = "Only .qdpx files",#TODO "Only .qdpx or .rqda",
+    #       accept = ".qdpx", #TODO c(".rqda", ".qdpx")
+    #     ) %>% tagAppendAttributes(class = "required"),
+    #     selectInput(ns("project_import_origin"),
+    #       "Project origin",
+    #       choices = "REFI-QDA" #TODO c("REFI-QDA", "RQDA")
+    #     ),
+    #     actionButton(ns("project_import"), "Import project", class = "btn-danger")
+    #   ),
+    #   glob,
+    #   permission = "project_owner"
+    # )
 
-    observeEvent(input$project_import, {
-      showModal(
-        modalDialog(
-          title = "Are you sure?",
-          paste(
-            "You are about to import a project. The current",
-            loc$project_name,
-            "project will be overwritten with imported content."
-          ),
-          easyClose = TRUE,
-          footer = tagList(
-            modalButton("Dismiss"),
-            actionButton(ns("confirmation_import"),
-              "Yes, I am sure.",
-              class = "btn-danger"
-            )
-          ),
-          fade = TRUE
-        )
-      )
-    })
+    # observeEvent(input$project_import, {
+    #   showModal(
+    #     modalDialog(
+    #       title = "Are you sure?",
+    #       paste(
+    #         "You are about to import a project. The current",
+    #         loc$project_name,
+    #         "project will be overwritten with imported content."
+    #       ),
+    #       easyClose = TRUE,
+    #       footer = tagList(
+    #         modalButton("Dismiss"),
+    #         actionButton(ns("confirmation_import"),
+    #           "Yes, I am sure.",
+    #           class = "btn-danger"
+    #         )
+    #       ),
+    #       fade = TRUE
+    #     )
+    #   )
+    # })
 
-    observeEvent(input$confirmation_import, {
-      rql_message("Processing import file.")
-      imported_content <- parse_qdpx(input$project_import_path[["datapath"]])
-      rql_message("Importing project.")
-      import_project(content = imported_content, user_id = glob$user$user_id, active_project = glob$active_project, pool = glob$pool)
-      rql_message("Project imported.")
-      removeModal()
-    })
+    # observeEvent(input$confirmation_import, {
+    #   rql_message("Processing import file.")
+    #   imported_content <- parse_qdpx(input$project_import_path[["datapath"]])
+    #   rql_message("Importing project.")
+    #   import_project(content = imported_content, user_id = glob$user$user_id, active_project = glob$active_project, pool = glob$pool)
+    #   rql_message("Project imported.")
+    #   removeModal()
+    # })
 
     return(NULL)
   })
