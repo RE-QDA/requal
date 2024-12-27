@@ -83,7 +83,7 @@ delete_code_UI <- function(ns, pool, project, user) {
             label = "Select codes to delete",
             choices = stats::setNames(codes$code_id, codes$code_name),
             selected = NULL,
-            multiple = TRUE,
+            multiple = FALSE,
             options = list(
                 closeAfterSelect = "true"
             )
