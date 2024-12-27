@@ -25,10 +25,8 @@ mod_document_code_ui <- function(id) {
 "))
     ),
     fluidRow(
-      class = "module_tools",
-      style = "width: 100% !important;",
       column(
-        width = 8,
+        width = 5,
         selectInput(
           ns("doc_selector"),
           label = "Select a document to code",
@@ -37,8 +35,8 @@ mod_document_code_ui <- function(id) {
         )
       ),
       column(
-        width = 2,
-        style = "text-align: right;",
+        width = 5,
+        div(style = "float: right;",
         actionButton(
           ns("toggle_style"),
           label = "",
@@ -49,11 +47,18 @@ mod_document_code_ui <- function(id) {
           label = "",
           icon = icon("sync")
         ) %>% tagAppendAttributes(title = "Reload document")
-      ),
+        )), 
       column(
         width = 2,
-        style = "text-align: left;",
+        div(style = "text-align: right;",
+          actionButton(
+          ns("code_columns"),
+          label = "",
+          icon = icon("table-columns")
+        ) %>% tagAppendAttributes(title = "Code columns"),
+        br(), "Selection:", br(),
         textOutput(ns("captured_range"))
+      )
       )
     ),
     fluidRow(
@@ -78,7 +83,7 @@ mod_document_code_ui <- function(id) {
             width = "100%"
           ),
           tags$div(
-            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 1em; margin-bottom: 1em;",
+            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
             tags$div(
               style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
               tags$iframe(
@@ -160,6 +165,11 @@ mod_document_code_server <- function(id, glob) {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
     })
 
+    ## Code columns observer -----
+    observeEvent(input$code_columns, {
+      shinyjs::toggleClass(id = "codes_menu", "two_columns", asis = TRUE)
+    })
+
     ## Codes menu observer ---- 
     observeEvent(req(loc$codes_menu_observer), {
       req(loc$codes_menu_observer > 0) # ignore init value
@@ -168,9 +178,8 @@ mod_document_code_server <- function(id, glob) {
         glob$active_project,
         user = glob$user
       )
-      loc$codes_menu <- sortable::rank_list(
-        input_id = "codes_menu",
-        labels = purrr::pmap(
+     
+      code_labels <- purrr::pmap(
           list(
             loc$codebook$code_id,
             loc$codebook$code_name,
@@ -183,9 +192,12 @@ mod_document_code_server <- function(id, glob) {
             code_name = ..2,
             code_color = ..3,
             code_desc = ..4
-          )
-        )
-      )
+          ))
+        
+      loc$codes_menu <- sortable::rank_list(
+        input_id = "codes_menu",
+        labels = code_labels
+      ) 
     })
   ## Observe Analyze screen ----
   # Listen to message from Analyze screen
@@ -412,7 +424,7 @@ mod_document_code_server <- function(id, glob) {
       } else {
         reported_range <- input$tag_position
       }
-      paste("Selection:", reported_range)
+      paste(reported_range)
     })
 
     # returns glob$segments_observer and glob$codebook
