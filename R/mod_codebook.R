@@ -66,7 +66,8 @@ mod_codebook_server <- function(id, glob) {
       glob$active_project,
       input$code_add,
       input$code_merge,
-      input$code_del_btn
+      input$code_del_btn,
+      glob$codebook_observer
     ), {
     #---Create code UI --------------
     mod_rql_button_server(

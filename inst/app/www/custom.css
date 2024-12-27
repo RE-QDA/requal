@@ -33,8 +33,14 @@
 
 .code-button:hover {
     overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
 }
-
+.code-button:popover {
+  overflow: initial;
+  white-space: initial;
+  text-overflow: initial;
+}
 .quote {
 font-size: medium;
 line-height: 1;
@@ -60,12 +66,14 @@ p.docpar {
 }
 
 .br {
-height: 0px;
-width: 0px;
+  height: 0px;
+  width: 0px;
 }
 
 b.segment {
-font-weight: normal;
+  font-weight: normal;
+  text-decoration-thickness: 5px !important; 
+  text-underline-offset: 3px !important;
 }
 
 
@@ -149,4 +157,54 @@ width: 100% !important;
 /* logo style */
 .logo {
   background-color: rgb(63, 79, 144) !important;
+}
+.split {
+  display: flex;
+  flex-direction: row;
+}
+
+.split > #split-1 {
+  padding-top: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  background-color: #ffffff !important;
+}
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
+}
+
+#rank-list-codes_menu {
+background-color: transparent;
+border: none;
+padding: 0px;
+margin-left: -0.3em;
+margin-right: -0.3em;
+display: flex;
+}
+
+
+.docpar::selection {
+  background: #ffffcc;
+  color: grey;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: red; 
+}
+
+.docpar b::selection {
+  background: #ffffcc;
+  color: grey;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: red; 
+}
+.quickcode {
+  height: calc(1.5em + .75rem + 2px);
 }

@@ -19,15 +19,22 @@ mod_project_ui <- function(id) {
         tagList(
           fluidRow(
             class = "module_tools",
-            div(mod_rql_button_ui(ns("project_edit_tool"),
-              label = "Edit project",
-              icon = "pencil",
-              inputId = ns("project_edit_menu")
-            )) %>% tagAppendAttributes(style = "padding-right: 25px;"),
-            mod_rql_button_ui(ns("project_delete_tool"),
+            div(
+              mod_rql_button_ui(ns("project_edit_tool"),
+                label = "Edit project",
+                icon = "pencil",
+                inputId = ns("project_edit_menu")
+              )
+            ) %>% tagAppendAttributes(style = "padding-right: 25px;"),
+            div(mod_rql_button_ui(ns("project_delete_tool"),
               label = "Delete project",
               icon = "trash",
               inputId = ns("project_delete_menu")
+            )) %>% tagAppendAttributes(style = "padding-right: 25px;"),
+            mod_rql_button_ui(ns("project_import_tool"),
+              label = "Import project",
+              icon = "file-import",
+              inputId = ns("project_import_menu")
             )
           ),
           fluidRow(
@@ -70,15 +77,15 @@ mod_project_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
     loc$edit_observer <- 0
-      output$project_name <- renderText({
-        loc$project_name
-      })
-      output$project_description <- renderText({
-        loc$project_description
-      })
-      output$project_date <- renderText({
-        loc$project_date
-      })
+    output$project_name <- renderText({
+      loc$project_name
+    })
+    output$project_description <- renderText({
+      loc$project_description
+    })
+    output$project_date <- renderText({
+      loc$project_date
+    })
     observeEvent(glob$active_project, {
       loc$project_df <- dplyr::tbl(glob$pool, "projects") %>%
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
@@ -104,33 +111,35 @@ mod_project_server <- function(id, glob) {
       ),
       glob,
       permission = "project_owner"
-          )
+    )
 
     observeEvent(input$project_edit_save, {
       active_project <- as.integer(local(glob$active_project))
 
       if (input$project_edit_name != loc$project_name) {
         res <- DBI::dbExecute(
-        glob$pool,
-        glue::glue_sql("UPDATE projects
+          glob$pool,
+          glue::glue_sql("UPDATE projects
                  SET project_name = {input$project_edit_name}
                  WHERE project_id = {active_project}", .con = glob$pool)
         )
-        updateTextInput(session = session,
-        "project_edit_name",
-        value = input$project_edit_name
+        updateTextInput(
+          session = session,
+          "project_edit_name",
+          value = input$project_edit_name
         )
       }
       if (input$project_edit_description != loc$project_description) {
         res <- DBI::dbExecute(
-        glob$pool,
-        glue::glue_sql("UPDATE projects
+          glob$pool,
+          glue::glue_sql("UPDATE projects
                  SET project_description = {input$project_edit_description}
                  WHERE project_id = {active_project}", .con = glob$pool)
         )
-               updateTextInput(session = session,
-        "project_edit_description",
-        value = input$project_edit_description
+        updateTextInput(
+          session = session,
+          "project_edit_description",
+          value = input$project_edit_description
         )
       }
 
@@ -138,7 +147,6 @@ mod_project_server <- function(id, glob) {
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
       shinyjs::removeClass(paste0("sw-content-", ns("project_edit_menu")), "sw-show", asis = TRUE)
       showNotification("Changes to project were saved.")
-
     })
 
     # Project delete UI ----
@@ -181,6 +189,58 @@ mod_project_server <- function(id, glob) {
         )
       )
       session$reload()
+    })
+
+    # Project import UI ----
+    mod_rql_button_server(
+      id = "project_import_tool",
+      custom_title = "Import project",
+      custom_tagList = tagList(
+        fileInput(ns("project_import_path"), NULL,
+          multiple = FALSE,
+          buttonLabel = "Select file",
+          placeholder = "Only .qdpx files",#TODO "Only .qdpx or .rqda",
+          accept = ".qdpx", #TODO c(".rqda", ".qdpx")
+        ) %>% tagAppendAttributes(class = "required"),
+        selectInput(ns("project_import_origin"),
+          "Project origin",
+          choices = "REFI-QDA" #TODO c("REFI-QDA", "RQDA")
+        ),
+        actionButton(ns("project_import"), "Import project", class = "btn-danger")
+      ),
+      glob,
+      permission = "project_owner"
+    )
+
+    observeEvent(input$project_import, {
+      showModal(
+        modalDialog(
+          title = "Are you sure?",
+          paste(
+            "You are about to import a project. The current",
+            loc$project_name,
+            "project will be overwritten with imported content."
+          ),
+          easyClose = TRUE,
+          footer = tagList(
+            modalButton("Dismiss"),
+            actionButton(ns("confirmation_import"),
+              "Yes, I am sure.",
+              class = "btn-danger"
+            )
+          ),
+          fade = TRUE
+        )
+      )
+    })
+
+    observeEvent(input$confirmation_import, {
+      rql_message("Processing import file.")
+      imported_content <- parse_qdpx(input$project_import_path[["datapath"]])
+      rql_message("Importing project.")
+      import_project(content = imported_content, user_id = glob$user$user_id, active_project = glob$active_project, pool = glob$pool)
+      rql_message("Project imported.")
+      removeModal()
     })
 
     return(NULL)

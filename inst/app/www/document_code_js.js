@@ -69,25 +69,22 @@ document.addEventListener('mouseup', function () {
       } 
       
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-        
+        console.log("tag_position" + tag_position_value)
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }
 
 }, false);
 })
 
-// Auxiliary function to add highlight in the browser
 
-$( document ).ready(function() {
-  Shiny.addCustomMessageHandler('highlight', function(arg_color) {
-  
-        var selection = window.getSelection().getRangeAt(0);
-        if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
-        var selectedText = selection.extractContents();
-        var mark = document.createElement("mark");
-        mark.style.background = arg_color;
-        mark.appendChild(selectedText);
-        selection.insertNode(mark);  
-  })
+Shiny.addCustomMessageHandler('getIframeContent', function(message) {
+  var iframe = document.getElementsByTagName('iframe')[0];
+  var res = iframe.contentDocument.getElementById('quickCodeInput');
+  var quickodeValue = res.dataset.quickode;
+  Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
 });
 
+Shiny.addCustomMessageHandler('refreshIframe', function(message) {
+  var iframe = document.getElementsByTagName('iframe')[0];
+  iframe.src = iframe.src;
+});

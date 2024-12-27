@@ -41,8 +41,8 @@ rql_import_rqda <- function(rqda_file, requal_file){
         RSQLite::SQLite(), 
         dbname = requal_file
     )
-    
-    message("Loading data from RQDA")
+  
+    rql_message("Loading data from RQDA")
     # Load Data from RQDA
     project_df <- dplyr::tbl(rqda_con, "project") %>% 
         dplyr::collect() %>% 
@@ -117,7 +117,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
         dplyr::filter(!is.na(code_id))
     
     # Create requal schema
-    message("Creating Requal scheme")
+    rql_message("Creating Requal scheme")
     create_db_schema(requal_pool)
 
     # Import to requal
@@ -129,7 +129,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
         dplyr::pull(project_id) %>% 
         utils::tail(1)
     
-    message("Importing documents")
+    rql_message("Importing documents")
     documents_df <- rqda_documents %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(documents_df)), function(x) {
@@ -137,7 +137,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                              user_id = USER_ID)
     })
     
-    message("Importing cases")
+    rql_message("Importing cases")
     cases_df <- rqda_cases %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(cases_df)), function(x) {
@@ -145,7 +145,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                          user_id = USER_ID)
     })
     
-    message("Importing case document map")
+    rql_message("Importing case document map")
     case_doc_map <- rqda_case_doc_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(case_doc_map)), function(x) {
@@ -157,7 +157,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
         dplyr::filter(is.na(code_color)) %>% 
         nrow()
     
-    message("Importing codes")
+    rql_message("Importing codes")
     codes_df <- rqda_codes %>% 
         dplyr::mutate(project_id = requal_project_id, 
                       code_color = ifelse(is.na(code_color), 
@@ -168,7 +168,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                          user_id = USER_ID)    
     })
     
-    message("Importing categories")
+    rql_message("Importing categories")
     categories_df <- rqda_categories %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(categories_df)), function(x) {
@@ -177,7 +177,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                             user_id = USER_ID)
     })
     
-    message("Importing category code mapping")
+    rql_message("Importing category code mapping")
     category_code_map <- rqda_category_code_map %>% 
         dplyr::mutate(project_id = requal_project_id)
     purrr::walk(seq_len(nrow(category_code_map)), function(x) {
@@ -186,7 +186,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                                  user_id = USER_ID)
     })
     
-    message("Importing segments")
+    rql_message("Importing segments")
     segments_df <- rqda_segments %>% 
         dplyr::mutate(project_id = requal_project_id, 
                       segment_text = purrr::pmap_chr(
@@ -204,7 +204,7 @@ rql_import_rqda <- function(rqda_file, requal_file){
                                user_id = USER_ID)    
     })
     
-    message("Importing memos")
+    rql_message("Importing memos")
     if(!all(is.na(rqda_segments$memo))){
         DBI::dbWriteTable(requal_pool, "memos", memos_df %>% dplyr::select(memo_id, text), 
                           append = TRUE, row.names = FALSE)

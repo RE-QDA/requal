@@ -282,8 +282,8 @@ load_doc_to_display <- function(pool,
                                 user,
                                 doc_selector,
                                 codebook,
+                                highlight,
                                 ns){
-    
     position_type <- position_start <- tag_start <- tag_end <- NULL
     raw_text <- load_doc_db(pool, active_project, doc_selector)
     
@@ -327,16 +327,18 @@ load_doc_to_display <- function(pool,
             dplyr::mutate(tag_end = "</b>",
                           tag_start = paste0('<b id="',
                                              code_id,
-                                             '" class="segment" style="padding:0; background-color:',
+                                             highlight_style(highlight),
                                              code_color,
+                                             '" data-color="',  
+                                             code_color,                                              
                                              '" title="',
                                              code_name,
-                                             '">')) %>% 
+                                              '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
             dplyr::bind_rows(
                 # start doc
                 tibble::tibble(position_start = 0,
                                position_type =  "segment_start",
-                               tag_start = "<article><p class='docpar'>"),
+                               tag_start = "<article id='article'><p class='docpar'>"),
                 # content
                 .,
                 # end doc
@@ -377,7 +379,7 @@ load_doc_to_display <- function(pool,
     }else{
         
         df_non_coded <- paste0(
-            "<article><p class='document_par'>",
+            "<article id='article'><p class='docpar'>",
             
             raw_text %>%
                 stringr::str_replace_all("[\\n\\r]",
@@ -511,5 +513,17 @@ blend_colors <- function(string_id, code_names) {
     color_mean_string <- paste0(color_mean, collapse = ",")
     
     paste0("rgb(", color_mean_string, ")")
+    
+}
+
+# highlight/underline ----
+
+highlight_style <- function(choice) {
+
+    switch(choice,
+           underline = '" class="segment" style="padding:0; text-decoration: underline; text-decoration-color:',
+           background = '" class="segment" style="padding:0; background-color:',
+    )
+
     
 }
