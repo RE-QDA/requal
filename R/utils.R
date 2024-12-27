@@ -407,12 +407,17 @@ rql_button_UI <- function(inputId, label, class = NULL) {
 
 
 db_helper_column <- function(pool, table, column, action){
+  
   check_colnames <- colnames(dplyr::tbl(pool, table))
  query <-  switch(action,
-    "add" = glue::glue_sql("ALTER TABLE {table} 
-      ADD COLUMN {column};", .con = pool),
-    "drop" = glue::glue_sql("ALTER TABLE {table} 
-      DROP COLUMN {column};", .con = pool)
+    "add" = glue::glue_sql("
+        ALTER TABLE {`table`} 
+        ADD COLUMN {`column`} INTEGER;
+        ", .con = pool),
+    "drop" = glue::glue_sql("
+        ALTER TABLE {`table`}
+        DROP COLUMN {`column`}
+        ", .con = pool)
   )
     if (!column %in% check_colnames && action == "add") {
       res <- DBI::dbExecute(pool, query) 

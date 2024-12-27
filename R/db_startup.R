@@ -581,6 +581,7 @@ add_quickcode_record <- function(pool, project_id, codes_df, user_id) {
       db_helper_column(pool, "codes", "is_new_quickcode", "add")
       # temporarily write into DB with original code_id
       codes_df$is_new_quickcode <- 1
+     
   res <- DBI::dbWriteTable(pool, "codes", codes_df, append = TRUE, row.names = FALSE)
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%

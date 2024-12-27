@@ -294,7 +294,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(input$quickcode), {
       # check if code name is unique
       if (!(input$quickcode %in% glob$codebook$code_name)) {
-        
+      
         codes_input_df <- data.frame(
           project_id = glob$active_project,
           code_name = input$quickcode,
