@@ -284,11 +284,17 @@ mod_document_code_server <- function(id, glob) {
     
     # Quick code tools ----
     observeEvent(input$quickcode_btn, {
+
       # We need a document and selection positions
       req(input$doc_selector)
       req(input$tag_position)
-      session$sendCustomMessage(type = "getIframeContent", message = list())
-      session$sendCustomMessage(type = 'refreshIframe', message = list())
+      if (parse_tag_pos(input$tag_position, "start") < parse_tag_pos(input$tag_position, "end")) {
+         session$sendCustomMessage(type = "getIframeContent", message = list())
+         session$sendCustomMessage(type = 'refreshIframe', message = list())
+      } else {
+         rql_message("Missing selected text segment.")
+      }
+     
     })
     # After quickcode button is pressed, we wait for the quickcode value 
     observeEvent(req(input$quickcode), {
