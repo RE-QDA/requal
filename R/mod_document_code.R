@@ -91,7 +91,7 @@ mod_document_code_ui <- function(id) {
                 style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
               )
             ),
-            actionButton(ns("quickcode_btn"), "Quick code", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+            actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
           ),
           uiOutput(ns("code_list"))  %>% tagAppendAttributes(class = "scrollable80")
         )

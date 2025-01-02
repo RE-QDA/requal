@@ -63,6 +63,53 @@ merge_code_UI <- function(ns, pool, project, user) {
 }
 
 
+edit_code_UI <- function(ns, pool, project, user) {
+    
+    req(user$data)
+    
+    codes <- list_db_codes(
+        pool,
+        project_id = project, 
+        user = user
+    )
+    
+    if(user$data$codebook_other_modify == 0){
+        codes <- codes %>% 
+            dplyr::filter(user_id == !!user$user_id)
+    }
+    tags$div(
+        selectizeInput(
+            ns("code_to_edit"),
+            label = "Select code to edit",
+            choices = c("", stats::setNames(codes$code_id, codes$code_name)),
+            selected = NULL,
+            multiple = FALSE,
+            options = list(
+                closeAfterSelect = "true"
+            )
+        ),
+        textInput(
+            ns("edit_code_name"),
+            label = "Code name"
+        ) %>% tagAppendAttributes(class = "required"),
+        textAreaInput(
+            ns("edit_code_desc"),
+            label = "Code description"
+                ),
+        colourpicker::colourInput(
+            ns("edit_color_pick"),
+            label = "Highlight",
+            value = "white",
+            showColour = "background",
+            closeOnClick = TRUE
+        ),
+        actionButton(ns("code_edit_btn"),
+                     label = "Edit",
+                     class = "btn-warning"
+        )
+    )  %>% tagAppendAttributes(style = "text-align: left")
+}
+
 delete_code_UI <- function(ns, pool, project, user) {
     
     req(user$data)
@@ -291,4 +338,26 @@ get_codebook_export_table <- function(glob){
     dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>% 
         dplyr::group_by(code_id, code_name, code_description) %>% 
         dplyr::summarise(categories = paste0(category_title, collapse = " | "))
+}
+
+# Edit codes ------
+
+edit_db_codes <- function(pool,
+                        active_project,
+                        user_id,
+                        edit_code_id,
+                        edit_code_name,
+                        edit_code_description,
+                        edit_code_color) {
+
+    update_code_sql <- glue::glue_sql("UPDATE codes
+                 SET code_name = {edit_code_name}, code_description = {edit_code_description}, code_color = {edit_code_color}
+                 WHERE code_id = {edit_code_id}", .con = pool)
+    DBI::dbExecute(pool, update_code_sql)
+    
+    # should log action with edit ids
+    #TODO
+    # log_edit_code_record(pool, project_id = active_project, edit_code_id, user_id)
+
+    rql_message(paste("Code", edit_code_name, "was updated."))
 }

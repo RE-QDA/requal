@@ -23,10 +23,14 @@ mod_codebook_ui <- function(id) {
         label = "Create code",
         icon = "plus"
       ),
+      mod_rql_button_ui(ns("code_edit_ui"),
+        label = "Edit codes",
+        icon = "edit"
+      ), 
       mod_rql_button_ui(ns("code_merge_ui"),
         label = "Merge codes",
         icon = "compress"
-      ),
+      ),     
       mod_rql_button_ui(ns("code_delete_ui"),
         label = "Delete code",
         icon = "minus"
@@ -65,6 +69,7 @@ mod_codebook_server <- function(id, glob) {
    observeEvent(c(
       glob$active_project,
       input$code_add,
+      input$code_edit_btn,
       input$code_merge,
       input$code_del_btn,
       glob$codebook_observer
@@ -82,6 +87,14 @@ mod_codebook_server <- function(id, glob) {
       id = "code_merge_ui",
       custom_title = "Merge codes",
       custom_tagList = merge_code_UI(ns, glob$pool, glob$active_project, glob$user),
+      glob,
+      permission = "codebook_modify"
+    )
+    #---Edit code UI --------------
+    mod_rql_button_server(
+      id = "code_edit_ui",
+      custom_title = "Edit code",
+      custom_tagList = edit_code_UI(ns, glob$pool, glob$active_project, glob$user),
       glob,
       permission = "codebook_modify"
     )
@@ -147,6 +160,75 @@ mod_codebook_server <- function(id, glob) {
       } else {
        warn_user("Code names must be unique and non-empty.")
       }
+    })
+
+    #---Edit existing code-------------------------------------
+    # To edit a code, first observe which code is being edited
+    observeEvent(input$code_to_edit, {
+      req(input$code_to_edit)
+      updateTextInput(
+        session = session,
+        "edit_code_name",
+        value = glob$codebook %>% 
+            dplyr::filter(code_id == input$code_to_edit) %>%
+            dplyr::pull(code_name)
+      )
+      updateTextAreaInput(
+        session = session,
+        "edit_code_desc",
+        value = glob$codebook %>% 
+            dplyr::filter(code_id == input$code_to_edit) %>%
+            dplyr::pull(code_description)
+      )
+      colourpicker::updateColourInput(
+        session = session,
+        "edit_color_pick",
+        value = glob$codebook %>% 
+            dplyr::filter(code_id == input$code_to_edit) %>%
+            dplyr::pull(code_color)
+      )
+    })
+    # Execute code edit
+    observeEvent(input$code_edit_btn, {
+      req(input$code_to_edit)
+
+      # check if code name is unique
+      code_names <- list_db_codes(
+        pool = glob$pool,
+        project_id = glob$active_project, 
+        user = glob$user
+      ) %>%
+      dplyr::filter(code_id != input$code_to_edit) %>% # exclude original name from comparison
+      dplyr::pull(code_name)
+
+      # code must have a name that does not exist yet (unless it stays the same as original)
+      if (isTruthy(input$edit_code_name) && !input$edit_code_name %in% code_names) {
+        
+        # edit code
+      edit_db_codes(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        edit_code_id = input$code_to_edit,
+        edit_code_name = input$edit_code_name,
+        edit_code_description = input$edit_code_desc,
+        edit_code_color = paste0(
+            "rgb(",
+            paste(
+              as.vector(
+                grDevices::col2rgb(
+                  input$edit_color_pick
+                )
+              ),
+              collapse = ", "
+            ),
+            ")"
+          )
+      )
+      } else {
+       warn_user("Code names must be unique and non-empty.")
+      }
+      
     })
 
     #---Delete existing code-------------------------------------
