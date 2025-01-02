@@ -284,23 +284,27 @@ mod_document_code_server <- function(id, glob) {
     
     # Quick code tools ----
     observeEvent(input$quickcode_btn, {
-
+      
       # We need a document and selection positions
       req(input$doc_selector)
       req(input$tag_position)
-      if (parse_tag_pos(input$tag_position, "start") < parse_tag_pos(input$tag_position, "end")) {
+     if (parse_tag_pos(input$tag_position, "start") < parse_tag_pos(input$tag_position, "end")) {
          session$sendCustomMessage(type = "getIframeContent", message = list())
+         if (!isTruthy(input$quickcode)) {
+        rql_message("Missing name for quick tag.")
+         }
          session$sendCustomMessage(type = 'refreshIframe', message = list())
       } else {
          rql_message("Missing selected text segment.")
-      }
-     
+      } 
+
     })
     # After quickcode button is pressed, we wait for the quickcode value 
     observeEvent(req(input$quickcode), {
-      # check if code name is unique
-      if (!(input$quickcode %in% glob$codebook$code_name)) {
-      
+     # check if code name is unique
+     if (input$quickcode %in% glob$codebook$code_name) {
+        warn_user("Code names must be unique and non-empty.")
+      } else {
         codes_input_df <- data.frame(
           project_id = glob$active_project,
           code_name = input$quickcode,
@@ -328,9 +332,7 @@ mod_document_code_server <- function(id, glob) {
           0, glob$codebook_observer + 1)
         # Notify user
         rql_message(paste(input$quickcode,"added to codebook."))
-      } else {
-       warn_user("Code names must be unique and non-empty.")
-      }
+      } 
     })
 
     # Segment removal ----------
