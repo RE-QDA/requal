@@ -290,9 +290,6 @@ mod_document_code_server <- function(id, glob) {
       req(input$tag_position)
      if (parse_tag_pos(input$tag_position, "start") < parse_tag_pos(input$tag_position, "end")) {
          session$sendCustomMessage(type = "getIframeContent", message = list())
-         if (!isTruthy(input$quickcode)) {
-        rql_message("Missing name for quick tag.")
-         }
          session$sendCustomMessage(type = 'refreshIframe', message = list())
       } else {
          rql_message("Missing selected text segment.")
