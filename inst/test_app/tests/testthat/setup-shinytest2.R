@@ -6,3 +6,5 @@ devtools::load_all(pkgload::pkg_path())
 # For CMD check use
 # shinytest2::load_app_env("inst/test_app")
 
+# Load application support files into testing environment
+shinytest2::load_app_env()

@@ -355,9 +355,13 @@ edit_db_codes <- function(pool,
                  WHERE code_id = {edit_code_id}", .con = pool)
     DBI::dbExecute(pool, update_code_sql)
     
-    # should log action with edit ids
-    #TODO
-    # log_edit_code_record(pool, project_id = active_project, edit_code_id, user_id)
+    log_edit_code_record(pool, project_id = active_project, 
+                         changes = list(
+                             code_id = edit_code_id, 
+                             code_name = edit_code_name, 
+                             code_color = edit_code_color,
+                             code_description = edit_code_description), 
+                         user_id)
 
     rql_message(paste("Code", edit_code_name, "was updated."))
 }
