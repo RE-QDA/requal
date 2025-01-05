@@ -1,4 +1,4 @@
-utils::globalVariables(c("sql"))
+utils::globalVariables(c("sql", "is_new_quickcode"))
 
 db_call <- c(
   

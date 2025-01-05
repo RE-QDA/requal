@@ -216,7 +216,7 @@ mod_doc_manager_server <- function(id, glob) {
               )
             },
             error = function(e) {
-              rql_message("Error in adding document: ", e$message)
+              rql_message(paste0("Error in adding document: ", e$message))
               return("failed")
             }
           )
