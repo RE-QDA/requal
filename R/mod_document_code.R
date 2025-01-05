@@ -229,7 +229,7 @@ mod_document_code_server <- function(id, glob) {
           glob$pool,
           glob$active_project,
           user = glob$user,
-          input$doc_selector,
+          ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id),
           loc$codebook,
           highlight = loc$highlight,
           ns = NS(id)
