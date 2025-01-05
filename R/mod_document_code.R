@@ -196,6 +196,7 @@ mod_document_code_server <- function(id, glob) {
         
       loc$codes_menu <- sortable::rank_list(
         input_id = "codes_menu",
+        css_id = "codes_menu",
         labels = code_labels
       ) 
     })
