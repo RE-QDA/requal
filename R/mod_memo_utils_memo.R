@@ -133,11 +133,10 @@ export_memos <- function(pool, project) {
 
 }
 
+
 # dropdown2 function ----
 dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
 {
-    if (!is.null(badgeStatus)) 
-        shinydashboard:::validateStatus(badgeStatus)
     items <- c(list(...))
     dropdownClass <- paste0("dropdown")
     numItems <- length(items)

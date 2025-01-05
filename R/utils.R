@@ -50,6 +50,11 @@ utils::globalVariables(c("project_name",
                          "credentials"
                          ))
 
+# dummy function for satisfying checks (getting rid of Note on not used imports)
+dummy <- function(){
+  dbplyr::sql
+  RPostgreSQL::dbConnect
+}
 
 set_dashboard_body <- function() {
     

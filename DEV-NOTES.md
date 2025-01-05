@@ -30,6 +30,7 @@ Instruction for local development of `requal` server version.
 - [x] add code
 - [x] merge codes
 - [x] delete code
+- [x] edit code
 - [x] export codebook
 
 #### Categories
