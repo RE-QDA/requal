@@ -14,3 +14,8 @@ requal_users.sqlite
 # gh-pages
 .quarto
 wiki/
+tests/test.requal
+
+# dev stuff
+test-iframe.R
+wip.R

@@ -50,7 +50,7 @@ load_segments_analysis <- function(pool,
 
 
 
-format_segments <- function(segment_text, segment_document, segment_code, segment_color) {
+format_segments <- function(segment_start, segment_text, segment_document_id, segment_document_name, segment_code, segment_color) {
 
 
   tags$div(
@@ -59,8 +59,11 @@ format_segments <- function(segment_text, segment_document, segment_code, segmen
     tags$blockquote(class = "quote", style =  paste0("border-left: 5px solid ", segment_color, "; margin-bottom: 0px !important;")),
 
 tags$div(
-    segment_document %>%
-      tags$div(class = "segment_badge"),
+  tags$div(class = "segment_badge",
+       actionLink(paste0("segment_start-", segment_start), label = segment_document_name, 
+       onclick =  paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_start: ", segment_start, "}, {priority: 'event'});")
+      )
+       ),
 
     segment_code %>%
       tags$div(class = "segment_badge", style = paste0("background-color: ", segment_color, " !important;")),

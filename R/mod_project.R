@@ -19,16 +19,23 @@ mod_project_ui <- function(id) {
         tagList(
           fluidRow(
             class = "module_tools",
-            div(mod_rql_button_ui(ns("project_edit_tool"),
-              label = "Edit project",
-              icon = "pencil",
-              inputId = ns("project_edit_menu")
-            )) %>% tagAppendAttributes(style = "padding-right: 25px;"),
-            mod_rql_button_ui(ns("project_delete_tool"),
+            div(
+              mod_rql_button_ui(ns("project_edit_tool"),
+                label = "Edit project",
+                icon = "pencil",
+                inputId = ns("project_edit_menu")
+              )
+            ) %>% tagAppendAttributes(style = "padding-right: 25px;"),
+            div(mod_rql_button_ui(ns("project_delete_tool"),
               label = "Delete project",
               icon = "trash",
               inputId = ns("project_delete_menu")
-            )
+            )) %>% tagAppendAttributes(style = "padding-right: 25px;") #,
+            #mod_rql_button_ui(ns("project_import_tool"),
+            #  label = "Import project",
+            #  icon = "file-import",
+            #  inputId = ns("project_import_menu")
+            #)
           ),
           fluidRow(
             class = "module_content",
@@ -70,15 +77,15 @@ mod_project_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
     loc$edit_observer <- 0
-      output$project_name <- renderText({
-        loc$project_name
-      })
-      output$project_description <- renderText({
-        loc$project_description
-      })
-      output$project_date <- renderText({
-        loc$project_date
-      })
+    output$project_name <- renderText({
+      loc$project_name
+    })
+    output$project_description <- renderText({
+      loc$project_description
+    })
+    output$project_date <- renderText({
+      loc$project_date
+    })
     observeEvent(glob$active_project, {
       loc$project_df <- dplyr::tbl(glob$pool, "projects") %>%
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
@@ -104,33 +111,35 @@ mod_project_server <- function(id, glob) {
       ),
       glob,
       permission = "project_owner"
-          )
+    )
 
     observeEvent(input$project_edit_save, {
       active_project <- as.integer(local(glob$active_project))
 
       if (input$project_edit_name != loc$project_name) {
         res <- DBI::dbExecute(
-        glob$pool,
-        glue::glue_sql("UPDATE projects
+          glob$pool,
+          glue::glue_sql("UPDATE projects
                  SET project_name = {input$project_edit_name}
                  WHERE project_id = {active_project}", .con = glob$pool)
         )
-        updateTextInput(session = session,
-        "project_edit_name",
-        value = input$project_edit_name
+        updateTextInput(
+          session = session,
+          "project_edit_name",
+          value = input$project_edit_name
         )
       }
       if (input$project_edit_description != loc$project_description) {
         res <- DBI::dbExecute(
-        glob$pool,
-        glue::glue_sql("UPDATE projects
+          glob$pool,
+          glue::glue_sql("UPDATE projects
                  SET project_description = {input$project_edit_description}
                  WHERE project_id = {active_project}", .con = glob$pool)
         )
-               updateTextInput(session = session,
-        "project_edit_description",
-        value = input$project_edit_description
+        updateTextInput(
+          session = session,
+          "project_edit_description",
+          value = input$project_edit_description
         )
       }
 
@@ -138,7 +147,6 @@ mod_project_server <- function(id, glob) {
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
       shinyjs::removeClass(paste0("sw-content-", ns("project_edit_menu")), "sw-show", asis = TRUE)
       showNotification("Changes to project were saved.")
-
     })
 
     # Project delete UI ----

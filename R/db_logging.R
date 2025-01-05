@@ -80,6 +80,14 @@ log_merge_code_record <- function(con, project_id, from, to, user_id){
                data = list(merge_from = from, merge_to = to))
 }
 
+log_edit_code_record <- function(con, project_id, changes, user_id){
+    log_action(con, 
+               user_id = user_id, 
+               project_id = project_id, 
+               action = "Edit code", 
+               data = changes)
+}
+
 log_add_segment_record <- function(con, project_id, segment, user_id){
     log_action(con, 
                user_id = user_id, 
@@ -207,3 +215,4 @@ log_change_user_permission <- function(con, project_id, permission_data, user_id
                action = "Change user permission", 
                data = permission_data)
 }
+

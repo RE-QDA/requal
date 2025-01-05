@@ -75,7 +75,8 @@ load_segments_db <- function(pool, active_project, user, doc_id) {
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project), 
                           .data$doc_id == as.integer(.env$doc_id)) %>%
-            dplyr::select(code_id,
+            dplyr::select(segment_id,
+                          code_id,
                           segment_start,
                           segment_end, 
                           user_id) %>%
@@ -87,7 +88,7 @@ load_segments_db <- function(pool, active_project, user, doc_id) {
         }
         
         return(segments %>% 
-                   dplyr::select(code_id, segment_start, segment_end))
+                   dplyr::select(segment_id, code_id, segment_start, segment_end))
         
     } else {""}
 }
@@ -230,6 +231,7 @@ calculate_code_overlap <- function(raw_segments) {
     names(vals) <- prevals$name
     
     res <- dplyr::tibble(
+        segment_id = NULL,
         code_id = NULL,
         segment_start = NULL,
         segment_end = NULL
@@ -268,8 +270,7 @@ calculate_code_overlap <- function(raw_segments) {
             dplyr::filter(
                 code_id != "",
                 !is.na(code_id)
-            ) %>%
-            dplyr::mutate(segment_id = 0:(dplyr::n() - 1))
+            ) 
     } else {
         res
     }
@@ -282,8 +283,8 @@ load_doc_to_display <- function(pool,
                                 user,
                                 doc_selector,
                                 codebook,
+                                highlight,
                                 ns){
-    
     position_type <- position_start <- tag_start <- tag_end <- NULL
     raw_text <- load_doc_db(pool, active_project, doc_selector)
     
@@ -327,16 +328,20 @@ load_doc_to_display <- function(pool,
             dplyr::mutate(tag_end = "</b>",
                           tag_start = paste0('<b id="',
                                              code_id,
-                                             '" class="segment" style="padding:0; background-color:',
+                                             highlight_style(highlight),
                                              code_color,
+                                             '" data-color="',  
+                                             code_color,
+                                             '" data-segment_start="',  
+                                             position_start,                                              
                                              '" title="',
                                              code_name,
-                                             '">')) %>% 
+                                              '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
             dplyr::bind_rows(
                 # start doc
                 tibble::tibble(position_start = 0,
                                position_type =  "segment_start",
-                               tag_start = "<article><p class='docpar'>"),
+                               tag_start = "<article id='article'><p class='docpar'>"),
                 # content
                 .,
                 # end doc
@@ -377,7 +382,7 @@ load_doc_to_display <- function(pool,
     }else{
         
         df_non_coded <- paste0(
-            "<article><p class='document_par'>",
+            "<article id='article'><p class='docpar'>",
             
             htmltools::htmlEscape(raw_text) %>%
                 stringr::str_replace_all("[\\n\\r]",
@@ -511,5 +516,17 @@ blend_colors <- function(string_id, code_names) {
     color_mean_string <- paste0(color_mean, collapse = ",")
     
     paste0("rgb(", color_mean_string, ")")
+    
+}
+
+# highlight/underline ----
+
+highlight_style <- function(choice) {
+
+    switch(choice,
+           underline = '" class="segment" style="padding:0; text-decoration: underline; text-decoration-color:',
+           background = '" class="segment" style="padding:0; background-color:',
+    )
+
     
 }

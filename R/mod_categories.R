@@ -95,7 +95,8 @@ mod_categories_server <- function(id, glob) {
     })
 
     # Relist categories on codebook changes ---------------
-    observeEvent(glob$codebook, {
+    observeEvent(c(glob$codebook, 
+                  glob$codebook_observer), {
       output$categories_ui <- renderUI({
         render_categories(
           id = id,
