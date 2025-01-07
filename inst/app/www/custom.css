@@ -77,6 +77,7 @@ p.docpar::before {
   left: -45px; /* Negative offset to place numbers in the padding area */
   width: 30px; /* Fixed width for alignment */
   text-align: right; /* Align numbers to the right */
+  font-family: 'Courier New', Courier, monospace; /* Specify a monospace font */
   color: lightgray; /* Style the numbers */
   pointer-events: none; /* Prevent interaction */
   user-select: none; /* Prevent selection */
