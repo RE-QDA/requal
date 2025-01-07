@@ -61,8 +61,25 @@ border-radius: .25em;
 background-color: white;
 }
 
+article {
+  counter-reset: paragraph; /* Initialize the counter for paragraphs */
+  padding-left: 45px; /* Create space for the line numbers */
+  position: relative; /* Position relative for absolute positioning of numbers */
+}
 p.docpar {
   margin: 0px 0px 5px 0px;
+  position: relative;
+  counter-increment: paragraph; /* Increment the counter for each paragraph */
+}
+p.docpar::before {
+  content: counter(paragraph); /* Display the current counter value */
+  position: absolute;
+  left: -45px; /* Negative offset to place numbers in the padding area */
+  width: 30px; /* Fixed width for alignment */
+  text-align: right; /* Align numbers to the right */
+  color: lightgray; /* Style the numbers */
+  pointer-events: none; /* Prevent interaction */
+  user-select: none; /* Prevent selection */
 }
 
 .br {
@@ -189,21 +206,22 @@ margin-right: -0.3em;
 display: flex;
 }
 
-
 .docpar::selection {
-  background: #ffffcc;
+  background: rgba(255, 223, 0, 0.75); /* A more contrasting yellow */
   color: black;
+  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
   text-decoration-line: underline;
   text-decoration-style: dotted;
-  text-decoration-color: red; 
+  text-decoration-color: red;
 }
 
 .docpar b::selection {
-  background: rgb(255, 255, 204, 0.75);
+  background: rgba(255, 223, 0, 0.5); /* A more contrasting yellow with some transparency */
   color: black;
+  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
   text-decoration-line: underline;
   text-decoration-style: dotted;
-  text-decoration-color: red; 
+  text-decoration-color: red;
 }
 
 .quickcode {
