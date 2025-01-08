@@ -230,27 +230,34 @@ positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
 duplicated_positions <- purrr::map(positions, .f = function(x){
   times <- sum(purrr::map_lgl(ranges, ~is_within_range(x, .x)))
   rep(x, times)
-
 })
-updated_positions <- unlist(duplicated_positions)
+adjusted_positions <- purrr::map(duplicated_positions, .f = function(x){
+  if (length(x) == 2) {
+    x[2] <- x[2] + 1
+  }
+  return(x)
+})
+updated_positions <- unlist(adjusted_positions)
+
 highligths_df <- tibble::tibble(
 segment_start = updated_positions[seq_along(updated_positions) %% 2 == 1],
 segment_end = updated_positions[seq_along(updated_positions) %% 2 == 0]
 )
+
 highligths_df |> 
 dplyr::mutate(segment_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
   raw_segments |> 
  dplyr::filter(segment_end >= y)    |> 
  dplyr::filter(segment_start <= x) |> 
  dplyr::pull(segment_id) |> 
-  paste(collapse = "+")
+  paste(collapse = "-")
 })) |> 
 dplyr::mutate(code_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
   raw_segments |> 
  dplyr::filter(segment_end >= y)    |> 
  dplyr::filter(segment_start <= x) |> 
  dplyr::pull(code_id) |> 
-  paste(collapse = "+")
+  paste(collapse = "-")
 }))   |> 
 dplyr::arrange(segment_start, segment_end)  |> 
  dplyr::mutate(
@@ -284,7 +291,7 @@ load_doc_to_display <- function(pool,
                                        doc_selector) %>% 
         calculate_code_overlap()
     
-    
+    browser()
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -306,7 +313,54 @@ load_doc_to_display <- function(pool,
                                 blend_colors,
                                 code_names)
         )
+
+        
        
+       substr(raw_text, 1,535)
+       strsplit(raw_text, "\n")
+       total_chars <- nchar(raw_text)
+   paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n")[[1]]) |> 
+    dplyr::transmute(
+        segment_type = "p",
+        segment_start = as.integer(dplyr::lag(end+1, default = 1)),
+        segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
+    ) 
+    if (nchar(raw_text) > max(paragraphs$segment_end)) {
+        paragraphs <- dplyr::bind_rows(
+        paragraphs,
+        tibble::tibble(
+            segment_type = "p",
+            segment_start = as.integer(max(paragraphs$segment_end)+1),
+            segment_end = as.integer(nchar(raw_text))
+             )
+        ) 
+    }
+
+text_data <- dplyr::bind_rows(
+        paragraphs,
+        coded_segments %>%
+        dplyr::left_join(code_names_lookup, by = "code_id") %>%
+        dplyr::mutate(segment_type = "span")
+    ) |> 
+    dplyr::arrange(segment_start) %>%
+    dplyr::mutate(par_id = cumsum(segment_type == "p")) %>%
+    dplyr::mutate(segment_end = dplyr::lead(segment_start-1, default = total_chars+1))
+
+
+spans <- text_data %>%
+    dplyr::mutate(text = purrr::map2(segment_start, segment_end, function(s, e) {
+        text <- substr(raw_text, s, e)
+        text <- stringr::str_replace_all(text, "\n", "")
+        htmltools::span(text, .noWS = "outside")
+    })) %>%
+    dplyr::group_by(par_id) %>%
+    dplyr::summarise(text = list(htmltools::tagList(text))) %>%
+    dplyr::mutate(text = purrr::map(text, ~ htmltools::p(.x, .noWS = "outside")))
+
+tagList(spans$text)
+# Print the HTML output
+htmltools::browsable(tagList(spans$text))
+
         content_df <- coded_segments %>% 
             dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
             dplyr::mutate(code_id = as.character(code_id)) %>% 
@@ -475,7 +529,7 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
 
 blend_codes <- function(string_id, code_names_df) {
     
-    ids <- unlist(strsplit(string_id, split = "\\+"))
+    ids <- unlist(strsplit(string_id, split = "\\-"))
     
     names <- code_names_df %>%
         dplyr::filter(code_id %in% ids) %>%
@@ -490,7 +544,7 @@ blend_codes <- function(string_id, code_names_df) {
 
 blend_colors <- function(string_id, code_names) {
     
-    ids <- unlist(strsplit(string_id, split = "\\+"))
+    ids <- unlist(strsplit(string_id, split = "\\-"))
     
     colors_multiple <- code_names %>%
         dplyr::filter(code_id %in% ids) %>%
