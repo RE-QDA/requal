@@ -347,19 +347,38 @@ text_data <- dplyr::bind_rows(
     dplyr::mutate(segment_end = dplyr::lead(segment_start-1, default = total_chars+1))
 
 
-spans <- text_data %>%
-    dplyr::mutate(text = purrr::map2(segment_start, segment_end, function(s, e) {
+spans <- purrr::pmap(text_data, 
+    function(s, e, highlight_id, segment_id, code_id, code_name, code_color) {
+        browser()
         text <- substr(raw_text, s, e)
         text <- stringr::str_replace_all(text, "\n", "")
         htmltools::span(text, .noWS = "outside")
-    })) %>%
+    }) %>%
     dplyr::group_by(par_id) %>%
     dplyr::summarise(text = list(htmltools::tagList(text))) %>%
-    dplyr::mutate(text = purrr::map(text, ~ htmltools::p(.x, .noWS = "outside")))
+    dplyr::mutate(text = purrr::map(text, ~ htmltools::p(.x, class = "docpar", .noWS = "outside")))
+
+spans <- purrr::pmap(text_data, 
+    function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, ...) {
+        text <- substr(raw_text, segment_start, segment_end)
+        text <- stringr::str_replace_all(text, "\n", "")
+        add_if_defined <- function(x) {
+            if (!is.na(x)) {
+                x
+            } else {
+               ""
+            }
+        }
+        class_list <- 
+        htmltools::span(text, 
+            title = add_if_defined(code_name),
+            style = paste0("background-color: ", add_if_defined(code_color), ";"),
+            .noWS = "outside")
+    })
 
 tagList(spans$text)
 # Print the HTML output
-htmltools::browsable(tagList(spans$text))
+htmltools::browsable(tagList(spans))
 
         content_df <- coded_segments %>% 
             dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
