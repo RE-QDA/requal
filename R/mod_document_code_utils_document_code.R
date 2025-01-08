@@ -221,59 +221,49 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments) {
-    prevals <- raw_segments %>%
-        tidyr::pivot_longer(cols = c(
-            segment_start,
-            segment_end
-        )) %>%
-        dplyr::arrange(value)
-    vals <- prevals$value
-    names(vals) <- prevals$name
-    
-    res <- dplyr::tibble(
-        segment_id = NULL,
-        code_id = NULL,
-        segment_start = NULL,
-        segment_end = NULL
-    )
-    
-    for (i in seq_along(vals)) {
-        overlap_df <- raw_segments %>%
-            dplyr::filter(vals[i] > segment_start & vals[i] <= segment_end)
-        if (names(vals[i]) == "segment_start") {
-            res <- dplyr::bind_rows(
-                res,
-                tibble::tibble(
-                    code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-                    segment_start = vals[i],
-                    segment_end = vals[i] - 1
-                )
-            )
-        } else {
-            res <- dplyr::bind_rows(
-                res,
-                tibble::tibble(
-                    code_id = paste0(sort(overlap_df$code_id), collapse = "+"),
-                    segment_start = vals[i] + 1,
-                    segment_end = min(overlap_df$segment_end)
-                )
-            )
-        }
-    }
-    
-    if (nrow(res)) {
-        prefinal <- res %>%
-            dplyr::mutate(
-                code_id = dplyr::lead(code_id),
-                segment_end = dplyr::lead(segment_end)
-            ) %>%
-            dplyr::filter(
-                code_id != "",
-                !is.na(code_id)
-            ) 
-    } else {
-        res
-    }
+is_within_range <- function(position, range) {
+  position >= range[1] & position <= range[2]
+}
+ranges <- purrr::map2(raw_segments$segment_start, raw_segments$segment_end, range)
+
+positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
+duplicated_positions <- purrr::map(positions, .f = function(x){
+  times <- sum(purrr::map_lgl(ranges, ~is_within_range(x, .x)))
+  rep(x, times)
+
+})
+updated_positions <- unlist(duplicated_positions)
+highligths_df <- tibble::tibble(
+segment_start = updated_positions[seq_along(updated_positions) %% 2 == 1],
+segment_end = updated_positions[seq_along(updated_positions) %% 2 == 0]
+)
+highligths_df |> 
+dplyr::mutate(segment_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
+  raw_segments |> 
+ dplyr::filter(segment_end >= y)    |> 
+ dplyr::filter(segment_start <= x) |> 
+ dplyr::pull(segment_id) |> 
+  paste(collapse = "+")
+})) |> 
+dplyr::mutate(code_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
+  raw_segments |> 
+ dplyr::filter(segment_end >= y)    |> 
+ dplyr::filter(segment_start <= x) |> 
+ dplyr::pull(code_id) |> 
+  paste(collapse = "+")
+}))   |> 
+dplyr::arrange(segment_start, segment_end)  |> 
+ dplyr::mutate(
+ highlight_id = cumsum(segment_id != dplyr::lag(segment_id, default = ""))
+)  |> 
+dplyr::summarise(
+  segment_id = unique(segment_id),
+  code_id = unique(code_id),
+  segment_start = min(segment_start),
+  segment_end = max(segment_end),
+  .by = highlight_id
+) 
+
 }
 
 # Generate text to be displayed -----
