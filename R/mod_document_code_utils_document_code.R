@@ -233,7 +233,7 @@ duplicated_positions <- purrr::map(positions, .f = function(x){
 })
 adjusted_positions <- purrr::map(duplicated_positions, .f = function(x){
   if (length(x) == 2) {
-    x[2] <- x[2] + 1
+    x[1] <- x[1] - 1
   }
   return(x)
 })
@@ -314,10 +314,7 @@ load_doc_to_display <- function(pool,
                                 code_names)
         )
 
-        
        
-       substr(raw_text, 1,535)
-       strsplit(raw_text, "\n")
        total_chars <- nchar(raw_text)
    paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n")[[1]]) |> 
     dplyr::transmute(
@@ -331,7 +328,7 @@ load_doc_to_display <- function(pool,
         tibble::tibble(
             segment_type = "p",
             segment_start = as.integer(max(paragraphs$segment_end)+1),
-            segment_end = as.integer(nchar(raw_text))
+            segment_end = as.integer(total_chars)
              )
         ) 
     }
@@ -344,13 +341,34 @@ text_data <- dplyr::bind_rows(
     ) |> 
     dplyr::arrange(segment_start) %>%
     dplyr::mutate(par_id = cumsum(segment_type == "p")) %>%
-    dplyr::mutate(segment_end = dplyr::lead(segment_start-1, default = total_chars+1))
+    dplyr::mutate(segment_end = ifelse(
+        dplyr::lead(segment_start, default = total_chars+1) <= segment_end, dplyr::lead(segment_start)-1, segment_end
+    ) ) %>%
+        dplyr::mutate(helper = ifelse(
+        (dplyr::lead(segment_start, default = total_chars+1) - segment_end) > 1, 
+        (dplyr::lead(segment_start, default = total_chars+1) - segment_end) - 1, 
+        0
+    ) ) 
+
+text_data_fill <- dplyr::bind_rows(
+    text_data,
+    text_data %>%
+    dplyr::filter(helper > 0)  %>%
+    dplyr::select(par_id, segment_end, helper) %>%
+    dplyr::mutate(
+    segment_start = segment_end + 1,
+    segment_end = segment_end + helper,
+    segment_type = "span"
+    ) 
+) %>%
+dplyr::arrange(segment_start)
 
 
-spans <- purrr::pmap(text_data, 
-    function(s, e, highlight_id, segment_id, code_id, code_name, code_color) {
-        browser()
-        text <- substr(raw_text, s, e)
+spans <- text_data_fill %>% 
+    dplyr::mutate(text = purrr::pmap(
+        list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color),
+    function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color) {
+        text <- substr(raw_text, segment_start, segment_end)
         text <- stringr::str_replace_all(text, "\n", "")
         htmltools::span(text, .noWS = "outside")
     }) %>%
@@ -358,7 +376,7 @@ spans <- purrr::pmap(text_data,
     dplyr::summarise(text = list(htmltools::tagList(text))) %>%
     dplyr::mutate(text = purrr::map(text, ~ htmltools::p(.x, class = "docpar", .noWS = "outside")))
 
-spans <- purrr::pmap(text_data, 
+spans <- purrr::pmap(text_data_fill, 
     function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, ...) {
         text <- substr(raw_text, segment_start, segment_end)
         text <- stringr::str_replace_all(text, "\n", "")
