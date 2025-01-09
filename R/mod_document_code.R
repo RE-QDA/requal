@@ -214,7 +214,7 @@ mod_document_code_server <- function(id, glob) {
   })
 
     # Render text and codes ----
-    output$focal_text <- renderText({
+    output$focal_text <- renderUI({
       req(isTruthy(loc$text))
       loc$text
     })
