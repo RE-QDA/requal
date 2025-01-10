@@ -335,25 +335,13 @@ load_doc_to_display <- function(pool,
                                 code_names)
         )
 
-add_if <- function(x, y) {
-            ifelse(!is.na(x), x, y) 
-        }
-
-
 spans <- spans_data %>% 
     dplyr::left_join(code_names_lookup, by = "code_id") %>%
     dplyr::mutate(text = purrr::pmap(
-        list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color),
-    function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color) {
-
-        text <- substr(raw_text, segment_start, segment_end)
-        text <- stringr::str_replace_all(text, "\n", "")
-        htmltools::span(text, .noWS = "outside")
-        htmltools::span(text, 
-            title = add_if(code_name, ""),
-            style = paste0("background-color: ", add_if(code_color, ""), ";"),
-            .noWS = "outside")
-    })) %>% dplyr::select(par_id,text) %>% 
+        list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text),
+        make_span
+    )) %>% 
+    dplyr::select(par_id,text) %>% 
     dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
     dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
 
@@ -361,7 +349,7 @@ spans <- spans_data %>%
 
 
 
-tags$article(spans$text)
+tags$article(id = "article", spans$text)
 # Print the HTML output
 # htmltools::browsable(tagList(spans))
 
@@ -570,11 +558,45 @@ blend_colors <- function(string_id, code_names) {
 # highlight/underline ----
 
 highlight_style <- function(choice) {
-
     switch(choice,
            underline = '" class="segment" style="padding:0; text-decoration: underline; text-decoration-color:',
            background = '" class="segment" style="padding:0; background-color:',
     )
-
-    
 }
+
+# make span  ----
+make_span  <- function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text) {
+        # Check if a code_id is assigned
+        code_assigned <- isTruthy(code_id)
+        
+        # Extract the text segment and remove newlines
+        text <- substr(raw_text, segment_start, segment_end)
+        text <- stringr::str_replace_all(text, "\n", "")
+        
+        # Return NULL if the text is empty
+        if (nchar(text) < 1 && !code_assigned) {
+            return(NULL)
+        } else {
+            # Create a span element with optional attributes
+            htmltools::span(
+                text,
+                title = if (code_assigned) code_name else NULL,
+                style = .span_style(code_color, "background-color"),
+                class = if (code_assigned) "segment" else NULL,
+                .noWS = "outside"
+            )
+        }
+    }
+.span_style <- function(x, style_spec = NULL) {
+    excluded <- c("rgb()")
+    if (isTruthy(x) && !x %in% excluded) {
+        if (!is.null(style_spec)) {
+            paste0(style_spec, ": ", x, ";")
+        } else {
+            x
+        }
+    } else {
+        NULL
+    }
+}
+
