@@ -221,72 +221,57 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments) {
-#################################
-#browser()
-is_within_range <- function(position, range) {
-  position >= range[1] & position <= range[2]
-}
-ranges <- purrr::map2(raw_segments$segment_start, raw_segments$segment_end, range)
 
-positions <- sort(c(raw_segments$segment_start, raw_segments$segment_end))
-duplicated_positions <- purrr::map(positions, .f = function(x){
-  times <- sum(purrr::map_lgl(ranges, ~is_within_range(x, .x)))
-  rep(x, times)
+extra_start_events <- purrr::map_int(unique(raw_segments$segment_end), .f = function(x) {
+    active_segments <- raw_segments %>%
+    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
+    if (any(active_segments$segment_end > x)) {
+        span_event <- x + 1
+    } else {
+        0
+    }
+})
+extra_end_events <- purrr::map_int(unique(raw_segments$segment_start), .f = function(x) {
+    active_segments <- raw_segments %>%
+    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
+    if (any(active_segments$segment_start < x)) {
+        span_event <- x - 1
+    } else {
+        0
+    }
 })
 
-updated_positions <- unlist(duplicated_positions)
+start_events <- sort(c(unique(raw_segments$segment_start), extra_start_events[extra_start_events > 0] ))
+end_events <- sort(c(unique(raw_segments$segment_end), extra_end_events[extra_end_events > 0] ))
 
-highligths_df <- tibble::tibble(
-segment_start = updated_positions[seq_along(updated_positions) %% 2 == 1],
-segment_end = updated_positions[seq_along(updated_positions) %% 2 == 0]
-) 
+res_prep <- tibble::tibble(
+    segment_start = start_events,
+    segment_end = end_events
+)
 
-highligths_df |> 
-dplyr::mutate(segment_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
-  raw_segments |> 
- dplyr::filter(segment_end >= y)    |> 
- dplyr::filter(segment_start <= x) |> 
- dplyr::pull(segment_id) |> 
-  paste(collapse = "-")
-})) |> 
-dplyr::mutate(code_id = purrr::map2_chr(segment_start, segment_end, .f = function(x,y){
-  raw_segments |> 
- dplyr::filter(segment_end >= y)    |> 
- dplyr::filter(segment_start <= x) |> 
- dplyr::pull(code_id) |> 
-  paste(collapse = "-")
-}))   |> 
-dplyr::arrange(segment_start, segment_end)  |> 
- dplyr::mutate(
- highlight_id = cumsum(segment_id != dplyr::lag(segment_id, default = ""))
-)  |> 
-dplyr::summarise(
-  segment_id = unique(segment_id),
-  code_id = unique(code_id),
-  segment_start = min(segment_start),
-  segment_end = max(segment_end),
-  .by = highlight_id
-)  |> 
+res <- res_prep %>%
     dplyr::mutate(
-        segment_start = ifelse(
-            (segment_start == dplyr::lag(segment_end, default = 0) &
-            stringr::str_detect(dplyr::lag(code_id, default = ""), "-")), 
-            segment_start+1, 
-            segment_start)
-    ) |> 
+        code_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
+             raw_segments %>%
+                dplyr::filter(s <= segment_end & e >= segment_start) %>%
+                dplyr::pull(code_id)
+        }),
+        segment_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
+            raw_segments %>%
+                dplyr::filter(s <= segment_end & e >= segment_start) %>%
+                dplyr::pull(segment_id)
+        })
+    ) %>%
     dplyr::mutate(
-        segment_end = ifelse(
-            (segment_end == dplyr::lead(segment_start, default = max(segment_end)+1)), 
-            segment_end-1, 
-            segment_end)
-    ) 
+        code_id = purrr::map_chr(code_id, ~ paste0(.x, collapse = "-")),
+        segment_id = purrr::map_chr(segment_id, ~ paste0(.x, collapse = "-"))
+    ) %>%
+    tibble::rownames_to_column("highlight_id")
 
-
-
+return(res) 
 }
 
 # Generate text to be displayed -----
-
 load_doc_to_display <- function(pool, 
                                 active_project,
                                 user,
@@ -307,7 +292,7 @@ load_doc_to_display <- function(pool,
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
     ###############################################
-    browser()
+   
     if(nrow(coded_segments)){
         
         distinct_code_ids <- as.character(
@@ -328,7 +313,7 @@ load_doc_to_display <- function(pool,
 
        
    total_chars <- nchar(raw_text)
-   paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n")[[1]]) |> 
+   paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n")[[1]]) %>%
     dplyr::transmute(
         segment_type = "p",
         segment_start = as.integer(dplyr::lag(end+1, default = 1)),
@@ -350,7 +335,7 @@ text_data <- dplyr::bind_rows(
         coded_segments %>%
         dplyr::left_join(code_names_lookup, by = "code_id") %>%
         dplyr::mutate(segment_type = "span")
-    ) |> 
+    ) %>%
     dplyr::arrange(segment_start) %>%
     dplyr::mutate(par_id = cumsum(segment_type == "p")) %>%
     dplyr::mutate(segment_end = ifelse(
