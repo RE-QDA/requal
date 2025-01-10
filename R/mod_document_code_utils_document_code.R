@@ -220,10 +220,14 @@ write_segment_db <- function(
 }
 
 # calculate code overlap for doc display ----
-calculate_code_overlap <- function(raw_segments) {
+calculate_code_overlap <- function(raw_segments, paragraphs) {
 
-extra_start_events <- purrr::map_int(unique(raw_segments$segment_end), .f = function(x) {
-    active_segments <- raw_segments %>%
+events_df <- dplyr::bind_rows(
+    raw_segments, paragraphs
+)
+
+extra_start_events <- purrr::map_int(unique(events_df$segment_end), .f = function(x) {
+    active_segments <- events_df %>%
     dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
     if (any(active_segments$segment_end > x)) {
         span_event <- x + 1
@@ -231,8 +235,8 @@ extra_start_events <- purrr::map_int(unique(raw_segments$segment_end), .f = func
         0
     }
 })
-extra_end_events <- purrr::map_int(unique(raw_segments$segment_start), .f = function(x) {
-    active_segments <- raw_segments %>%
+extra_end_events <- purrr::map_int(unique(events_df$segment_start), .f = function(x) {
+    active_segments <- events_df %>%
     dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
     if (any(active_segments$segment_start < x)) {
         span_event <- x - 1
@@ -241,8 +245,8 @@ extra_end_events <- purrr::map_int(unique(raw_segments$segment_start), .f = func
     }
 })
 
-start_events <- sort(c(unique(raw_segments$segment_start), extra_start_events[extra_start_events > 0] ))
-end_events <- sort(c(unique(raw_segments$segment_end), extra_end_events[extra_end_events > 0] ))
+start_events <- sort(c(unique(events_df$segment_start), extra_start_events[extra_start_events > 0] ))
+end_events <- sort(c(unique(events_df$segment_end), extra_end_events[extra_end_events > 0] ))
 
 res_prep <- tibble::tibble(
     segment_start = start_events,
@@ -281,24 +285,44 @@ load_doc_to_display <- function(pool,
                                 ns){
     position_type <- position_start <- tag_start <- tag_end <- NULL
     raw_text <- load_doc_db(pool, active_project, doc_selector)
-    
+    total_chars <- nchar(raw_text)
+
+    paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n|\r")[[1]]) %>%
+    dplyr::transmute(
+        segment_start = as.integer(dplyr::lag(end+1, default = 1)),
+        segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
+    ) %>% 
+    tibble::rowid_to_column("par_id") 
+    if (total_chars > max(paragraphs$segment_end)) {
+        # safeguard against text without final linebreak
+        paragraphs <- dplyr::bind_rows(
+        paragraphs,
+        tibble::tibble(
+            par_id = max(paragraphs$par_id) + 1,
+            segment_start = as.integer(max(paragraphs$segment_end) + 1),
+            segment_end = as.integer(total_chars)
+             )
+        ) 
+    }
     coded_segments <- load_segments_db(pool, 
                                        active_project,
                                        user,
-                                       doc_selector) %>% 
-        calculate_code_overlap()
-    
+                                       doc_selector) 
+    spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
+    dplyr::left_join(
+        paragraphs %>% 
+        dplyr::select(segment_start, par_id), by = "segment_start"
+        ) %>% 
+        tidyr::fill(par_id, .direction = "down")
+ 
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
-    ###############################################
-   
+
     if(nrow(coded_segments)){
         
         distinct_code_ids <- as.character(
-            coded_segments %>%
-                dplyr::distinct(code_id) %>%
-                dplyr::pull(code_id)
+           unique(spans_data %>% dplyr::pull(code_id))
         )
         
         code_names_lookup <- tibble::tibble(
@@ -311,60 +335,13 @@ load_doc_to_display <- function(pool,
                                 code_names)
         )
 
-       
-   total_chars <- nchar(raw_text)
-   paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n")[[1]]) %>%
-    dplyr::transmute(
-        segment_type = "p",
-        segment_start = as.integer(dplyr::lag(end+1, default = 1)),
-        segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
-    ) 
-    if (nchar(raw_text) > max(paragraphs$segment_end)) {
-        paragraphs <- dplyr::bind_rows(
-        paragraphs,
-        tibble::tibble(
-            segment_type = "p",
-            segment_start = as.integer(max(paragraphs$segment_end)+1),
-            segment_end = as.integer(total_chars)
-             )
-        ) 
-    }
-
-text_data <- dplyr::bind_rows(
-        paragraphs,
-        coded_segments %>%
-        dplyr::left_join(code_names_lookup, by = "code_id") %>%
-        dplyr::mutate(segment_type = "span")
-    ) %>%
-    dplyr::arrange(segment_start) %>%
-    dplyr::mutate(par_id = cumsum(segment_type == "p")) %>%
-    dplyr::mutate(segment_end = ifelse(
-        dplyr::lead(segment_start, default = total_chars+1) <= segment_end, dplyr::lead(segment_start)-1, segment_end
-    ) ) %>%
-        dplyr::mutate(helper = ifelse(
-        (dplyr::lead(segment_start, default = total_chars+1) - segment_end) > 1, 
-        (dplyr::lead(segment_start, default = total_chars+1) - segment_end) - 1, 
-        0
-    ) ) 
-
-    text_data_fill <- dplyr::bind_rows(
-        text_data,
-        text_data %>%
-        dplyr::filter(helper > 0)  %>%
-        dplyr::select(par_id, segment_end, helper) %>%
-        dplyr::mutate(
-            segment_start = segment_end + 1,
-            segment_end = segment_end + helper,
-            segment_type = "span"
-            ) 
-        ) %>%
-        dplyr::arrange(segment_start)
-
 add_if <- function(x, y) {
             ifelse(!is.na(x), x, y) 
         }
 
-spans <- text_data_fill %>% 
+
+spans <- spans_data %>% 
+    dplyr::left_join(code_names_lookup, by = "code_id") %>%
     dplyr::mutate(text = purrr::pmap(
         list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color),
     function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color) {
@@ -377,9 +354,10 @@ spans <- text_data_fill %>%
             style = paste0("background-color: ", add_if(code_color, ""), ";"),
             .noWS = "outside")
     })) %>% dplyr::select(par_id,text) %>% 
-    dplyr::summarise(text = list(htmltools::tagList(text)), .by = "par_id") %>%
-    dplyr::mutate(text = purrr::map(text, ~ htmltools::p(.x, class = "docpar", .noWS = "outside"))) %>%
+    dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
     dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
+
+
 
 
 
