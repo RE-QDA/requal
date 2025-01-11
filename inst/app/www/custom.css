@@ -178,9 +178,6 @@ width: 100% !important;
 }
 
 .split > #split-1 {
-  padding-top: 5px !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
   background-color: #ffffff !important;
 }
 .gutter {
@@ -230,3 +227,21 @@ display: flex;
     display: grid;
     grid-template-columns: 1fr 1fr; /* Creates two columns of equal width */
    }
+
+/* stretch default shiny widgets */
+  .full-width {
+    width: 100% !important;
+  }
+
+/* Style for the document selection row */
+.doc_sel_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #ecf0f5;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+}

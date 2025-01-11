@@ -25,51 +25,34 @@ mod_document_code_ui <- function(id) {
 "))
     ),
     fluidRow(
-      column(
-        width = 5,
-        selectInput(
-          ns("doc_selector"),
-          label = "Select a document to code",
-          choices = "",
-          selected = ""
-        )
-      ),
-      column(
-        width = 5,
-        div(style = "float: right;",
-        actionButton(
-          ns("toggle_style"),
-          label = "",
-          icon = icon("highlighter")
-        ) %>% tagAppendAttributes(title = "Highlight style"),
-        actionButton(
-          ns("doc_refresh"),
-          label = "",
-          icon = icon("sync")
-        ) %>% tagAppendAttributes(title = "Reload document")
-        )), 
-      column(
-        width = 2,
-        div(style = "text-align: right;",
-          actionButton(
-          ns("code_columns"),
-          label = "",
-          icon = icon("table-columns")
-        ) %>% tagAppendAttributes(title = "Code columns"),
-        br(), "Selection:", br(),
-        textOutput(ns("captured_range"))
-      )
-      )
-    ),
-    fluidRow(
       style = "height: 90%",
       tags$div(
         style = "display: flex;",
         class = "split",
         tags$div(
           id = "split-1",
-          style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-          htmlOutput(ns("focal_text")) %>% tagAppendAttributes(class = "scrollable80")
+          style = "flex-grow: 1; flex-shrink: 1;",
+            fluidRow(
+              class = "doc_sel_row",
+              div(
+                style = "flex: 1; margin-right: 10px;",
+                selectInput(ns("doc_selector"), label = "Select a document to code", choices = "", selected = "")  %>% 
+                tagAppendAttributes(class = "full-width")
+              ),
+              div(
+                style = "display: flex; justify-content: flex-end; align-items: center;",
+                actionButton(ns("doc_refresh"), label = "", icon = icon("sync"), title = "Reload document"),
+                actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
+                div(
+                  id = ns("selection_displayer"),
+                  style = "margin-left: 20px; margin-right: 5px;", 
+                  "Selection:", br(), textOutput(ns("captured_range"))
+                )
+              )
+            ),
+          fluidRow(
+          htmlOutput(ns("focal_text"), class = "scrollable80") 
+          )
         ),
         tags$div(
           id = "split-2",
