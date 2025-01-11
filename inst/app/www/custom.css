@@ -88,14 +88,10 @@ p.docpar::before {
   width: 0px;
 }
 
-b.segment {
-  font-weight: normal;
+span.segment {
   text-decoration-thickness: 5px !important; 
   text-underline-offset: 3px !important;
 }
-
-
-
 
 .category-rank-list {
 -webkit-border-radius: 1px;
@@ -216,7 +212,7 @@ display: flex;
   text-decoration-color: red;
 }
 
-.docpar b::selection {
+.docpar span::selection {
   background: rgba(255, 223, 0, 0.5); /* A more contrasting yellow with some transparency */
   color: black;
   text-decoration: underline; /* Fallback for browsers that don't support advanced styles */

@@ -308,125 +308,58 @@ load_doc_to_display <- function(pool,
                                        active_project,
                                        user,
                                        doc_selector) 
+
+
+    if(nrow(coded_segments)){
+        
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
-    dplyr::left_join(
-        paragraphs %>% 
-        dplyr::select(segment_start, par_id), by = "segment_start"
-        ) %>% 
-        tidyr::fill(par_id, .direction = "down")
+      dplyr::left_join(
+           paragraphs %>% 
+           dplyr::select(segment_start, par_id), by = "segment_start"
+           ) %>% 
+           tidyr::fill(par_id, .direction = "down")
  
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
 
-    if(nrow(coded_segments)){
-        
-        distinct_code_ids <- as.character(
-           unique(spans_data %>% dplyr::pull(code_id))
+    distinct_code_ids <- as.character(
+        unique(spans_data %>% dplyr::pull(code_id))
         )
         
-        code_names_lookup <- tibble::tibble(
-            code_id = distinct_code_ids,
-            code_name = sapply(distinct_code_ids,
-                               blend_codes,
-                               code_names),
-            code_color = sapply(distinct_code_ids,
-                                blend_colors,
-                                code_names)
+    code_names_lookup <- tibble::tibble(
+        code_id = distinct_code_ids,
+        code_name = sapply(distinct_code_ids,
+                          blend_codes,
+                          code_names),
+        code_color = sapply(distinct_code_ids,
+                            blend_colors,
+                            code_names)
         )
 
-spans <- spans_data %>% 
-    dplyr::left_join(code_names_lookup, by = "code_id") %>%
-    dplyr::mutate(text = purrr::pmap(
-        list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text),
-        make_span
-    )) %>% 
-    dplyr::select(par_id,text) %>% 
-    dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
-    dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
-
-
-
-
-
-tags$article(id = "article", spans$text)
-# Print the HTML output
-# htmltools::browsable(tagList(spans))
-
-#         content_df <- coded_segments %>% 
-#             dplyr::filter(segment_start <= segment_end) %>% # patch for failing calculate_code_overlap() function in case of identical code positions
-#             dplyr::mutate(code_id = as.character(code_id)) %>% 
-#             tidyr::pivot_longer(cols = c(segment_start, segment_end),
-#                                 values_to = "position_start", 
-#                                 names_to = "position_type",
-#                                 values_drop_na = TRUE) %>% 
-#             dplyr::left_join(code_names_lookup, by = c("code_id")) %>%
-#             dplyr::mutate(tag_end = "</b>",
-#                           tag_start = paste0('<b id="',
-#                                              code_id,
-#                                              highlight_style(highlight),
-#                                              code_color,
-#                                              '" data-color="',  
-#                                              code_color,
-#                                              '" data-segment_start="',  
-#                                              position_start,                                              
-#                                              '" title="',
-#                                              code_name,
-#                                               '" onclick="Shiny.setInputValue(\'', ns("clicked_title"), '\', this.title, {priority: \'event\'});">')) %>% 
-#             dplyr::bind_rows(
-#                 # start doc
-#                 tibble::tibble(position_start = 0,
-#                                position_type =  "segment_start",
-#                                tag_start = "<article id='article'><p class='docpar'>"),
-#                 # content
-#                 .,
-#                 # end doc
-#                 tibble::tibble(position_start = nchar(raw_text),
-#                                position_type = "segment_end",
-#                                tag_end = "</p></article>")
-#             ) %>% 
-#             dplyr::mutate(position_start = ifelse(position_type == "segment_end",
-#                                                   position_start+1,
-#                                                   position_start)) %>% 
-#             dplyr::group_by(position_start, position_type) %>% 
-#             dplyr::summarise(tag_start = paste(tag_start, collapse = ""),
-#                              tag_end = paste(tag_end, collapse = ""),
-#                              .groups = "drop")  %>% 
-#             dplyr::group_by(position_start) %>% 
-#             dplyr::transmute(tag = ifelse(position_type == "segment_start",
-#                                           tag_start, 
-#                                           tag_end)) %>% 
-#             dplyr::ungroup()  %>% 
-#             dplyr::mutate(position_end = dplyr::lead(position_start-1, default = max(position_start))) 
-        
-        
-#         html_content <- paste0(purrr::pmap_chr(list(content_df$position_start,
-#                                                     content_df$position_end,
-#                                                     content_df$tag),
-#                                                ~paste0(..3, 
-#                                                        htmltools::htmlEscape(substr(
-                                                           
-#                                                            raw_text, 
-#                                                            ..1, 
-#                                                            ..2)))),
-#                                collapse = "") %>% 
-#             stringr::str_replace_all("[\\n\\r]",
-#                                      "<span class='br'>\\&#8203</span></p><p class='docpar'>")
-        
-        
-        
-    }else{
-        
-        df_non_coded <- paste0(
-            "<article id='article'><p class='docpar'>",
-            
-            htmltools::htmlEscape(raw_text) %>%
-                stringr::str_replace_all("[\\n\\r]",
-                                         "<span class='br'>\\&#8203</span></p><p class='docpar'>"),
-            
-            "</p></article")
-        
+    spans <- spans_data %>% 
+        dplyr::left_join(code_names_lookup, by = "code_id") %>%
+        dplyr::mutate(text = purrr::pmap(
+            list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text, highlight),
+            make_span
+        )) %>% 
+        dplyr::select(par_id,text) %>% 
+        dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
+        dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
+     
+    } else {
+  
+    spans <- paragraphs |> 
+        dplyr::mutate(text = purrr::pmap(
+            list(segment_start, segment_end, raw_text = raw_text),
+            make_span
+        )) %>% 
+        dplyr::select(par_id,text) %>% 
+        dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
+        dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
     }
+    return(tags$article(id = "article", spans$text))
+
 }
 
 
@@ -557,39 +490,15 @@ blend_colors <- function(string_id, code_names) {
 
 # highlight/underline ----
 
-highlight_style <- function(choice) {
+.highlight_style <- function(choice) {
     switch(choice,
-           underline = '" class="segment" style="padding:0; text-decoration: underline; text-decoration-color:',
-           background = '" class="segment" style="padding:0; background-color:',
+           underline = "text-decoration: underline; text-decoration-color",
+           background = "background-color",
     )
 }
-
-# make span  ----
-make_span  <- function(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text) {
-        # Check if a code_id is assigned
-        code_assigned <- isTruthy(code_id)
-        
-        # Extract the text segment and remove newlines
-        text <- substr(raw_text, segment_start, segment_end)
-        text <- stringr::str_replace_all(text, "\n", "")
-        
-        # Return NULL if the text is empty
-        if (nchar(text) < 1 && !code_assigned) {
-            return(NULL)
-        } else {
-            # Create a span element with optional attributes
-            htmltools::span(
-                text,
-                title = if (code_assigned) code_name else NULL,
-                style = .span_style(code_color, "background-color"),
-                class = if (code_assigned) "segment" else NULL,
-                .noWS = "outside"
-            )
-        }
-    }
 .span_style <- function(x, style_spec = NULL) {
     excluded <- c("rgb()")
-    if (isTruthy(x) && !x %in% excluded) {
+    if (!x %in% excluded) {
         if (!is.null(style_spec)) {
             paste0(style_spec, ": ", x, ";")
         } else {
@@ -599,4 +508,32 @@ make_span  <- function(segment_start, segment_end, highlight_id, segment_id, cod
         NULL
     }
 }
+# make span  ----
+make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL) {
+        # Check if a code_id is assigned
+        code_assigned <- isTruthy(code_id)
+        
+        # Extract the text segment and remove newlines
+        text <- substr(raw_text, segment_start, segment_end)
+        text <- htmltools::htmlEscape(stringr::str_replace_all(text, "\n|\r", ""))
+        
+        # Return NULL if the text is empty
+        # TODO - check if this condition is still needed
+        if (nchar(text) < 1 && !code_assigned) {
+            return(NULL)
+        } else {
+            # Create a span element with attributes and data
+            htmltools::span(
+                text,
+                title = if (code_assigned) code_name else NULL,
+                style = if (code_assigned) .span_style(code_color, .highlight_style(highlight)) else NULL,
+                class = if (code_assigned) "segment" else NULL,
+                `data-color` = if (code_assigned) code_color else NULL,
+                `data-startend` = paste(segment_start, segment_end),
+                `data-codes` = if (code_assigned) paste(code_id) else NULL,
+                .noWS = "outside"
+            ) 
+        }
+    }
+
 
