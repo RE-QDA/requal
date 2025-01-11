@@ -283,11 +283,11 @@ load_doc_to_display <- function(pool,
                                 codebook,
                                 highlight,
                                 ns){
-    position_type <- position_start <- tag_start <- tag_end <- NULL
     raw_text <- load_doc_db(pool, active_project, doc_selector)
     total_chars <- nchar(raw_text)
-
-    paragraphs <-  tibble::as_tibble(stringr::str_locate_all(raw_text, "\n|\r")[[1]]) %>%
+    paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(raw_text, "\n|\r")[[1]])
+    if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = total_chars)
+    paragraphs <- paragraph_indices %>%
     dplyr::transmute(
         segment_start = as.integer(dplyr::lag(end+1, default = 1)),
         segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
@@ -355,8 +355,7 @@ load_doc_to_display <- function(pool,
             make_span
         )) %>% 
         dplyr::select(par_id,text) %>% 
-        dplyr::summarise(text = list(htmltools::p(text, class = "docpar", .noWS = "outside")), .by = "par_id") %>% 
-        dplyr::mutate(text = purrr::map(text, ~ htmltools::tagAppendChild(.x, htmltools::span(HTML("&#8203"), class = "br", .noWS = "outside")))) 
+        dplyr::summarise(text = list(htmltools::p(text, span(HTML("&#8203"), class = "br", .noWS = "outside"), class = "docpar", .noWS = "outside")), .by = "par_id")
     }
     return(tags$article(id = "article", spans$text))
 
@@ -515,8 +514,8 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
         
         # Extract the text segment and remove newlines
         text <- substr(raw_text, segment_start, segment_end)
-        text <- htmltools::htmlEscape(stringr::str_replace_all(text, "\n|\r", ""))
-        
+        text <- stringr::str_replace_all(text, "\n|\r", "")
+
         # Return NULL if the text is empty
         # TODO - check if this condition is still needed
         if (nchar(text) < 1 && !code_assigned) {
