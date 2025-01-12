@@ -283,6 +283,7 @@ load_doc_to_display <- function(pool,
                                 codebook,
                                 highlight,
                                 ns){
+    end <- highlight_id <- par_id <- NULL
     raw_text <- load_doc_db(pool, active_project, doc_selector)
     total_chars <- nchar(raw_text)
     paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(raw_text, "\n|\r")[[1]])
