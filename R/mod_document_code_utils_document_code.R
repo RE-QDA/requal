@@ -349,7 +349,7 @@ load_doc_to_display <- function(pool,
      
     } else {
   
-    spans <- paragraphs |> 
+    spans <- paragraphs %>%  
         dplyr::mutate(text = purrr::pmap(
             list(segment_start, segment_end, raw_text = raw_text),
             make_span
