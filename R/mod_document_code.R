@@ -41,11 +41,10 @@ mod_document_code_ui <- function(id) {
               ),
               div(
                 style = "display: flex; justify-content: flex-end; align-items: center;",
-                actionButton(ns("doc_refresh"), label = "", icon = icon("sync"), title = "Reload document"),
-                actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
+                actionButton(ns("doc_refresh"), label = "", icon = icon("sync"), title = "Reload document", style = "margin-bottom: -10px"),
                 div(
                   id = ns("selection_displayer"),
-                  style = "margin-left: 20px; margin-right: 5px;", 
+                  style = "margin-left: 20px; margin-right: 5px; min-width: 75px;", 
                   "Selection:", br(), textOutput(ns("captured_range"))
                 )
               )
@@ -59,13 +58,18 @@ mod_document_code_ui <- function(id) {
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
           tags$b("Codes"),
           br(),
-          actionButton(
-            ns("remove_codes"),
-            "Remove code",
-            class = "btn-danger",
-            width = "100%"
-          ),
-          tags$div(
+          shinyjs::hidden(div(id = ns("code_toolbox"),
+          div(
+                style = "display: flex; justify-content: flex-end; align-items: center;",
+                actionButton(
+                          ns("code_columns"),
+                          label = "",
+                          icon = icon("table-columns"),
+                          title = "Code columns"
+                        ),
+                actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
+              ),
+             div(
             style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
             tags$div(
               style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
@@ -75,6 +79,19 @@ mod_document_code_ui <- function(id) {
               )
             ),
             actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+          )
+              )),
+         actionButton(
+            ns("btn_code_toolbox"),
+            icon("ellipsis-h"),
+            title = "Toggle coding toolbox",
+            class = "ellipsis-button"
+          ),
+          actionButton(
+            ns("remove_codes"),
+            "Remove code",
+            class = "btn-danger",
+            width = "100%"
           ),
           uiOutput(ns("code_list"))  %>% tagAppendAttributes(class = "scrollable80")
         )
@@ -109,6 +126,10 @@ mod_document_code_server <- function(id, glob) {
       loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
       # Send a message to the client to toggle the style
       session$sendCustomMessage("toggleStyle", message = loc$highlight)
+    })
+    ## Observe advanced toolbox display ----
+    observeEvent(input$btn_code_toolbox, {
+      shinyjs::toggle(id = "code_toolbox", anim = TRUE, animType = "slide")
     })
 
     ## Observe changes in documents
