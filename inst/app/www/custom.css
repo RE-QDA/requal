@@ -10,6 +10,7 @@
     border: none;
     height:80vh;
     overflow-y:scroll;
+    margin-right: 15px;
 }
 .scrollable90{
     border: none;
@@ -63,7 +64,8 @@ background-color: white;
 
 article {
   counter-reset: paragraph; /* Initialize the counter for paragraphs */
-  padding-left: 45px; /* Create space for the line numbers */
+  padding-left: 70px; /* Create space for the line numbers */
+  padding-right: 10px;
   position: relative; /* Position relative for absolute positioning of numbers */
 }
 p.docpar {
