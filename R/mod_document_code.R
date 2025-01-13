@@ -83,9 +83,9 @@ mod_document_code_ui <- function(id) {
               )),
          actionButton(
             ns("btn_code_toolbox"),
-            icon("ellipsis-h"),
+            shiny::icon("angle-double-down"),
             title = "Toggle coding toolbox",
-            class = "ellipsis-button"
+            class = "coding-toolbox-button"
           ),
           actionButton(
             ns("remove_codes"),
