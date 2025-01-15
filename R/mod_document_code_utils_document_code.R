@@ -221,58 +221,88 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments, paragraphs) {
-
+browser()
 events_df <- dplyr::bind_rows(
     raw_segments, paragraphs
-)
+) |> 
+dplyr::arrange(segment_start) 
 
-extra_start_events <- purrr::map_int(unique(events_df$segment_end), .f = function(x) {
-    active_segments <- events_df %>%
-    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
-    if (any(active_segments$segment_end > x)) {
-        span_event <- x + 1
-    } else {
-        0
-    }
-})
-extra_end_events <- purrr::map_int(unique(events_df$segment_start), .f = function(x) {
-    active_segments <- events_df %>%
-    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
-    if (any(active_segments$segment_start < x)) {
-        span_event <- x - 1
-    } else {
-        0
-    }
-})
+# https://stackoverflow.com/questions/3269434/whats-the-most-efficient-way-to-test-if-two-ranges-overlap
+positions_df <- dplyr::bind_rows(
+    tibble::tibble(
+        event = "xstart",
+        position = events_df$segment_start,
+    ),
+    tibble::tibble(
+        event = "yend",
+        position = events_df$segment_end
+    ) 
+) |> 
+dplyr::arrange(position, event)
 
-start_events <- sort(c(unique(events_df$segment_start), extra_start_events[extra_start_events > 0] ))
-end_events <- sort(c(unique(events_df$segment_end), extra_end_events[extra_end_events > 0] ))
+extra_events <- positions_df |> 
+dplyr::filter(dplyr::lag(event) == event) |> 
+dplyr::mutate(position = position - 1,
+event = ifelse(event == "xstart", "segment_end", "segment_start")
+) 
+
+
+extra_df <- events_df |> 
+tibble::rownames_to_column("span_id") |> 
+dplyr::bind_rows(
+    tibble::tibble(
+        segment_start = extra_events$position[extra_events$event == "segment_start"],
+        segment_end = extra_events$position[extra_events$event == "segment_end"]
+    )
+) |> dplyr::arrange(segment_start)
+
+
+
+start_events <- sort(c(unique(events_df$segment_start), extra_events$position[extra_events$event == "segment_start"] ))
+end_events <- sort(c(unique(events_df$segment_end), extra_events$position[extra_events$event == "segment_end"] ))
 
 res_prep <- tibble::tibble(
     segment_start = start_events,
     segment_end = end_events
+) |> 
+dplyr::mutate(segment_start = ifelse(segment_start == dplyr::lag(segment_end, default = 0), segment_start+1, segment_start)) |> 
+dplyr::left_join(events_df |> dplyr::select(segment_start, code_id) |> 
+tibble::rownames_to_column("span_id"))
+
+
+
+raw_segments_m <- raw_segments |> dplyr::bind_rows(res_prep) |> dplyr::arrange(segment_start)
+start_matrix <- outer(raw_segments$segment_start, raw_segments$segment_start, pmax)
+end_matrix <- outer(raw_segments$segment_end, raw_segments$segment_end, pmin)
+
+# Calculate the overlap condition
+overlap_matrix <- (start_matrix - end_matrix) <= 0
+
+test <- raw_segments |> 
+dplyr::mutate(tag =
+purrr::map_chr(
+seq_len(nrow(raw_segments)), .f = function(x) {
+paste(raw_segments[overlap_matrix[x,], ]$code_id, collapse = "-")
+})
+)  |>  
+dplyr::arrange(segment_start)
+
+test2 <- tibble::tibble(
+    tag = test$tag,
+    segment_start = sort(test$segment_start),
+    segment_end_check = sort(test$segment_end)
+
 )
 
-res <- res_prep %>%
-    dplyr::mutate(
-        code_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
-             raw_segments %>%
-                dplyr::filter(s <= segment_end & e >= segment_start) %>%
-                dplyr::pull(code_id)
-        }),
-        segment_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
-            raw_segments %>%
-                dplyr::filter(s <= segment_end & e >= segment_start) %>%
-                dplyr::pull(segment_id)
-        })
-    ) %>%
-    dplyr::mutate(
-        code_id = purrr::map_chr(code_id, ~ paste0(.x, collapse = "-")),
-        segment_id = purrr::map_chr(segment_id, ~ paste0(.x, collapse = "-"))
-    ) %>%
-    tibble::rownames_to_column("highlight_id")
+res_prep |> 
+dplyr::left_join(test2, by = "segment_start") |> 
+tidyr::fill(segment_end_check, tag, span_id, .direction = "down") |> 
+dplyr::mutate(code_id = ifelse(segment_end_check >= segment_end, tag, NA))  |> 
+    tibble::rownames_to_column("highlight_id")  |> 
+    dplyr::mutate(segment_id = span_id) |> 
+    dplyr::select(highlight_id, segment_id, code_id, segment_start, segment_end)
 
-return(res) 
+
 }
 
 # Generate text to be displayed -----
