@@ -299,19 +299,21 @@ mod_document_code_server <- function(id, glob) {
           startOff,
           endOff
         )
+        # browser()
         # TODO JS implementation of coding
-        #     code_info <- glob$codebook |>
-        #      dplyr::filter(code_id == input$selected_code)
+            code_info <- glob$codebook |>
+             dplyr::filter(code_id == input$selected_code)
 
-        # session$sendCustomMessage(type = 'wrapTextWithBold', message = list(
-        # startOffset = startOff-1, #convert to javascript
-        # endOffset = endOff,
-        # newId = input$selected_code,
-        # color = code_info$code_color,
-        # title = code_info$code_name
-        # ))
+        session$sendCustomMessage(type = 'AddCode', message = list(
+        startOffset = startOff, 
+        endOffset = endOff,
+        newId = input$selected_code,
+        color = code_info$code_color,
+        title = code_info$code_name
+        ))
+        session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
-        # loc$text_observer <- loc$text_observer + 1
+        #loc$text_observer <- loc$text_observer + 1
         glob$segments_observer <- glob$segments_observer + 1
       }
     })

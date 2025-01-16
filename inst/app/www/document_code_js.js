@@ -106,30 +106,36 @@ function findScrollElement(message) {
   return segments[index]; // This could be undefined if no matching segment is found
 }
 
-$( document ).ready(function() {
+$(document).ready(function() {
+  Shiny.addCustomMessageHandler('scrollToSegment', function(message) {
+    const observer = new MutationObserver((mutationsList, observer) => {
+      let el = findScrollElement(message);
+      if (el) {
+        console.log("Scrolling to element:", el);
+        scrollToElementWithinContainer(el);
+        observer.disconnect(); // Stop observing once the element is found and scrolled to
+      }
+    });
 
-Shiny.addCustomMessageHandler('scrollToSegment', function(message) {
-  let el = findScrollElement(message);
-  if (el) { // Check if the element exists before trying to scroll into view
-      console.log("Scrolling to element:", el);
-      scrollToElementWithinContainer(el);
-  } else {
-      console.log("No element found to scroll to for message:", message);
+    // Start observing the #article element for changes
+    const articleElement = document.getElementById('article');
+    if (articleElement) {
+      observer.observe(articleElement, { childList: true, subtree: true });
+    } else {
+      console.log("No #article element found to observe.");
+    }
+  });
+
+  function findScrollElement(message) {
+    // Implement your logic to find the scroll element based on the message
+    // Example: return document.getElementById(message.id);
+    return document.querySelector(message.selector); // Adjust based on your message structure
+  }
+
+  function scrollToElementWithinContainer(el) {
+    // Implement your logic to scroll to the element within its container
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
-});
-
-function scrollToElementWithinContainer(targetSelected) {
-  let container = document.querySelector('#document_code_ui_1-focal_text');
-  let target = targetSelected;
-
-  if (container && target) {
-      let targetPosition = target.getBoundingClientRect().top;
-      let containerPosition = container.getBoundingClientRect().top;
-      let scrollPosition = targetPosition - containerPosition + container.scrollTop;
-      
-      container.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-  }
-}
 
 
