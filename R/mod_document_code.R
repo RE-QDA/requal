@@ -15,6 +15,7 @@ mod_document_code_ui <- function(id) {
       tags$script(src = "www/split.min.js"),
       tags$script(src = "www/highlight_style.js"),
       tags$script(src = "www/document_code_js.js"),
+      tags$script(src = "www/highlight_tool.js"),
       tags$script(HTML("
   document.addEventListener('DOMContentLoaded', (event) => {
     Split(['#split-1', '#split-2'], {
@@ -230,15 +231,43 @@ mod_document_code_server <- function(id, glob) {
     # Load text observer ----
     observeEvent(req(loc$text_observer), {
       req(loc$text_observer > 0) # ignore init value
+      # define text values that may be useful outside of this observer
+      loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
+      loc$total_chars <- nchar(loc$raw_text)
+      paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(loc$raw_text, "\n|\r")[[1]])
+      if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = total_chars)
+      loc$paragraphs <- paragraph_indices %>%
+          dplyr::transmute(
+          segment_start = as.integer(dplyr::lag(end+1, default = 1)),
+          segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
+          ) %>% 
+        tibble::rowid_to_column("par_id") %>%
+        dplyr::mutate(par_id = paste("par_id", par_id, sep = "-"))
+      if (loc$total_chars > max(loc$paragraphs$segment_end)) {
+              # safeguard against text without final linebreak
+              loc$paragraphs <- dplyr::bind_rows(
+              loc$paragraphs,
+              tibble::tibble(
+                  par_id = max(loc$paragraphs$par_id) + 1,
+                  segment_start = as.integer(max(loc$paragraphs$segment_end) + 1),
+                  segment_end = as.integer(loc$total_chars)
+                  )
+              ) 
+          }
+      # render text for display
       loc$text <- load_doc_to_display(
           glob$pool,
           glob$active_project,
           user = glob$user,
-          ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id),
+          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id),
+          raw_text = loc$raw_text,
+          paragraphs = loc$paragraphs,
           loc$codebook,
           highlight = loc$highlight,
           ns = NS(id)
         )
+        session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+
     })
 
     # Coding tools ------------------------------------------------------------
@@ -282,7 +311,7 @@ mod_document_code_server <- function(id, glob) {
         # title = code_info$code_name
         # ))
 
-        loc$text_observer <- loc$text_observer + 1
+        # loc$text_observer <- loc$text_observer + 1
         glob$segments_observer <- glob$segments_observer + 1
       }
     })

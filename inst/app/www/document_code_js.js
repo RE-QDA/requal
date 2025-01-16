@@ -76,6 +76,7 @@ document.addEventListener('mouseup', function () {
 }, false);
 })
 
+// Obtain information from iframe and send to Shiny
 
 Shiny.addCustomMessageHandler('getIframeContent', function(message) {
   var iframe = document.getElementsByTagName('iframe')[0];
@@ -84,10 +85,17 @@ Shiny.addCustomMessageHandler('getIframeContent', function(message) {
   Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
 });
 
+// Refresh iframe
+
 Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   var iframe = document.getElementsByTagName('iframe')[0];
   iframe.src = iframe.src;
 });
+
+
+// Functions for scrolling
+// TODO
+
 
 function findScrollElement(message) {
   let targetStart = parseInt(message, 10);
@@ -123,3 +131,5 @@ function scrollToElementWithinContainer(targetSelected) {
       container.scrollTo({ top: scrollPosition, behavior: 'smooth' });
   }
 }
+
+
