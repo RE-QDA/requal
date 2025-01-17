@@ -231,6 +231,7 @@ mod_document_code_server <- function(id, glob) {
     # Load text observer ----
     observeEvent(req(loc$text_observer), {
       req(loc$text_observer > 0) # ignore init value
+
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
       loc$total_chars <- nchar(loc$raw_text)
@@ -301,19 +302,19 @@ mod_document_code_server <- function(id, glob) {
         )
         # browser()
         # TODO JS implementation of coding
-            code_info <- glob$codebook |>
-             dplyr::filter(code_id == input$selected_code)
+        #     code_info <- glob$codebook |>
+        #      dplyr::filter(code_id == input$selected_code)
 
-        session$sendCustomMessage(type = 'AddCode', message = list(
-        startOffset = startOff, 
-        endOffset = endOff,
-        newId = input$selected_code,
-        color = code_info$code_color,
-        title = code_info$code_name
-        ))
-        session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+        # session$sendCustomMessage(type = 'AddCode', message = list(
+        # startOffset = startOff, 
+        # endOffset = endOff,
+        # newId = input$selected_code,
+        # color = code_info$code_color,
+        # title = code_info$code_name
+        # ))
+        # session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
-        #loc$text_observer <- loc$text_observer + 1
+        loc$text_observer <- loc$text_observer + 1
         glob$segments_observer <- glob$segments_observer + 1
       }
     })

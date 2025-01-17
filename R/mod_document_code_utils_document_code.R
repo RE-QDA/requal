@@ -221,58 +221,79 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments, paragraphs) {
-
+   
 events_df <- dplyr::bind_rows(
     paragraphs, raw_segments
-) |> dplyr::arrange(segment_start)
+) |> dplyr::select(segment_start, segment_end) |> 
+tidyr::pivot_longer(starts_with("segment"), names_to = "event", values_to = "position") |> 
+dplyr::arrange(position) 
 
-extra_start_events <- purrr::map_int(unique(events_df$segment_end), .f = function(x) {
-    active_segments <- events_df %>%
-    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
-    if (any(active_segments$segment_end > x)) {
-        span_event <- x + 1
-    } else {
-        0
-    }
-})
-extra_end_events <- purrr::map_int(unique(events_df$segment_start), .f = function(x) {
-    active_segments <- events_df %>%
-    dplyr::filter(x >= (segment_start) & x <= (segment_end)) 
-    if (any(active_segments$segment_start < x)) {
-        span_event <- x - 1
-    } else {
-        0
-    }
-})
+events_df2 <- events_df |> 
+  dplyr::mutate(
+    test = ifelse(event == dplyr::lag(event), TRUE, FALSE),
+    lag_position = dplyr::lag(position)
+  ) |> 
+  dplyr::rowwise() |> 
+  dplyr::mutate(
+    extra_e = ifelse(event == "segment_start" & test, position - 1, NA),
+    extra_s = ifelse(event == "segment_end" & test, lag_position + 1, NA)
+  ) |> 
+  dplyr::ungroup()
+ events_df3 <-  dplyr::bind_rows(
+    tibble::tibble(
+        event = "segment_start",
+        position = na.omit(events_df2$extra_s)
+    ),
+    tibble::tibble(
+        event = "segment_end",
+        position = na.omit(events_df2$extra_e)
+    ),
+    events_df2 |> dplyr::select(event, position)
+  ) |> 
+  dplyr::arrange(position, desc(event)) |> 
+  dplyr::distinct() 
+ events_prefinal <- events_df3 |> 
+ dplyr::mutate(row_id = cumsum(event == "segment_start")) |> 
+ dplyr::summarise(segment_start = min(position), segment_end=max(position), .by = "row_id") |> 
+  dplyr::select(-row_id)   |> 
+     dplyr::mutate(
+        lag_end = dplyr::lag(segment_end),
+        test = ifelse((segment_start - lag_end)>1, TRUE, FALSE)) |> 
+  dplyr::mutate(segment_end = ifelse(is.na(segment_end), dplyr::lead(segment_start)-1, segment_end)) |> 
+    dplyr::mutate(segment_start = ifelse(is.na(segment_start), dplyr::lag(segment_end)+1, segment_start)) 
 
-start_events <- sort(c(unique(events_df$segment_start), extra_start_events[extra_start_events > 0] ))
-end_events <- sort(c(unique(events_df$segment_end), extra_end_events[extra_end_events > 0] ))
+missed_rows <- events_prefinal |> 
+dplyr::filter(test) |> 
+dplyr::mutate(segment_end = segment_start - 1, segment_start = lag_end + 1)
 
-res_prep <- tibble::tibble(
-    segment_start = start_events,
-    segment_end = end_events
-) |> 
-dplyr::filter(segment_start <= segment_end)
+events_final <- events_prefinal |> 
+dplyr::bind_rows(missed_rows) |> 
+  dplyr::arrange(segment_start) |> 
+    tibble::rownames_to_column("span_id") |> 
+    dplyr::mutate(span_id = paste0("span_id-", span_id)) |> 
+    dplyr::select(-test, -lag_end) 
 
-res <- res_prep %>%
-    dplyr::mutate(
-        code_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
-             raw_segments %>%
-                dplyr::filter(s <= segment_end & e >= segment_start) %>%
-                dplyr::pull(code_id)
-        }),
-        segment_id = purrr::map2(segment_start, segment_end, .f = function(s, e) {
-            raw_segments %>%
-                dplyr::filter(s <= segment_end & e >= segment_start) %>%
-                dplyr::pull(segment_id)
-        })
-    ) %>%
-    dplyr::mutate(
-        code_id = purrr::map_chr(code_id, ~ paste0(.x, collapse = "-")),
-        segment_id = purrr::map_chr(segment_id, ~ paste0(.x, collapse = "-"))
-    ) %>%
-    tibble::rownames_to_column("highlight_id")
+named_starts <- stats::setNames(events_final$segment_start, events_final$span_id)
+named_ends <- stats::setNames(events_final$segment_start, events_final$span_id)
 
+long_codes <- raw_segments |> 
+dplyr::mutate(span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
+intersect(
+    names(named_starts[named_starts >= x]),
+    names(named_ends[named_ends <= y])
+)
+})) |> tidyr::unnest() |> dplyr::select(-segment_end, -segment_start)
+
+res <- events_final |> 
+dplyr::left_join(long_codes) |> 
+dplyr::summarise(
+    segment_start = unique(segment_start),
+    segment_end = unique(segment_end),
+    segment_id = paste0(segment_id, collapse = "-"),
+    code_id = paste0(code_id, collapse = "-"),
+    .by = span_id
+) |> tibble::rownames_to_column("highlight_id") |> 
+dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "NA"))
 return(res) 
 }
 
@@ -292,7 +313,7 @@ load_doc_to_display <- function(pool,
                                        user,
                                        doc_selector) 
 
-
+   
     if(nrow(coded_segments)){
     
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
@@ -311,16 +332,16 @@ load_doc_to_display <- function(pool,
         )
         
     code_names_lookup <- tibble::tibble(
-        code_id =distinct_code_ids[distinct_code_ids != ""],
-        code_name = sapply(distinct_code_ids[distinct_code_ids != ""],
+        code_id =distinct_code_ids,
+        code_name = sapply(distinct_code_ids,
                           blend_codes,
                           code_names),
-        code_color = sapply(distinct_code_ids[distinct_code_ids != ""],
+        code_color = sapply(distinct_code_ids,
                             blend_colors,
                             code_names)
-        )
+        ) |> dplyr::filter(!is.na(code_id))
 
-    spans <- spans_data %>% 
+    spans <- spans_data %>%
         dplyr::left_join(code_names_lookup, by = "code_id") %>%
         dplyr::mutate(text = purrr::pmap(
             list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text, highlight),
