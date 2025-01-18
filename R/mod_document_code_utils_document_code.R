@@ -221,7 +221,8 @@ write_segment_db <- function(
 
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments, paragraphs) {
-   
+
+
 events_df <- dplyr::bind_rows(
     paragraphs, raw_segments
 ) |> dplyr::select(segment_start, segment_end) |> 
@@ -269,9 +270,11 @@ dplyr::mutate(segment_end = segment_start - 1, segment_start = lag_end + 1)
 events_final <- events_prefinal |> 
 dplyr::bind_rows(missed_rows) |> 
   dplyr::arrange(segment_start) |> 
+  dplyr::filter(segment_start > 0, segment_start > 0) |> 
     tibble::rownames_to_column("span_id") |> 
     dplyr::mutate(span_id = paste0("span_id-", span_id)) |> 
-    dplyr::select(-test, -lag_end) 
+    dplyr::select(-test, -lag_end)  
+
 
 named_starts <- stats::setNames(events_final$segment_start, events_final$span_id)
 named_ends <- stats::setNames(events_final$segment_start, events_final$span_id)
@@ -282,10 +285,10 @@ intersect(
     names(named_starts[named_starts >= x]),
     names(named_ends[named_ends <= y])
 )
-})) |> tidyr::unnest() |> dplyr::select(-segment_end, -segment_start)
+})) |> tidyr::unnest(cols = c(span_id)) |> dplyr::select(-segment_end, -segment_start)
 
 res <- events_final |> 
-dplyr::left_join(long_codes) |> 
+dplyr::left_join(long_codes, by = "span_id") |> 
 dplyr::summarise(
     segment_start = unique(segment_start),
     segment_end = unique(segment_end),
@@ -314,7 +317,6 @@ load_doc_to_display <- function(pool,
                                        doc_selector) 
 
    
-    #if(nrow(coded_segments)){
     
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
@@ -322,7 +324,7 @@ load_doc_to_display <- function(pool,
            dplyr::select(segment_start, par_id), by = "segment_start"
            ) %>% 
            tidyr::fill(par_id, .direction = "down")
-    print(spans_data)
+ 
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -339,41 +341,12 @@ load_doc_to_display <- function(pool,
         code_color = sapply(distinct_code_ids,
                             blend_colors,
                             code_names)
-        ) |> dplyr::filter(!is.na(code_id))
+        ) |> 
+        dplyr::filter(!is.na(code_id))
 
     spans <- spans_data %>%
         dplyr::left_join(code_names_lookup, by = "code_id")
 
-        
-        # dplyr::mutate(text = purrr::pmap(
-        #     list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text, highlight),
-        #     make_span
-        # )) %>% 
-        # dplyr::summarise(text = list(htmltools::p(text, 
-        #             id = unique(par_id), 
-        #             class = "docpar",
-        #             `data-startend` = paste(min(segment_start), max(segment_end), sep = " "),
-        #             span(HTML("&#8203"), class = "br", .noWS = "outside"), 
-        #             .noWS = "outside")), 
-        #         .by = "par_id")
-     
-    # } else {
-  
-    # spans <- paragraphs |> 
-    #     dplyr::mutate(text = purrr::pmap(
-    #         list(segment_start, segment_end, raw_text = raw_text),
-    #         make_span
-    #     )) %>% 
-    #      dplyr::summarise(text = list(htmltools::p(text, 
-    #                 id = par_id, 
-    #                 class = "docpar",
-    #                 `data-startend` = paste(segment_start, segment_end, sep = " "),
-    #                 span(HTML("&#8203"), class = "br", .noWS = "outside"), 
-    #                 .noWS = "outside")), 
-    #             .by = "par_id")
-    # }
-    #return(tags$article(id = "article", spans$text))
-    print("spans")
     return(spans)
 }
 

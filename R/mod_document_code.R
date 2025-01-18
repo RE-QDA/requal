@@ -27,9 +27,7 @@ mod_document_code_ui <- function(id) {
   tags$script(HTML("
     Shiny.addCustomMessageHandler('appendParagraph', function(message) {
       var article = document.getElementById('article');
-      var newParagraph = document.createElement('div');
-      newParagraph.innerHTML = message.html;
-      article.appendChild(newParagraph);
+      article.insertAdjacentHTML('beforeend', message.html);
     });
   ")),
     tags$script(HTML("
@@ -179,7 +177,7 @@ mod_document_code_server <- function(id, glob) {
 
     ## Observe refresh ----
     # Update loc$codes_menu when input$doc_refresh or glob$codebook changes
-    observeEvent(input$doc_refresh, {
+    observeEvent(glob$codebook, {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
     })
 
@@ -240,13 +238,12 @@ mod_document_code_server <- function(id, glob) {
     # Displayed text observer ----
     observeEvent(req(loc$text_observer), {
       req(loc$text_observer > 0) # ignore init value
-          session$sendCustomMessage('clearArticle', list())
-
+      session$sendCustomMessage('clearArticle', list())
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
       loc$total_chars <- nchar(loc$raw_text)
       paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(loc$raw_text, "\n|\r")[[1]])
-      if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = total_chars)
+      if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = loc$total_chars)
       loc$paragraphs <- paragraph_indices %>%
           dplyr::transmute(
           segment_start = as.integer(dplyr::lag(end+1, default = 1)),
@@ -254,20 +251,19 @@ mod_document_code_server <- function(id, glob) {
           ) %>% 
         tibble::rowid_to_column("par_id") %>%
         dplyr::mutate(par_id = paste("par_id", par_id, sep = "-"))
-        print("soko made")
-      # if (loc$total_chars > max(loc$paragraphs$segment_end)) {
-      #         # safeguard against text without final linebreak
-      #         loc$paragraphs <- dplyr::bind_rows(
-      #         loc$paragraphs,
-      #         tibble::tibble(
-      #             par_id = max(loc$paragraphs$par_id) + 1,
-      #             segment_start = as.integer(max(loc$paragraphs$segment_end) + 1),
-      #             segment_end = as.integer(loc$total_chars)
-      #             )
-      #         ) 
-      #     }
-      # render text for display
-      print("ok")
+
+            if (loc$total_chars > max(loc$paragraphs$segment_end)) {
+              # safeguard against text without final linebreak
+              loc$paragraphs <- dplyr::bind_rows(
+              loc$paragraphs,
+              tibble::tibble(
+                  par_id = paste0("par_id-", length(loc$paragraphs$par_id) + 1),
+                  segment_start = as.integer(max(loc$paragraphs$segment_end) + 1),
+                  segment_end = as.integer(loc$total_chars)
+                  )
+              ) 
+          }
+              
       text_data <- load_doc_to_display(
           glob$pool,
           glob$active_project,
@@ -279,15 +275,13 @@ mod_document_code_server <- function(id, glob) {
           highlight = loc$highlight,
           ns = NS(id)
         )
-        print(text_data)
-        #loc$text <- htmltools::tagQuery(tags$article(id = "article"))
-                #loc$text <- htmltools::tagQuery(tags$article(id = "article"))
 
         par_ids <- unique(text_data$par_id)
-        par_chunks <- chunks <- split(par_ids, ceiling(seq_along(par_ids) / 100))
+        #par_chunks <- chunks <- split(par_ids, ceiling(seq_along(par_ids) / 100))
       
-        purrr::walk(par_chunks, .f = function(x) {
-           par <- text_data |> dplyr::filter(par_id %in% unlist(x)) |> 
+        purrr::walk(par_ids, .f = function(x) {
+          
+           par <- text_data |> dplyr::filter(par_id == x) |> 
                   dplyr::mutate(text = purrr::pmap(
             list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, loc$raw_text, loc$highlight),
             make_span
@@ -299,19 +293,22 @@ mod_document_code_server <- function(id, glob) {
                     span(HTML("&#8203"), class = "br", .noWS = "outside"), 
                     .noWS = "outside")), 
                 .by = "par_id")
-        # loc$text$
-        # append(par$text)
+        
       
     html_string <- as.character(par$text[[1]])
-    print(html_string)
     # Send the HTML string to the client
-    session$sendCustomMessage("appendParagraph", list(html = html_string))
+            session$sendCustomMessage("appendParagraph", list(html = html_string))
             session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
         })
-
+        # Add empty span:
+        # patch for non-highlighted segments (single row docs, or last par of docs)
+        # this triggers highlightSegments
+        # can be removed if ever debugged or the displayed text generating system improves
+        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
 
     })
+  
 
     # Coding tools ------------------------------------------------------------
     observeEvent(req(input$selected_code), {
