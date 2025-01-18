@@ -314,7 +314,7 @@ load_doc_to_display <- function(pool,
                                        doc_selector) 
 
    
-    if(nrow(coded_segments)){
+    #if(nrow(coded_segments)){
     
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
@@ -322,7 +322,7 @@ load_doc_to_display <- function(pool,
            dplyr::select(segment_start, par_id), by = "segment_start"
            ) %>% 
            tidyr::fill(par_id, .direction = "down")
- 
+    print(spans_data)
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -342,36 +342,39 @@ load_doc_to_display <- function(pool,
         ) |> dplyr::filter(!is.na(code_id))
 
     spans <- spans_data %>%
-        dplyr::left_join(code_names_lookup, by = "code_id") %>%
-        dplyr::mutate(text = purrr::pmap(
-            list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text, highlight),
-            make_span
-        )) %>% 
-        dplyr::summarise(text = list(htmltools::p(text, 
-                    id = unique(par_id), 
-                    class = "docpar",
-                    `data-startend` = paste(min(segment_start), max(segment_end), sep = " "),
-                    span(HTML("&#8203"), class = "br", .noWS = "outside"), 
-                    .noWS = "outside")), 
-                .by = "par_id")
-     
-    } else {
-  
-    spans <- paragraphs |> 
-        dplyr::mutate(text = purrr::pmap(
-            list(segment_start, segment_end, raw_text = raw_text),
-            make_span
-        )) %>% 
-         dplyr::summarise(text = list(htmltools::p(text, 
-                    id = par_id, 
-                    class = "docpar",
-                    `data-startend` = paste(segment_start, segment_end, sep = " "),
-                    span(HTML("&#8203"), class = "br", .noWS = "outside"), 
-                    .noWS = "outside")), 
-                .by = "par_id")
-    }
-    return(tags$article(id = "article", spans$text))
+        dplyr::left_join(code_names_lookup, by = "code_id")
 
+        
+        # dplyr::mutate(text = purrr::pmap(
+        #     list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, raw_text, highlight),
+        #     make_span
+        # )) %>% 
+        # dplyr::summarise(text = list(htmltools::p(text, 
+        #             id = unique(par_id), 
+        #             class = "docpar",
+        #             `data-startend` = paste(min(segment_start), max(segment_end), sep = " "),
+        #             span(HTML("&#8203"), class = "br", .noWS = "outside"), 
+        #             .noWS = "outside")), 
+        #         .by = "par_id")
+     
+    # } else {
+  
+    # spans <- paragraphs |> 
+    #     dplyr::mutate(text = purrr::pmap(
+    #         list(segment_start, segment_end, raw_text = raw_text),
+    #         make_span
+    #     )) %>% 
+    #      dplyr::summarise(text = list(htmltools::p(text, 
+    #                 id = par_id, 
+    #                 class = "docpar",
+    #                 `data-startend` = paste(segment_start, segment_end, sep = " "),
+    #                 span(HTML("&#8203"), class = "br", .noWS = "outside"), 
+    #                 .noWS = "outside")), 
+    #             .by = "par_id")
+    # }
+    #return(tags$article(id = "article", spans$text))
+    print("spans")
+    return(spans)
 }
 
 

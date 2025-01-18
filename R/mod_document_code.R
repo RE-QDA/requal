@@ -23,7 +23,20 @@ mod_document_code_ui <- function(id) {
       minSize: [100, 100]
     });
   });
-"))
+")),
+  tags$script(HTML("
+    Shiny.addCustomMessageHandler('appendParagraph', function(message) {
+      var article = document.getElementById('article');
+      var newParagraph = document.createElement('div');
+      newParagraph.innerHTML = message.html;
+      article.appendChild(newParagraph);
+    });
+  ")),
+    tags$script(HTML("
+    Shiny.addCustomMessageHandler('clearArticle', function(message) {
+      $('#article').empty();
+    });
+  "))
     ),
     fluidRow(
       style = "height: 90%",
@@ -51,7 +64,7 @@ mod_document_code_ui <- function(id) {
               )
             ),
           fluidRow(
-          htmlOutput(ns("focal_text"), class = "scrollable80") 
+                 div(id = ns("focal_text"), tags$article(id = "article", class = "scrollable80", .noWS = "outside"), .noWS = "outside")
           )
         ),
         tags$div(
@@ -218,19 +231,16 @@ mod_document_code_server <- function(id, glob) {
       session$sendCustomMessage(type = 'scrollToSegment', message = glob$analyze_link$segment_start)
   })
 
-    # Render text and codes ----
-    output$focal_text <- renderUI({
-      req(isTruthy(loc$text))
-      loc$text
-    })
+    # Render codes ----
     output$code_list <- renderUI({
       req(isTruthy(loc$codes_menu))
       loc$codes_menu
     })
 
-    # Load text observer ----
+    # Displayed text observer ----
     observeEvent(req(loc$text_observer), {
       req(loc$text_observer > 0) # ignore init value
+          session$sendCustomMessage('clearArticle', list())
 
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
@@ -244,19 +254,21 @@ mod_document_code_server <- function(id, glob) {
           ) %>% 
         tibble::rowid_to_column("par_id") %>%
         dplyr::mutate(par_id = paste("par_id", par_id, sep = "-"))
-      if (loc$total_chars > max(loc$paragraphs$segment_end)) {
-              # safeguard against text without final linebreak
-              loc$paragraphs <- dplyr::bind_rows(
-              loc$paragraphs,
-              tibble::tibble(
-                  par_id = max(loc$paragraphs$par_id) + 1,
-                  segment_start = as.integer(max(loc$paragraphs$segment_end) + 1),
-                  segment_end = as.integer(loc$total_chars)
-                  )
-              ) 
-          }
+        print("soko made")
+      # if (loc$total_chars > max(loc$paragraphs$segment_end)) {
+      #         # safeguard against text without final linebreak
+      #         loc$paragraphs <- dplyr::bind_rows(
+      #         loc$paragraphs,
+      #         tibble::tibble(
+      #             par_id = max(loc$paragraphs$par_id) + 1,
+      #             segment_start = as.integer(max(loc$paragraphs$segment_end) + 1),
+      #             segment_end = as.integer(loc$total_chars)
+      #             )
+      #         ) 
+      #     }
       # render text for display
-      loc$text <- load_doc_to_display(
+      print("ok")
+      text_data <- load_doc_to_display(
           glob$pool,
           glob$active_project,
           user = glob$user,
@@ -267,7 +279,37 @@ mod_document_code_server <- function(id, glob) {
           highlight = loc$highlight,
           ns = NS(id)
         )
-        session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+        print(text_data)
+        #loc$text <- htmltools::tagQuery(tags$article(id = "article"))
+                #loc$text <- htmltools::tagQuery(tags$article(id = "article"))
+
+        par_ids <- unique(text_data$par_id)
+        par_chunks <- chunks <- split(par_ids, ceiling(seq_along(par_ids) / 100))
+      
+        purrr::walk(par_chunks, .f = function(x) {
+           par <- text_data |> dplyr::filter(par_id %in% unlist(x)) |> 
+                  dplyr::mutate(text = purrr::pmap(
+            list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, loc$raw_text, loc$highlight),
+            make_span
+        )) %>% 
+        dplyr::summarise(text = list(htmltools::p(text, 
+                    id = unique(par_id), 
+                    class = "docpar",
+                    `data-startend` = paste(min(segment_start), max(segment_end), sep = " "),
+                    span(HTML("&#8203"), class = "br", .noWS = "outside"), 
+                    .noWS = "outside")), 
+                .by = "par_id")
+        # loc$text$
+        # append(par$text)
+      
+    html_string <- as.character(par$text[[1]])
+    print(html_string)
+    # Send the HTML string to the client
+    session$sendCustomMessage("appendParagraph", list(html = html_string))
+            session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+
+        })
+
 
     })
 
