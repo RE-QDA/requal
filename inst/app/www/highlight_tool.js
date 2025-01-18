@@ -20,6 +20,8 @@ $(document).ready(function() {
 
     const ids = Array.isArray(message.ids) ? message.ids : [message.ids]; // Ensure ids is an array
 
+    const targetNode = document.getElementById("article");
+
     const observer = new MutationObserver((mutationsList, observer) => {
       ids.forEach(id => {
         const container = document.getElementById(id);
@@ -37,7 +39,7 @@ $(document).ready(function() {
     });
 
     // Start observing the document body for changes
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(targetNode, { childList: true, attributes: true, subtree: true });
   });
 });
 

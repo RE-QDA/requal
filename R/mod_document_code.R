@@ -304,18 +304,18 @@ mod_document_code_server <- function(id, glob) {
            par <- text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
            spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text) 
             
-             session$sendCustomMessage("clearContent", list(id = x))
+            # session$sendCustomMessage("clearContent", list(id = x))
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
             session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
             session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
                 })
-                            session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+       #  session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
     #     # Add empty span:
     #     # patch for non-highlighted segments (single row docs, or last par of docs)
     #     # this triggers highlightSegments
-    #     # can be removed if ever debugged or the displayed text generating system improves
-    #     session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
+        # can be removed if ever debugged or the displayed text generating system improves
+        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
 
     })
   

@@ -161,7 +161,17 @@ Shiny.addCustomMessageHandler('clearContent', function(message) {
 });
 
 Shiny.addCustomMessageHandler('updateParagraphContent', function(message) {
-      let par = document.getElementById(message.id);
-      par.innerHTML = message.data;
+  const container = document.getElementById(message.id);
+  const fragment = document.createDocumentFragment();
+
+// Create new content
+const newElement = document.createElement('span');
+newElement.innerHTML = message.data;
+fragment.appendChild(newElement);
+
+// Replace existing content
+container.innerHTML = ''; // Clear existing content
+container.appendChild(fragment); // Add new content
+
 });
     
