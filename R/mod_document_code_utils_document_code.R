@@ -468,18 +468,14 @@ blend_colors <- function(string_id, code_names) {
 make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL) {
         # Check if a code_id is assigned
         code_assigned <- isTruthy(code_id)
-        
+      
         # Extract the text segment and remove newlines
         text <- substr(raw_text, segment_start, segment_end)
         text <- stringr::str_replace_all(text, "\n|\r", "")
 
-        # Return NULL if the text is empty
-        # TODO - check if this condition is still needed
-        if (nchar(text) < 1 && !code_assigned) {
-            return(NULL)
-        } else {
+     
             # Create a span element with attributes and data
-            htmltools::span(
+        htmltools::span(
                 text,
                 title = if (code_assigned) code_name else NULL,
                 class = if (code_assigned) "segment segment-coded" else NULL,
@@ -488,7 +484,7 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
                 `data-codes` = if (code_assigned) paste(code_id) else NULL,
                 .noWS = "outside"
             ) 
-        }
+        
     }
 
 

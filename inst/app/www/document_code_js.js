@@ -139,3 +139,29 @@ $(document).ready(function() {
 });
 
 
+function updateParagraphContent(message) {
+
+  // Locate the paragraph using the par_id
+  console.log(1)
+  console.log(data)
+  const paragraph = document.querySelector(`#${data.par_id}`);
+
+  if (paragraph) {
+    // Replace the content of the paragraph based on the provided data
+    // Example: You might want to update the text or other attributes
+    paragraph.textContent = `Updated content for ${data.par_id}`;
+  }
+}
+
+
+
+Shiny.addCustomMessageHandler('clearContent', function(message) {
+  let par = document.getElementById(message.id);
+  par.innerHTML = '';
+});
+
+Shiny.addCustomMessageHandler('updateParagraphContent', function(message) {
+      let par = document.getElementById(message.id);
+      par.innerHTML = message.data;
+});
+    

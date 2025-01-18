@@ -237,6 +237,7 @@ mod_document_code_server <- function(id, glob) {
 
     # Displayed text observer ----
     observeEvent(req(loc$text_observer), {
+      #browser()
       req(loc$text_observer > 0) # ignore init value
       session$sendCustomMessage('clearArticle', list())
       # define text values that may be useful outside of this observer
@@ -263,7 +264,26 @@ mod_document_code_server <- function(id, glob) {
                   )
               ) 
           }
-              
+      
+
+        test <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {
+         
+         paste0(
+            '<p id ="',
+            par_id,
+            '" class = "docpar" data-startend',
+            segment_start,
+            '-',
+            segment_end,
+            '>',
+            gsub("\n", "", htmltools::htmlEscape(substr(loc$raw_text, segment_start, segment_end))),
+            '<span class = "br">&#8203</span></p>')
+        })
+
+        
+
+          session$sendCustomMessage("appendParagraph", list(html = as.character(paste(test, collapse = ""))))
+
       text_data <- load_doc_to_display(
           glob$pool,
           glob$active_project,
@@ -274,38 +294,28 @@ mod_document_code_server <- function(id, glob) {
           loc$codebook,
           highlight = loc$highlight,
           ns = NS(id)
-        )
+        ) |> 
+        dplyr::filter(!all(is.na(code_id)), .by = par_id)
 
         par_ids <- unique(text_data$par_id)
-        #par_chunks <- chunks <- split(par_ids, ceiling(seq_along(par_ids) / 100))
-      
-        purrr::walk(par_ids, .f = function(x) {
-          
-           par <- text_data |> dplyr::filter(par_id == x) |> 
-                  dplyr::mutate(text = purrr::pmap(
-            list(segment_start, segment_end, highlight_id, segment_id, code_id, code_name, code_color, loc$raw_text, loc$highlight),
-            make_span
-        )) %>% 
-        dplyr::summarise(text = list(htmltools::p(text, 
-                    id = unique(par_id), 
-                    class = "docpar",
-                    `data-startend` = paste(min(segment_start), max(segment_end), sep = " "),
-                    span(HTML("&#8203"), class = "br", .noWS = "outside"), 
-                    .noWS = "outside")), 
-                .by = "par_id")
-        
-      
-    html_string <- as.character(par$text[[1]])
-    # Send the HTML string to the client
-            session$sendCustomMessage("appendParagraph", list(html = html_string))
-            session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
-        })
-        # Add empty span:
-        # patch for non-highlighted segments (single row docs, or last par of docs)
-        # this triggers highlightSegments
-        # can be removed if ever debugged or the displayed text generating system improves
-        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
+                purrr::walk(par_ids, .f = function(x) {
+         
+           par <- text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
+           spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text) 
+            
+             session$sendCustomMessage("clearContent", list(id = x))
+            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
+            session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
+                })
+                            session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
+
+    #     # Add empty span:
+    #     # patch for non-highlighted segments (single row docs, or last par of docs)
+    #     # this triggers highlightSegments
+    #     # can be removed if ever debugged or the displayed text generating system improves
+    #     session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
 
     })
   
