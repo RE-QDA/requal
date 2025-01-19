@@ -303,18 +303,16 @@ mod_document_code_server <- function(id, glob) {
          
            par <- text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
            spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text) 
-            
             # session$sendCustomMessage("clearContent", list(id = x))
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
             session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
             session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
                 })
-       #  session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
-    #     # Add empty span:
-    #     # patch for non-highlighted segments (single row docs, or last par of docs)
-    #     # this triggers highlightSegments
-        # can be removed if ever debugged or the displayed text generating system improves
+       # Add empty span:
+       # patch for non-highlighted segments (single row docs, or last par of docs)
+       # this triggers highlightSegments
+       # can be removed if ever debugged or the displayed text generating system improves
         session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
 
     })
@@ -349,21 +347,38 @@ mod_document_code_server <- function(id, glob) {
           startOff,
           endOff
         )
-        # browser()
-        # TODO JS implementation of coding
-        #     code_info <- glob$codebook |>
-        #      dplyr::filter(code_id == input$selected_code)
+        
+        
+        par_coded <- loc$paragraphs |> 
+        dplyr::filter(startOff >= segment_start, endOff <= segment_end) 
 
-        # session$sendCustomMessage(type = 'AddCode', message = list(
-        # startOffset = startOff, 
-        # endOffset = endOff,
-        # newId = input$selected_code,
-        # color = code_info$code_color,
-        # title = code_info$code_name
-        # ))
-        # session$sendCustomMessage("highlightSegments", message = list(ids = "article", styleType = loc$highlight))
 
-        loc$text_observer <- loc$text_observer + 1
+          local_text_data <- load_doc_to_display(
+          glob$pool,
+          glob$active_project,
+          user = glob$user,
+          doc_selector = input$doc_selector,
+          raw_text = loc$raw_text,
+          paragraphs = par_coded,
+          loc$codebook,
+          highlight = loc$highlight,
+          ns = NS(id)
+        ) |> 
+        dplyr::filter(segment_start >= min(par_coded$segment_start), segment_end <= max(par_coded$segment_end))
+
+         par_ids_local <- unique(local_text_data$par_id)
+
+                purrr::walk(par_ids_local, .f = function(x) {
+         
+           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
+           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text) 
+            # session$sendCustomMessage("clearContent", list(id = x))
+            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
+            session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
+                })
+        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
+
         glob$segments_observer <- glob$segments_observer + 1
       }
     })

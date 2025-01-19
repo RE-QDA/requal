@@ -315,9 +315,7 @@ load_doc_to_display <- function(pool,
                                        active_project,
                                        user,
                                        doc_selector) 
-
    
-    
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
            paragraphs %>% 
