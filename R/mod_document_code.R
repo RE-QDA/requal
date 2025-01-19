@@ -117,6 +117,20 @@ mod_document_code_ui <- function(id) {
 #' @noRd
 mod_document_code_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
+
+    # DEVNOTE
+    # At this point, it is very messy, but a more suistainable pattern of building html
+    # is implemented in text display rendering and it has been partially done
+    # for coding actions too. It needs still lot of cleaning and can be optimized
+    # the same system needs to be implemented for code deletion
+    # I now use JS for highlighting but it will be better to return to css, which
+    # means also restoring the old way of calculating overlapping colors
+    # th calculation of overlaps seems more or less ok - though it could be improved
+    # unless outright bugs are found, we can live with for some time
+    # btw, wrapping things in functions can make it more easily maintainable...
+    # it seems a simple wrap suffices 
+    # file with JS will also require some clean up
+
     ns <- session$ns
     loc <- reactiveValues()
     loc$highlight <- "background"
