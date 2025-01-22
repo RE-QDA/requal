@@ -316,7 +316,7 @@ mod_document_code_server <- function(id, glob) {
                 purrr::walk(par_ids, .f = function(x) {
          
            par <- text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
-           spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text) 
+           spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
             # session$sendCustomMessage("clearContent", list(id = x))
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
             session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))

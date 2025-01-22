@@ -450,17 +450,22 @@ blend_codes <- function(string_id, code_names_df) {
     
 }
 
+# Color helper for overlaying codes ----
 blend_colors <- function(string_id, code_names) {
-    
-    ids <- unlist(strsplit(string_id, split = "\\-"))
-    
+    ids <- unlist(strsplit(string_id, split = "\\+"))
     colors_multiple <- code_names %>%
         dplyr::filter(code_id %in% ids) %>%
         dplyr::pull(code_color)
-    
-    paste(colors_multiple, collapse = " | ")
-    
-}
+    color_mean <- colors_multiple %>%
+        stringr::str_extract_all("\\d+") %>%
+        purrr::map(as.numeric) %>%
+        as.data.frame() %>%
+        rowMeans() %>%
+        round()
+    color_mean_string <- paste0(color_mean, collapse = ",")
+    paste0("rgb(", color_mean_string, ")")
+    }
+
 
 # make span  ----
 make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL) {
@@ -470,14 +475,14 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
         # Extract the text segment and remove newlines
         text <- substr(raw_text, segment_start, segment_end)
         text <- stringr::str_replace_all(text, "\n|\r", "")
-
+        segment_class <- class <- paste("segment segment-code", highlight) # can add memo class when the time comes
      
             # Create a span element with attributes and data
         htmltools::span(
                 text,
                 title = if (code_assigned) code_name else NULL,
-                class = if (code_assigned) "segment segment-coded" else NULL,
-                `data-color` = if (code_assigned) code_color else NULL,
+                class = if (code_assigned) segment_class else NULL,
+                style = if (code_assigned) paste("--highlight-color:", code_color) else NULL,
                 `data-startend` = paste(segment_start, segment_end),
                 `data-codes` = if (code_assigned) paste(code_id) else NULL,
                 .noWS = "outside"

@@ -1,47 +1,47 @@
-$(document).ready(function() {
-  Shiny.addCustomMessageHandler('highlightSegments', function(message) {
-    const processSegments = (elements, styleType) => {
-      elements.forEach(segment_coded => {
-        const colors = segment_coded.getAttribute('data-color').split(' | ');
-        const color = averageColor(colors);
-        // console.log('Style Type:', styleType);
-        // console.log('Colors:', colors);
-        // console.log('Computed Color:', color);
+// $(document).ready(function() {
+//   Shiny.addCustomMessageHandler('highlightSegments', function(message) {
+//     const processSegments = (elements, styleType) => {
+//       elements.forEach(segment_coded => {
+//         const colors = segment_coded.getAttribute('data-color').split(' | ');
+//         const color = averageColor(colors);
+//         // console.log('Style Type:', styleType);
+//         // console.log('Colors:', colors);
+//         // console.log('Computed Color:', color);
 
-        if (styleType === 'underline') {
-          segment_coded.style.textDecoration = `underline ${color}`;
-          segment_coded.style.backgroundColor = ''; // Clear background if previously set
-        } else {
-          segment_coded.style.backgroundColor = color;
-          segment_coded.style.textDecoration = ''; // Clear underline if previously set
-        }
-      });
-    };
+//         if (styleType === 'underline') {
+//           segment_coded.style.textDecoration = `underline ${color}`;
+//           segment_coded.style.backgroundColor = ''; // Clear background if previously set
+//         } else {
+//           segment_coded.style.backgroundColor = color;
+//           segment_coded.style.textDecoration = ''; // Clear underline if previously set
+//         }
+//       });
+//     };
 
-    const ids = Array.isArray(message.ids) ? message.ids : [message.ids]; // Ensure ids is an array
+//     const ids = Array.isArray(message.ids) ? message.ids : [message.ids]; // Ensure ids is an array
 
-    const targetNode = document.getElementById("article");
+//     const targetNode = document.getElementById("article");
 
-    const observer = new MutationObserver((mutationsList, observer) => {
-      ids.forEach(id => {
-        const container = document.getElementById(id);
-        if (container) {
-          const segments = container.querySelectorAll('.segment-coded');
-          if (segments.length > 0) {
-            // console.log(`Segments found in #${id}:`, segments.length);
-            processSegments(segments, message.styleType || 'background');
-            observer.disconnect(); // Stop observing once the elements are processed
-          }
-        } else {
-          console.log(`Container with ID #${id} not found.`);
-        }
-      });
-    });
+//     const observer = new MutationObserver((mutationsList, observer) => {
+//       ids.forEach(id => {
+//         const container = document.getElementById(id);
+//         if (container) {
+//           const segments = container.querySelectorAll('.segment-coded');
+//           if (segments.length > 0) {
+//             // console.log(`Segments found in #${id}:`, segments.length);
+//             processSegments(segments, message.styleType || 'background');
+//             observer.disconnect(); // Stop observing once the elements are processed
+//           }
+//         } else {
+//           console.log(`Container with ID #${id} not found.`);
+//         }
+//       });
+//     });
 
-    // Start observing the document body for changes
-    observer.observe(targetNode, { childList: true, attributes: true, subtree: true });
-  });
-});
+//     // Start observing the document body for changes
+//     observer.observe(targetNode, { childList: true, attributes: true, subtree: true });
+//   });
+// });
 
 function averageColor(colors) {
   const rgbColors = colors.map(color => {

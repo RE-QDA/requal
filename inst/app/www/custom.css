@@ -90,11 +90,6 @@ p.docpar::before {
   width: 0px;
 }
 
-span.segment {
-  text-decoration-thickness: 5px !important; 
-  text-underline-offset: 3px !important;
-}
-
 .category-rank-list {
 -webkit-border-radius: 1px;
 border-radius: 1px;
@@ -266,4 +261,16 @@ display: flex;
 }
 .coding-toolbox-button:focus:not(:hover) {
   background: transparent; 
+}
+
+/* Styles for in-text highlights */
+
+.segment-code.background {
+  background-color: var(--highlight-color); /* Fallback to white */
+}
+
+.segment-code.underline {
+  text-decoration-color: var(--highlight-color);
+  text-decoration-thickness: 5px !important; 
+  text-underline-offset: 3px !important;
 }
