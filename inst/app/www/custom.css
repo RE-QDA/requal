@@ -72,6 +72,8 @@ p.docpar {
   margin: 0px 0px 5px 0px;
   position: relative;
   counter-increment: paragraph; /* Increment the counter for each paragraph */
+  font-size: 110%; 
+  line-height: 1.5;
 }
 p.docpar::before {
   content: counter(paragraph); /* Display the current counter value */
@@ -265,12 +267,13 @@ display: flex;
 
 /* Styles for in-text highlights */
 
-.segment-code.background {
-  background-color: var(--highlight-color); /* Fallback to white */
+.background {
+  background-color: var(--code-color); 
 }
 
-.segment-code.underline {
-  text-decoration-color: var(--highlight-color);
+.underline {
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
   text-decoration-thickness: 5px !important; 
-  text-underline-offset: 3px !important;
+  text-underline-offset: 4px !important;
 }

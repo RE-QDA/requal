@@ -469,24 +469,22 @@ blend_colors <- function(string_id, code_names) {
 
 # make span  ----
 make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL) {
+        
+        # Extract the text segment and remove newlines
+        span_text <- substr(raw_text, segment_start, segment_end)
+        span_text <- stringr::str_replace_all(span_text, "\n|\r", "")
         # Check if a code_id is assigned
         code_assigned <- isTruthy(code_id)
-      
-        # Extract the text segment and remove newlines
-        text <- substr(raw_text, segment_start, segment_end)
-        text <- stringr::str_replace_all(text, "\n|\r", "")
-        segment_class <- class <- paste("segment segment-code", highlight) # can add memo class when the time comes
-     
-            # Create a span element with attributes and data
+        # Create a span element with attributes and data
         htmltools::span(
-                text,
-                title = if (code_assigned) code_name else NULL,
-                class = if (code_assigned) segment_class else NULL,
-                style = if (code_assigned) paste("--highlight-color:", code_color) else NULL,
-                `data-startend` = paste(segment_start, segment_end),
-                `data-codes` = if (code_assigned) paste(code_id) else NULL,
-                .noWS = "outside"
-            ) 
+            span_text,
+            title = if (code_assigned) code_name else NULL,
+            class = if (code_assigned) paste("segment segment-code", highlight) else NULL,
+            style = if (code_assigned) paste("--code-color:", code_color) else NULL,
+            `data-startend` = paste(segment_start, segment_end),
+            `data-codes` = if (code_assigned) paste(code_id) else NULL,
+            .noWS = "outside"
+        )
         
     }
 

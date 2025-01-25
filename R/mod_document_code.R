@@ -148,10 +148,23 @@ mod_document_code_server <- function(id, glob) {
       showNotification(input$clicked_title)
     })
     ## Observe choice of highlight style ----
+    values <- c("background", "underline", "none")
     observeEvent(input$toggle_style, {
-      loc$highlight <- ifelse(loc$highlight == "underline", "background", "underline")
-      # Send a message to the client to toggle the style
-      session$sendCustomMessage("toggleStyle", message = loc$highlight)
+      # Find the current index of the highlight style
+      current_style_index <- match(loc$highlight, values)
+      new_style_index <- (current_style_index %% length(values)) + 1
+      # Update loc$highlight with the new style
+      loc$highlight  <- values[new_style_index]
+        # Send a message to the client to toggle the style
+      #session$sendCustomMessage("toggleStyle", message = loc$highlight)
+      if (loc$highlight == "background") {
+        shinyjs::addClass(class = "background", selector = ".segment-code")
+      } else if (loc$highlight == "underline") {
+         shinyjs::removeClass(class = "background", selector = ".segment-code")
+         shinyjs::addClass(class = "underline", selector = ".segment-code")
+      } else {
+        shinyjs::removeClass(class = "underline", selector = ".segment-code")
+      }
     })
     ## Observe advanced toolbox display ----
     observeEvent(input$btn_code_toolbox, {
