@@ -92,6 +92,20 @@ Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   iframe.src = iframe.src;
 });
 
+Shiny.addCustomMessageHandler('toggle_icon_angles', function(message) {
+    console.log(message)
+    let btn = document.getElementById(message.id);
+    console.log(message.id)
+    console.log(btn)
+    let icon = btn.querySelector('i');
+    if (icon.classList.contains('fa-angles-up')) {
+        icon.classList.remove('fa-angles-up');
+        icon.classList.add('fa-angles-down');
+    } else {
+        icon.classList.remove('fa-angles-down');
+        icon.classList.add('fa-angles-up');
+    }
+});
 
 // Functions for scrolling
 // TODO
