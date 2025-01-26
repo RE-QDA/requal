@@ -136,7 +136,7 @@ mod_document_code_server <- function(id, glob) {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
     loc$text_observer <- 0
-    loc$scroll <- 0
+    golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', message = list())
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
@@ -226,14 +226,12 @@ mod_document_code_server <- function(id, glob) {
   ## Observe Analyze screen ----
   # Listen to message from Analyze screen
   observeEvent(glob$analyze_link, {
-  updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = glob$analyze_link$doc_id)
-  loc$codes_menu_observer  <- loc$codes_menu_observer + 1
-  loc$text_observer <- loc$text_observer + 1
-  loc$scroll <- loc$scroll + 1
-  })
-  observeEvent(loc$scroll , {
-      req(isTruthy(loc$scroll))
-      session$sendCustomMessage(type = 'scrollToSegment', message = glob$analyze_link$segment_start)
+    if (input$doc_selector != glob$analyze_link$doc_id) {
+      updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = glob$analyze_link$doc_id)
+      #loc$codes_menu_observer  <- loc$codes_menu_observer + 1
+      loc$text_observer <- loc$text_observer + 1
+    }
+  golem::invoke_js('scrollToSegment', list(target_start = glob$analyze_link$segment_start))
   })
 
     # Render codes ----
@@ -246,7 +244,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(loc$text_observer), {
       #browser()
       req(loc$text_observer > 0) # ignore init value
-      session$sendCustomMessage('clearArticle', list())
+      golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
       loc$total_chars <- nchar(loc$raw_text)
