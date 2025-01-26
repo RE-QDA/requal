@@ -92,20 +92,7 @@ Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   iframe.src = iframe.src;
 });
 
-Shiny.addCustomMessageHandler('toggle_icon_angles', function(message) {
-    console.log(message)
-    let btn = document.getElementById(message.id);
-    console.log(message.id)
-    console.log(btn)
-    let icon = btn.querySelector('i');
-    if (icon.classList.contains('fa-angles-up')) {
-        icon.classList.remove('fa-angles-up');
-        icon.classList.add('fa-angles-down');
-    } else {
-        icon.classList.remove('fa-angles-down');
-        icon.classList.add('fa-angles-up');
-    }
-});
+
 
 // Functions for scrolling
 // TODO
@@ -151,22 +138,6 @@ $(document).ready(function() {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 });
-
-
-function updateParagraphContent(message) {
-
-  // Locate the paragraph using the par_id
-  console.log(1)
-  console.log(data)
-  const paragraph = document.querySelector(`#${data.par_id}`);
-
-  if (paragraph) {
-    // Replace the content of the paragraph based on the provided data
-    // Example: You might want to update the text or other attributes
-    paragraph.textContent = `Updated content for ${data.par_id}`;
-  }
-}
-
 
 
 Shiny.addCustomMessageHandler('clearContent', function(message) {

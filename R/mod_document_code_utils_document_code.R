@@ -327,12 +327,13 @@ load_doc_to_display <- function(pool,
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
 
-    distinct_code_ids <- as.character(
-        unique(spans_data %>% dplyr::pull(code_id))
-        )
-        
+    distinct_code_ids <- spans_data %>% 
+            na.omit() %>%  
+            dplyr::pull(code_id) %>% 
+            unique()
+      
     code_names_lookup <- tibble::tibble(
-        code_id =distinct_code_ids,
+        code_id = distinct_code_ids,
         code_name = sapply(distinct_code_ids,
                           blend_codes,
                           code_names),
@@ -370,7 +371,6 @@ load_segment_codes_db <- function(pool,
         dplyr::filter(dplyr::between(marked_codes,
                                      .data$segment_start,
                                      .data$segment_end)) %>%
-        dplyr::select(code_id, code_name, segment_id, user_id) %>%
         dplyr::collect() 
     
     if(!is.null(user_id)){
@@ -378,8 +378,7 @@ load_segment_codes_db <- function(pool,
             dplyr::filter(.data$user_id == as.integer(.env$user_id))
     }
     
-    segment_codes_df %>% 
-        dplyr::select(code_id, code_name, segment_id)
+    segment_codes_df 
 }
 
 # Parse tag position -----------
@@ -452,7 +451,7 @@ blend_codes <- function(string_id, code_names_df) {
 
 # Color helper for overlaying codes ----
 blend_colors <- function(string_id, code_names) {
-    ids <- unlist(strsplit(string_id, split = "\\+"))
+    ids <- unlist(strsplit(string_id, split = "\\-"))
     colors_multiple <- code_names %>%
         dplyr::filter(code_id %in% ids) %>%
         dplyr::pull(code_color)

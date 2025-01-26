@@ -60,6 +60,8 @@ white-space: nowrap;
 vertical-align: baseline;
 border-radius: .25em;
 background-color: white;
+max-width: 50%;
+text-wrap: wrap;
 }
 
 article {
@@ -120,6 +122,10 @@ margin-top: 2px !important;
 margin-left: 0px !important; 
 margin-right: 0px !important; 
 margin-bottom: 5px !important; 
+}
+
+.box .box-title {
+  padding-right: 70px;
 }
 
 .memo ul {
@@ -245,8 +251,8 @@ display: flex;
   margin-right: 0px;
 }
 
-/* Styles for advanced coding tools */
-.coding-toolbox-button {
+/* Styles for advanced toolbox */
+.toolbox-button {
   width: 100%;
   height: 20px;
   background: transparent;
@@ -257,11 +263,11 @@ display: flex;
   font-size:10px;
   margin-bottom: 5px;
 }
-.coding-toolbox-button:hover,
-.coding-toolbox-button:focus {
+.toolbox-button:hover,
+.toolbox-button:focus {
   background: #ccccc333;
 }
-.coding-toolbox-button:focus:not(:hover) {
+.toolbox-button:focus:not(:hover) {
   background: transparent; 
 }
 

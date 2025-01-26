@@ -25,8 +25,8 @@ mod_document_code_ui <- function(id) {
   });
 ")),
   tags$script(HTML("
-    Shiny.addCustomMessageHandler('appendParagraph', function(message) {
-      var article = document.getElementById('article');
+    Shiny.addCustomMessageHandler('appendContent', function(message) {
+      var article = document.getElementById(message.id);
       article.insertAdjacentHTML('beforeend', message.html);
     });
   ")),
@@ -70,35 +70,29 @@ mod_document_code_ui <- function(id) {
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
           tags$b("Codes"),
           br(),
-          shinyjs::hidden(div(id = ns("code_toolbox"),
-          div(
-                style = "display: flex; justify-content: flex-end; align-items: center;",
-                actionButton(
-                          ns("code_columns"),
-                          label = "",
-                          icon = icon("table-columns"),
-                          title = "Code columns"
-                        ),
-                actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
-              ),
-             div(
-            style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
-            tags$div(
-              style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
-              tags$iframe(
-                src = "www/quickcode.html",
-                style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
+          mod_rql_hidden_ui_ui(ns("rql_hidden_ui_1"), title = "Toggle coding toolbox", hidden_tags = tagList(
+              div(
+                    style = "display: flex; justify-content: flex-end; align-items: center;",
+                    actionButton(
+                              ns("code_columns"),
+                              label = "",
+                              icon = icon("table-columns"),
+                              title = "Code columns"
+                            ),
+                    actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
+                  ),
+                div(
+                style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
+                tags$div(
+                  style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
+                  tags$iframe(
+                    src = "www/quickcode.html",
+                    style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
+                  )
+                ),
+                actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
               )
-            ),
-            actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
-          )
-              )),
-         actionButton(
-            ns("btn_code_toolbox"),
-            shiny::icon("angle-double-down"),
-            title = "Toggle coding toolbox",
-            class = "coding-toolbox-button"
-          ),
+          )),
           actionButton(
             ns("remove_codes"),
             "Remove code",
@@ -141,7 +135,7 @@ mod_document_code_server <- function(id, glob) {
     loc$text_observer <- 0
     loc$scroll <- 0
     })
-
+    mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
     ## Observe click on coded text ----
     observeEvent(input$clicked_title, {
@@ -151,11 +145,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$toggle_style, {
       toggle_style_LF()
     })
-    ## Observe advanced toolbox display ----
-    observeEvent(input$btn_code_toolbox, {
-      golem::invoke_js("toggle_icon_angles", list(id = ns("btn_code_toolbox")))
-      shinyjs::toggle(id = "code_toolbox", anim = TRUE, animType = "slide")
-    })
+  
 
     ## Observe changes in documents
     observeEvent(glob$documents, {
@@ -279,7 +269,7 @@ mod_document_code_server <- function(id, glob) {
           }
       
 
-        test <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {
+        text_plain <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {
          
          paste0(
             '<p id ="',
@@ -295,7 +285,7 @@ mod_document_code_server <- function(id, glob) {
 
         
 
-          session$sendCustomMessage("appendParagraph", list(html = as.character(paste(test, collapse = ""))))
+          golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
 
       text_data <- load_doc_to_display(
           glob$pool,
@@ -312,21 +302,13 @@ mod_document_code_server <- function(id, glob) {
 
         par_ids <- unique(text_data$par_id)
 
-                purrr::walk(par_ids, .f = function(x) {
+                purrr::walk(par_ids, .f = function(x_par) {
          
-           par <- text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
+           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-span_id, -par_id)
            spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-            # session$sendCustomMessage("clearContent", list(id = x))
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
-            session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
+            session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
                 })
-
-       # Add empty span:
-       # patch for non-highlighted segments (single row docs, or last par of docs)
-       # this triggers highlightSegments
-       # can be removed if ever debugged or the displayed text generating system improves
-        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
 
     })
   
@@ -362,35 +344,10 @@ mod_document_code_server <- function(id, glob) {
         )
         
         
-        par_coded <- loc$paragraphs |> 
-        dplyr::filter(startOff >= segment_start, endOff <= segment_end) 
+        loc$par_coded <- loc$paragraphs |> 
+        dplyr::filter(segment_start < endOff,  segment_end > startOff) 
 
-
-          local_text_data <- load_doc_to_display(
-          glob$pool,
-          glob$active_project,
-          user = glob$user,
-          doc_selector = input$doc_selector,
-          raw_text = loc$raw_text,
-          paragraphs = par_coded,
-          loc$codebook,
-          highlight = loc$highlight,
-          ns = NS(id)
-        ) |> 
-        dplyr::filter(segment_start >= min(par_coded$segment_start), segment_end <= max(par_coded$segment_end))
-
-         par_ids_local <- unique(local_text_data$par_id)
-
-                purrr::walk(par_ids_local, .f = function(x) {
-         
-           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
-           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text) 
-            # session$sendCustomMessage("clearContent", list(id = x))
-            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
-            session$sendCustomMessage("highlightSegments", message = list(ids = x, styleType = loc$highlight))
-                })
-        session$sendCustomMessage("appendParagraph", list(html = "<span></span>")) 
+        edit_paragraphs_LF()
 
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -450,7 +407,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$remove_codes, {
       req(glob$active_project)
       req(input$doc_selector)
-
+     
       if (glob$user$data$annotation_other_modify == 0) {
         loc$marked_segments_df <- load_segment_codes_db(
           glob$pool,
@@ -486,7 +443,11 @@ mod_document_code_server <- function(id, glob) {
           segment_id = loc$marked_segments_df$segment_id
         )
         # Refresh text
-        loc$text_observer <- loc$text_observer + 1
+        
+       loc$par_coded <- loc$paragraphs |> 
+        dplyr::filter(segment_start < max(loc$marked_segments_df$segment_end),  segment_end > min(loc$marked_segments_df$segment_start))
+
+        edit_paragraphs_LF()
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
       } else {
@@ -528,7 +489,11 @@ mod_document_code_server <- function(id, glob) {
         removeModal()
 
         # Refresh text
-        loc$text_observer <- loc$text_observer + 1
+        
+       loc$par_coded <- loc$paragraphs |> 
+        dplyr::filter(segment_start < max(loc$marked_segments_df$segment_end),  segment_end > min(loc$marked_segments_df$segment_start))
+
+        edit_paragraphs_LF()
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -559,12 +524,40 @@ mod_document_code_server <- function(id, glob) {
       #session$sendCustomMessage("toggleStyle", message = loc$highlight)
       if (loc$highlight == "background") {
         shinyjs::addClass(class = "background", selector = ".segment-code")
+        rql_message("Segment style: Highlight")
       } else if (loc$highlight == "underline") {
          shinyjs::removeClass(class = "background", selector = ".segment-code")
          shinyjs::addClass(class = "underline", selector = ".segment-code")
+         rql_message("Segment style: Underline")
       } else {
         shinyjs::removeClass(class = "underline", selector = ".segment-code")
+        rql_message("Segment style: None")
       }
+    }
+
+    edit_paragraphs_LF <- function() {
+                local_text_data <- load_doc_to_display(
+          glob$pool,
+          glob$active_project,
+          user = glob$user,
+          doc_selector = input$doc_selector,
+          raw_text = loc$raw_text,
+          paragraphs = loc$par_coded,
+          loc$codebook,
+          highlight = loc$highlight,
+          ns = NS(id)
+        ) |> 
+        dplyr::filter(segment_start >= min(loc$par_coded$segment_start), segment_end <= max(loc$par_coded$segment_end))
+
+         par_ids_local <- unique(local_text_data$par_id)
+
+                purrr::walk(par_ids_local, .f = function(x) {
+         
+           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
+           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
+            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
+                })
     }
 
     # returns glob$segments_observer and glob$codebook
