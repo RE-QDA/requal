@@ -219,6 +219,54 @@ write_segment_db <- function(
     
 }
 
+write_memo_segment_db <- function(
+        pool, 
+        active_project,
+        user_id,
+        doc_id,
+        code_id,
+        startOff,
+        endOff
+) {
+    
+            segment_df <- data.frame(project_id = active_project,
+                                 user_id = user_id,
+                                 doc_id = doc_id,
+                                 code_id = code_id,
+                                 segment_start = startOff,
+                                 segment_end = endOff,
+                                 segment_text = get_segment_text(pool, 
+                                                                 project_id = active_project,
+                                                                 doc_id,
+                                                                 startOff,
+                                                                 endOff)
+            )
+        
+        res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE, row.names = FALSE)
+    
+    
+    if(res){
+        written_segment_id <- dplyr::tbl(pool, "segments") %>% 
+            dplyr::filter(.data$project_id == !!segment_df$project_id, 
+                          .data$doc_id == !!segment_df$doc_id, 
+                           is.na(.data$code_id), 
+                          .data$segment_start == !!segment_df$segment_start, 
+                          .data$segment_end == !!segment_df$segment_end, 
+                          .data$user_id == !!segment_df$user_id) %>% 
+            dplyr::pull(segment_id) 
+
+        #TODO edit for memo purposes
+        # log_add_segment_record(pool, project_id = active_project, segment_df %>% 
+        #                            dplyr::mutate(segment_id = written_segment_id), 
+        #                        user_id = user_id)
+    }else{
+        rql_message("Segment memo not added")
+    }
+
+    
+    
+}
+
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(raw_segments, paragraphs) {
 

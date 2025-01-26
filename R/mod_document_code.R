@@ -68,41 +68,60 @@ mod_document_code_ui <- function(id) {
         tags$div(
           id = "split-2",
           style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
-          tags$b("Codes"),
-          br(),
-          mod_rql_hidden_ui_ui(ns("rql_hidden_ui_1"), title = "Toggle coding toolbox", hidden_tags = tagList(
-              div(
-                    style = "display: flex; justify-content: flex-end; align-items: center;",
-                    actionButton(
-                              ns("code_columns"),
-                              label = "",
-                              icon = icon("table-columns"),
-                              title = "Code columns"
-                            ),
-                    actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
-                  ),
-                div(
-                style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
-                actionButton(ns("clear_iframe"), "", icon = icon("x"), title = "Clear form",
-                    style = "height: calc(1.5em + .75rem + 10px); margin-right: 0px; padding-right: 5px; padding-left: 5px; border: none; background: transparent;"),
-                tags$div(
-                  style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
-                  tags$iframe(
-                    src = "www/quickcode.html",
-                    style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
-                  )
+          tabsetPanel(
+            type = "tabs",
+            id = ns("documentcode_tabset"),
+            # Codes panel ----
+            tabPanel("Codes",
+              id = ns("codetools_tabset"),
+              value = "codetools_tabset",
+                br(),
+                mod_rql_hidden_ui_ui(ns("rql_hidden_ui_1"), title = "Toggle coding toolbox", hidden_tags = tagList(
+                    div(
+                          style = "display: flex; justify-content: flex-end; align-items: center;",
+                          actionButton(
+                                    ns("code_columns"),
+                                    label = "",
+                                    icon = icon("table-columns"),
+                                    title = "Code columns"
+                                  ),
+                          actionButton(ns("toggle_style"), label = "", icon = icon("highlighter"), title = "Highlight style"),
+                        ),
+                      div(
+                      style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
+                      actionButton(ns("clear_iframe"), "", icon = icon("x"), title = "Clear form",
+                          style = "height: calc(1.5em + .75rem + 10px); margin-right: 0px; padding-right: 5px; padding-left: 5px; border: none; background: transparent;"),
+                      tags$div(
+                        style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
+                        tags$iframe(
+                          src = "www/quickcode.html",
+                          style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
+                        )
+                      ),
+                      actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), title = "Apply new code to selection",
+                        style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+                    )
+                )),
+                actionButton(
+                  ns("remove_codes"),
+                  "Remove code",
+                  class = "btn-danger",
+                  width = "100%"
                 ),
-                actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), title = "Apply new code to selection",
-                  style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+                uiOutput(ns("code_list"))  %>% tagAppendAttributes(class = "scrollable80")
+              ),
+              # Memos panel ----
+              tabPanel("Memos",
+              id = ns("memotools_tabset"),
+              value = "memotools_tabset",
+                br(),
+                actionButton(
+                  ns("add_segment_memo"),
+                  "Add segment memo",
+                  width = "100%"
+                ),
               )
-          )),
-          actionButton(
-            ns("remove_codes"),
-            "Remove code",
-            class = "btn-danger",
-            width = "100%"
-          ),
-          uiOutput(ns("code_list"))  %>% tagAppendAttributes(class = "scrollable80")
+          )
         )
       )
     )
@@ -501,6 +520,33 @@ mod_document_code_server <- function(id, glob) {
         edit_paragraphs_LF()
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
+      }
+    })
+    
+    # Memo tools ----
+    observeEvent(input$add_segment_memo, {
+      print("here")
+      browser()
+      startOff <- parse_tag_pos(req(input$tag_position), "start")
+      endOff <- parse_tag_pos(req(input$tag_position), "end")
+
+      if (endOff >= startOff) {
+       new_segment_id <- write_memo_segment_db(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = input$doc_selector,
+          code_id = NA,
+          startOff,
+          endOff
+        )
+      new_memo_id  <- add_memo_record(
+        pool = glob$pool,
+        project = glob$active_project,
+        text = req(input$memo_text),
+        user_id = glob$user$user_id
+      )
+      add_memo_segment_map(...)
       }
     })
 
