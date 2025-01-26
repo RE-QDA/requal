@@ -83,6 +83,8 @@ mod_document_code_ui <- function(id) {
                   ),
                 div(
                 style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
+                actionButton(ns("clear_iframe"), "", icon = icon("x"), title = "Clear form",
+                    style = "height: calc(1.5em + .75rem + 10px); margin-right: 0px; padding-right: 5px; padding-left: 5px; border: none; background: transparent;"),
                 tags$div(
                   style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
                   tags$iframe(
@@ -90,7 +92,8 @@ mod_document_code_ui <- function(id) {
                     style = "height: calc(1.5em + .75rem + 10px); width: 100%; border: none;"
                   )
                 ),
-                actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
+                actionButton(ns("quickcode_btn"), "Quick tag", icon = icon("bolt-lightning"), title = "Apply new code to selection",
+                  style = "height: calc(1.5em + .75rem + 10px); margin-left: 0px;")
               )
           )),
           actionButton(
@@ -134,6 +137,7 @@ mod_document_code_server <- function(id, glob) {
     loc$code_action_observer <- 0
     loc$text_observer <- 0
     loc$scroll <- 0
+    golem::invoke_js('refreshIframe', message = list())
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -197,7 +201,7 @@ mod_document_code_server <- function(id, glob) {
         glob$active_project,
         user = glob$user
       )
-     
+
       code_labels <- purrr::pmap(
           list(
             loc$codebook$code_id,
@@ -354,21 +358,27 @@ mod_document_code_server <- function(id, glob) {
     })
     
     # Quick code tools ----
-    observeEvent(input$quickcode_btn, {
-      
-      # We need a document and selection positions
-      req(input$doc_selector)
-      req(input$tag_position)
-     if (parse_tag_pos(input$tag_position, "start") < parse_tag_pos(input$tag_position, "end")) {
-         session$sendCustomMessage(type = "getIframeContent", message = list())
-         session$sendCustomMessage(type = 'refreshIframe', message = list())
+    observeEvent(input$quickcode, {
+        if (isTruthy(input$quickcode)) {
+        non_matched_codes <- loc$codebook |> 
+        dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
+        dplyr::pull(code_id)
+        purrr::map(non_matched_codes, shinyjs::hide)
+        matched_codes <- loc$codebook$code_id[!loc$codebook$code_id %in% non_matched_codes]
+        purrr::map(matched_codes, shinyjs::show)
       } else {
-         rql_message("Missing selected text segment.")
-      } 
-
+           purrr::map(loc$codebook$code_id, shinyjs::show)
+      }
     })
-    # After quickcode button is pressed, we wait for the quickcode value 
-    observeEvent(req(input$quickcode), {
+    # Clear quick code form
+    observeEvent(input$clear_iframe, {
+        golem::invoke_js('refreshIframe', message = list())
+        # Refresh codes menu
+        purrr::map(loc$codebook$code_id, shinyjs::show)
+    })
+    # After quickcode button is pressed
+    observeEvent(req(input$quickcode_btn), {
+      req(input$doc_selector)
      # check if code name is unique
      if (input$quickcode %in% glob$codebook$code_name) {
         warn_user("Code names must be unique and non-empty.")
@@ -392,14 +402,11 @@ mod_document_code_server <- function(id, glob) {
         loc$codes_menu_observer <- loc$codes_menu_observer + 1
         # Execute coding action
         loc$code_action_observer <- loc$code_action_observer + 1
-        # Refresh text 
-         loc$text_observer <- loc$text_observer + 1
         # Notify codebook screen about new quick code
-        glob$codebook_observer  <- ifelse(
-          !isTruthy(glob$codebook_observer), 
-          0, glob$codebook_observer + 1)
+        glob$codebook_observer  <- ifelse(!isTruthy(glob$codebook_observer), 1, (glob$codebook_observer + 1))
         # Notify user
         rql_message(paste(input$quickcode,"added to codebook."))
+        golem::invoke_js('refreshIframe', message = list())
       } 
     })
 

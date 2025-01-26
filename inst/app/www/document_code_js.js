@@ -84,12 +84,48 @@ Shiny.addCustomMessageHandler('getIframeContent', function(message) {
   var quickodeValue = res.dataset.quickode;
   Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
 });
+$(document).ready(function() {
+  var iframe = document.getElementsByTagName('iframe')[0];
+
+  // Ensure the iframe is loaded before accessing its content
+  iframe.onload = function() {
+    var res = iframe.contentDocument.getElementById('quickCodeInput');
+
+    if (res) {
+      // Define a callback function to execute when mutations are observed
+      var observerCallback = function(mutationsList, observer) {
+        for (var mutation of mutationsList) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-quickode') {
+            var quickodeValue = res.dataset.quickode;
+            Shiny.setInputValue('document_code_ui_1-quickcode', quickodeValue);
+          }
+        }
+      };
+
+      // Create an observer instance linked to the callback function
+      var observer = new MutationObserver(observerCallback);
+
+      // Start observing the target node for configured mutations
+      observer.observe(res, {
+        attributes: true, // Observe attribute changes
+        attributeFilter: ['data-quickode'] // Only observe changes to the 'data-quickode' attribute
+      });
+
+      // Initial setInputValue call to handle the current state
+      var initialQuickodeValue = res.dataset.quickode;
+      Shiny.setInputValue('document_code_ui_1-quickcode', initialQuickodeValue);
+    } else {
+      console.error('Element with id "quickCodeInput" not found in iframe.');
+    }
+  };
+});
 
 // Refresh iframe
 
 Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   var iframe = document.getElementsByTagName('iframe')[0];
   iframe.src = iframe.src;
+  Shiny.setInputValue('document_code_ui_1-quickcode', '');
 });
 
 
