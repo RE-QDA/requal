@@ -12,6 +12,9 @@
     overflow-y:scroll;
     margin-right: 15px;
 }
+.scrollable80#document_code_ui_1-code_list {
+  margin-right: 0px;
+}
 .scrollable90{
     border: none;
     height:90vh;
@@ -264,6 +267,16 @@ display: flex;
 }
 .toolbox-button:focus:not(:hover) {
   background: transparent; 
+}
+
+.code-menu-extra {
+  background: transparent;
+  border: none;
+  position: absolute;
+  margin-left: -30px;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: lightgrey; 
 }
 
 /* Styles for in-text highlights */
