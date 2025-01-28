@@ -14,6 +14,8 @@ __Release notes:__
   - Customize the layout by adjusting the ratio between text and coding tools to suit your workflow.
 - Enhanced Two-Column View and Draggable Code Menu
   - Greater flexibility with additional options for displaying codes in the Annotation screen.
+- Line counter
+  - Track and reference specific locations in your document with the new line counter.
 - Minor Fixes and Updates
 - New Tests
 
