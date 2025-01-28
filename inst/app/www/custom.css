@@ -206,6 +206,7 @@ padding: 0px;
 margin-left: -0.3em;
 margin-right: -0.3em;
 display: flex;
+position: relative;
 }
 
 .docpar::selection {
@@ -273,10 +274,16 @@ display: flex;
   background: transparent;
   border: none;
   position: absolute;
-  margin-left: -30px;
-  padding-left: 4px;
-  padding-right: 4px;
+  margin-left: -21px;
+  padding-left: 8px;
+  padding-right: 8px;
   color: lightgrey; 
+}
+.code-menu-extra:hover {
+  background: transparent;
+}
+.code-menu-extra:click {
+  background: transparent;
 }
 
 /* Styles for in-text highlights */

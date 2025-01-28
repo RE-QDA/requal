@@ -374,7 +374,7 @@ mod_document_code_server <- function(id, glob) {
       }
     })
     
-    # Quick code tools ----
+    ## Quick code tools ----
     observeEvent(input$quickcode, {
         if (isTruthy(input$quickcode)) {
         non_matched_codes <- loc$codebook |> 
@@ -427,6 +427,17 @@ mod_document_code_server <- function(id, glob) {
       } 
     })
 
+    ## Codes extras -----
+    observeEvent(req(input$selected_code_extra), {
+      req(input$doc_selector)
+      removeUI("#code_extra_div")
+      sel <- paste0("#", ns(paste0("more-", input$selected_code_extra)))
+      generate_code_extra_LF(sel)
+    })
+    observeEvent(req(input$close_code_extra_div), {
+      removeUI("#code_extra_div")
+    })
+    
     # Segment removal ----------
     observeEvent(input$remove_codes, {
       req(glob$active_project)
@@ -543,10 +554,14 @@ mod_document_code_server <- function(id, glob) {
       new_memo_id  <- add_memo_record(
         pool = glob$pool,
         project = glob$active_project,
-        text = req(input$memo_text),
+        text = "TODO grab memo text",
         user_id = glob$user$user_id
       )
-      add_memo_segment_map(...)
+      #add_memo_segment_map(...)
+      loc$par_memoed <- loc$paragraphs |> 
+        dplyr::filter(segment_start < endOff,  segment_end > startOff) 
+
+
       }
     })
 
@@ -563,6 +578,7 @@ mod_document_code_server <- function(id, glob) {
     })
 
     # Local functions -------------------
+    ## toggle_style_LF  -------------------
 
     toggle_style_LF <- function() {
       values <- c("background", "underline", "none")
@@ -586,6 +602,7 @@ mod_document_code_server <- function(id, glob) {
       }
     }
 
+    ## edit_paragraphs_LF  -------------------
     edit_paragraphs_LF <- function() {
                 local_text_data <- load_doc_to_display(
           glob$pool,
@@ -609,6 +626,66 @@ mod_document_code_server <- function(id, glob) {
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
             session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
                 })
+    }
+
+
+    ## edit_memos_LF  -------------------
+    edit_memos_LF <- function() {
+                local_text_data <- load_doc_to_display(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user = glob$user,
+          doc_selector = input$doc_selector,
+          raw_text = loc$raw_text,
+          paragraphs = loc$par_memoed,
+          codebook = NULL,
+          highlight = loc$highlight,
+          ns = NS(id)
+        ) |> 
+        dplyr::filter(segment_start >= min(loc$par_memoed$segment_start), segment_end <= max(loc$par_memoed$segment_end))
+         
+        golem::invoke_js("wrapText", list(paragraphId = "my_paragraph", start = startOff, end = endOff))
+
+         par_ids_local <- unique(local_text_data$par_id)
+
+                purrr::walk(par_ids_local, .f = function(x) {
+         
+           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
+           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
+            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
+                })
+    }
+
+    ## generate_code_extra_LF  -------------------
+    generate_code_extra_LF <- function(sel) {
+      doc_group <- NULL
+      selected_code_extra <- as.integer(input$selected_code_extra)
+      active_project <- as.integer(glob$active_project)
+      active_doc <- as.integer(input$doc_selector)
+      code_info <- glob$codebook  |> dplyr::filter(
+        code_id == selected_code_extra
+      )
+      segments_info <- dplyr::tbl(pool, "segments") %>%
+            dplyr::filter(project_id == active_project) %>%
+            dplyr::filter(code_id == selected_code_extra) %>% 
+            dplyr::mutate(doc_group = ifelse(doc_id == active_doc, "this_document", "other_documents")) %>%
+            dplyr::count(doc_group) %>%
+            dplyr::collect()
+       insertUI(
+         selector = sel,
+         where = "afterEnd",
+         ui =   tags$div(id = "code_extra_div",
+      style = "position: relative; border: 1px solid #ccc; background: white; text-align: left; padding-left: 5px; margin-bottom: 5px;",
+      div(
+        style = "position: absolute; top: 0px; right: 0px;",
+        actionButton(ns("close_code_extra_div"), "", icon = icon("x"), style = "background: transparent; border: none; color: lightgray;")
+      ),
+      "Code:", tags$b(code_info$code_name), br(),
+      "Document:", tags$b(segments_info$n[1]), br(),
+      "Total:", tags$b(sum(segments_info$n)), br()
+  )
+        )
     }
 
     # returns glob$segments_observer and glob$codebook

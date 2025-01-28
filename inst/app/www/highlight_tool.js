@@ -220,4 +220,23 @@ function AddCode(startOffset, endOffset, newId, color, title) {
 }
 
 
+Shiny.addCustomMessageHandler('wrapText', function(message) {
+  var paragraph = document.getElementById(message.paragraphId);
+  if (!paragraph) return;
 
+  var text = paragraph.textContent;
+  var start = message.start;
+  var end = message.end;
+  var memo = message.memo;
+
+  if (start < 0 || end > text.length || start >= end) {
+    alert('Invalid offsets');
+    return;
+  }
+
+  var before = text.substring(0, start);
+  var middle = text.substring(start, end);
+  var after = text.substring(end);
+
+  paragraph.innerHTML = before + '<span class=\"memo memo_' + memo + '\">' + middle + '</span>' + after;
+});

@@ -363,6 +363,13 @@ load_doc_to_display <- function(pool,
                                        active_project,
                                        user,
                                        doc_selector) 
+    if (is.null(codebook)) {
+        coded_segments <- coded_segments |> 
+        dplyr::filter(is.na(code_id))
+
+    } else {
+       coded_segments <- na.omit(coded_segments)
+    }
    
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
@@ -397,6 +404,60 @@ load_doc_to_display <- function(pool,
     return(spans)
 }
 
+# Generate memos to be displayed -----
+load_memos_to_display <- function(pool, 
+                                active_project,
+                                user,
+                                doc_selector,
+                                raw_text,
+                                paragraphs,
+                                highlight,
+                                ns){
+    
+    coded_segments <- load_segments_db(pool, 
+                                       active_project,
+                                       user,
+                                       doc_selector) 
+    if (is.null(codebook)) {
+        coded_segments <- coded_segments |> 
+        dplyr::filter(is.na(code_id))
+
+    } else {
+       coded_segments <- na.omit(coded_segments)
+    }
+   
+    spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
+      dplyr::left_join(
+           paragraphs %>% 
+           dplyr::select(segment_start, par_id), by = "segment_start"
+           ) %>% 
+           tidyr::fill(par_id, .direction = "down")
+ 
+    code_names <- codebook %>%
+        dplyr::select(code_id, code_name, code_color) %>%
+        dplyr::mutate(code_id = as.character(code_id))
+
+    distinct_code_ids <- spans_data %>% 
+            na.omit() %>%  
+            dplyr::pull(code_id) %>% 
+            unique()
+      
+    code_names_lookup <- tibble::tibble(
+        code_id = distinct_code_ids,
+        code_name = sapply(distinct_code_ids,
+                          blend_codes,
+                          code_names),
+        code_color = sapply(distinct_code_ids,
+                            blend_colors,
+                            code_names)
+        ) |> 
+        dplyr::filter(!is.na(code_id))
+
+    spans <- spans_data %>%
+        dplyr::left_join(code_names_lookup, by = "code_id")
+
+    return(spans)
+}
 
 # Load codes for a segment -------------------------------------------
 
@@ -485,7 +546,7 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
                title = "Code info",
                icon = icon("ellipsis-vertical"),
                class = "code-menu-extra",
-               onclick = paste0("Shiny.setInputValue('", ns("selected_code_more"), "', this.name, {priority: 'event'});"))
+               onclick = paste0("Shiny.setInputValue('", ns("selected_code_extra"), "', this.name, {priority: 'event'});"))
     )
     
     
