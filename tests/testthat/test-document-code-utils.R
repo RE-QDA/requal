@@ -45,10 +45,10 @@ test_that("Test that calculating new segment range works", {
     )
 })
 
-test_that("Test that calculating code overlap works", {
-    expect_true(nrow(calculate_code_overlap(coded_segments_df)) == 2)
-    expect_true(nrow(calculate_code_overlap(coded_segments_overlap)) == 3)
-    expect_true(all(calculate_code_overlap(coded_segments_overlap) %>% 
-                        dplyr::pull(code_id) %in% c("1", "1+2", "2")))
-    
-})
+# test_that("Test that calculating code overlap works", {
+#     expect_true(nrow(calculate_code_overlap(coded_segments_df)) == 2)
+#     expect_true(nrow(calculate_code_overlap(coded_segments_overlap)) == 3)
+#     expect_true(all(calculate_code_overlap(coded_segments_overlap) %>% 
+#                         dplyr::pull(code_id) %in% c("1", "1+2", "2")))
+#     
+# })

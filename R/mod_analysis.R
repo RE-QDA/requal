@@ -24,7 +24,7 @@ mod_analysis_ui <- function(id) {
     fluidRow(
       class = "module_content",
         uiOutput(ns("segments")) %>%
-          tagAppendAttributes(class = "scrollable90")
+          tagAppendAttributes(class = "scrollable80")
       )
     # ###########
     #   column(
