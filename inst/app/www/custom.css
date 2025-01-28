@@ -206,19 +206,14 @@ display: flex;
 }
 
 .docpar::selection {
-  background: rgba(255, 223, 0, 0.75); /* A more contrasting yellow */
-  color: black;
-  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: red;
+  background: rgba(0, 0, 0); 
+  color: white;
 }
 
 .docpar span::selection {
-  background: rgba(255, 223, 0, 0.5); /* A more contrasting yellow with some transparency */
-  color: black;
-  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
-  text-decoration-line: underline;
+  background: rgb(0, 0, 0); 
+  color: white;
+  text-decoration: underline;
   text-decoration-style: dotted;
   text-decoration-color: red;
 }
@@ -274,7 +269,8 @@ display: flex;
 /* Styles for in-text highlights */
 
 .background {
-  background-color: var(--code-color); 
+  background-color: var(--code-color);
+  padding-bottom: 4px; 
 }
 
 .underline {
