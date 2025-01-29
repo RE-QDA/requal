@@ -1,5 +1,19 @@
 [
   {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Requal posts",
+    "section": "",
+    "text": "Thuringothyris (v1.1.2)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/soc-coffee-2024-05-16/index.html",
+    "href": "posts/soc-coffee-2024-05-16/index.html",
+    "title": "Requal at Sociological Coffee",
+    "section": "",
+    "text": "Martin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University."
+  },
+  {
     "objectID": "get_started.html",
     "href": "get_started.html",
     "title": "Getting started",
@@ -11,14 +25,42 @@
     "href": "get_started.html#installation",
     "title": "Getting started",
     "section": "Installation",
-    "text": "Installation\n\nServer version\nTo use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:\n\nhttps://requal.fsv.cuni.cz/demo\nuser: demo\npswd: requal123\n\n\n\nDesktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases.\nInstall the remotes package by running install.packages(\"remotes\") command in R console.\nInstall the Requal package by running remotes::install_local(file.choose()) and selecting the downloaded release file on your hard drive.\n\n\n\nDevelopment version (desktop)\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"devtools\")\ndevtools::install_github(\"RE-QDA/requal\")"
+    "text": "Installation\n\nServer version\nTo use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:\n\nhttps://requal.fsv.cuni.cz/demo\nuser: demo\npswd: requal123\n\n\n\nDesktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases. The installation file is in the requal_&lt;VERSION_NUMBER&gt;.tar.gz format.\nOpen the R console and install the remotes package by running install.packages(\"remotes\") command.\nInstall the requal package by running remotes::install_local(file.choose()) command and selecting the downloaded release file on your hard drive."
   },
   {
     "objectID": "get_started.html#usage-desktop",
     "href": "get_started.html#usage-desktop",
     "title": "Getting started",
     "section": "Usage (desktop)",
-    "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen"
+    "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen\n\n\n\nDevelopment version (desktop)\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"devtools\")\ndevtools::install_github(\"RE-QDA/requal\")"
+  },
+  {
+    "objectID": "contact.html",
+    "href": "contact.html",
+    "title": "Contact",
+    "section": "",
+    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app.\n\nMeet the team:\n\nRadim Hladík\nMichael Škvrňák\nNina Fárová\nMartin Hájek\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "contact.html#help-contribution",
+    "href": "contact.html#help-contribution",
+    "title": "Contact",
+    "section": "",
+    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app.\n\nMeet the team:\n\nRadim Hladík\nMichael Škvrňák\nNina Fárová\nMartin Hájek\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+  },
+  {
+    "objectID": "contact.html#acknowledgement",
+    "href": "contact.html#acknowledgement",
+    "title": "Contact",
+    "section": "Acknowledgement",
+    "text": "Acknowledgement\nThe application development has been supported by:\n\nThe Technology Agency of the Czech Republic, project n. TL05000054\nCLS INFRA Fellowship Programme"
+  },
+  {
+    "objectID": "contact.html#other-foss-caqdas",
+    "href": "contact.html#other-foss-caqdas",
+    "title": "Contact",
+    "section": "Other FOSS CAQDAS",
+    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative online qualitative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight tool for coding text and its further analysis with R.\nROCK - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.\nIramuteq - graphical user interface for geometrical text analyses in R.\nCATMA - annotation and query software tuned for literary and historical documents."
   },
   {
     "objectID": "index.html",
@@ -33,47 +75,5 @@
     "title": "Thuringothyris (v1.1.2)",
     "section": "",
     "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.9002.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
-  },
-  {
-    "objectID": "contact.html",
-    "href": "contact.html",
-    "title": "Contact",
-    "section": "",
-    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
-  },
-  {
-    "objectID": "contact.html#help-contribution",
-    "href": "contact.html#help-contribution",
-    "title": "Contact",
-    "section": "",
-    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nEmail to martin[dot]hajek[at]fsv[dot]cuni[dot]cz. Department of Sociology, Faculty of Social Sciences, Charles University, Czechia\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
-  },
-  {
-    "objectID": "contact.html#acknowledgement",
-    "href": "contact.html#acknowledgement",
-    "title": "Contact",
-    "section": "Acknowledgement",
-    "text": "Acknowledgement\nThe application development has been supported by The Technology Agency of the Czech Republic, project n. TL05000054."
-  },
-  {
-    "objectID": "contact.html#other-foss-caqdas",
-    "href": "contact.html#other-foss-caqdas",
-    "title": "Contact",
-    "section": "Other FOSS CAQDAS",
-    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative online qualitative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight tool for coding text and its further analysis with R.\nROCK - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.\nIramuteq - graphical user interface for geometrical text analyses in R.\nCATMA - annotation and query software tuned for literary and historical documents."
-  },
-  {
-    "objectID": "posts/soc-coffee-2024-05-16/index.html",
-    "href": "posts/soc-coffee-2024-05-16/index.html",
-    "title": "Requal at Sociological Coffee",
-    "section": "",
-    "text": "Martin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University."
-  },
-  {
-    "objectID": "posts.html",
-    "href": "posts.html",
-    "title": "Requal posts",
-    "section": "",
-    "text": "Thuringothyris (v1.1.2)\n\n\n\n\n\n\n\nreleases\n\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n  \n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
   }
 ]

@@ -23,13 +23,24 @@ pswd: requal123
 
 ### Desktop version
 
-To use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
+To use Requal, you need to have the R language installed and running on your machine. You can download and install R from [here](https://cloud.r-project.org). You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
 
 You can install Requal from GitHub by following these steps (assuming you have R installed on your machine):
 
-1. Download the current release of Requal from Releases.
-2. Install the remotes package by running `install.packages("remotes")` command in R console.
-3. Install the Requal package by running `remotes::install_local(file.choose())` and selecting the downloaded release file on your hard drive.
+1. Download the current release of Requal from [Releases](https://github.com/RE-QDA/requal/releases). The installation file is in the ` requal_<VERSION_NUMBER>.tar.gz` format.
+2. Open the R console and install the `remotes` package by running `install.packages("remotes")` command.
+3. Install the `requal` package by running `remotes::install_local(file.choose())` command and selecting the downloaded release file on your hard drive.
+
+## Usage (desktop)
+
+After installation, the Requal app can be launched from the R console with the following command:
+
+```
+requal::run_app()
+```
+
+![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)
+
 
 ### Development version (desktop)
 
@@ -41,14 +52,4 @@ You can install the development version of Requal from GitHub by running this co
 install.packages("devtools")
 devtools::install_github("RE-QDA/requal")
 ```
-
-## Usage (desktop)
-
-After installation, the Requal app can be launched from the R console with the following command:
-
-```
-requal::run_app()
-```
-
-![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)
 
