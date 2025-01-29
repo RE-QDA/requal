@@ -299,3 +299,11 @@ position: relative;
   text-decoration-thickness: 5px !important; 
   text-underline-offset: 4px !important;
 }
+
+.memo {
+  text-decoration-line: underline;
+  text-decoration-style: wavy; 
+  text-decoration-color: red;
+  text-decoration-thickness: 3px !important; 
+  text-underline-offset: 4px !important;
+}

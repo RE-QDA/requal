@@ -61,6 +61,7 @@ add_memo_record <- function(pool, project, text, user_id) {
                                 dplyr::mutate(memo_id = max(memo_id)), 
                             user_id = user_id)
     }
+    return(memo_id)
 }
 
 # render memos -----

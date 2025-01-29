@@ -318,7 +318,7 @@ dplyr::mutate(segment_end = segment_start - 1, segment_start = lag_end + 1)
 events_final <- events_prefinal |> 
 dplyr::bind_rows(missed_rows) |> 
   dplyr::arrange(segment_start) |> 
-  dplyr::filter(segment_start > 0, segment_start > 0) |> 
+  dplyr::filter(segment_start > 0) |> 
     tibble::rownames_to_column("span_id") |> 
     dplyr::mutate(span_id = paste0("span_id-", span_id)) |> 
     dplyr::select(-test, -lag_end)  
@@ -341,7 +341,8 @@ dplyr::summarise(
     segment_start = unique(segment_start),
     segment_end = unique(segment_end),
     segment_id = paste0(segment_id, collapse = "-"),
-    code_id = paste0(code_id, collapse = "-"),
+    code_id = paste0(na.omit(code_id), collapse = "-"),
+    memo_id = paste0(na.omit(memo_id), collapse = "-"),
     .by = span_id
 ) |> tibble::rownames_to_column("highlight_id") |> 
 dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "NA"))
@@ -358,19 +359,20 @@ load_doc_to_display <- function(pool,
                                 codebook,
                                 highlight,
                                 ns){
-    
     coded_segments <- load_segments_db(pool, 
                                        active_project,
                                        user,
-                                       doc_selector) 
-    if (is.null(codebook)) {
-        coded_segments <- coded_segments |> 
-        dplyr::filter(is.na(code_id))
+                                       doc_selector)
+    memos_index <- coded_segments$segment_id[is.na(coded_segments$code_id)]
+    memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |> 
+        dplyr::filter(segment_id %in% memos_index) |> 
+        dplyr::collect()
 
-    } else {
-       coded_segments <- na.omit(coded_segments)
+    if (nrow(memos_segments_map) > 0) {
+        coded_segments <- coded_segments |> 
+            dplyr::left_join(memos_segments_map, by = "segment_id")
     }
-   
+    
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
            paragraphs %>% 
@@ -584,18 +586,32 @@ blend_colors <- function(string_id, code_names) {
 
 
 # make span  ----
-make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL) {
+make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL, memo_id = NULL) {
         
         # Extract the text segment and remove newlines
         span_text <- substr(raw_text, segment_start, segment_end)
         span_text <- stringr::str_replace_all(span_text, "\n|\r", "")
         # Check if a code_id is assigned
         code_assigned <- isTruthy(code_id)
+        memo_assigned <- isTruthy(memo_id)
+        span_class <- if (code_assigned && memo_assigned) {
+            # Both code and memo are assigned
+                paste0("segment segment-code ", highlight, " memo memo_id_", memo_id)
+            } else if (code_assigned) {
+                # Only code is assigned
+                paste0("segment segment-code ", highlight)
+            } else if (memo_assigned) {
+                # Only memo is assigned
+                paste0("memo memo_id_", memo_id)
+            } else {
+                # Neither code nor memo is assigned
+                NULL
+            }
         # Create a span element with attributes and data
         htmltools::span(
             span_text,
             title = if (code_assigned) code_name else NULL,
-            class = if (code_assigned) paste("segment segment-code", highlight) else NULL,
+            class = span_class,
             style = if (code_assigned) paste("--code-color:", code_color) else NULL,
             `data-startend` = paste(segment_start, segment_end),
             `data-codes` = if (code_assigned) paste(code_id) else NULL,
@@ -603,5 +619,4 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
         )
         
     }
-
 

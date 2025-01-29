@@ -536,8 +536,7 @@ mod_document_code_server <- function(id, glob) {
     
     # Memo tools ----
     observeEvent(input$add_segment_memo, {
-      print("here")
-      browser()
+      #browser()
       startOff <- parse_tag_pos(req(input$tag_position), "start")
       endOff <- parse_tag_pos(req(input$tag_position), "end")
 
@@ -557,10 +556,12 @@ mod_document_code_server <- function(id, glob) {
         text = "TODO grab memo text",
         user_id = glob$user$user_id
       )
+      new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
       #add_memo_segment_map(...)
+      DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
       loc$par_memoed <- loc$paragraphs |> 
         dplyr::filter(segment_start < endOff,  segment_end > startOff) 
-
+      edit_memos_LF()
 
       }
     })
@@ -638,13 +639,12 @@ mod_document_code_server <- function(id, glob) {
           doc_selector = input$doc_selector,
           raw_text = loc$raw_text,
           paragraphs = loc$par_memoed,
-          codebook = NULL,
+          codebook = glob$codebook,
           highlight = loc$highlight,
           ns = NS(id)
         ) |> 
         dplyr::filter(segment_start >= min(loc$par_memoed$segment_start), segment_end <= max(loc$par_memoed$segment_end))
          
-        golem::invoke_js("wrapText", list(paragraphId = "my_paragraph", start = startOff, end = endOff))
 
          par_ids_local <- unique(local_text_data$par_id)
 
