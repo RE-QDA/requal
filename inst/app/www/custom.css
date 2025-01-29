@@ -210,16 +210,12 @@ position: relative;
 }
 
 .docpar::selection {
-  background: rgba(0, 0, 0); 
-  color: white;
-}
-
-.docpar span::selection {
   background: rgb(0, 0, 0); 
   color: white;
   text-decoration: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: red;
+  text-decoration-color: var(--code-color, transparent);
+  text-decoration-thickness: 5px !important; 
+  text-underline-offset: 4px !important;
 }
 
 .quickcode {
@@ -290,7 +286,6 @@ position: relative;
 
 .background {
   background-color: var(--code-color);
-  padding-bottom: 4px; 
 }
 
 .underline {
@@ -301,9 +296,6 @@ position: relative;
 }
 
 .memo {
-  text-decoration-line: underline;
-  text-decoration-style: wavy; 
-  text-decoration-color: red;
-  text-decoration-thickness: 3px !important; 
-  text-underline-offset: 4px !important;
+  border-bottom: 3px dotted red !important; 
+  padding-bottom: 4px; 
 }

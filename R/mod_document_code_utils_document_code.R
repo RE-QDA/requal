@@ -342,7 +342,7 @@ dplyr::summarise(
     segment_end = unique(segment_end),
     segment_id = paste0(segment_id, collapse = "-"),
     code_id = paste0(na.omit(code_id), collapse = "-"),
-    memo_id = paste0(na.omit(memo_id), collapse = "-"),
+    memo_id = if ("memo_id" %in% colnames(long_codes)) paste0(na.omit(memo_id), collapse = "-") else NA_character_,
     .by = span_id
 ) |> tibble::rownames_to_column("highlight_id") |> 
 dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "NA"))
@@ -612,9 +612,9 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
             span_text,
             title = if (code_assigned) code_name else NULL,
             class = span_class,
-            style = if (code_assigned) paste("--code-color:", code_color) else NULL,
+            style = if (code_assigned) paste("--code-color:", na.omit(code_color)) else NULL,
             `data-startend` = paste(segment_start, segment_end),
-            `data-codes` = if (code_assigned) paste(code_id) else NULL,
+            `data-codes` = if (code_assigned) paste(na.omit(code_id)) else NULL,
             .noWS = "outside"
         )
         
