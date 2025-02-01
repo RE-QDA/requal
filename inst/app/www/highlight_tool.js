@@ -235,3 +235,14 @@ Shiny.addCustomMessageHandler('insertNote', function(message) {
     }
   }
 });
+
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('text_memo')) { // Check if the clicked element is the parent
+    const childToRemove = e.target.querySelector('.text_memo_extra'); // Find the specific child
+    if (childToRemove) {
+      childToRemove.remove(); // Remove the child element
+    } else {
+      Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
+    }
+  }
+});

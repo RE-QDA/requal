@@ -261,7 +261,7 @@ mod_document_code_server <- function(id, glob) {
 
     # Displayed text observer ----
     observeEvent(req(loc$text_observer), {
-      
+      #browser()
       req(loc$text_observer > 0) # ignore init value
       golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
@@ -337,15 +337,15 @@ mod_document_code_server <- function(id, glob) {
                           doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
                           )  
       memos_data <- text_data |> 
-      dplyr::select(span_id, memo_id) |> 
-      dplyr::filter(!is.na(memo_id)) |> 
-      dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
-      tidyr::unnest(cols = c("memo_id")) |>
-      dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
-      dplyr::filter(memo_id != "memo")
+        dplyr::select(span_id, memo_id) |> 
+        dplyr::filter(!is.na(memo_id)) |> 
+        dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
+        tidyr::unnest(cols = c("memo_id")) |>
+        dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
+        dplyr::filter(memo_id != "memo")
 
       purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
-              memo_html <- icon("sticky-note", id = memo_id, class = "text_memo memo") 
+              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo memo")
               insertUI(paste0("#", span_id), ui = memo_html)
       })
 
@@ -555,7 +555,7 @@ mod_document_code_server <- function(id, glob) {
     
     # Memo tools ----
     observeEvent(input$add_segment_memo, {
-      #browser()
+      
       startOff <- parse_tag_pos(req(input$tag_position), "start")
       endOff <- parse_tag_pos(req(input$tag_position), "end")
 
@@ -583,6 +583,20 @@ mod_document_code_server <- function(id, glob) {
       edit_memos_LF()
 
       }
+    })
+
+    ## Observe text_memo_click ----
+
+    observeEvent(input$text_memo_click, {
+      text_memo_input <-  strsplit(input$text_memo_click, " ")[[1]][1]
+                         insertUI(
+         selector = paste0("#", text_memo_input),
+         where = "beforeEnd",
+         ui =   tags$div(id =  paste0("text_memo_extra-", text_memo_input),
+      class = "text_memo_extra",
+      span("This is the text of my memo. Lore impsum etc.")
+         )
+        )
     })
 
     # Helper: position counter ---------------
@@ -674,6 +688,25 @@ mod_document_code_server <- function(id, glob) {
             new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
             session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
                 })
+              
+              text_memos  <- load_memos_to_display(
+                          pool = glob$pool,
+                          active_project = glob$active_project,
+                          user = glob$user,
+                          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
+                          )  
+      memos_data <- local_text_data |> 
+        dplyr::select(span_id, memo_id) |> 
+        dplyr::filter(!is.na(memo_id)) |> 
+        dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
+        tidyr::unnest(cols = c("memo_id")) |>
+        dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
+        dplyr::filter(memo_id != "memo")
+
+      purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
+              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo memo") 
+              insertUI(paste0("#", span_id), ui = memo_html)
+    })
     }
 
     ## generate_code_extra_LF  -------------------

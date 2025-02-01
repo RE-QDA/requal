@@ -241,7 +241,7 @@ write_memo_segment_db <- function(
                                                                  startOff,
                                                                  endOff)
             )
-        
+       
         res <- DBI::dbWriteTable(pool, "segments", segment_df, append = TRUE, row.names = FALSE)
     
     
@@ -374,7 +374,7 @@ load_doc_to_display <- function(pool,
     memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |> 
         dplyr::filter(segment_id %in% memos_index) |> 
         dplyr::collect()
-        
+
     if (nrow(memos_segments_map) > 0) {
         coded_segments <- coded_segments |> 
             dplyr::left_join(memos_segments_map, by = "segment_id")
