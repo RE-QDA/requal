@@ -85,9 +85,9 @@ p.docpar::before {
   position: absolute;
   left: -45px; /* Negative offset to place numbers in the padding area */
   width: 30px; /* Fixed width for alignment */
-  text-align: right; /* Align numbers to the right */
-  font-family: 'Courier New', Courier, monospace; /* Specify a monospace font */
-  color: #959595; /* Style the numbers */
+  text-align: right; 
+  font-family: 'Courier New', Courier, monospace; 
+  color: #959595; 
   pointer-events: none; /* Prevent interaction */
   user-select: none; /* Prevent selection */
 }
@@ -209,14 +209,6 @@ display: flex;
 position: relative;
 }
 
-.docpar::selection {
-  background: rgb(0, 0, 0); 
-  color: white;
-  text-decoration: underline;
-  text-decoration-color: var(--code-color, transparent);
-  text-decoration-thickness: 5px !important; 
-  text-underline-offset: 4px !important;
-}
 
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
@@ -273,10 +265,11 @@ position: relative;
   margin-left: -21px;
   padding-left: 8px;
   padding-right: 8px;
-  color: lightgrey; 
+  color: silver; 
 }
 .code-menu-extra:hover {
   background: transparent;
+  border: none;
 }
 .code-menu-extra:click {
   background: transparent;
@@ -291,11 +284,36 @@ position: relative;
 .underline {
   text-decoration: underline;
   text-decoration-color: var(--code-color);
-  text-decoration-thickness: 5px !important; 
-  text-underline-offset: 4px !important;
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
 }
 
 .memo {
-  border-bottom: 3px dotted red !important; 
-  padding-bottom: 4px; 
+  text-decoration: underline;
+  text-decoration-color: red;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 3px; 
+  text-underline-offset: 5px;
+}
+
+.memo.background {
+  text-decoration: underline;
+  text-decoration-color: red;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 3px; 
+  text-underline-offset: 5px;
+}
+
+.memo.underline {
+  background-color: yellow;
+}
+
+.docpar::selection,
+.docpar span::selection  {
+  background: rgb(0, 0, 0); 
+  color: white;
+  text-decoration: underline; 
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
 }

@@ -443,3 +443,16 @@ db_update_value <- function(pool, table, col_val, by_col_val){
       res <- purrr::map(query, ~tryCatch({DBI::dbExecute(pool, .x)}))
       
 }
+
+
+# format class HTML
+
+format_class_id <- function(x, class_name = NULL)   {
+class_string <- purrr::map_chr(unique(na.omit(x)), function(y) paste0(class_name, "_id_", y))
+if (length(class_string) > 0) class_string <- paste(class_name, paste(class_string, collapse = " "), collapse = " ")
+class_string
+}
+
+
+
+

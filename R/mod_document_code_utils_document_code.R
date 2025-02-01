@@ -268,11 +268,11 @@ write_memo_segment_db <- function(
 }
 
 # calculate code overlap for doc display ----
-calculate_code_overlap <- function(raw_segments, paragraphs) {
+calculate_code_overlap <- function(coded_segments, paragraphs) {
 
 
 events_df <- dplyr::bind_rows(
-    paragraphs, raw_segments
+    paragraphs, coded_segments
 ) |> dplyr::select(segment_start, segment_end) |> 
 tidyr::pivot_longer(starts_with("segment"), names_to = "event", values_to = "position") |> 
 dplyr::arrange(position) 
@@ -327,7 +327,7 @@ dplyr::bind_rows(missed_rows) |>
 named_starts <- stats::setNames(events_final$segment_start, events_final$span_id)
 named_ends <- stats::setNames(events_final$segment_start, events_final$span_id)
 
-long_codes <- raw_segments |> 
+long_codes <- coded_segments |> 
 dplyr::mutate(span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
 intersect(
     names(named_starts[named_starts >= x]),
@@ -335,17 +335,22 @@ intersect(
 )
 })) |> tidyr::unnest(cols = c(span_id)) |> dplyr::select(-segment_end, -segment_start)
 
+if (!("memo_id" %in% colnames(long_codes))) {
+    long_codes <- long_codes |> 
+    dplyr::mutate(memo_id = NA)
+}
 res <- events_final |> 
 dplyr::left_join(long_codes, by = "span_id") |> 
 dplyr::summarise(
     segment_start = unique(segment_start),
     segment_end = unique(segment_end),
-    segment_id = paste0(segment_id, collapse = "-"),
-    code_id = paste0(na.omit(code_id), collapse = "-"),
-    memo_id = if ("memo_id" %in% colnames(long_codes)) paste0(na.omit(memo_id), collapse = "-") else NA_character_,
+    segment_id = format_class_id(segment_id, "segment"),
+    code_id = format_class_id(code_id, "code"),
+    memo_id = format_class_id(memo_id, "memo"),
     .by = span_id
 ) |> tibble::rownames_to_column("highlight_id") |> 
 dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "NA"))
+
 return(res) 
 }
 
@@ -372,14 +377,14 @@ load_doc_to_display <- function(pool,
         coded_segments <- coded_segments |> 
             dplyr::left_join(memos_segments_map, by = "segment_id")
     }
-    
+    browser()
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
            paragraphs %>% 
            dplyr::select(segment_start, par_id), by = "segment_start"
            ) %>% 
            tidyr::fill(par_id, .direction = "down")
- 
+
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -402,7 +407,7 @@ load_doc_to_display <- function(pool,
 
     spans <- spans_data %>%
         dplyr::left_join(code_names_lookup, by = "code_id")
-
+    saveRDS(spans_data, "spans_data.RDS")
     return(spans)
 }
 
@@ -558,7 +563,7 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
 
 blend_codes <- function(string_id, code_names_df) {
     
-    ids <- unlist(strsplit(string_id, split = "\\-"))
+    ids <- unlist(strsplit(string_id, split = "\\code_id_"))
     
     names <- code_names_df %>%
         dplyr::filter(code_id %in% ids) %>%
@@ -570,7 +575,7 @@ blend_codes <- function(string_id, code_names_df) {
 
 # Color helper for overlaying codes ----
 blend_colors <- function(string_id, code_names) {
-    ids <- unlist(strsplit(string_id, split = "\\-"))
+    ids <- unlist(strsplit(string_id, split = "\\code_id_"))
     colors_multiple <- code_names %>%
         dplyr::filter(code_id %in% ids) %>%
         dplyr::pull(code_color)
@@ -587,7 +592,6 @@ blend_colors <- function(string_id, code_names) {
 
 # make span  ----
 make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL, memo_id = NULL) {
-        
         # Extract the text segment and remove newlines
         span_text <- substr(raw_text, segment_start, segment_end)
         span_text <- stringr::str_replace_all(span_text, "\n|\r", "")

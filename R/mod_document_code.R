@@ -295,11 +295,11 @@ mod_document_code_server <- function(id, glob) {
          paste0(
             '<p id ="',
             par_id,
-            '" class = "docpar" data-startend',
+            '" class = "docpar" data-startend="',
             segment_start,
-            '-',
+            ' ',
             segment_end,
-            '>',
+            '">',
             gsub("\n", "", htmltools::htmlEscape(substr(loc$raw_text, segment_start, segment_end))),
             '<span class = "br">&#8203</span></p>')
         })
@@ -307,20 +307,21 @@ mod_document_code_server <- function(id, glob) {
         
 
           golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
+        
 
       text_data <- load_doc_to_display(
-          glob$pool,
-          glob$active_project,
+          pool = glob$pool,
+          active_project = glob$active_project,
           user = glob$user,
           doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id),
           raw_text = loc$raw_text,
           paragraphs = loc$paragraphs,
-          loc$codebook,
+          codebook = loc$codebook,
           highlight = loc$highlight,
           ns = NS(id)
         ) |> 
-        dplyr::filter(!all(is.na(code_id)), .by = par_id)
-
+        dplyr::filter(!all(code_id == ""), .by = par_id)
+       
         par_ids <- unique(text_data$par_id)
 
                 purrr::walk(par_ids, .f = function(x_par) {

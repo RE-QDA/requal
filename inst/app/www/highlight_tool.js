@@ -196,7 +196,7 @@ function AddCode(startOffset, endOffset, newId, color, title) {
         span.textContent = fullText.slice(segment.start, segment.end);
 
         if (segment.colors.length > 0) {
-          span.className = 'segment segment-coded';
+          span.className = 'segment code';
           span.setAttribute('data-color', segment.colors.join(' | '));
           // Use the most recently added color (last in sorted array)
           span.style.backgroundColor = segment.colors[segment.colors.length - 1];
