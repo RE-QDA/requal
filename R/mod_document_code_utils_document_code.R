@@ -377,7 +377,7 @@ load_doc_to_display <- function(pool,
         coded_segments <- coded_segments |> 
             dplyr::left_join(memos_segments_map, by = "segment_id")
     }
-    browser()
+    
     spans_data <- calculate_code_overlap(coded_segments, paragraphs) %>%  
       dplyr::left_join(
            paragraphs %>% 
@@ -407,7 +407,6 @@ load_doc_to_display <- function(pool,
 
     spans <- spans_data %>%
         dplyr::left_join(code_names_lookup, by = "code_id")
-    saveRDS(spans_data, "spans_data.RDS")
     return(spans)
 }
 
@@ -563,19 +562,19 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
 
 blend_codes <- function(string_id, code_names_df) {
     
-    ids <- unlist(strsplit(string_id, split = "\\code_id_"))
+    ids <- stringr::str_extract_all(string_id, "\\d+", simplify = TRUE)
     
     names <- code_names_df %>%
         dplyr::filter(code_id %in% ids) %>%
         dplyr::pull(code_name)
     
-    paste(names, collapse = " | ")
+    paste(names, collapse = "\n")
     
 }
 
 # Color helper for overlaying codes ----
 blend_colors <- function(string_id, code_names) {
-    ids <- unlist(strsplit(string_id, split = "\\code_id_"))
+    ids <- stringr::str_extract_all(string_id, "\\d+", simplify = TRUE)
     colors_multiple <- code_names %>%
         dplyr::filter(code_id %in% ids) %>%
         dplyr::pull(code_color)
@@ -593,6 +592,7 @@ blend_colors <- function(string_id, code_names) {
 # make span  ----
 make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_id = NULL, code_id = NULL, code_name = NULL, code_color = NULL, raw_text, highlight = NULL, memo_id = NULL) {
         # Extract the text segment and remove newlines
+        
         span_text <- substr(raw_text, segment_start, segment_end)
         span_text <- stringr::str_replace_all(span_text, "\n|\r", "")
         # Check if a code_id is assigned
@@ -600,13 +600,13 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
         memo_assigned <- isTruthy(memo_id)
         span_class <- if (code_assigned && memo_assigned) {
             # Both code and memo are assigned
-                paste0("segment segment-code ", highlight, " memo memo_id_", memo_id)
+                paste(segment_id, code_id, highlight, memo_id)
             } else if (code_assigned) {
                 # Only code is assigned
-                paste0("segment segment-code ", highlight)
+                paste(segment_id, code_id, highlight)
             } else if (memo_assigned) {
                 # Only memo is assigned
-                paste0("memo memo_id_", memo_id)
+                paste(segment_id, memo_id)
             } else {
                 # Neither code nor memo is assigned
                 NULL

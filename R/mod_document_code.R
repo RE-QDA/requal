@@ -592,14 +592,14 @@ mod_document_code_server <- function(id, glob) {
         # Send a message to the client to toggle the style
       #session$sendCustomMessage("toggleStyle", message = loc$highlight)
       if (loc$highlight == "background") {
-        shinyjs::addClass(class = "background", selector = ".segment-code")
+        shinyjs::addClass(class = "background", selector = ".segment.code")
         rql_message("Segment style: Highlight")
       } else if (loc$highlight == "underline") {
-         shinyjs::removeClass(class = "background", selector = ".segment-code")
-         shinyjs::addClass(class = "underline", selector = ".segment-code")
+         shinyjs::removeClass(class = "background", selector = ".segment.code")
+         shinyjs::addClass(class = "underline", selector = ".segment.code")
          rql_message("Segment style: Underline")
       } else {
-        shinyjs::removeClass(class = "underline", selector = ".segment-code")
+        shinyjs::removeClass(class = "underline", selector = ".segment.code")
         rql_message("Segment style: None")
       }
     }
