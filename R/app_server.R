@@ -32,7 +32,7 @@ app_server <- function(input, output, session) {
   
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
-    shinyjs::show(id = "btn-memo")
+    shinyjs::show(id = "btn-free_memo")
     shinyjs::show(selector = "div.tab-content")
     glob$users_observer <- 0
     glob$segments_observer <- 0

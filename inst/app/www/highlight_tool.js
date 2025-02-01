@@ -220,23 +220,18 @@ function AddCode(startOffset, endOffset, newId, color, title) {
 }
 
 
-Shiny.addCustomMessageHandler('wrapText', function(message) {
-  var paragraph = document.getElementById(message.paragraphId);
-  if (!paragraph) return;
+Shiny.addCustomMessageHandler('insertNote', function(message) {
+  var target = document.getElementById(message.span_id);
+  console.log(target)
+  if (target) {
+    // Create a temporary div to parse the HTML string
+    var tempDiv = document.createElement('span');
+    tempDiv.innerHTML = message.memo_html;
+    // Append the parsed HTML to the target element
+    console.log(tempDiv)
 
-  var text = paragraph.textContent;
-  var start = message.start;
-  var end = message.end;
-  var memo = message.memo;
-
-  if (start < 0 || end > text.length || start >= end) {
-    alert('Invalid offsets');
-    return;
+    while (tempDiv.firstChild) {
+      target.appendChild(tempDiv.firstChild);
+    }
   }
-
-  var before = text.substring(0, start);
-  var middle = text.substring(start, end);
-  var after = text.substring(end);
-
-  paragraph.innerHTML = before + '<span class=\"memo memo_' + memo + '\">' + middle + '</span>' + after;
 });

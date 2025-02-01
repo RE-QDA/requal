@@ -23,11 +23,11 @@ app_ui <- function(request, mode = NULL, access = NULL) {
         ),
         controlbarIcon = icon("ellipsis-v", id = "launchpad_icon"),
         dropdownBlock2(
-          id = "btn-memo",
+          id = "btn-free_memo",
           badgeStatus = NULL,
           icon = shiny::icon("sticky-note", verify_fa = FALSE),
           mod_memo_ui("memo_ui_1")
-        ) %>% tagAppendAttributes(class = "memo", style = "display:none;", title = "Free memo"),
+        ) %>% tagAppendAttributes(class = "free_memo", style = "display:none;", title = "Free memo"),
         tags$li(mod_user_ui("user_ui_1")) %>%
           tagAppendAttributes(class = "dropdown"),
         tags$li(actionLink(

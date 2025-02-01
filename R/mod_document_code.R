@@ -261,7 +261,7 @@ mod_document_code_server <- function(id, glob) {
 
     # Displayed text observer ----
     observeEvent(req(loc$text_observer), {
-      #browser()
+      
       req(loc$text_observer > 0) # ignore init value
       golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
@@ -320,17 +320,35 @@ mod_document_code_server <- function(id, glob) {
           highlight = loc$highlight,
           ns = NS(id)
         ) |> 
-        dplyr::filter(!all(code_id == ""), .by = par_id)
+        dplyr::filter(!all(is.na(code_id)), .by = par_id) 
        
         par_ids <- unique(text_data$par_id)
 
-                purrr::walk(par_ids, .f = function(x_par) {
-         
-           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-span_id, -par_id)
-           spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-            session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
-                })
+        purrr::walk(par_ids, .f = function(x_par) {
+           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
+              spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
+              new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+              session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
+            })
+      text_memos  <- load_memos_to_display(
+                          pool = glob$pool,
+                          active_project = glob$active_project,
+                          user = glob$user,
+                          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
+                          )  
+      memos_data <- text_data |> 
+      dplyr::select(span_id, memo_id) |> 
+      dplyr::filter(!is.na(memo_id)) |> 
+      dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
+      tidyr::unnest(cols = c("memo_id")) |>
+      dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
+      dplyr::filter(memo_id != "memo")
+
+      purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
+              memo_html <- icon("sticky-note", id = memo_id, class = "text_memo memo") 
+              insertUI(paste0("#", span_id), ui = memo_html)
+      })
+
 
     })
   

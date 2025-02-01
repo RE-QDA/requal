@@ -131,13 +131,13 @@ margin-bottom: 5px !important;
   padding-right: 70px;
 }
 
-.memo ul {
+.free_memo ul {
 left: auto !important;
 right: 0 !important;
 width: 375px;
 }
 
-#btn-memo > ul > li > ul > div {
+#btn-free_memo > ul > li > ul > div {
 margin-left: -20px !important;
 margin-right: auto !important; 
 width: 100% !important;  
@@ -289,31 +289,31 @@ position: relative;
 }
 
 .memo {
-  text-decoration: underline;
-  text-decoration-color: red;
-  text-decoration-style: dotted;
-  text-decoration-thickness: 3px; 
-  text-underline-offset: 5px;
+  position: relative; /* Ensure the pseudo-element is positioned relative to the parent */
 }
 
-.memo.background {
-  text-decoration: underline;
-  text-decoration-color: red;
-  text-decoration-style: dotted;
-  text-decoration-thickness: 3px; 
-  text-underline-offset: 5px;
-}
-
-.memo.underline {
-  background-color: yellow;
+.memo::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px; /* Offset the border */
+  height: 3px; /* Thickness of the border */
+  border-bottom: 3px dotted red; /* Style of the border */
+  pointer-events: none; /* Ensure the pseudo-element doesn't interfere with interactions */
 }
 
 .docpar::selection,
 .docpar span::selection  {
   background: rgb(0, 0, 0); 
   color: white;
-  text-decoration: underline; 
-  text-decoration-color: var(--code-color);
-  text-decoration-thickness: 5px; 
-  text-underline-offset: 4px;
+  border-bottom: 5px solid var(--code-color);
+}
+
+.text_memo {
+  font-size: 110%;
+  padding: 0px;
+  margin-right: 5px;
+  margin-left: 5px;
+  background-color: yellow;
 }
