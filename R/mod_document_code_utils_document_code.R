@@ -618,7 +618,6 @@ make_span  <- function(segment_start, segment_end, highlight_id = NULL, segment_
             class = span_class,
             style = if (code_assigned) paste("--code-color:", na.omit(code_color)) else NULL,
             `data-startend` = paste(segment_start, segment_end),
-            `data-codes` = if (code_assigned) paste(na.omit(code_id)) else NULL,
             .noWS = "outside"
         )
         

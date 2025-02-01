@@ -175,7 +175,7 @@ Shiny.addCustomMessageHandler('updateParagraphContent', function(message) {
   const container = document.getElementById(message.id);
   const fragment = document.createDocumentFragment();
   // Create new content
-  const newElement = document.createElement('span');
+  const newElement = document.createElement('div');
   newElement.innerHTML = message.data;
   fragment.appendChild(newElement);
   // Replace existing content
