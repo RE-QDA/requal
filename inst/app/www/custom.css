@@ -288,19 +288,8 @@ position: relative;
   text-underline-offset: 4px;
 }
 
-.memo {
-  position: relative; /* Ensure the pseudo-element is positioned relative to the parent */
-}
-
-.memo::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 1px; /* Offset the border */
-  height: 3px; /* Thickness of the border */
-  border-bottom: 3px dotted red; /* Style of the border */
-  pointer-events: none; /* Ensure the pseudo-element doesn't interfere with interactions */
+.memo.underline {
+  background-color: rgb(255, 255, 140); 
 }
 
 .docpar::selection,
@@ -311,9 +300,14 @@ position: relative;
 }
 
 .text_memo {
-  font-size: 110%;
-  padding: 0px;
+  font-size: 175;
   margin-right: 5px;
   margin-left: 5px;
-  background-color: yellow;
+  background-color: #7b7b7b;
+  color: yellow;
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-bottom: 2px;
+  padding-top: 1px;
 }
+
