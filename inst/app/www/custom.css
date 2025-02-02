@@ -341,12 +341,13 @@ position: relative;
   margin-top: -3px;
 	border-radius: 10px;
   user-select: none;
-  /* font: initial; */
-  /* font-size: medium; */
+  font: initial;
+  font-size: medium;
   font-family: Helvetica, Arial, sans-serif;
-  /* font-weight: normal; */
+  font-weight: normal;
   max-width: 300px;
   border: 1px solid silver;
+  z-index: inherit;
 }
 
 .text_memo_btn.show-memo::after {

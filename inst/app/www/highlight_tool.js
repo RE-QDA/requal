@@ -244,9 +244,9 @@ let maxZ = 2;
 document.addEventListener('click', (e) => {
   if (e.target.classList.contains('text_memo_btn')) { // Check if the clicked element has the class
     // Find the maximum z-index among all elements with the class 'text_memo_btn'
-    this.style.zIndex = ++maxZ;
+    e.target.style.zIndex = ++maxZ;
     e.target.classList.toggle('show-memo');
     Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
-  }
+    }
 });
 
