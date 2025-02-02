@@ -246,3 +246,20 @@ document.addEventListener('click', (e) => {
     }
   }
 });
+
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('text_memo_extra')) { // Check if the clicked element has the class
+    // Find the maximum z-index among all elements with the class 'text_memo_extra'
+    let maxZ = 0;
+    document.querySelectorAll('.text_memo_extra').forEach((el) => {
+      const z = parseInt(window.getComputedStyle(el).zIndex, 10);
+      if (!isNaN(z)) {
+        maxZ = Math.max(maxZ, z);
+      }
+    });
+
+    // Set z-index of the clicked element to be one higher than the maximum
+    e.target.style.zIndex = maxZ + 1;
+  }
+});
+
