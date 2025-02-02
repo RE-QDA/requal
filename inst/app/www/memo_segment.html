@@ -1,0 +1,47 @@
+<html>
+<head>
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    label, select, textarea {
+      margin: 0.5rem 0;
+      font-family: Helvetica, Arial, sans-serif;
+    }
+    #segmentMemoInput {
+      box-sizing: border-box;
+      width: 100%; 
+      height:100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      font-weight: 300;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      text-align: left;
+      resize: none;
+    }
+  </style>
+</head>
+<body>
+  <label for="memotype">Memo type:</label>
+  <select name="memotype" id="segmentTypeInput">
+    <option value="freesegment">Free segment</option>
+    <option value="codedsegment">Coded segment</option>
+  </select> 
+  <textarea id="segmentMemoInput" placeholder="Free segment memo" oninput="segmentMemoUpdate()"></textarea>
+  <script>
+    function segmentMemoUpdate() {
+      let text = document.getElementById("segmentMemoInput").value;
+      document.getElementById("segmentMemoInput").setAttribute('data-memo_text', text);
+      document.getElementById("segmentTypeInput").setAttribute('data-memo_type', text);
+    }
+  </script>
+</body>
+</html>

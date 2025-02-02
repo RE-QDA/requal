@@ -81,6 +81,8 @@ golem::add_module( name = "text_stats")
 golem::add_module( name = "summary" )
 golem::add_module( name = "rql_button" )
 golem::add_module( name = "rql_hidden_ui" )
+golem::add_module( name = "memo_segment" )
+
 
 
 

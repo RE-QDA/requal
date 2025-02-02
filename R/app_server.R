@@ -80,6 +80,8 @@ app_server <- function(input, output, session) {
 
   # memo
   mod_memo_server("memo_ui_1", glob)
+  # output: glob$docmemo
+  mod_memo_segment_server("memo_segment_1", glob)
 
   # show admin interface
   observeEvent(glob$user$is_admin, {

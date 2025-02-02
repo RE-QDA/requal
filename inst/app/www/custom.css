@@ -300,7 +300,7 @@ position: relative;
 }
 
 .text_memo {
-  font-size: 200%;
+  font-size: 165%;
   margin-right: 5px;
   margin-left: 5px;
   margin-top: 3px;
@@ -332,4 +332,18 @@ position: relative;
   display: block;
   max-width: 300px;
   border: 1px solid silver;
+}
+
+.memo_segment_container {
+    resize: vertical; 
+    overflow: auto;
+    min-height: 25vh;
+    max-height: 80vh;
+  }
+.memo_segment_input {
+  height: 100%; 
+  min-height: 25vh;
+  max-height: 80vh;
+  width: 100%;
+  border: 1px;
 }

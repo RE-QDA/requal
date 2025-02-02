@@ -115,11 +115,7 @@ mod_document_code_ui <- function(id) {
               id = ns("memotools_tabset"),
               value = "memotools_tabset",
                 br(),
-                actionButton(
-                  ns("add_segment_memo"),
-                  "Add segment memo",
-                  width = "100%"
-                ),
+                mod_memo_segment_ui("memo_segment_1")
               )
           )
         )
@@ -585,6 +581,7 @@ mod_document_code_server <- function(id, glob) {
       }
     })
 
+    
     ## Observe text_memo_click ----
 
     observeEvent(input$text_memo_click, {
@@ -597,7 +594,20 @@ mod_document_code_server <- function(id, glob) {
       span("This is the text of my memo. Lore impsum etc.")
          )
         )
+        golem::invoke_js("addClickListeners", list())
     })
+
+    ## Observe memo show ----
+     observeEvent(glob$docmemo$memo_show, {
+          print(glob$docmemo$memo_show)
+
+      if (glob$docmemo$memo_show) {
+        shinyjs::show(selector = ".text_memo, .text_memo_extra")
+      } else {
+        shinyjs::hide(selector = ".text_memo, .text_memo_extra")
+      }
+    })
+
 
     # Helper: position counter ---------------
     output$captured_range <- renderText({
