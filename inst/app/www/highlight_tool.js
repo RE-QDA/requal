@@ -220,26 +220,26 @@
 // }
 
 // Select the <article> element or any other parent element you want to limit the listener to
-const articleElement = document.querySelector('article');
+// const articleElement = document.querySelector('article');
 
-if (articleElement) {
-  articleElement.addEventListener('click', (e) => {
-    // Check if the clicked element is an <i> tag with the 'text_memo_btn' class
-    if (e.target.tagName.toLowerCase() === 'i' && e.target.classList.contains('text_memo_btn')) {
-      e.stopPropagation(); // Prevent the event from bubbling up to parent elements
+// if (articleElement) {
+//   articleElement.addEventListener('click', (e) => {
+//     // Check if the clicked element is an <i> tag with the 'text_memo_btn' class
+//     if (e.target.tagName.toLowerCase() === 'i' && e.target.classList.contains('text_memo_btn')) {
+//       e.stopPropagation(); // Prevent the event from bubbling up to parent elements
 
-      console.log('Clicked element:', e.target);
-      console.log('Class list before toggle:', e.target.classList);
+//       console.log('Clicked element:', e.target);
+//       console.log('Class list before toggle:', e.target.classList);
 
-      e.target.classList.toggle('show-memo');
+//       e.target.classList.toggle('show-memo');
 
-      console.log('Class list after toggle:', e.target.classList);
+//       console.log('Class list after toggle:', e.target.classList);
 
-      // Optionally, send a message to Shiny if needed
-      Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
-    }
-  });
-}
+//       // Optionally, send a message to Shiny if needed
+//       Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
+//     }
+//   });
+// }
 // document.addEventListener('click', (e) => {
 //   if (e.target.classList.contains('text_memo_btn')) { // Check if the clicked element has the class
 //     // Find the maximum z-index among all elements with the class 'text_memo_btn'

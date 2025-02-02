@@ -342,7 +342,7 @@ mod_document_code_server <- function(id, glob) {
 
       purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
               memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo`="This is the text of my memo.")
-              insertUI(paste0("#", span_id), ui = memo_html)
+              insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
       })
 
 
