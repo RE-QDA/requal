@@ -341,7 +341,7 @@ mod_document_code_server <- function(id, glob) {
         dplyr::filter(memo_id != "memo")
 
       purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
-              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo memo")
+              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo`="This is the text of my memo.")
               insertUI(paste0("#", span_id), ui = memo_html)
       })
 
@@ -586,15 +586,16 @@ mod_document_code_server <- function(id, glob) {
 
     observeEvent(input$text_memo_click, {
       text_memo_input <-  strsplit(input$text_memo_click, " ")[[1]][1]
-                         insertUI(
-         selector = paste0("#", text_memo_input),
-         where = "beforeEnd",
-         ui =   tags$div(id =  paste0("text_memo_extra-", text_memo_input),
-      class = "text_memo_extra",
-      span("This is the text of my memo. Lore impsum etc.")
-         )
-        )
-        golem::invoke_js("addClickListeners", list())
+      print(text_memo_input)
+      #shinyjs::toggleClass(text_memo_input, "show-memo", asis = TRUE)
+      #                    insertUI(
+      #    selector = paste0("#", text_memo_input),
+      #    where = "beforeEnd",
+      #    ui =   tags$div(id =  paste0("text_memo_extra-", text_memo_input),
+      # class = "text_memo_extra",
+      # span("This is the text of my memo. Lore impsum etc.")
+      #    )
+        # )
     })
 
     ## Observe memo show ----

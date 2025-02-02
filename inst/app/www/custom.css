@@ -299,7 +299,22 @@ position: relative;
   border-bottom: 5px solid var(--code-color);
 }
 
-.text_memo {
+
+.memo_segment_container {
+    resize: vertical; 
+    overflow: auto;
+    min-height: 25vh;
+    max-height: 80vh;
+  }
+.memo_segment_input {
+  height: 100%; 
+  min-height: 25vh;
+  max-height: 80vh;
+  width: 100%;
+  border: 1px;
+}
+
+.text_memo_btn {
   font-size: 165%;
   margin-right: 5px;
   margin-left: 5px;
@@ -312,7 +327,9 @@ position: relative;
   padding-top: 1px;
 }
 
-.text_memo_extra {
+.text_memo_btn::after {
+  content: attr(data-memo);
+  display: none; /* Initially hidden */
   position: absolute;
   background: rgb(255, 255, 120);
   text-align: left;
@@ -329,21 +346,10 @@ position: relative;
   font-size: medium;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
-  display: block;
   max-width: 300px;
   border: 1px solid silver;
 }
 
-.memo_segment_container {
-    resize: vertical; 
-    overflow: auto;
-    min-height: 25vh;
-    max-height: 80vh;
-  }
-.memo_segment_input {
-  height: 100%; 
-  min-height: 25vh;
-  max-height: 80vh;
-  width: 100%;
-  border: 1px;
+.text_memo_btn.show-memo::after {
+  display: block; /* Visible when the class is added */
 }

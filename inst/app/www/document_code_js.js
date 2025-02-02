@@ -1,36 +1,32 @@
+// Function to calculate selection positions
 function getCaretCharacterOffsetWithin(element) {
   var caretOffset = 0;
   var doc = element.ownerDocument || element.document;
   var win = doc.defaultView || doc.parentWindow;
   var sel;
-
+  //var sel = sel.replace(/[\t\n\r ]+/g, "");
   if (typeof win.getSelection != "undefined") {
       sel = win.getSelection();
+      // https://stackoverflow.com/questions/7224368/how-do-i-remove-siblings-from-the-dom
+    //   var previous = sel.previousSibling;
+      
+      // iterate until we find an element node or there is no previous sibling
+      // while(previous && previous.nodeType !== 1) {
+        //   previous = previous.previousSibling;
+       // }
+
+       // if there is a sibling, remove it
+      // if(previous) {
+        //   previous.parentNode.removeChild(previous);
+      // }
       if (sel.rangeCount > 0) {
-          var range = sel.getRangeAt(0);
+          var range = win.getSelection().getRangeAt(0);
           var preCaretRange = range.cloneRange();
           preCaretRange.selectNodeContents(element);
           preCaretRange.setEnd(range.endContainer, range.endOffset);
-
-          // Traverse the nodes within the range and calculate offset
-          var walker = doc.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
-              acceptNode: function(node) {
-                  // Exclude text nodes that are within elements with the class 'exclude-from-caret'
-                  return node.parentNode.closest('.text_memo_extra') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
-              }
-          });
-
-          while (walker.nextNode()) {
-              var node = walker.currentNode;
-              if (node === range.endContainer) {
-                  caretOffset += range.endOffset;
-                  break;
-              } else {
-                  caretOffset += node.textContent.length;
-              }
-          }
-      }
-  } else if ((sel = doc.selection) && sel.type != "Control") {
+          caretOffset = preCaretRange.toString().length;
+       }
+  } else if ( (sel = doc.selection) && sel.type != "Control") {
       var textRange = sel.createRange();
       var preCaretTextRange = doc.body.createTextRange();
       preCaretTextRange.moveToElementText(element);
@@ -40,39 +36,40 @@ function getCaretCharacterOffsetWithin(element) {
   return caretOffset;
 }
 
-$(document).ready(function() {
-document.addEventListener('mouseup', function() {
-  var sel = window.getSelection();
-  
-  if (sel.rangeCount > 0) {
-    var range = sel.getRangeAt(0);
-    var el = document.getElementById("document_code_ui_1-focal_text");
+// Function to send calculated positions to Shiny
+$( document ).ready(function() {
+document.addEventListener('mouseup', function () {
+    var sel = window.getSelection();
+    // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
+    
+    if(sel.rangeCount > 0){
+      var range = sel.getRangeAt(0);
+      var el = document.getElementById("document_code_ui_1-focal_text")
+    
+      var endOffset = getCaretCharacterOffsetWithin(el);
+      var startOffset_js = endOffset - range.toString().length;
+      var startOffset = startOffset_js+1;
+      var text_length = $('#document_code_ui_1-focal_text').text().length;
 
-    // Calculate the caret offset excluding elements with the class 'exclude-from-caret'
-    var endOffset = getCaretCharacterOffsetWithin(el);
-    var startOffset_js = endOffset - range.toString().length;
-    var startOffset = startOffset_js + 1;
-    var text_length = $(el).text().length;
-
-    if (endOffset == 0) {
-      endOffset = endOffset + 1;
+      if (endOffset == 0) {
+        var endOffset = endOffset+1;
+      } 
+      if (startOffset > endOffset) {
+        var endOffset = startOffset; 
+      } 
+      if (startOffset < 1) {
+        var startOffset = 1;
+      } 
+      if (endOffset > text_length) {
+        var endOffset = text_length;
+      } 
+      
+      var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
+        console.log("tag_position" + tag_position_value)
+      Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }
-    if (startOffset > endOffset) {
-      endOffset = startOffset;
-    }
-    if (startOffset < 1) {
-      startOffset = 1;
-    }
-    if (endOffset > text_length) {
-      endOffset = text_length;
-    }
-
-    var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-    console.log("tag_position" + tag_position_value);
-    Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
-  }
 }, false);
-});
+})
 // Obtain information from iframe and send to Shiny
 $(document).ready(function() {
   var iframe = document.getElementsByTagName('iframe')[0];
