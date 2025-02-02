@@ -333,7 +333,6 @@ position: relative;
   position: absolute;
   background: rgb(255, 255, 120);
   text-align: left;
-  z-index: 2;
   color: black;
   font-size: small;
   padding: 10px;
@@ -342,10 +341,10 @@ position: relative;
   margin-top: -3px;
 	border-radius: 10px;
   user-select: none;
-  font: initial;
-  font-size: medium;
+  /* font: initial; */
+  /* font-size: medium; */
   font-family: Helvetica, Arial, sans-serif;
-  font-weight: normal;
+  /* font-weight: normal; */
   max-width: 300px;
   border: 1px solid silver;
 }

@@ -12,10 +12,6 @@ mod_document_code_ui <- function(id) {
 
   fluidPage(
     tags$head(
-      tags$script(src = "www/split.min.js"),
-      tags$script(src = "www/highlight_style.js"),
-      tags$script(src = "www/document_code_js.js"),
-      tags$script(src = "www/highlight_tool.js"),
       tags$script(HTML("
   document.addEventListener('DOMContentLoaded', (event) => {
     Split(['#split-1', '#split-2'], {
