@@ -147,22 +147,26 @@ mod_document_code_server <- function(id, glob) {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
     loc$text_observer <- 0
+    loc$display_observer <- 0
+    loc$startOff <- 0
+    loc$endOff <- 0
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', message = list())
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
-    ## Observe click on coded text ----
-    observeEvent(input$clicked_title, {
-      showNotification(input$clicked_title)
-    })
+
     ## Observe choice of highlight style ----
     observeEvent(input$toggle_style, {
       toggle_style_LF()
     })
   
-
-    ## Observe changes in documents
+    ## Observe offset positions -------
+    observeEvent(input$tag_position, {
+      loc$startOff <- parse_tag_pos(req(input$tag_position), "start")
+      loc$endOff <- parse_tag_pos(req(input$tag_position), "end")
+    })
+    ## Observe changes in available documents ----
     observeEvent(glob$documents, {
       if (isTruthy(glob$active_project)) {
         if (glob$user$data$data_other_view == 1) {
@@ -245,13 +249,13 @@ mod_document_code_server <- function(id, glob) {
   golem::invoke_js('scrollToSegment', list(target_start = glob$analyze_link$segment_start))
   })
 
-    # Render codes ----
-    output$code_list <- renderUI({
-      req(isTruthy(loc$codes_menu))
-      loc$codes_menu
-    })
+  # Render codes ----
+  output$code_list <- renderUI({
+    req(isTruthy(loc$codes_menu))
+    loc$codes_menu
+  })
 
-    # Displayed text observer ----
+    # Initialize new text skelet  ----
     observeEvent(req(loc$text_observer), {
       #browser()
       req(loc$text_observer > 0) # ignore init value
@@ -269,7 +273,7 @@ mod_document_code_server <- function(id, glob) {
         tibble::rowid_to_column("par_id") %>%
         dplyr::mutate(par_id = paste("par_id", par_id, sep = "-"))
 
-            if (loc$total_chars > max(loc$paragraphs$segment_end)) {
+          if (loc$total_chars > max(loc$paragraphs$segment_end)) {
               # safeguard against text without final linebreak
               loc$paragraphs <- dplyr::bind_rows(
               loc$paragraphs,
@@ -282,8 +286,7 @@ mod_document_code_server <- function(id, glob) {
           }
       
 
-        text_plain <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {
-         
+        text_plain <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {     
          paste0(
             '<p id ="',
             par_id,
@@ -295,58 +298,16 @@ mod_document_code_server <- function(id, glob) {
             gsub("\n", "", htmltools::htmlEscape(substr(loc$raw_text, segment_start, segment_end))),
             '<span class = "br">&#8203</span></p>')
         })
-
-        
-
-          golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
-        
-
-      text_data <- load_doc_to_display(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user = glob$user,
-          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id),
-          raw_text = loc$raw_text,
-          paragraphs = loc$paragraphs,
-          codebook = loc$codebook,
-          highlight = loc$highlight,
-          ns = NS(id)
-        ) |> 
-        dplyr::filter(!all(is.na(code_id)), .by = par_id) 
-       
-        par_ids <- unique(text_data$par_id)
-
-        purrr::walk(par_ids, .f = function(x_par) {
-           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
-              spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-              new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-              session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
-            })
-      text_memos  <- load_memos_to_display(
-                          pool = glob$pool,
-                          active_project = glob$active_project,
-                          user = glob$user,
-                          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
-                          )  
-      memos_data <- text_data |> 
-        dplyr::select(span_id, memo_id) |> 
-        dplyr::filter(!is.na(memo_id)) |> 
-        dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
-        tidyr::unnest(cols = c("memo_id")) |>
-        dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
-        dplyr::filter(memo_id != "memo")
-
-      purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
-              memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo`="This is the text of my memo.", .noWS = c("outside", "after-begin", "before-end")),
-                            icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
-                             .noWS = c("outside", "after-begin", "before-end"))
-              insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
-      })
-
-
-    })
+      golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
+      loc$par_index <- loc$paragraphs
+      loc$display_observer <- loc$display_observer + 1
+  })
   
-
+    # Display/edit text  -----
+    observeEvent(loc$display_observer, {
+      req(loc$display_observer > 0)
+      edit_display_LF()
+    })
     # Coding tools ------------------------------------------------------------
     observeEvent(req(input$selected_code), {
       # We need a document and selection positions
@@ -361,27 +322,24 @@ mod_document_code_server <- function(id, glob) {
     # Write code to DB when observer is updated
     observeEvent(req(loc$code_action_observer), {
       req(loc$code_action_observer > 0) # ignore init value
-      req(loc$code)
-      # To execute, we need a document and a selection
-      startOff <- parse_tag_pos(req(input$tag_position), "start")
-      endOff <- parse_tag_pos(req(input$tag_position), "end")
+      req(loc$code)     
 
-      if (endOff >= startOff) {
+      if (loc$endOff >= loc$startOff) {
         write_segment_db(
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
           doc_id = input$doc_selector,
           code_id = loc$code,
-          startOff,
-          endOff
+          loc$startOff,
+          loc$endOff
         )
         
         
-        loc$par_coded <- loc$paragraphs |> 
-        dplyr::filter(segment_start < endOff,  segment_end > startOff) 
+        loc$par_index <- loc$paragraphs |> 
+        dplyr::filter(segment_start < loc$endOff,  segment_end > loc$startOff) 
 
-        edit_paragraphs_LF()
+        edit_display_LF()
 
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -548,65 +506,55 @@ mod_document_code_server <- function(id, glob) {
     })
     
     # Memo tools ----
-    observeEvent(input$add_segment_memo, {
-      browser()
-      startOff <- parse_tag_pos(req(input$tag_position), "start")
-      endOff <- parse_tag_pos(req(input$tag_position), "end")
+    ## Add new free segment memo ----
+    observeEvent(glob$docmemo$add_segment_memo, {
 
-      if (endOff >= startOff) {
+      if (loc$endOff >= loc$startOff) {
        new_segment_id <- write_memo_segment_db(
           pool = glob$pool,
           active_project = glob$active_project,
           user_id = glob$user$user_id,
           doc_id = input$doc_selector,
           code_id = NA,
-          startOff,
-          endOff
+          loc$startOff,
+          loc$endOff
         )
       new_memo_id  <- add_memo_record(
         pool = glob$pool,
         project = glob$active_project,
-        text = "TODO grab memo text",
+        text = input$segment_memo$text,
         user_id = glob$user$user_id
       )
       new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
       #add_memo_segment_map(...)
       DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-      loc$par_memoed <- loc$paragraphs |> 
-        dplyr::filter(segment_start < endOff,  segment_end > startOff) 
-      edit_memos_LF()
-
+      loc$par_index <- loc$paragraphs |> 
+        dplyr::filter(loc$startOff > segment_start, loc$endOff < segment_end) 
+      edit_display_LF()
+      loc$memos_observer <- loc$memos_observer + 1
+      #glob$memos_observer <- glob$memos_observer + 1
       }
     })
+    ## Add new coded segment memo ----
+    ## Add new free segment memo ----
+
+
 
     
-    ## Observe text_memo_click ----
-
-    observeEvent(input$text_memo_click, {
-      text_memo_input <-  strsplit(input$text_memo_click, " ")[[1]][1]
-      print(text_memo_input)
-      #shinyjs::toggleClass(text_memo_input, "show-memo", asis = TRUE)
-      #                    insertUI(
-      #    selector = paste0("#", text_memo_input),
-      #    where = "beforeEnd",
-      #    ui =   tags$div(id =  paste0("text_memo_extra-", text_memo_input),
-      # class = "text_memo_extra",
-      # span("This is the text of my memo. Lore impsum etc.")
-      #    )
-        # )
+    ## Observe text_memo_edit_click ----
+    observeEvent(input$text_memo_edit_click, {
+      rql_message(input$text_memo_edit_click)
     })
 
 
     ## Observe segment memo input ----
-    observeEvent(input$segment_memo, {
+    observeEvent(loc$memos_observer, {
       print(input$segment_memo)
     })
     
 
     ## Observe memo show ----
      observeEvent(glob$docmemo$memo_show, {
-          print(glob$docmemo$memo_show)
-
       if (glob$docmemo$memo_show) {
         shinyjs::show(selector = ".text_memo_btn, .text_memo_edit.show_edit")
       } else {
@@ -618,13 +566,14 @@ mod_document_code_server <- function(id, glob) {
     # Helper: position counter ---------------
     output$captured_range <- renderText({
       req(isTruthy(input$tag_position))
-      splitted_range <- strsplit(input$tag_position, split = "-")
-      if (splitted_range[[1]][1] == splitted_range[[1]][2]) {
-        reported_range <- unique(splitted_range[[1]])
+      if (loc$startOff == loc$endOff) {
+        reported_range <- loc$startOff
+      } else if (loc$startOff > loc$endOff) {
+        reported_range <- ""
       } else {
-        reported_range <- input$tag_position
+         reported_range <- input$tag_position
       }
-      paste(reported_range)
+      as.character(reported_range)
     })
 
     # Local functions -------------------
@@ -652,77 +601,54 @@ mod_document_code_server <- function(id, glob) {
       }
     }
 
-    ## edit_paragraphs_LF  -------------------
-    edit_paragraphs_LF <- function() {
-                local_text_data <- load_doc_to_display(
-          glob$pool,
-          glob$active_project,
-          user = glob$user,
-          doc_selector = input$doc_selector,
-          raw_text = loc$raw_text,
-          paragraphs = loc$par_coded,
-          loc$codebook,
-          highlight = loc$highlight,
-          ns = NS(id)
-        ) |> 
-        dplyr::filter(segment_start >= min(loc$par_coded$segment_start), segment_end <= max(loc$par_coded$segment_end))
 
-         par_ids_local <- unique(local_text_data$par_id)
-
-                purrr::walk(par_ids_local, .f = function(x) {
-         
-           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
-           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
-                })
-    }
-
-
-    ## edit_memos_LF  -------------------
-    edit_memos_LF <- function() {
-                local_text_data <- load_doc_to_display(
+    ## edit_display_LF  -------------------
+    edit_display_LF <- function() {
+        text_data <- load_doc_to_display(
           pool = glob$pool,
           active_project = glob$active_project,
           user = glob$user,
           doc_selector = input$doc_selector,
           raw_text = loc$raw_text,
-          paragraphs = loc$par_memoed,
+          paragraphs = loc$par_index,
           codebook = glob$codebook,
           highlight = loc$highlight,
           ns = NS(id)
         ) |> 
-        dplyr::filter(segment_start >= min(loc$par_memoed$segment_start), segment_end <= max(loc$par_memoed$segment_end))
+        dplyr::filter(par_id %in% loc$par_index$par_id)
          
 
-         par_ids_local <- unique(local_text_data$par_id)
+        par_ids <- unique(text_data$par_id)
 
-                purrr::walk(par_ids_local, .f = function(x) {
-         
-           par_local <- local_text_data |> dplyr::filter(par_id == x)  |> dplyr::select(-span_id, -par_id)
-           spans <- purrr::pmap(par_local, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-            new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-            session$sendCustomMessage("updateParagraphContent", list(id = x, data = new_text))
-                })
-              
-              text_memos  <- load_memos_to_display(
+        purrr::walk(par_ids, .f = function(x_par) {
+           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
+              spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
+              new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+              session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
+            })
+      text_memos  <- load_memos_to_display(
                           pool = glob$pool,
                           active_project = glob$active_project,
                           user = glob$user,
                           doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
-                          )  
-      memos_data <- local_text_data |> 
+                          )   |> 
+                      dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
+
+      memos_data <- text_data |> 
         dplyr::select(span_id, memo_id) |> 
         dplyr::filter(!is.na(memo_id)) |> 
         dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
         tidyr::unnest(cols = c("memo_id")) |>
         dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
-        dplyr::filter(memo_id != "memo")
+        dplyr::filter(memo_id != "memo") |> 
+        dplyr::left_join(text_memos |> dplyr::select(memo_id, text), by = "memo_id")
 
-      purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
-              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo memo") 
-              insertUI(paste0("#", span_id), ui = memo_html)
-    })
+      purrr::pmap(memos_data, function(span_id, memo_id, text) {
+              memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
+                            icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
+                             .noWS = c("outside", "after-begin", "before-end"))
+              insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
+      })
     }
 
     ## generate_code_extra_LF  -------------------

@@ -303,6 +303,7 @@ position: relative;
 .memo_segment_container {
     resize: vertical; 
     overflow: auto;
+    scrollbar-width: none;
     min-height: 25vh;
     max-height: 80vh;
   }
@@ -351,21 +352,15 @@ position: relative;
 }
 
 .text_memo_btn.show_memo::after {
-  display: block; /* Visible when the class is added */
+  display: block;
 }
 
 .text_memo_edit {
-  font-size: 165%;
-  margin-right: 5px;
-  margin-left: 5px;
-  margin-top: 3px;
-  background-color: white;
-  color: rgb(225, 225, 225);
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-bottom: 2px;
-  padding-top: 1px;
-  display: none;
+	font-size: 165%;
+	margin-right: 5px;
+	margin-left: -5px;
+	color: rgb(225, 225, 225);
+	display: none;
 }
 .text_memo_edit.show_edit {
   display: inline-block;
