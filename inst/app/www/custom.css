@@ -350,6 +350,23 @@ position: relative;
   z-index: inherit;
 }
 
-.text_memo_btn.show-memo::after {
+.text_memo_btn.show_memo::after {
   display: block; /* Visible when the class is added */
+}
+
+.text_memo_edit {
+  font-size: 165%;
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 3px;
+  background-color: white;
+  color: rgb(225, 225, 225);
+  padding-left: 3px;
+  padding-right: 3px;
+  padding-bottom: 2px;
+  padding-top: 1px;
+  display: none;
+}
+.text_memo_edit.show_edit {
+  display: inline-block;
 }

@@ -337,7 +337,9 @@ mod_document_code_server <- function(id, glob) {
         dplyr::filter(memo_id != "memo")
 
       purrr::map2(memos_data$span_id, memos_data$memo_id, function(span_id, memo_id) {
-              memo_html <- icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo`="This is the text of my memo.")
+              memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo`="This is the text of my memo.", .noWS = c("outside", "after-begin", "before-end")),
+                            icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
+                             .noWS = c("outside", "after-begin", "before-end"))
               insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
       })
 
@@ -599,9 +601,9 @@ mod_document_code_server <- function(id, glob) {
           print(glob$docmemo$memo_show)
 
       if (glob$docmemo$memo_show) {
-        shinyjs::show(selector = ".text_memo, .text_memo_extra")
+        shinyjs::show(selector = ".text_memo_btn, .text_memo_edit.show_edit")
       } else {
-        shinyjs::hide(selector = ".text_memo, .text_memo_extra")
+        shinyjs::hide(selector = ".text_memo_btn, .text_memo_edit.show_edit")
       }
     })
 

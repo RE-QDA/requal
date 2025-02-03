@@ -245,8 +245,16 @@ document.addEventListener('click', (e) => {
   if (e.target.classList.contains('text_memo_btn')) { // Check if the clicked element has the class
     // Find the maximum z-index among all elements with the class 'text_memo_btn'
     e.target.style.zIndex = ++maxZ;
-    e.target.classList.toggle('show-memo');
+    e.target.classList.toggle('show_memo');
     Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
+
+    // Find the next sibling element with the class 'text-memo-edit'
+    const nextSibling = e.target.nextElementSibling;
+    console.log(nextSibling)
+    if (nextSibling && nextSibling.classList.contains('text_memo_edit')) {
+      // Add the class 'show-edit' to the next sibling element
+      nextSibling.classList.toggle('show_edit');
     }
+  }
 });
 
