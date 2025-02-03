@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -31,8 +32,8 @@
 </head>
 <body>
   <label for="memotype">Memo type:</label>
-  <select name="memotype" id="segmentTypeInput">
-    <option value="freesegment">Free segment</option>
+  <select name="memotype" id="segmentTypeInput" data-memo_type="freesegment" onchange="segmentTypeUpdate()">
+    <option value="freesegment" selected>Free segment</option>
     <option value="codedsegment">Coded segment</option>
   </select> 
   <textarea id="segmentMemoInput" placeholder="Free segment memo" oninput="segmentMemoUpdate()"></textarea>
@@ -40,7 +41,20 @@
     function segmentMemoUpdate() {
       let text = document.getElementById("segmentMemoInput").value;
       document.getElementById("segmentMemoInput").setAttribute('data-memo_text', text);
-      document.getElementById("segmentTypeInput").setAttribute('data-memo_type', text);
+      updateDataset();
+    }
+
+    function segmentTypeUpdate() {
+      let type = document.getElementById("segmentTypeInput").value;
+      document.getElementById("segmentTypeInput").setAttribute('data-memo_type', type);
+      updateDataset();
+    }
+
+    function updateDataset() {
+      let text = document.getElementById("segmentMemoInput").dataset.memo_text || '';
+      let type = document.getElementById("segmentTypeInput").dataset.memo_type || '';
+      document.getElementById("segmentMemoInput").setAttribute('data-memo_text', text);
+      document.getElementById("segmentTypeInput").setAttribute('data-memo_type', type);
     }
   </script>
 </body>

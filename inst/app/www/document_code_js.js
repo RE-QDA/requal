@@ -120,33 +120,44 @@ $(document).ready(function() {
 
   // Ensure the iframe is loaded before accessing its content
   iframe.onload = function() {
-    var res = iframe.contentDocument.getElementById('segmentMemoInput');
+    var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
+    var segmentTypeElement = iframe.contentDocument.getElementById('segmentTypeInput');
 
-    if (res) {
+    if (segmentMemoElement && segmentTypeElement) {
+      // Function to update Shiny input with both values
+      var updateShinyInput = function() {
+        var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
+        var segmentTypeValue = segmentTypeElement.dataset.memo_type || '';
+        
+        Shiny.setInputValue('document_code_ui_1-segment_memo', {
+          text: segmentMemoValue,
+          type: segmentTypeValue
+        });
+      };
+
       // Define a callback function to execute when mutations are observed
       var observerCallback = function(mutationsList, observer) {
-        for (var mutation of mutationsList) {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'data-memo_text') {
-            var segmentMemoValue = res.dataset.memo_text;
-            Shiny.setInputValue('document_code_ui_1-segment_memo', segmentMemoValue);
-          }
-        }
+        updateShinyInput();
       };
 
       // Create an observer instance linked to the callback function
       var observer = new MutationObserver(observerCallback);
 
-      // Start observing the target node for configured mutations
-      observer.observe(res, {
-        attributes: true, // Observe attribute changes
-        attributeFilter: ['data-memo_text'] // Only observe changes to the 'data-quickode' attribute
+      // Start observing the target nodes for configured mutations
+      observer.observe(segmentMemoElement, {
+        attributes: true,
+        attributeFilter: ['data-memo_text']
+      });
+
+      observer.observe(segmentTypeElement, {
+        attributes: true,
+        attributeFilter: ['data-memo_type']
       });
 
       // Initial setInputValue call to handle the current state
-      var initialsegmentMemoValue = res.dataset.memo_text;
-      Shiny.setInputValue('document_code_ui_1-segment_memo', initialsegmentMemoValue);
+      updateShinyInput();
     } else {
-      console.error('Element with id "segmentMemoInput" not found in iframe.');
+      console.error('Element with id "segmentMemoInput" or "segmentTypeInput" not found in iframe.');
     }
   };
 });
