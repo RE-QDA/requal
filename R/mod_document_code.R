@@ -623,7 +623,7 @@ mod_document_code_server <- function(id, glob) {
           ,
           highlight = loc$highlight
         ) 
-
+        print(text_data)
         par_ids <- unique(text_data$par_id)
 
         purrr::walk(par_ids, .f = function(x_par) {

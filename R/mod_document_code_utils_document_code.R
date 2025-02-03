@@ -228,7 +228,6 @@ write_memo_segment_db <- function(
         startOff,
         endOff
 ) {
-    #TODO: if overlap, edit instead of write
             segment_df <- data.frame(project_id = active_project,
                                  user_id = user_id,
                                  doc_id = doc_id,
@@ -263,7 +262,7 @@ write_memo_segment_db <- function(
         rql_message("Segment memo not added")
     }
 
-    
+    return(max(written_segment_id))
     
 }
 
