@@ -161,6 +161,15 @@ $(document).ready(function() {
     }
   };
 });
+// Refresh memo iframe
+Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
+  var iframe = document.getElementsByTagName('iframe')[1];
+  iframe.src = iframe.src;
+  Shiny.setInputValue('document_code_ui_1-segment_memo', {
+    text: '',
+    type: 'freesegment'
+  });
+});
 
 // Functions for scrolling
 $(document).ready(function() {

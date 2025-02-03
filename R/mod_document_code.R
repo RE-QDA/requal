@@ -151,7 +151,8 @@ mod_document_code_server <- function(id, glob) {
     loc$startOff <- 0
     loc$endOff <- 0
     golem::invoke_js('clearArticle', list())
-    golem::invoke_js('refreshIframe', message = list())
+    golem::invoke_js('refreshIframe', list())
+    golem::invoke_js('refreshMemoIframe', list())
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -305,6 +306,7 @@ mod_document_code_server <- function(id, glob) {
   
     # Display/edit text  -----
     observeEvent(loc$display_observer, {
+      browser()
       req(loc$display_observer > 0)
       edit_display_LF()
     })
@@ -339,8 +341,7 @@ mod_document_code_server <- function(id, glob) {
         loc$par_index <- loc$paragraphs |> 
         dplyr::filter(segment_start < loc$endOff,  segment_end > loc$startOff) 
 
-        edit_display_LF()
-
+        loc$display_observer <- loc$display_observer + 1
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
@@ -530,7 +531,9 @@ mod_document_code_server <- function(id, glob) {
       DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
       loc$par_index <- loc$paragraphs |> 
         dplyr::filter(loc$startOff > segment_start, loc$endOff < segment_end) 
-      edit_display_LF()
+        print(loc$par_index)
+      golem::invoke_js('refreshMemoIframe', list())
+      loc$display_observer <- loc$display_observer + 1
       loc$memos_observer <- loc$memos_observer + 1
       #glob$memos_observer <- glob$memos_observer + 1
       }
@@ -623,8 +626,8 @@ mod_document_code_server <- function(id, glob) {
         purrr::walk(par_ids, .f = function(x_par) {
            par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
               spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-              new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
-              session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
+                new_text <- purrr::map_chr(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span></p>')
+                  session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
             })
       text_memos  <- load_memos_to_display(
                           pool = glob$pool,
@@ -635,18 +638,25 @@ mod_document_code_server <- function(id, glob) {
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
 
       memos_data <- text_data |> 
-        dplyr::select(span_id, memo_id) |> 
+        dplyr::select(par_id, span_id, memo_id) |> 
+        dplyr::filter(par_id %in% par_ids) |> 
+        dplyr::select(-par_id) |> 
         dplyr::filter(!is.na(memo_id)) |> 
         dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
         tidyr::unnest(cols = c("memo_id")) |>
         dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
         dplyr::filter(memo_id != "memo") |> 
-        dplyr::left_join(text_memos |> dplyr::select(memo_id, text), by = "memo_id")
-
+        dplyr::inner_join(
+          text_memos |> 
+          dplyr::select(memo_id, text), 
+          by = "memo_id"
+          ) 
+      print(memos_data)
       purrr::pmap(memos_data, function(span_id, memo_id, text) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                             icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
+                             print(memo_html)
               insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
       })
     }
@@ -676,8 +686,8 @@ mod_document_code_server <- function(id, glob) {
         actionButton(ns("close_code_extra_div"), "", icon = icon("x"), style = "background: transparent; border: none; color: lightgray;")
       ),
       "Code:", tags$b(code_info$code_name), br(),
-      "Document:", tags$b(segments_info$n[1]), br(),
-      "Total:", tags$b(sum(segments_info$n)), br()
+      "Document:", tags$b(ifelse(is.na(segments_info$n[1]), 0, segments_info$n[1])), br(),
+      "Total:", tags$b(ifelse(is.na(sum(segments_info$n)), 0, sum(segments_info$n))), br()
   )
         )
     }
