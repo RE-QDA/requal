@@ -549,7 +549,7 @@ mod_document_code_server <- function(id, glob) {
     
     # Memo tools ----
     observeEvent(input$add_segment_memo, {
-      
+      browser()
       startOff <- parse_tag_pos(req(input$tag_position), "start")
       endOff <- parse_tag_pos(req(input$tag_position), "end")
 
@@ -595,6 +595,13 @@ mod_document_code_server <- function(id, glob) {
       #    )
         # )
     })
+
+
+    ## Observe segment memo input ----
+    observeEvent(input$segment_memo, {
+      print(input$segment_memo)
+    })
+    
 
     ## Observe memo show ----
      observeEvent(glob$docmemo$memo_show, {

@@ -114,7 +114,42 @@ Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   Shiny.setInputValue('document_code_ui_1-quickcode', '');
 });
 
+// Obtain information from memo iframe and send to Shiny
+$(document).ready(function() {
+  var iframe = document.getElementsByTagName('iframe')[1];
 
+  // Ensure the iframe is loaded before accessing its content
+  iframe.onload = function() {
+    var res = iframe.contentDocument.getElementById('segmentMemoInput');
+
+    if (res) {
+      // Define a callback function to execute when mutations are observed
+      var observerCallback = function(mutationsList, observer) {
+        for (var mutation of mutationsList) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-memo_text') {
+            var segmentMemoValue = res.dataset.memo_text;
+            Shiny.setInputValue('document_code_ui_1-segment_memo', segmentMemoValue);
+          }
+        }
+      };
+
+      // Create an observer instance linked to the callback function
+      var observer = new MutationObserver(observerCallback);
+
+      // Start observing the target node for configured mutations
+      observer.observe(res, {
+        attributes: true, // Observe attribute changes
+        attributeFilter: ['data-memo_text'] // Only observe changes to the 'data-quickode' attribute
+      });
+
+      // Initial setInputValue call to handle the current state
+      var initialsegmentMemoValue = res.dataset.memo_text;
+      Shiny.setInputValue('document_code_ui_1-segment_memo', initialsegmentMemoValue);
+    } else {
+      console.error('Element with id "segmentMemoInput" not found in iframe.');
+    }
+  };
+});
 
 // Functions for scrolling
 $(document).ready(function() {
