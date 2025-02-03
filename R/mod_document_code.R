@@ -306,6 +306,7 @@ mod_document_code_server <- function(id, glob) {
   
     # Display/edit text  -----
     observeEvent(loc$display_observer, {
+      browser()
       req(loc$display_observer > 0)
       edit_display_LF()
     })
@@ -659,7 +660,6 @@ mod_document_code_server <- function(id, glob) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                             icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
-                             print(memo_html)
               insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
       })
     }  

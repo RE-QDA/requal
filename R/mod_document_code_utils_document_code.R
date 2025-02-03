@@ -228,7 +228,7 @@ write_memo_segment_db <- function(
         startOff,
         endOff
 ) {
-    
+    #TODO: if overlap, edit instead of write
             segment_df <- data.frame(project_id = active_project,
                                  user_id = user_id,
                                  doc_id = doc_id,
@@ -419,7 +419,7 @@ load_memos_to_display <- function(pool,
                                 user,
                                 doc_selector
                                 ){
-    
+    # Get info about segments with memos
     memoed_segments <- load_segments_db(pool = pool, 
                                        active_project = active_project,
                                        user = user,
@@ -428,14 +428,15 @@ load_memos_to_display <- function(pool,
                             dplyr::pull(segment_id)
     memo_res <- NULL
     if (length(memoed_segments) > 0) {
-
+        # Map segments to memos
         memo_seg <- dplyr::tbl(pool, "memos_segments_map") |> 
             dplyr::filter(segment_id %in% memoed_segments) |> 
             dplyr::collect()
+        # Get info about memo content
         memo_data <- dplyr::tbl(pool, "memos")  |> 
             dplyr::filter(memo_id %in% !!unique(memo_seg$memo_id)) |>  
             dplyr::collect() 
-            
+        # Bind memo details to mapped memos
         memo_res <- memo_seg |> 
                     dplyr::left_join(memo_data, by = "memo_id") 
     }
