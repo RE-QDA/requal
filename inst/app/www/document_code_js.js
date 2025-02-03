@@ -224,13 +224,18 @@ Shiny.addCustomMessageHandler('clearContent', function(message) {
 
 Shiny.addCustomMessageHandler('updateParagraphContent', function(message) {
   const container = document.getElementById(message.id);
-  const fragment = document.createDocumentFragment();
-  // Create new content
-  const newElement = document.createElement('div');
-  newElement.innerHTML = message.data;
-  fragment.appendChild(newElement);
-  // Replace existing content
-  container.innerHTML = ''; // Clear existing content
-  container.appendChild(fragment); // Add new content
+  
+  // Create a temporary element to hold the new content
+  const tempElement = document.createElement('div');
+  tempElement.innerHTML = message.data;
+
+  // Replace the existing content with the new content
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
+  while (tempElement.firstChild) {
+    container.appendChild(tempElement.firstChild);
+  }
 });
     

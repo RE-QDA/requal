@@ -268,10 +268,10 @@ write_memo_segment_db <- function(
 }
 
 # calculate code overlap for doc display ----
-calculate_code_overlap <- function(coded_segments, paragraphs) {
+calculate_code_overlap <- function(segments, paragraphs) {
 
 events_df <- dplyr::bind_rows(
-    paragraphs, coded_segments
+    paragraphs, segments
 ) |> dplyr::select(segment_start, segment_end) |> 
 tidyr::pivot_longer(starts_with("segment"), names_to = "event", values_to = "position") |> 
 dplyr::arrange(position) 
@@ -325,7 +325,7 @@ dplyr::bind_rows(missed_rows) |>
 named_starts <- stats::setNames(events_final$segment_start, events_final$span_id)
 named_ends <- stats::setNames(events_final$segment_start, events_final$span_id)
 
-long_codes <- coded_segments |> 
+long_codes <- segments |> 
 dplyr::mutate(span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
 intersect(
     names(named_starts[named_starts >= x]),
@@ -364,24 +364,27 @@ load_doc_to_display <- function(pool,
                                 raw_text,
                                 paragraphs,
                                 codebook,
-                                highlight,
-                                ns){
-    coded_segments <- load_segments_db(pool, 
-                                       active_project,
-                                       user,
-                                       doc_selector)
-    memos_index <- coded_segments$segment_id[is.na(coded_segments$code_id)]
+                                highlight){
+    min_start <- min(paragraphs$segment_start)
+    max_end <- max(paragraphs$segment_end)
+    segments <- load_segments_db(pool, 
+                        active_project,
+                        user,
+                        doc_selector) |> 
+                    dplyr::filter(segment_start >= min_start,
+                                segment_end <= max_end)
+
+    memos_index <- segments$segment_id[is.na(segments$code_id)]
     memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |> 
         dplyr::filter(segment_id %in% memos_index) |> 
         dplyr::collect()
 
     if (nrow(memos_segments_map) > 0) {
-        coded_segments <- coded_segments |> 
+        segments <- segments |> 
             dplyr::left_join(memos_segments_map, by = "segment_id")
     }
-    
-    spans_data <- calculate_code_overlap(coded_segments, paragraphs)
 
+    spans_data <- calculate_code_overlap(segments, paragraphs)
     code_names <- codebook %>%
         dplyr::select(code_id, code_name, code_color) %>%
         dplyr::mutate(code_id = as.character(code_id))
@@ -400,8 +403,13 @@ load_doc_to_display <- function(pool,
                             blend_colors,
                             code_names)
         ) 
+        if (nrow(code_names_lookup) > 0) {
     spans <- spans_data %>%
         dplyr::left_join(code_names_lookup, by = "code_id")
+        } else {
+    spans <- spans_data %>%
+        dplyr::mutate(code_name = NA) 
+        }
     return(spans)
 }
 
