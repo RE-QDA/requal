@@ -33,7 +33,7 @@ knitr::include_graphics("https://owncloud.cesnet.cz/index.php/s/mQcxC998RC6qwVP/
 
 ### Prerequisites
 
-To use `requal`, you need to have the [R language](https://www.r-project.org) installed and running on your machine. You can download and install R from [here](https://cloud.r-project.org)). You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
+To use `requal`, you need to have the [R language](https://www.r-project.org) installed and running on your machine. You can download and install R from [here](https://cran.r-project.org/). You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
 
 ### Package 
 
