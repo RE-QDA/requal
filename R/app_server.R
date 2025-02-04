@@ -95,7 +95,7 @@ app_server <- function(input, output, session) {
       updateTabsetPanel(session, "tab_menu", input$analyze_link$tab_menu)
       glob$analyze_link <- list(
         doc_id = input$analyze_link$doc_id,
-        segment_start = input$analyze_link$segment_start
+        segment_id = input$analyze_link$segment_id
         )
   })
 

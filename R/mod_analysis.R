@@ -200,7 +200,7 @@ mod_rql_button_server(
       if (nrow(loc$segments_df) > 0) {
         loc$segments_taglist <- purrr::pmap(
           list(
-            loc$segments_df$segment_start,
+            loc$segments_df$segment_id,
             loc$segments_df$segment_text,
             loc$segments_df$doc_id,
             loc$segments_df$doc_name,
@@ -208,7 +208,7 @@ mod_rql_button_server(
             loc$segments_df$code_color
           ),
           ~ format_segments(
-            segment_start = ..1,
+            segment_id = ..1,
             segment_text = ..2,
             segment_document_id = ..3,
             segment_document_name = ..4,

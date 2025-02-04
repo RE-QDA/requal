@@ -59,25 +59,7 @@ dummy <- function(){
 set_dashboard_body <- function() {
     
     shinydashboard::dashboardBody( 
-        # css for control bar icon
-        tags$head(tags$style(HTML('
-#launchpad_icon{
-  margin-right: 10px;
-  color: white;
-  animation-name: launchpad-animation;
-  animation-duration: 1s;
-  animation-iteration-count: 1;
-}
-
-@keyframes launchpad-animation {
-  from {color: white;}
-  to {color: red;}
-}
-
-  '))),
-
 shinyjs::hidden(shinydashboard::tabItems(
-    
     shinydashboard::tabItem("Project",
             mod_project_ui("mod_project_ui_1")),
     shinydashboard::tabItem("Data",

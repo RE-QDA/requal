@@ -146,6 +146,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(glob$active_project), {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
+    loc$doc_selector  <- 0
     loc$text_observer <- 0
     loc$display_observer <- 0
     loc$startOff <- 0
@@ -194,7 +195,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(c(input$doc_selector, 
                   input$doc_refresh), {
         req(input$doc_selector)
-        loc$doc_selector <- ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
+        loc$doc_selector <- input$doc_selector
         loc$codes_menu_observer  <- loc$codes_menu_observer + 1 # must run first
         loc$text_observer <- loc$text_observer + 1
     })
@@ -243,12 +244,13 @@ mod_document_code_server <- function(id, glob) {
   ## Observe Analyze screen ----
   # Listen to message from Analyze screen
   observeEvent(glob$analyze_link, {
-    if (input$doc_selector != glob$analyze_link$doc_id) {
-      updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = glob$analyze_link$doc_id)
+    if (loc$doc_selector != glob$analyze_link$doc_id) {
+      loc$doc_selector  <- glob$analyze_link$doc_id
+      updateSelectInput(session = session, "doc_selector", choices = c("", glob$documents), selected = loc$doc_selector)
       #loc$codes_menu_observer  <- loc$codes_menu_observer + 1
       loc$text_observer <- loc$text_observer + 1
     }
-  golem::invoke_js('scrollToSegment', list(target_start = glob$analyze_link$segment_start))
+  golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
   })
 
   # Render codes ----

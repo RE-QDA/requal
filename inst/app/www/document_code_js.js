@@ -179,7 +179,7 @@ $(document).ready(function() {
     const maxAttempts = 20; // Limit the number of attempts
 
     function attemptScroll() {
-      let el = findScrollElement(arg);
+      let el = findScrollElement(arg.target_id);
       if (el) {
         console.log("Element found, scrolling into view:", el);
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -198,18 +198,33 @@ $(document).ready(function() {
   });
 });
 
-function findScrollElement(arg) {
-  let targetStart = parseInt(arg.target_start, 10);
-  let segments = document.querySelectorAll('article .segment');
+function findScrollElement(targetId) {
+  console.log(targetId);
 
-  let matchingElement = Array.from(segments).find(el => {
-    let startEnd = el.dataset.startend.split(' ');
-    let startValue = parseInt(startEnd[0], 10);
-    return startValue === targetStart;
-  });
+  // Construct the class name based on the targetId
+  const className = `segment_id_${targetId}`;
 
-  if (matchingElement) {
-    return matchingElement;
+  // Find all elements with the constructed class name
+  let matchingElements = document.querySelectorAll(`.${className}`);
+
+  if (matchingElements.length > 0) {
+    // Scroll to the first matching element
+    let firstElement = matchingElements[0];
+    firstElement.scrollIntoView({ behavior: 'smooth' });
+
+    // Add the animation class to all matching elements
+    matchingElements.forEach(el => {
+      el.classList.add('segment_animated');
+      el.classList.add('animate_background');
+    });
+
+    // Optionally, remove the animation class after the animation completes
+    setTimeout(() => {
+      matchingElements.forEach(el => {
+        el.classList.remove('animate_background');
+        el.classList.remove('segment_animated');
+      });
+    }, 5000); // Match the duration of the animation
   } else {
     console.log("No matching segment found.");
     return null;
