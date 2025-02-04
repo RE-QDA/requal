@@ -194,6 +194,7 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(c(input$doc_selector, 
                   input$doc_refresh), {
         req(input$doc_selector)
+        loc$doc_selector <- ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
         loc$codes_menu_observer  <- loc$codes_menu_observer + 1 # must run first
         loc$text_observer <- loc$text_observer + 1
     })
@@ -262,7 +263,7 @@ mod_document_code_server <- function(id, glob) {
       req(loc$text_observer > 0) # ignore init value
       golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
-      loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id))
+      loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  loc$doc_selector)
       loc$total_chars <- nchar(loc$raw_text)
       paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(loc$raw_text, "\n|\r")[[1]])
       if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = loc$total_chars)
@@ -300,7 +301,8 @@ mod_document_code_server <- function(id, glob) {
             '<span class = "br">&#8203</span></p>')
         })
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
-      loc$par_index <- loc$paragraphs
+      loc$startOff <- 1
+      loc$endOff <- loc$total_chars
       loc$display_observer <- loc$display_observer + 1
   })
   
@@ -312,7 +314,7 @@ mod_document_code_server <- function(id, glob) {
     # Coding tools ------------------------------------------------------------
     observeEvent(req(input$selected_code), {
       # We need a document and selection positions
-      req(input$doc_selector)
+      req(loc$doc_selector)
       req(input$tag_position)
       # Register code for which action is executed
       loc$code <- input$selected_code
@@ -330,16 +332,12 @@ mod_document_code_server <- function(id, glob) {
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
-          doc_id = input$doc_selector,
+          doc_id = loc$doc_selector,
           code_id = loc$code,
           loc$startOff,
           loc$endOff
         )
-        
-        
-        loc$par_index <- loc$paragraphs |> 
-        dplyr::filter(segment_start < loc$endOff,  segment_end > loc$startOff) 
-
+ 
         loc$display_observer <- loc$display_observer + 1
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -366,7 +364,7 @@ mod_document_code_server <- function(id, glob) {
     })
     # After quickcode button is pressed
     observeEvent(req(input$quickcode_btn), {
-      req(input$doc_selector)
+      req(loc$doc_selector)
      # check if code name is unique
      if (input$quickcode %in% glob$codebook$code_name) {
         warn_user("Code names must be unique and non-empty.")
@@ -400,7 +398,7 @@ mod_document_code_server <- function(id, glob) {
 
     ## Codes extras -----
     observeEvent(req(input$selected_code_extra), {
-      req(input$doc_selector)
+      req(loc$doc_selector)
       removeUI("#code_extra_div")
       sel <- paste0("#", ns(paste0("more-", input$selected_code_extra)))
       generate_code_extra_LF(sel)
@@ -412,14 +410,14 @@ mod_document_code_server <- function(id, glob) {
     # Segment removal ----------
     observeEvent(input$remove_codes, {
       req(glob$active_project)
-      req(input$doc_selector)
+      req(loc$doc_selector)
      
       if (glob$user$data$annotation_other_modify == 0) {
         loc$marked_segments_df <- load_segment_codes_db(
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
-          active_doc = input$doc_selector,
+          active_doc = loc$doc_selector,
           marked_codes = parse_tag_pos(
             input$tag_position,
             "start"
@@ -430,7 +428,7 @@ mod_document_code_server <- function(id, glob) {
           glob$pool,
           glob$active_project,
           user_id = NULL,
-          active_doc = input$doc_selector,
+          active_doc = loc$doc_selector,
           marked_codes = parse_tag_pos(
             input$tag_position,
             "start"
@@ -445,15 +443,13 @@ mod_document_code_server <- function(id, glob) {
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
-          doc_id = input$doc_selector,
+          doc_id = loc$doc_selector,
           segment_id = loc$marked_segments_df$segment_id
         )
         # Refresh text
-        
-       loc$par_coded <- loc$paragraphs |> 
-        dplyr::filter(segment_start < max(loc$marked_segments_df$segment_end),  segment_end > min(loc$marked_segments_df$segment_start))
-
-        edit_paragraphs_LF()
+        loc$startOff <- min(loc$marked_segments_df$segment_start)
+        loc$endOff <- max(loc$marked_segments_df$segment_end)
+        loc$display_observer <- loc$display_observer + 1
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
       } else {
@@ -489,17 +485,16 @@ mod_document_code_server <- function(id, glob) {
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
-          doc_id = input$doc_selector,
+          doc_id = loc$doc_selector,
           segment_id = input$codes_to_remove
         )
         removeModal()
 
         # Refresh text
         
-       loc$par_coded <- loc$paragraphs |> 
-        dplyr::filter(segment_start < max(loc$marked_segments_df$segment_end),  segment_end > min(loc$marked_segments_df$segment_start))
-
-        edit_paragraphs_LF()
+        loc$startOff <- min(loc$marked_segments_df$segment_start)
+        loc$endOff <- max(loc$marked_segments_df$segment_end)
+        loc$display_observer <- loc$display_observer + 1
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
       }
@@ -514,7 +509,7 @@ mod_document_code_server <- function(id, glob) {
           pool = glob$pool,
           active_project = glob$active_project,
           user_id = glob$user$user_id,
-          doc_id = input$doc_selector,
+          doc_id = loc$doc_selector,
           code_id = NA,
           loc$startOff,
           loc$endOff
@@ -528,8 +523,6 @@ mod_document_code_server <- function(id, glob) {
       new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
       #add_memo_segment_map(...)
       DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-      loc$par_index <- loc$paragraphs |> 
-        dplyr::filter(loc$startOff > segment_start, loc$endOff < segment_end) 
       golem::invoke_js('refreshMemoIframe', list())
       loc$display_observer <- loc$display_observer + 1
       loc$memos_observer <- loc$memos_observer + 1
@@ -605,6 +598,8 @@ mod_document_code_server <- function(id, glob) {
 
     ## edit_display_LF  -------------------
     edit_display_LF <- function() {
+      loc$par_index <- loc$paragraphs |> 
+        dplyr::filter(segment_start <= loc$endOff, segment_end >= loc$startOff) 
         text_data <- load_doc_to_display(
           pool = glob$pool
           ,
@@ -612,7 +607,7 @@ mod_document_code_server <- function(id, glob) {
           ,
           user = glob$user
           ,
-          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
+          doc_selector = loc$doc_selector
           ,
           raw_text = loc$raw_text
           ,
@@ -635,7 +630,7 @@ mod_document_code_server <- function(id, glob) {
                           pool = glob$pool,
                           active_project = glob$active_project,
                           user = glob$user,
-                          doc_selector = ifelse(isTruthy(input$doc_selector), input$doc_selector, glob$analyze_link$doc_id)
+                          doc_selector = loc$doc_selector
                           )  
         if (!is.null(text_memos)) {
           text_memos <- text_memos |> 
@@ -673,7 +668,7 @@ mod_document_code_server <- function(id, glob) {
       doc_group <- NULL
       selected_code_extra <- as.integer(input$selected_code_extra)
       active_project <- as.integer(glob$active_project)
-      active_doc <- as.integer(input$doc_selector)
+      active_doc <- as.integer(loc$doc_selector)
       code_info <- glob$codebook  |> dplyr::filter(
         code_id == selected_code_extra
       )
