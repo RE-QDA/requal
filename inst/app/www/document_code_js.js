@@ -170,7 +170,6 @@ Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
     type: 'freesegment'
   });
 });
-
 // Functions for scrolling
 $(document).ready(function() {
   Shiny.addCustomMessageHandler('scrollToSegment', function(arg) {
@@ -179,11 +178,24 @@ $(document).ready(function() {
     const maxAttempts = 20; // Limit the number of attempts
 
     function attemptScroll() {
-      let el = findScrollElement(arg.target_id);
-      if (el) {
-        console.log("Element found, scrolling into view:", el);
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      let els = findScrollElement(arg.target_id);
+      if (els) {
+        console.log("Element found, scrolling into view:", els);
+        let firstElement = els[0];
+        firstElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         clearInterval(scrollInterval); // Stop further attempts once the element is found and scrolled to
+
+        els.forEach(el => {
+          el.classList.add('highlight-effect');
+        });
+        
+        // Remove highlight after animation
+        setTimeout(() => {
+          els.forEach(el => {
+            el.classList.remove('highlight-effect');
+          });
+        }, 2000);
+
       } else {
         attempts++;
         console.log("Element not found, retrying... Attempt:", attempts);
@@ -208,15 +220,12 @@ function findScrollElement(targetId) {
   let matchingElements = document.querySelectorAll(`.${className}`);
 
   if (matchingElements.length > 0) {
-    // Scroll to the first matching element
-    let firstElement = matchingElements[0];
-    return firstElement;
+    return matchingElements;
   } else {
     console.log("No matching segment found.");
     return null;
   }
 }
-
 // Helper for clearing content
 Shiny.addCustomMessageHandler('clearContent', function(message) {
   let par = document.getElementById(message.id);
