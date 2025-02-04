@@ -210,21 +210,7 @@ function findScrollElement(targetId) {
   if (matchingElements.length > 0) {
     // Scroll to the first matching element
     let firstElement = matchingElements[0];
-    firstElement.scrollIntoView({ behavior: 'smooth' });
-
-    // Add the animation class to all matching elements
-    matchingElements.forEach(el => {
-      el.classList.add('segment_animated');
-      el.classList.add('animate_background');
-    });
-
-    // Optionally, remove the animation class after the animation completes
-    setTimeout(() => {
-      matchingElements.forEach(el => {
-        el.classList.remove('animate_background');
-        el.classList.remove('segment_animated');
-      });
-    }, 5000); // Match the duration of the animation
+    return firstElement;
   } else {
     console.log("No matching segment found.");
     return null;
