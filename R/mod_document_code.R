@@ -194,6 +194,7 @@ mod_document_code_server <- function(id, glob) {
     # Update loc$text when input$doc_selector or input$doc_refresh changes
     observeEvent(c(input$doc_selector, 
                   input$doc_refresh), {
+        golem::invoke_js("setArticleStatusValue", list(status = "loading"))
         req(input$doc_selector)
         loc$doc_selector <- input$doc_selector
         loc$codes_menu_observer  <- loc$codes_menu_observer + 1 # must run first
@@ -250,7 +251,6 @@ mod_document_code_server <- function(id, glob) {
       #loc$codes_menu_observer  <- loc$codes_menu_observer + 1
       loc$text_observer <- loc$text_observer + 1
     }
-  golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
   })
 
   # Render codes ----
@@ -259,7 +259,7 @@ mod_document_code_server <- function(id, glob) {
     loc$codes_menu
   })
 
-    # Initialize new text skelet  ----
+    # Initialize new text skelet $text_observer ----
     observeEvent(req(loc$text_observer), {
       #browser()
       req(loc$text_observer > 0) # ignore init value
@@ -308,10 +308,16 @@ mod_document_code_server <- function(id, glob) {
       loc$display_observer <- loc$display_observer + 1
   })
   
-    # Display/edit text  -----
+    # Display/edit text $display_observer -----
     observeEvent(loc$display_observer, {
       req(loc$display_observer > 0)
       edit_display_LF()
+      golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
+    })
+    observeEvent(c(req(input$doc_status), req(glob$analyze_link$segment_id)), {
+      if (req(input$doc_status) == "loaded") {
+          golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
+          }
     })
     # Coding tools ------------------------------------------------------------
     observeEvent(req(input$selected_code), {
@@ -619,7 +625,6 @@ mod_document_code_server <- function(id, glob) {
           ,
           highlight = loc$highlight
         ) 
-        print(text_data)
         par_ids <- unique(text_data$par_id)
 
         purrr::walk(par_ids, .f = function(x_par) {
@@ -653,8 +658,7 @@ mod_document_code_server <- function(id, glob) {
           by = "memo_id"
           ) 
 
-        print("memos data")
-        print(memos_data)
+ 
       purrr::pmap(memos_data, function(span_id, memo_id, text) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                             icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),

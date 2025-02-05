@@ -379,18 +379,25 @@ position: relative;
   display: inline-block;
 }
 
-.segment_animated {
-  transition: background-color 1s ease-in-out;
-  background-color: var(--code-color); /* Set the original background color */
+
+@keyframes highlightFade {
+  0% {
+    background-color: silver;
+  }
+  25% {
+    background-color: rgb(250, 250, 150);
+  }
+  50% {
+    background-color: silver;
+  }
+  75% {
+    background-color: rgb(250, 250, 150);
+  }
+  100% {
+    background-color: var(--code-color);
+  }
 }
 
-.animate_background {
-  animation-name: background-animation;
-  animation-duration: 5s;
-  animation-fill-mode: forwards; /* Retain the final state of the animation */
-}
-
-@keyframes background_animation {
-  from { background-color: yellow; }
-  to { background-color: var(--code-color); } /* Ensure this matches the original color */
+.highlight-effect {
+  animation: highlightFade 2s ease-out forwards;
 }

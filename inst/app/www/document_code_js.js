@@ -171,6 +171,10 @@ Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
   });
 });
 
+Shiny.addCustomMessageHandler('setArticleStatusValue', function(message) {
+    Shiny.setInputValue('document_code_ui_1-doc_status',  message.status);
+    console.log("Data-value set to" + message.status);
+});
 // Functions for scrolling
 $(document).ready(function() {
   Shiny.addCustomMessageHandler('scrollToSegment', function(arg) {
@@ -179,11 +183,26 @@ $(document).ready(function() {
     const maxAttempts = 20; // Limit the number of attempts
 
     function attemptScroll() {
-      let el = findScrollElement(arg.target_id);
-      if (el) {
-        console.log("Element found, scrolling into view:", el);
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      let matchedElements = findScrollElement(arg.target_id);
+
+      // Check if matchedElements is not null and has elements
+      if (matchedElements && matchedElements.length > 0) {
+        let firstElement = matchedElements[0];
+        console.log("Element found, scrolling into view:", firstElement);
+        firstElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         clearInterval(scrollInterval); // Stop further attempts once the element is found and scrolled to
+
+        // Add highlight effect to all matching elements
+        matchedElements.forEach(el => {
+          el.classList.add('highlight-effect');
+        });
+
+        // Remove highlight after 2 seconds
+        setTimeout(() => {
+          matchedElements.forEach(el => {
+            el.classList.remove('highlight-effect');
+          });
+        }, 2000);
       } else {
         attempts++;
         console.log("Element not found, retrying... Attempt:", attempts);
@@ -193,6 +212,7 @@ $(document).ready(function() {
         }
       }
     }
+
     // Set an interval to repeatedly attempt to find and scroll to the element
     const scrollInterval = setInterval(attemptScroll, 500); // Attempt every 500 milliseconds
   });
@@ -208,9 +228,7 @@ function findScrollElement(targetId) {
   let matchingElements = document.querySelectorAll(`.${className}`);
 
   if (matchingElements.length > 0) {
-    // Scroll to the first matching element
-    let firstElement = matchingElements[0];
-    return firstElement;
+    return matchingElements;
   } else {
     console.log("No matching segment found.");
     return null;
