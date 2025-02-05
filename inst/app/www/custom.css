@@ -27,6 +27,7 @@
 }
 .scrollable80#document_code_ui_1-code_list {
   margin-right: 0px;
+  scrollbar-width: none;
 }
 .scrollable90{
     border: none;
