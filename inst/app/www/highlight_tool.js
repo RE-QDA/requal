@@ -240,26 +240,5 @@
 //     }
 //   });
 // }
-let maxZ = 2;
-document.addEventListener('click', (e) => {
-  // Click on text memo icon
-  if (e.target.classList.contains('text_memo_btn')) { 
-    // Find the maximum z-index among all elements with the class 'text_memo_btn'
-    e.target.style.zIndex = ++maxZ;
-    e.target.classList.toggle('show_memo');
-    Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
 
-    // Find the next sibling element with the class 'text-memo-edit'
-    const nextSibling = e.target.nextElementSibling;
-    console.log(nextSibling)
-    if (nextSibling && nextSibling.classList.contains('text_memo_edit')) {
-      // Add the class 'show-edit' to the next sibling element
-      nextSibling.classList.toggle('show_edit');
-    }
-  } else if (e.target.classList.contains('text_memo_edit')) {
-  // Click on text memo edit icon
-  Shiny.setInputValue('document_code_ui_1-text_memo_edit_click', e.target.id + ' ' + Math.random());
-  }
-
-});
 

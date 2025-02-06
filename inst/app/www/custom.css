@@ -29,6 +29,11 @@
   margin-right: 0px;
   scrollbar-width: none;
 }
+[data-value="codetools_tabset"],
+[data-value="memotools_tabset"] {
+  max-height: 80vh;
+  scrollbar-width: none;
+}
 .scrollable90{
     border: none;
     height:90vh;
@@ -311,73 +316,6 @@ position: relative;
   background: rgb(0, 0, 0); 
   color: white;
   border-bottom: 5px solid var(--code-color);
-}
-
-
-.memo_segment_container {
-    resize: vertical; 
-    overflow: auto;
-    scrollbar-width: none;
-    min-height: 25vh;
-    max-height: 80vh;
-  }
-.memo_segment_input {
-  height: 100%; 
-  min-height: 25vh;
-  max-height: 80vh;
-  width: 100%;
-  border: 1px;
-}
-
-.text_memo_btn {
-  font-size: 165%;
-  margin-right: 5px;
-  margin-left: 5px;
-  margin-top: 3px;
-  background-color: white;
-  color: silver;
-  padding-left: 3px;
-  padding-right: 3px;
-  padding-bottom: 2px;
-  padding-top: 1px;
-}
-
-.text_memo_btn::after {
-  content: attr(data-memo);
-  display: none; /* Initially hidden */
-  position: absolute;
-  background: rgb(255, 255, 120);
-  text-align: left;
-  color: black;
-  font-size: small;
-  padding: 10px;
-	min-width: 200px;
-	min-height: 200px;
-  margin-top: -3px;
-	border-radius: 10px;
-  user-select: none;
-  font: initial;
-  font-size: medium;
-  font-family: Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  max-width: 300px;
-  border: 1px solid silver;
-  z-index: inherit;
-}
-
-.text_memo_btn.show_memo::after {
-  display: block;
-}
-
-.text_memo_edit {
-	font-size: 165%;
-	margin-right: 5px;
-	margin-left: -5px;
-	color: rgb(225, 225, 225);
-	display: none;
-}
-.text_memo_edit.show_edit {
-  display: inline-block;
 }
 
 

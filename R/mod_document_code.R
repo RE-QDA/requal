@@ -111,7 +111,7 @@ mod_document_code_ui <- function(id) {
               id = ns("memotools_tabset"),
               value = "memotools_tabset",
                 br(),
-                mod_memo_segment_ui("memo_segment_1")
+                mod_memo_segment_ui(ns("memo_segment_1"))
               )
           )
         )
@@ -141,6 +141,7 @@ mod_document_code_server <- function(id, glob) {
 
     ns <- session$ns
     loc <- reactiveValues()
+    segment_memos <- reactiveValues() # messages from nested module
     loc$highlight <- "background"
     loc$code <- NULL
     observeEvent(req(glob$active_project), {
@@ -151,9 +152,9 @@ mod_document_code_server <- function(id, glob) {
     loc$display_observer <- 0
     loc$startOff <- 0
     loc$endOff <- 0
+    loc$memo_id <- NULL
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
-    golem::invoke_js('refreshMemoIframe', list())
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -509,59 +510,18 @@ mod_document_code_server <- function(id, glob) {
     })
     
     # Memo tools ----
-    ## Add new free segment memo ----
-    observeEvent(glob$docmemo$add_segment_memo, {
-   
-      if (loc$endOff >= loc$startOff) {
-       new_segment_id <- write_memo_segment_db(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          doc_id = loc$doc_selector,
-          code_id = NA,
-          loc$startOff,
-          loc$endOff
-        )
-      new_memo_id  <- add_memo_record(
-        pool = glob$pool,
-        project = glob$active_project,
-        text = input$segment_memo$text,
-        user_id = glob$user$user_id
-      )
-      new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
-      #add_memo_segment_map(...)
-      DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-      golem::invoke_js('refreshMemoIframe', list())
-      loc$display_observer <- loc$display_observer + 1
-      loc$memos_observer <- loc$memos_observer + 1
-      #glob$memos_observer <- glob$memos_observer + 1
-      }
-    })
-    ## Add new coded segment memo ----
-    ## Add new free segment memo ----
-
+    observeEvent(c(loc$memo_id,loc$startOff, loc$endOff), {
+      segment_memos <- mod_memo_segment_server("memo_segment_1", glob, memo_id = loc$memo_id, segment_start = loc$startOff, segment_end = loc$endOff)
+      })
 
 
     
     ## Observe text_memo_edit_click ----
-    observeEvent(input$text_memo_edit_click, {
-      rql_message(input$text_memo_edit_click)
-    })
+    observeEvent(input$text_memo_click, {
+      parsed_memo_id  <- as.integer(stringr::str_extract(input$text_memo_click, "\\d+"))
+      loc$memo_id <- parsed_memo_id
+            print(paste("coding screen click", loc$memo_id))
 
-
-    ## Observe segment memo input ----
-    observeEvent(loc$memos_observer, {
-      print(input$segment_memo)
-    })
-    
-
-    ## Observe memo show ----
-     observeEvent(glob$docmemo$memo_show, {
-      if (glob$docmemo$memo_show) {
-        shinyjs::show(selector = ".text_memo_btn, .text_memo_edit.show_edit")
-      } else {
-        shinyjs::hide(selector = ".text_memo_btn, .text_memo_edit.show_edit")
-      }
     })
 
 
@@ -661,7 +621,6 @@ mod_document_code_server <- function(id, glob) {
  
       purrr::pmap(memos_data, function(span_id, memo_id, text) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
-                            icon("edit", id = paste0("edit-", memo_id), class = "fas text_memo_edit", .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
               insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
       })

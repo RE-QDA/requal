@@ -82,6 +82,7 @@ golem::add_module( name = "summary" )
 golem::add_module( name = "rql_button" )
 golem::add_module( name = "rql_hidden_ui" )
 golem::add_module( name = "memo_segment" )
+golem::add_module( name = "memo_editor")
 
 
 
@@ -111,6 +112,9 @@ golem::add_js_file( "document_code_js" )
 golem::add_js_file( "check_categories" )
 golem::add_js_handler( "handlers" )
 golem::add_css_file( "custom" )
+golem::add_css_file( "memo_editor" )
+golem::add_js_file( "memo_editor" )
+
 
 ## Add internal datasets ----
 ## If you have data in your package

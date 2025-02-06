@@ -114,63 +114,7 @@ Shiny.addCustomMessageHandler('refreshIframe', function(message) {
   Shiny.setInputValue('document_code_ui_1-quickcode', '');
 });
 
-// Obtain information from memo iframe and send to Shiny
-$(document).ready(function() {
-  var iframe = document.getElementsByTagName('iframe')[1];
-
-  // Ensure the iframe is loaded before accessing its content
-  iframe.onload = function() {
-    var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
-    var segmentTypeElement = iframe.contentDocument.getElementById('segmentTypeInput');
-
-    if (segmentMemoElement && segmentTypeElement) {
-      // Function to update Shiny input with both values
-      var updateShinyInput = function() {
-        var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
-        var segmentTypeValue = segmentTypeElement.dataset.memo_type || '';
-        
-        Shiny.setInputValue('document_code_ui_1-segment_memo', {
-          text: segmentMemoValue,
-          type: segmentTypeValue
-        });
-      };
-
-      // Define a callback function to execute when mutations are observed
-      var observerCallback = function(mutationsList, observer) {
-        updateShinyInput();
-      };
-
-      // Create an observer instance linked to the callback function
-      var observer = new MutationObserver(observerCallback);
-
-      // Start observing the target nodes for configured mutations
-      observer.observe(segmentMemoElement, {
-        attributes: true,
-        attributeFilter: ['data-memo_text']
-      });
-
-      observer.observe(segmentTypeElement, {
-        attributes: true,
-        attributeFilter: ['data-memo_type']
-      });
-
-      // Initial setInputValue call to handle the current state
-      updateShinyInput();
-    } else {
-      console.error('Element with id "segmentMemoInput" or "segmentTypeInput" not found in iframe.');
-    }
-  };
-});
-// Refresh memo iframe
-Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
-  var iframe = document.getElementsByTagName('iframe')[1];
-  iframe.src = iframe.src;
-  Shiny.setInputValue('document_code_ui_1-segment_memo', {
-    text: '',
-    type: 'freesegment'
-  });
-});
-
+// Set load or loaded status for article
 Shiny.addCustomMessageHandler('setArticleStatusValue', function(message) {
     Shiny.setInputValue('document_code_ui_1-doc_status',  message.status);
     console.log("Data-value set to" + message.status);
