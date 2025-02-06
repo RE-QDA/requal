@@ -47,11 +47,9 @@ Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
 // Add event listeners to the text_memo_btn class
 document.addEventListener('click', (e) => {
   // Restrict scope to elements within an article
-  if (e.target.closest('article')) {
     // Click on text memo icon
     if (e.target.classList.contains('text_memo_btn')) {
       handleSingleClick(e.target);
-    }
   }
 });
 // Function to handle single click

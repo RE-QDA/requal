@@ -17,8 +17,7 @@ mod_memo_segment_ui <- function(id) {
         checkboxInput(ns("memo_show"), "Show memos", value = TRUE, width = "120px")
       )
     )),
-    actionButton(ns("memo_compose"), "Compose memo"),
-    shinyjs::hidden(mod_memo_editor_ui(ns("memo_editor_1")))
+    mod_memo_editor_ui(ns("memo_editor_1"))
   )
 }
 
@@ -37,12 +36,12 @@ mod_memo_segment_server <- function(id, glob, memo_id = NULL, segment_start = NU
 
     mod_rql_hidden_ui_server("rql_hidden_ui_2")
    
-    observeEvent(input$new_memo, {
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = loc$segment_start, segment_end = loc$segment_end, ifram)
+    observeEvent(glob$active_project, {
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = isolate(loc$segment_start), segment_end = isolate(loc$segment_end), type = "segment")
       })
-    observeEvent(c(req(loc$memo_id), glob$active_project), {
+    observeEvent(req(loc$memo_id), {
                   print(paste("memos tabset screen", loc$memo_id))
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = loc$segment_start, segment_end = loc$segment_end)
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = isolate(loc$segment_start), segment_end = isolate(loc$segment_end), type = "segment")
       })
     ## Add new free segment memo ----
     observeEvent(glob$add_segment_memo, {

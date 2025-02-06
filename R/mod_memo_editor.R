@@ -13,6 +13,7 @@ mod_memo_editor_ui <- function(id) {
   tagList(
     div(
       class = "memo_editor",
+      actionButton(ns("new_memo"), "New memo"),
       div(
         class = "memo_segment_container",
         width = "100%",
@@ -33,65 +34,66 @@ mod_memo_editor_ui <- function(id) {
 #' memo_editor Server Functions
 #'
 #' @noRd
-mod_memo_editor_server <- function(id, glob, memo_id = NULL, segment_start = NULL, segment_end = NULL, iframe = FALSE) {
+mod_memo_editor_server <- function(id, glob, open_new = NULL, memo_id = NULL, segment_start = NULL, segment_end = NULL, type = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
-    return_values <- reactiveValues(  ) # messages to nesting module
-    loc$memo_id  <-  memo_id
-    loc$segment_start  <- segment_start
-    loc$segment_end  <-  segment_end
+    return_values <- reactiveValues() # messages to nesting module
+    loc$memo_id <- memo_id
+    loc$segment_start <- segment_start
+    loc$segment_end <- segment_end
+    loc$open_new <- open_new
+    observe(print(loc$open_new))
     observeEvent(req(glob$active_project), {
-    return_values$memo_text  <- NULL
-    return_values$memo_id <- NULL
-    return_values$segment_start <- NULL
-    return_values$segment_end <- NULL
+      return_values$memo_text <- NULL
+      return_values$memo_id <- NULL
+      return_values$segment_start <- NULL
+      return_values$segment_end <- NULL
     })
 
-  observeEvent(input$memo_text_external, {
-    print(input$memo_text_external)
-  })
-      observe(print(loc$memo_id))
-      observe(print(isTruthy(loc$memo_id)))
+    observeEvent(input$memo_text_external, {
+      print(input$memo_text_external)
+    })
+    observeEvent(input$new_memo, {
+      loc$memo_id <- NULL
+    })
     output$text_input_area <- renderUI({
-      glob$active_project
-        if (isTruthy(loc$memo_id))  {
-                    textAreaInput(ns("memo_text_internal"), NULL, placeholder = "Memo text", width = "100%", height = "100%", resize = "none") |> tagAppendAttributes(class = "memo_segment_input")
+      # glob$active_project
 
-        } else {
-          tags$iframe(
-            src = "www/memo.html",
-            class = "memo_segment_input"
-          )
-        }
+      if (isTruthy(loc$memo_id)) {
+        memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id)
+        memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
+          dplyr::filter(memo_id == !!memo_called_df$memo_id) |>
+          dplyr::collect()
+        loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
+        textAreaInput(ns("memo_text_internal"), NULL, value = memo_called_df$memo_text, width = "100%", height = "100%", resize = "none") |>
+          tagAppendAttributes(class = "memo_segment_input")
+      } else if (type == "segment") {
+        tags$iframe(
+          src = "www/memo.html",
+          class = "memo_segment_input"
+        )
+      } else {
+        textAreaInput(ns("memo_text_internal"), NULL, placeholder = "New text", width = "100%", height = "100%", resize = "none") |>
+          tagAppendAttributes(class = "memo_segment_input")
+      }
     })
     # Open memo to read/edit ----
     observeEvent(req(loc$memo_id), {
-
-      
-  
-        print(paste("Triggered by memo_id:", loc$memo_id))
-      memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id)
-          memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |> 
-        dplyr::filter(memo_id == !!memo_called_df$memo_id) |> 
-        dplyr::collect()
-      loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
-      print(memo_called_df$memo_text)
-
+      print(paste("Triggered by memo_id:", loc$memo_id))
     })
 
-     observeEvent(input$cancel, {
+    observeEvent(input$cancel, {
       loc$memo_id <- NULL
       loc$segment_start <- NULL
       loc$segment_end <- NULL
-      golem::invoke_js('refreshMemoIframe', list())
-
+      golem::invoke_js("refreshMemoIframe", list())
     })
     observeEvent(input$save_close, {
       browser()
     })
-   
-    
+
+
     return(return_values)
   })
 }
