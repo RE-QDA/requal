@@ -1,3 +1,7 @@
+// Replace text in iframe when a custom message is received
+Shiny.addCustomMessageHandler('replaceSegmentMemoText', function(message) {
+  replaceSegmentMemoText(message.memo_text);
+});
 // Function to replace the text of segmentMemoInput
 function replaceSegmentMemoText(newText) {
   var iframe = document.getElementsByTagName('iframe')[1];
@@ -23,6 +27,8 @@ function replaceSegmentMemoText(newText) {
   };
 }
 
+
+
 // Obtain information from memo iframe and send to Shiny
 $(document).ready(function() {
   var iframe = document.getElementsByTagName('iframe')[1];
@@ -34,7 +40,7 @@ $(document).ready(function() {
     if (segmentMemoElement) {
       var updateShinyInput = function() {
         var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
-        Shiny.setInputValue('memo_segment_1-memo_editor_1-memo', segmentMemoValue);
+        Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text', segmentMemoValue);
         console.log(segmentMemoValue);
       };
 
@@ -65,29 +71,11 @@ Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
   var iframe = document.getElementsByTagName('iframe')[1];
   iframe.src = iframe.src;
   console.log('refresh');
-  Shiny.setInputValue('memo_segment_1-memo_editor_1-memo_text', '');
 });
 
-// Replace text in iframe when a custom message is received
-Shiny.addCustomMessageHandler('replaceSegmentMemoText', function(message) {
-  replaceSegmentMemoText(message.memo_text);
-});
 
-let maxZ = 2;
 
-// Function to handle single click
-function handleSingleClick(target) {
-  Shiny.setInputValue('document_code_ui_1-text_memo_click', target.id + ' ' + Math.random());
-  target.classList.remove('show_memo');
-}
-
-// Function to handle double click
-function handleDoubleClick(target) {
-  target.style.zIndex = ++maxZ;
-  target.classList.toggle('show_memo');
-}
-
-// Add event listeners to the document
+// Add event listeners to the text_memo_btn class
 document.addEventListener('click', (e) => {
   // Restrict scope to elements within an article
   if (e.target.closest('article')) {
@@ -97,13 +85,23 @@ document.addEventListener('click', (e) => {
     }
   }
 });
+// Function to handle single click
+function handleSingleClick(target) {
+  Shiny.setInputValue('document_code_ui_1-text_memo_click', target.id);
+}
 
-document.addEventListener('dblclick', (e) => {
-  // Restrict scope to elements within an article
-  if (e.target.closest('article')) {
-    // Double click on text memo icon
-    if (e.target.classList.contains('text_memo_btn')) {
-      handleDoubleClick(e.target);
-    }
-  }
-});
+// let maxZ = 2;
+// // Function to handle double click
+// function handleDoubleClick(target) {
+//   target.style.zIndex = ++maxZ;
+//   target.classList.toggle('show_memo');
+// }
+// document.addEventListener('dblclick', (e) => {
+//   // Restrict scope to elements within an article
+//   if (e.target.closest('article')) {
+//     // Double click on text memo icon
+//     if (e.target.classList.contains('text_memo_btn')) {
+//       handleDoubleClick(e.target);
+//     }
+//   }
+// });

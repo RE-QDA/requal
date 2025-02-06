@@ -173,12 +173,12 @@ function findScrollElement(targetId) {
 
   if (matchingElements.length > 0) {
     return matchingElements;
+    return matchingElements;
   } else {
     console.log("No matching segment found.");
     return null;
   }
 }
-
 // Helper for clearing content
 Shiny.addCustomMessageHandler('clearContent', function(message) {
   let par = document.getElementById(message.id);

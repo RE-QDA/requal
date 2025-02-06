@@ -56,7 +56,7 @@
 .text_memo_btn:hover::after {
     display: block;
   }
-.text_memo_btn.show_memo::after {
+/* .text_memo_btn.show_memo::after {
     display: block;
-}
+} */
   
