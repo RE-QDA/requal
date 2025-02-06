@@ -1,34 +1,3 @@
-// Replace text in iframe when a custom message is received
-Shiny.addCustomMessageHandler('replaceSegmentMemoText', function(message) {
-  replaceSegmentMemoText(message.memo_text);
-});
-// Function to replace the text of segmentMemoInput
-function replaceSegmentMemoText(newText) {
-  var iframe = document.getElementsByTagName('iframe')[1];
-
-  // Ensure the iframe is loaded before accessing its content
-  iframe.onload = function() {
-    var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
-
-    if (segmentMemoElement) {
-      // Replace the text content or value of the element
-      segmentMemoElement.textContent = newText; // Use textContent for plain text
-      // segmentMemoElement.value = newText; // Use value if it's an input element
-      segmentMemoElement.dataset.memo_text = newText; // Update data attribute if needed
-
-      // Optionally, trigger the observer manually if needed
-      var event = new Event('change');
-      segmentMemoElement.dispatchEvent(event);
-
-      console.log('Text replaced with:', newText);
-    } else {
-      console.error('Element with id "segmentMemoInput" not found in iframe.');
-    }
-  };
-}
-
-
-
 // Obtain information from memo iframe and send to Shiny
 $(document).ready(function() {
   var iframe = document.getElementsByTagName('iframe')[1];
@@ -40,7 +9,7 @@ $(document).ready(function() {
     if (segmentMemoElement) {
       var updateShinyInput = function() {
         var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
-        Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text', segmentMemoValue);
+        Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text_external', segmentMemoValue);
         console.log(segmentMemoValue);
       };
 

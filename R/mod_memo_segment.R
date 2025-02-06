@@ -17,7 +17,8 @@ mod_memo_segment_ui <- function(id) {
         checkboxInput(ns("memo_show"), "Show memos", value = TRUE, width = "120px")
       )
     )),
-    mod_memo_editor_ui(ns("memo_editor_1"), iframe = TRUE)
+    ac
+    shinyhjs::hidden(mod_memo_editor_ui(ns("memo_editor_1")))
   )
 }
 
@@ -36,11 +37,12 @@ mod_memo_segment_server <- function(id, glob, memo_id = NULL, segment_start = NU
 
     mod_rql_hidden_ui_server("rql_hidden_ui_2")
    
-
-    observeEvent(c(loc$memo_id, loc$startOff, loc$endOff), {
-                  print(paste("tools screen click", loc$memo_id))
-
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = loc$memo_id, segment_start = loc$segment_start, segment_end = loc$segment_end)
+    observeEvent(input$new_memo, {
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = loc$segment_start, segment_end = loc$segment_end, ifram)
+      })
+    observeEvent(c(req(loc$memo_id), glob$active_project), {
+                  print(paste("memos tabset screen", loc$memo_id))
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = loc$segment_start, segment_end = loc$segment_end)
       })
     ## Add new free segment memo ----
     observeEvent(glob$add_segment_memo, {
