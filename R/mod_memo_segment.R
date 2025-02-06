@@ -17,8 +17,8 @@ mod_memo_segment_ui <- function(id) {
         checkboxInput(ns("memo_show"), "Show memos", value = TRUE, width = "120px")
       )
     )),
-    ac
-    shinyhjs::hidden(mod_memo_editor_ui(ns("memo_editor_1")))
+    actionButton(ns("memo_compose"), "Compose memo"),
+    shinyjs::hidden(mod_memo_editor_ui(ns("memo_editor_1")))
   )
 }
 
