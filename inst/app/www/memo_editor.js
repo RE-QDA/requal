@@ -1,5 +1,4 @@
-// Obtain information from memo iframe and send to Shiny
-$(document).ready(function() {
+Shiny.addCustomMessageHandler('initializeIframeHandler', function(message) {
   var iframe = document.getElementsByTagName('iframe')[1];
 
   // Ensure the iframe is loaded before accessing its content

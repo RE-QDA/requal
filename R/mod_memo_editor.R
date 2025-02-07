@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_memo_editor_ui <- function(id) {
   ns <- NS(id)
-  print(ns("test"))
+  print(ns("memo_text_external"))
   tagList(
     div(
       class = "memo_editor",
@@ -69,10 +69,12 @@ mod_memo_editor_server <- function(id, glob, open_new = NULL, memo_id = NULL, se
         textAreaInput(ns("memo_text_internal"), NULL, value = memo_called_df$memo_text, width = "100%", height = "100%", resize = "none") |>
           tagAppendAttributes(class = "memo_segment_input")
       } else if (type == "segment") {
-        tags$iframe(
+        iframe_t <- tags$iframe(
           src = "www/memo.html",
           class = "memo_segment_input"
         )
+              golem::invoke_js("initializeIframeHandler")
+iframe_t
       } else {
         textAreaInput(ns("memo_text_internal"), NULL, placeholder = "New text", width = "100%", height = "100%", resize = "none") |>
           tagAppendAttributes(class = "memo_segment_input")

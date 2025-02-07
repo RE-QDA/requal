@@ -155,6 +155,7 @@ mod_document_code_server <- function(id, glob) {
     loc$memo_id <- NULL
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
+    mod_memo_segment_server("memo_segment_1", glob, memo_id = NULL)
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -510,19 +511,16 @@ mod_document_code_server <- function(id, glob) {
     })
     
     # Memo tools ----
-    observeEvent(c(loc$memo_id,loc$startOff, loc$endOff), {
-      segment_memos <- mod_memo_segment_server("memo_segment_1", glob, memo_id = loc$memo_id, segment_start = loc$startOff, segment_end = loc$endOff)
-      })
-
-
-    
+   
     ## Observe text_memo_edit_click ----
     observeEvent(input$text_memo_click, {
       parsed_memo_id  <- as.integer(stringr::str_extract(input$text_memo_click, "\\d+"))
       loc$memo_id <- parsed_memo_id
             print(paste("coding screen click", loc$memo_id))
-
     })
+    observeEvent(loc$memo_id, {
+      mod_memo_segment_server("memo_segment_1", glob, memo_id = loc$memo_id, segment_start = loc$startOff, segment_end = loc$endOff)
+      })
 
 
     # Helper: position counter ---------------

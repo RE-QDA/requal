@@ -37,11 +37,11 @@ mod_memo_segment_server <- function(id, glob, memo_id = NULL, segment_start = NU
     mod_rql_hidden_ui_server("rql_hidden_ui_2")
    
     observeEvent(glob$active_project, {
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = isolate(loc$segment_start), segment_end = isolate(loc$segment_end), type = "segment")
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = loc$segment_start, segment_end = loc$segment_end, type = "segment")
       })
     observeEvent(req(loc$memo_id), {
                   print(paste("memos tabset screen", loc$memo_id))
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = isolate(loc$segment_start), segment_end = isolate(loc$segment_end), type = "segment")
+    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = loc$segment_start, segment_end = loc$segment_end, type = "segment")
       })
     ## Add new free segment memo ----
     observeEvent(glob$add_segment_memo, {
