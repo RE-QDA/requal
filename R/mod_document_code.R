@@ -150,12 +150,12 @@ mod_document_code_server <- function(id, glob) {
     loc$doc_selector  <- 0
     loc$text_observer <- 0
     loc$display_observer <- 0
-    loc$startOff <- 0
-    loc$endOff <- 0
+    glob$startOff <- 0
+    glob$endOff <- 0
     loc$memo_id <- NULL
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
-    mod_memo_segment_server("memo_segment_1", glob, memo_id = NULL)
+    mod_memo_segment_server("memo_segment_1", glob)
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -167,8 +167,8 @@ mod_document_code_server <- function(id, glob) {
   
     ## Observe offset positions -------
     observeEvent(input$tag_position, {
-      loc$startOff <- parse_tag_pos(req(input$tag_position), "start")
-      loc$endOff <- parse_tag_pos(req(input$tag_position), "end")
+      glob$startOff <- parse_tag_pos(req(input$tag_position), "start")
+      glob$endOff <- parse_tag_pos(req(input$tag_position), "end")
     })
     ## Observe changes in available documents ----
     observeEvent(glob$documents, {
@@ -305,8 +305,8 @@ mod_document_code_server <- function(id, glob) {
             '<span class = "br">&#8203</span></p>')
         })
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
-      loc$startOff <- 1
-      loc$endOff <- loc$total_chars
+      glob$startOff <- 1
+      glob$endOff <- loc$total_chars
       loc$display_observer <- loc$display_observer + 1
   })
   
@@ -337,15 +337,15 @@ mod_document_code_server <- function(id, glob) {
       req(loc$code_action_observer > 0) # ignore init value
       req(loc$code)     
 
-      if (loc$endOff >= loc$startOff) {
+      if (glob$endOff >= glob$startOff) {
         write_segment_db(
           glob$pool,
           glob$active_project,
           user_id = glob$user$user_id,
           doc_id = loc$doc_selector,
           code_id = loc$code,
-          loc$startOff,
-          loc$endOff
+          glob$startOff,
+          glob$endOff
         )
  
         loc$display_observer <- loc$display_observer + 1
@@ -457,8 +457,8 @@ mod_document_code_server <- function(id, glob) {
           segment_id = loc$marked_segments_df$segment_id
         )
         # Refresh text
-        loc$startOff <- min(loc$marked_segments_df$segment_start)
-        loc$endOff <- max(loc$marked_segments_df$segment_end)
+        glob$startOff <- min(loc$marked_segments_df$segment_start)
+        glob$endOff <- max(loc$marked_segments_df$segment_end)
         loc$display_observer <- loc$display_observer + 1
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
@@ -502,33 +502,21 @@ mod_document_code_server <- function(id, glob) {
 
         # Refresh text
         
-        loc$startOff <- min(loc$marked_segments_df$segment_start)
-        loc$endOff <- max(loc$marked_segments_df$segment_end)
+        glob$startOff <- min(loc$marked_segments_df$segment_start)
+        glob$endOff <- max(loc$marked_segments_df$segment_end)
         loc$display_observer <- loc$display_observer + 1
         # Notify analysis screen
         glob$segments_observer <- glob$segments_observer + 1
       }
     })
     
-    # Memo tools ----
    
-    ## Observe text_memo_edit_click ----
-    observeEvent(input$text_memo_click, {
-      parsed_memo_id  <- as.integer(stringr::str_extract(input$text_memo_click, "\\d+"))
-      loc$memo_id <- parsed_memo_id
-            print(paste("coding screen click", loc$memo_id))
-    })
-    observeEvent(loc$memo_id, {
-      mod_memo_segment_server("memo_segment_1", glob, memo_id = loc$memo_id, segment_start = loc$startOff, segment_end = loc$endOff)
-      })
-
-
     # Helper: position counter ---------------
     output$captured_range <- renderText({
       req(isTruthy(input$tag_position))
-      if (loc$startOff == loc$endOff) {
-        reported_range <- loc$startOff
-      } else if (loc$startOff > loc$endOff) {
+      if (glob$startOff == glob$endOff) {
+        reported_range <- glob$startOff
+      } else if (glob$startOff > glob$endOff) {
         reported_range <- ""
       } else {
          reported_range <- input$tag_position
@@ -565,7 +553,7 @@ mod_document_code_server <- function(id, glob) {
     ## edit_display_LF  -------------------
     edit_display_LF <- function() {
       loc$par_index <- loc$paragraphs |> 
-        dplyr::filter(segment_start <= loc$endOff, segment_end >= loc$startOff) 
+        dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
         text_data <- load_doc_to_display(
           pool = glob$pool
           ,

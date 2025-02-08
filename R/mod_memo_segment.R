@@ -24,25 +24,23 @@ mod_memo_segment_ui <- function(id) {
 #' memo_segment Server Functions
 #'
 #' @noRd
-mod_memo_segment_server <- function(id, glob, memo_id = NULL, segment_start = NULL, segment_end = NULL) {
+mod_memo_segment_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
-    loc$memo_id <- memo_id
-    loc$segment_start <- segment_start
-    loc$segment_end <- segment_end
-    memo_editor <- reactiveValues() # messages from nested module
-    return_values <- reactiveValues() # messages to nesting module
-
     mod_rql_hidden_ui_server("rql_hidden_ui_2")
-   
-    observeEvent(glob$active_project, {
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = NULL, segment_start = loc$segment_start, segment_end = loc$segment_end, type = "segment")
-      })
-    observeEvent(req(loc$memo_id), {
-                  print(paste("memos tabset screen", loc$memo_id))
-    memo_editor <- mod_memo_editor_server("memo_editor_1", glob = glob, memo_id = req(loc$memo_id), segment_start = loc$segment_start, segment_end = loc$segment_end, type = "segment")
-      })
+   # memo editor segment
+   mod_memo_editor_server("memo_editor_1", glob, type = "iframe")
+
+       ## Observe text_memo_edit_click ----
+    observeEvent(req(input$text_memo_click), {
+      golem::invoke_js("updateEditorInput", 
+              list(ns_memo_id = paste0(ns("memo_editor_1"), "-memo_id"),
+                    id = parse_memo_id(input$text_memo_click)))
+      golem::invoke_js("resetMemoClick", 
+              list(ns_text_memo_click = ns("text_memo_click")))
+    })
+
     ## Add new free segment memo ----
     observeEvent(glob$add_segment_memo, {
    
@@ -74,11 +72,7 @@ mod_memo_segment_server <- function(id, glob, memo_id = NULL, segment_start = NU
     ## Add new coded segment memo ----
     ## Add new free segment memo ----
 
-    
-    observeEvent(memo_editor$memo_text, {
-      print(memo_editor$memo_text)
-    })
-
+  
     observeEvent(input$memo_show, {
       glob$memo_show <- input$memo_show
     })

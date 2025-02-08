@@ -8,7 +8,7 @@ Shiny.addCustomMessageHandler('initializeIframeHandler', function(message) {
     if (segmentMemoElement) {
       var updateShinyInput = function() {
         var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
-        Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text_external', segmentMemoValue);
+        Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text_input', segmentMemoValue);
         console.log(segmentMemoValue);
       };
 
@@ -38,7 +38,6 @@ Shiny.addCustomMessageHandler('initializeIframeHandler', function(message) {
 Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
   var iframe = document.getElementsByTagName('iframe')[1];
   iframe.src = iframe.src;
-  console.log('refresh');
 });
 
 
@@ -53,8 +52,20 @@ document.addEventListener('click', (e) => {
 });
 // Function to handle single click
 function handleSingleClick(target) {
-  Shiny.setInputValue('document_code_ui_1-text_memo_click', target.id);
+  Shiny.setInputValue('document_code_ui_1-memo_segment_1-text_memo_click', target.id);
 }
+
+// Refresh memo id
+Shiny.addCustomMessageHandler('resetMemoClick', function(message) {
+  Shiny.setInputValue(message.ns_text_memo_click, null);
+});
+
+// Refresh memo id
+Shiny.addCustomMessageHandler('updateEditorInput', function(message) {
+  Shiny.setInputValue(message.ns_memo_id, message.id);
+});
+
+
 
 // let maxZ = 2;
 // // Function to handle double click

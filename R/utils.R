@@ -440,5 +440,10 @@ class_string
 }
 
 
+# parse memo id from string
+parse_memo_id  <- function(x) {
+as.integer(stringr::str_extract(x, "\\d+"))
+} 
+
 
 

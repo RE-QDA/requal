@@ -9,11 +9,9 @@
 #' @importFrom shiny NS tagList
 mod_memo_editor_ui <- function(id) {
   ns <- NS(id)
-  print(ns("memo_text_external"))
   tagList(
     div(
       class = "memo_editor",
-      actionButton(ns("new_memo"), "New memo"),
       div(
         class = "memo_segment_container",
         width = "100%",
@@ -34,69 +32,42 @@ mod_memo_editor_ui <- function(id) {
 #' memo_editor Server Functions
 #'
 #' @noRd
-mod_memo_editor_server <- function(id, glob, open_new = NULL, memo_id = NULL, segment_start = NULL, segment_end = NULL, type = NULL) {
+mod_memo_editor_server <- function(id, glob, type = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
-    return_values <- reactiveValues() # messages to nesting module
-    loc$memo_id <- memo_id
-    loc$segment_start <- segment_start
-    loc$segment_end <- segment_end
-    loc$open_new <- open_new
-    observe(print(loc$open_new))
-    observeEvent(req(glob$active_project), {
-      return_values$memo_text <- NULL
-      return_values$memo_id <- NULL
-      return_values$segment_start <- NULL
-      return_values$segment_end <- NULL
-    })
-
-    observeEvent(input$memo_text_external, {
-      print(input$memo_text_external)
-    })
-    observeEvent(input$new_memo, {
-      loc$memo_id <- NULL
-    })
+    print(ns("memo_text_input"))
     output$text_input_area <- renderUI({
-      # glob$active_project
-
-      if (isTruthy(loc$memo_id)) {
-        memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id)
+      loc$editor_ui
+    })  
+    observeEvent(input$memo_id, {
+      if (isTruthy(input$memo_id)) {
+         memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
         memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
           dplyr::filter(memo_id == !!memo_called_df$memo_id) |>
           dplyr::collect()
         loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
-        textAreaInput(ns("memo_text_internal"), NULL, value = memo_called_df$memo_text, width = "100%", height = "100%", resize = "none") |>
-          tagAppendAttributes(class = "memo_segment_input")
-      } else if (type == "segment") {
-        iframe_t <- tags$iframe(
-          src = "www/memo.html",
-          class = "memo_segment_input"
-        )
-              golem::invoke_js("initializeIframeHandler")
-iframe_t
+        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = memo_called_df$memo_text)
       } else {
-        textAreaInput(ns("memo_text_internal"), NULL, placeholder = "New text", width = "100%", height = "100%", resize = "none") |>
-          tagAppendAttributes(class = "memo_segment_input")
+        loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
+
       }
-    })
-    # Open memo to read/edit ----
-    observeEvent(req(loc$memo_id), {
-      print(paste("Triggered by memo_id:", loc$memo_id))
+    }, ignoreNULL = FALSE)
+    observe(print(input$memo_text_input))
+
+   observeEvent(input$cancel, {
+       golem::invoke_js("refreshMemoIframe")
+       golem::invoke_js("updateEditorInput", 
+              list(ns_memo_id = ns("memo_id"),
+                    id = ""))
     })
 
-    observeEvent(input$cancel, {
-      loc$memo_id <- NULL
-      loc$segment_start <- NULL
-      loc$segment_end <- NULL
-      golem::invoke_js("refreshMemoIframe", list())
-    })
-    observeEvent(input$save_close, {
-      browser()
-    })
+#     observeEvent(input$save_close, {
+#       browser()
+#     })
 
 
-    return(return_values)
+
   })
 }
 
@@ -117,3 +88,30 @@ iframe_t
 
 # # Run the test app
 # shiny::shinyApp(ui, server)
+
+
+
+
+editor_ui <- function(type, ns, memo_text = NULL) {
+  tagList(
+    if (is.null(type)) {
+      textAreaInput(
+        ns("memo_text_editor"), 
+        NULL, 
+        value = if (!is.null(memo_text)) memo_text, 
+        width = "100%", 
+        height = "100%",
+        resize = "vertical"
+      ) |> tagAppendAttributes(class = "memo_segment_input")
+    } else {
+      golem::invoke_js("initializeIframeHandler")
+       div(
+        style = "width: 100%; height: 100%; resize: vertical",
+        tags$iframe(
+        src = "www/memo.html",
+        class = "memo_segment_input"
+      ))
+      
+    }
+  )
+}
