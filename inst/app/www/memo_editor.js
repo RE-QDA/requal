@@ -1,6 +1,44 @@
 $(document).ready(function() {
-  // Select the body or a relevant container to observe for mutations
-  var targetNode = document.body;
+  // Function to set up the observer for the iframe
+  function setupIframeObserver() {
+    // Check if the second iframe is available
+    var iframes = document.getElementsByTagName('iframe');
+    if (iframes.length > 1) {
+      var iframe = iframes[1]; // Get the second iframe
+
+      // Ensure the iframe is loaded before accessing its content
+      iframe.onload = function() {
+        var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
+
+        if (segmentMemoElement) {
+          var updateShinyInput = function() {
+            var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
+            Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text_input', segmentMemoValue);
+            console.log('Updated Shiny input:', segmentMemoValue);
+          };
+
+          // Define a callback function to execute when mutations are observed
+          var observerCallback = function(mutationsList, observer) {
+            updateShinyInput();
+          };
+
+          // Create an observer instance linked to the callback function
+          var memoObserver = new MutationObserver(observerCallback);
+
+          // Start observing the target nodes for configured mutations
+          memoObserver.observe(segmentMemoElement, {
+            attributes: true,
+            attributeFilter: ['data-memo_text']
+          });
+
+          // Initial setInputValue call to handle the current state
+          updateShinyInput();
+        } else {
+          console.error('Element with id \"segmentMemoInput\" not found in iframe.');
+        }
+      };
+    }
+  }
 
   // Options for the observer (which mutations to observe)
   var config = { childList: true, subtree: true };
@@ -9,46 +47,8 @@ $(document).ready(function() {
   var callback = function(mutationsList, observer) {
     for (var mutation of mutationsList) {
       if (mutation.type === 'childList') {
-        // Check if the second iframe is available
-        var iframes = document.getElementsByTagName('iframe');
-        if (iframes.length > 1) {
-          var iframe = iframes[1]; // Get the second iframe
-
-          // Ensure the iframe is loaded before accessing its content
-          iframe.onload = function() {
-            var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
-
-            if (segmentMemoElement) {
-              var updateShinyInput = function() {
-                var segmentMemoValue = segmentMemoElement.dataset.memo_text || '';
-                Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-memo_text_input', segmentMemoValue);
-                console.log('Updated Shiny input:', segmentMemoValue);
-              };
-
-              // Define a callback function to execute when mutations are observed
-              var observerCallback = function(mutationsList, observer) {
-                updateShinyInput();
-              };
-
-              // Create an observer instance linked to the callback function
-              var memoObserver = new MutationObserver(observerCallback);
-
-              // Start observing the target nodes for configured mutations
-              memoObserver.observe(segmentMemoElement, {
-                attributes: true,
-                attributeFilter: ['data-memo_text']
-              });
-
-              // Initial setInputValue call to handle the current state
-              updateShinyInput();
-            } else {
-              console.error('Element with id \"segmentMemoInput\" not found in iframe.');
-            }
-          };
-
-          // Disconnect the observer after finding the iframe
-          observer.disconnect();
-        }
+        // Attempt to set up the iframe observer whenever children change
+        setupIframeObserver();
       }
     }
   };
@@ -56,16 +56,41 @@ $(document).ready(function() {
   // Create an observer instance linked to the callback function
   var observer = new MutationObserver(callback);
 
-  // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
+  // Start observing the document body for configured mutations
+  observer.observe(document.body, config);
 
-  console.log('MutationObserver is set up to detect the second iframe.');
+  console.log('Persistent MutationObserver is set up to detect the second iframe.');
 });
 
-// Refresh memo iframe
-Shiny.addCustomMessageHandler('refreshMemoIframe', function(message) {
-  var iframe = document.getElementsByTagName('iframe')[1];
-  iframe.src = iframe.src;
+Shiny.addCustomMessageHandler('resetSegmentMemoInput', function(message) {
+  console.log('resetSegmentMemoInput called')
+  var iframes = document.getElementsByTagName('iframe');
+  if (iframes.length > 1) {
+    var iframe = iframes[1]; // Get the second iframe
+
+    // Ensure the iframe is loaded before accessing its content
+    if (iframe.contentDocument) {
+      var segmentMemoElement = iframe.contentDocument.getElementById('segmentMemoInput');
+      
+      if (segmentMemoElement) {
+        // Reset the value of segmentMemoInput
+        segmentMemoElement.value = ''; // Assuming it's an input or textarea
+        segmentMemoElement.dataset.memo_text = ''; // Resetting the data attribute if needed
+
+        // Optionally, trigger any events if needed
+        var event = new Event('input', { bubbles: true });
+        segmentMemoElement.dispatchEvent(event);
+
+        console.log('segmentMemoInput has been reset.');
+      } else {
+        console.error('Element with id \"segmentMemoInput\" not found in iframe.');
+      }
+    } else {
+      console.error('Iframe content is not accessible.');
+    }
+  } else {
+    console.error('Second iframe not found.');
+  }
 });
 
 
