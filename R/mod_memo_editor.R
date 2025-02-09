@@ -9,6 +9,48 @@
 #' @importFrom shiny NS tagList
 mod_memo_editor_ui <- function(id) {
   ns <- NS(id)
+  tags$head(
+    tags$script(HTML("
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select the node that will be observed for mutations
+    var targetNode = document.querySelector('.memo_segment_container');
+
+    if (targetNode) {
+      // Options for the observer (which mutations to observe)
+      var config = { childList: true, subtree: true };
+
+      // Callback function to execute when mutations are observed
+      var callback = function(mutationsList, observer) {
+        for (var mutation of mutationsList) {
+          if (mutation.type === 'childList') {
+            // Check if an iframe has been added
+            mutation.addedNodes.forEach(function(node) {
+              if (node.tagName === 'IFRAME') {
+                // Attach onload event to the iframe
+                node.onload = function() {
+                  // Update Shiny input value
+                  Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-iframe_loaded', true);
+                  console.log('Iframe loaded and Shiny input updated.');
+                };
+              }
+            });
+          }
+        }
+      };
+
+      // Create an observer instance linked to the callback function
+      var observer = new MutationObserver(callback);
+
+      // Start observing the target node for configured mutations
+      observer.observe(targetNode, config);
+
+      console.log('MutationObserver is set up to detect iframes and execute onload.');
+    } else {
+      console.error('Element with class \"memo_segment_container\" not found.');
+    }
+  });
+"))
+  )
   tagList(
     div(
       class = "memo_editor",
@@ -36,7 +78,11 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+
     print(ns("memo_text_input"))
+    observe(print(input$iframe_loaded))
+
+
     output$text_input_area <- renderUI({
       loc$editor_ui
     })  
