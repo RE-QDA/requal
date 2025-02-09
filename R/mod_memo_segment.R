@@ -28,7 +28,7 @@ mod_memo_segment_server <- function(id, glob) {
     loc <- reactiveValues()
     mod_rql_hidden_ui_server("rql_hidden_ui_2")
    # memo editor segment
-   mod_memo_editor_server("memo_editor_1", glob, type = "iframe")
+   mod_memo_editor_server("memo_editor_1", glob, type = "free_segment")
 
        ## Observe text_memo_edit_click ----
     observeEvent(req(input$text_memo_click), {
@@ -40,44 +40,9 @@ mod_memo_segment_server <- function(id, glob) {
       glob$selected_documentcode_tabset <- "memotools_tabset"
     })
 
-    ## Add new free segment memo ----
-    observeEvent(glob$add_segment_memo, {
-   
-      if (loc$endOff >= loc$startOff) {
-       new_segment_id <- write_memo_segment_db(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          doc_id = loc$doc_selector,
-          code_id = NA,
-          loc$startOff,
-          loc$endOff
-        )
-      new_memo_id  <- add_memo_record(
-        pool = glob$pool,
-        project = glob$active_project,
-        text = input$segment_memo$text,
-        user_id = glob$user$user_id
-      )
-      new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
-      #add_memo_segment_map(...)
-      DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-      golem::invoke_js('refreshMemoIframe', list())
-      loc$display_observer <- loc$display_observer + 1
-      loc$memos_observer <- loc$memos_observer + 1
-      #glob$memos_observer <- glob$memos_observer + 1
-      }
-    })
-    ## Add new coded segment memo ----
-    ## Add new free segment memo ----
-
   
     observeEvent(input$memo_show, {
       glob$memo_show <- input$memo_show
-    })
-
-    observeEvent(input$add_segment_memo, {
-      glob$add_segment_memo <- input$add_segment_memo
     })
 
     return(NULL)
