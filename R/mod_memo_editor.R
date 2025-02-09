@@ -21,9 +21,10 @@ mod_memo_editor_ui <- function(id) {
         style = "display: flex;",
         width = "100%",
         actionButton(ns("cancel"), "Cancel"),
-        actionButton(ns("save"), "", icon = icon("save")),
-        actionButton(ns("save_close"), "Save & Close", class = "btn-success"),
-        actionButton(ns("delete_memo"), "Delete", class = "btn-danger")
+        shinyjs::hidden(actionButton(ns("save"), "", icon = icon("save"), class = "btn-warning")),
+        shinyjs::hidden(actionButton(ns("create_new"), "Create new", class = "btn-success")),
+        shinyjs::hidden(actionButton(ns("save_close"), "Save & Close", class = "btn-success")),
+        shinyjs::hidden(actionButton(ns("delete_memo"), "Delete", class = "btn-danger"))
       )
     )
   )
@@ -37,12 +38,8 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     ns <- session$ns
     loc <- reactiveValues()
 
-    print(ns("memo_text_input"))
-    observe(print(input$iframe_loaded))
-
-
     output$text_input_area <- renderUI({
-      loc$editor_ui
+      loc$editor_ui$taglist
     })  
     observeEvent(input$memo_id, {
       if (isTruthy(input$memo_id)) {
@@ -53,13 +50,13 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           dplyr::filter(memo_id == !!memo_called_df$memo_id) |>
           dplyr::collect()
         loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
-        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = memo_called_df$memo_text)
+        loc$memo_text <- memo_called_df$memo_text
+        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$memo_text)
       } else {
         loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
 
       }
     }, ignoreNULL = FALSE)
-    observe(print(input$memo_text_input))
 
    observeEvent(input$cancel, {
            golem::invoke_js("resetSegmentMemoInput", list())
@@ -69,9 +66,37 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
     })
 
-#     observeEvent(input$save_close, {
-#       browser()
-#     })
+
+    observeEvent(loc$editor_ui$editor_state, {
+        if (loc$editor_ui$editor_state == "composer") {
+           shinyjs::show("create_new", animType = "fade")
+           shinyjs::hide("save_close")
+           shinyjs::hide("save")
+        } else if(loc$editor_ui$editor_state == "editor") {
+           shinyjs::hide("create_new")
+        }
+    })
+
+    observeEvent(input$memo_text_editor, {
+      if (input$memo_text_editor != loc$memo_text && 
+      loc$editor_ui$editor_state == "editor") {
+           shinyjs::show("save", animType = "fade")
+           shinyjs::show("save_close", animType = "fade")
+        } else if (input$memo_text_editor == loc$memo_text && 
+      loc$editor_ui$editor_state == "editor") {
+           shinyjs::hide("save")
+           shinyjs::hide("save_close")
+        }
+    })
+
+
+         # input$memo_text_input
+
+
+
+    # observeEvent(input$save_close, {
+    #   browser()
+    # })
 
 
 
@@ -100,25 +125,26 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
 
 editor_ui <- function(type, ns, memo_text = NULL) {
-  tagList(
+  
     if (is.null(type)) {
-      textAreaInput(
+      list(editor_state = "editor",
+            taglist = textAreaInput(
         ns("memo_text_editor"), 
         NULL, 
         value = if (!is.null(memo_text)) memo_text, 
         width = "100%", 
         height = "100%",
         resize = "vertical"
-      ) |> tagAppendAttributes(class = "memo_segment_input")
+      ) |> tagAppendAttributes(class = "memo_segment_input"))
     } else {
       golem::invoke_js("initializeIframeHandler")
-       div(
+      list(editor_state = "composer",
+        taglist = div(
         style = "width: 100%; height: 100%; resize: vertical",
         tags$iframe(
         src = "www/memo.html",
         class = "memo_segment_input"
-      ))
+      )))
       
     }
-  )
 }

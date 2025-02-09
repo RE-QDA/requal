@@ -69,8 +69,8 @@ mod_document_code_ui <- function(id) {
             id = ns("documentcode_tabset"),
             # Codes panel ----
             tabPanel("Codes",
-              id = ns("codetools_tabset"),
-              value = "codetools_tabset",
+              id = ns("codetools_tab"),
+              value = "codetools_tab",
                 br(),
                 mod_rql_hidden_ui_ui(ns("rql_hidden_ui_1"), title = "Toggle coding toolbox", hidden_tags = tagList(
                     div(
@@ -108,8 +108,8 @@ mod_document_code_ui <- function(id) {
               ),
               # Memos panel ----
               tabPanel("Memos",
-              id = ns("memotools_tabset"),
-              value = "memotools_tabset",
+              id = ns("memotools_tab"),
+              value = "memotools_tab",
                 br(),
                 mod_memo_segment_ui(ns("memo_segment_1"))
               )
@@ -152,6 +152,7 @@ mod_document_code_server <- function(id, glob) {
     loc$display_observer <- 0
     glob$startOff <- 0
     glob$endOff <- 0
+    glob$selected_documentcode_tabset <- NULL
     loc$memo_id <- NULL
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
@@ -262,6 +263,12 @@ mod_document_code_server <- function(id, glob) {
       } else {
         shinyjs::hide(selector = ".text_memo_btn, .text_memo_edit.show_edit")
       }
+     })
+
+     ## Observe memo tab ----
+     observeEvent(req(glob$selected_documentcode_tabset), {
+        updateTabsetPanel(inputId = "documentcode_tabset", selected = "memotools_tab")
+        glob$selected_documentcode_tabset <- NULL
      })
 
   # Render codes ----
