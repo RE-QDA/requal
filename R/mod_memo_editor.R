@@ -38,6 +38,11 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     ns <- session$ns
     loc <- reactiveValues()
     loc$memo_text_input <- ""
+    loc$refresh_observer <- 0
+    loc$save_observer <- 0
+
+
+    # Render composer/editor ----
     output$text_input_area <- renderUI({
       loc$editor_ui$taglist
     })  
@@ -46,27 +51,36 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
                golem::invoke_js("resetSegmentMemoInput")
 
          memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
+                 loc$edited_memo_id <- memo_called_df$memo_id
+
         memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
-          dplyr::filter(memo_id == !!memo_called_df$memo_id) |>
+          dplyr::filter(memo_id == !!loc$edited_memo_id) |>
           dplyr::collect()
+        loc$segment_id <- memos_segments_map$segment_id
         loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
-        loc$saved_memo_text <- memo_called_df$memo_text
-        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$saved_memo_text)
+        loc$edited_memo_text <- memo_called_df$memo_text
+        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$edited_memo_text)
       } else {
         loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
 
       }
     }, ignoreNULL = FALSE)
 
-   observeEvent(input$cancel, {
-           golem::invoke_js("resetSegmentMemoInput", list())
+   # Refresh composer
+   observeEvent(loc$refresh_observer, {
+      req(loc$refresh_observer > 0)
+       golem::invoke_js("resetSegmentMemoInput", list())
        golem::invoke_js("updateEditorInput", 
               list(ns_memo_id = ns("memo_id"),
                     id = ""))
       loc$memo_text_input <- ""
     })
+    observeEvent(input$cancel, {
+      loc$refresh_observer <- loc$refresh_observer + 1
+    })
+    
 
-    # Adjust UI to different editor states
+    # Adjust UI to different editor states ----
     observeEvent(loc$editor_ui$editor_state, {
         if (loc$editor_ui$editor_state == "composer") {
            shinyjs::show("create_new", animType = "fade")
@@ -77,19 +91,20 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
         }
     })
 
-    # Monitor difference between saved and input text, adjust UI
+    # Monitor difference between saved and input text, adjust UI 
     observeEvent(input$memo_text_editor, {
-      if (input$memo_text_editor != loc$saved_memo_text && 
+      if (input$memo_text_editor != loc$edited_memo_text && 
       loc$editor_ui$editor_state == "editor") {
            shinyjs::show("save", animType = "fade")
            shinyjs::show("save_close", animType = "fade")
-        } else if (input$memo_text_editor == loc$saved_memo_text && 
+        } else if (input$memo_text_editor == loc$edited_memo_text && 
       loc$editor_ui$editor_state == "editor") {
            shinyjs::hide("save")
            shinyjs::hide("save_close")
         }
     })
-    # Consolidate input text from different sources into loc$memo_text_input
+    # Consolidate input text ----
+    # from different sources into loc$memo_text_input
     observeEvent(c(input$memo_text_editor, input$memo_text_input), {
       if (loc$editor_ui$editor_state == "editor") {
               loc$memo_text_input <- input$memo_text_editor
@@ -97,42 +112,59 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
              loc$memo_text_input <- input$memo_text_input
       }
     })
-
-    observe(      print(loc$memo_text_input))
        
-    ## Add new free segment memo ----
+    # Add new free segment memo ----
     observeEvent(input$create_new, {
-   
-    #   if (loc$endOff >= loc$startOff) {
-    #    new_segment_id <- write_memo_segment_db(
-    #       pool = glob$pool,
-    #       active_project = glob$active_project,
-    #       user_id = glob$user$user_id,
-    #       doc_id = loc$doc_selector,
-    #       code_id = NA,
-    #       loc$startOff,
-    #       loc$endOff
-    #     )
-    #   new_memo_id  <- add_memo_record(
-    #     pool = glob$pool,
-    #     project = glob$active_project,
-    #     text = input$segment_memo$text,
-    #     user_id = glob$user$user_id
-    #   )
-    #   new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
-    #   #add_memo_segment_map(...)
-    #   DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-    #   loc$display_observer <- loc$display_observer + 1
-    #   loc$memos_observer <- loc$memos_observer + 1
+      
+      if (type == "free_segment" & glob$endOff >= glob$startOff)
+       new_segment_id <- write_memo_segment_db(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = glob$doc_selector,
+          code_id = NA,
+          glob$startOff,
+          glob$endOff
+        )
+      new_memo_id  <- add_memo_record(
+        pool = glob$pool,
+        project = glob$active_project,
+        text = loc$memo_text_input,
+        user_id = glob$user$user_id
+      )
+      new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
+    # the function below can be wrapped to a new add_memo_segment_map(...)
+      DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
+      glob$memo_segment_observer <- glob$memo_segment_observer + 1
+       loc$refresh_observer <- loc$refresh_observer + 1
     #   #glob$memos_observer <- glob$memos_observer + 1 enable after memo screen exists to initialize the glob
-    #   }
     })
 
+    # Save edits ----
+    observeEvent(loc$save_observer, {
+      req(loc$save_observer > 0)
+      update_memo_record(
+        pool = glob$pool,
+        project = glob$active_project,
+        memo_id = loc$edited_memo_id,
+        memo_text = loc$memo_text_input,
+        user_id = glob$user$user_id
+        )
+       segment_df <-  dplyr::tbl(pool, "segments") %>%
+            dplyr::filter(.data$segment_id == !!loc$segment_id) %>%
+            dplyr::collect()
+        glob$startOff <- segment_df$segment_start
+                glob$endOff <- segment_df$segment_end
+        glob$memo_segment_observer <- glob$memo_segment_observer + 1
+    })
+    observeEvent(input$save, {
+      loc$save_observer <- loc$save_observer + 1
+    })
 
-
-    # observeEvent(input$save_close, {
-    #   browser()
-    # })
+    observeEvent(input$save_close, {
+      loc$save_observer <- loc$save_observer + 1
+      loc$refresh_observer <- loc$refresh_observer + 1
+    })
 
 
 
