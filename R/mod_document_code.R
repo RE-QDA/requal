@@ -255,6 +255,15 @@ mod_document_code_server <- function(id, glob) {
     }
   })
 
+      ## Observe memo show ----
+     observeEvent(glob$memo_show, {
+      if (glob$memo_show) {
+        shinyjs::show(selector = ".text_memo_btn, .text_memo_edit.show_edit")
+      } else {
+        shinyjs::hide(selector = ".text_memo_btn, .text_memo_edit.show_edit")
+      }
+     })
+
   # Render codes ----
   output$code_list <- renderUI({
     req(isTruthy(loc$codes_menu))
