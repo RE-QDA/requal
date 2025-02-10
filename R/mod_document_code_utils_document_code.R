@@ -494,15 +494,20 @@ parse_tag_pos <- function(tag_postion, which_part) {
 delete_segment_codes_db <- function(pool, 
                                     active_project,
                                     user_id,
-                                    doc_id,
+                                    doc_id = NULL,
                                     segment_id) {
     
     # delete code from a segment
+    if (is.null(doc_id)) {
+        query <- glue::glue_sql("DELETE FROM segments
+                       WHERE project_id = {active_project}
+                       AND segment_id = {segment_id}", .con = pool)
+    } else {
     query <- glue::glue_sql("DELETE FROM segments
                        WHERE project_id = {active_project}
                        AND doc_id = {doc_id}
                        AND segment_id = {segment_id}", .con = pool)
-    
+    }
     purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
     
     log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)

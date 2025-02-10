@@ -13,7 +13,7 @@
   border: 1px;
 }
 .memo_editor .action-button {
-    width: 100%;
+    flex: auto;
   }
 
   .text_memo_btn {

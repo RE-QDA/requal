@@ -18,7 +18,7 @@ mod_memo_editor_ui <- function(id) {
         uiOutput(ns("text_input_area"))
       ),
       div(
-        style = "display: flex;",
+        style = "display: flex; flex-wrap: wrap;",
         width = "100%",
         actionButton(ns("cancel"), "Cancel"),
         shinyjs::hidden(actionButton(ns("save"), "", icon = icon("save"), class = "btn-warning")),
@@ -49,18 +49,26 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     observeEvent(input$memo_id, {
       if (isTruthy(input$memo_id)) {
                golem::invoke_js("resetSegmentMemoInput")
-
-         memo_called_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
-                 loc$edited_memo_id <- memo_called_df$memo_id
-
+        # if memo_id is provided, collect data on existing memo
+        memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
         memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
-          dplyr::filter(memo_id == !!loc$edited_memo_id) |>
+          dplyr::filter(memo_id == !!memo_df$memo_id) |>
           dplyr::collect()
-        loc$segment_id <- memos_segments_map$segment_id
-        loc$can_modify <- find_memo_permission(memo_called_df$user_id, glob$user)
-        loc$edited_memo_text <- memo_called_df$memo_text
-        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$edited_memo_text)
+        segment_df <-  dplyr::tbl(pool, "segments") %>%
+            dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
+            dplyr::collect()
+        loc$editing_data <- list(
+            memo_id = memo_df$memo_id,
+            segment_id = memos_segments_map$segment_id,
+            memo_text = memo_df$memo_text,
+            startOff = segment_df$segment_start,
+            endOff = segment_df$segment_start
+        )
+        loc$can_modify <- find_memo_permission(memo_df$user_id, glob$user)
+        # render editor
+        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$editing_data$memo_text)
       } else {
+        # render composer
         loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
 
       }
@@ -86,18 +94,20 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
            shinyjs::show("create_new", animType = "fade")
            shinyjs::hide("save_close")
            shinyjs::hide("save")
+           shinyjs::hide("delete_memo")
         } else if(loc$editor_ui$editor_state == "editor") {
            shinyjs::hide("create_new")
+           shinyjs::show("delete_memo")
         }
     })
 
     # Monitor difference between saved and input text, adjust UI 
     observeEvent(input$memo_text_editor, {
-      if (input$memo_text_editor != loc$edited_memo_text && 
+      if (input$memo_text_editor != loc$editing_data$memo_text && 
       loc$editor_ui$editor_state == "editor") {
            shinyjs::show("save", animType = "fade")
            shinyjs::show("save_close", animType = "fade")
-        } else if (input$memo_text_editor == loc$edited_memo_text && 
+        } else if (input$memo_text_editor == loc$editing_data$memo_text && 
       loc$editor_ui$editor_state == "editor") {
            shinyjs::hide("save")
            shinyjs::hide("save_close")
@@ -146,15 +156,13 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       update_memo_record(
         pool = glob$pool,
         project = glob$active_project,
-        memo_id = loc$edited_memo_id,
+        memo_id = loc$editing_data$memo_id,
         memo_text = loc$memo_text_input,
         user_id = glob$user$user_id
         )
-       segment_df <-  dplyr::tbl(pool, "segments") %>%
-            dplyr::filter(.data$segment_id == !!loc$segment_id) %>%
-            dplyr::collect()
-        glob$startOff <- segment_df$segment_start
-                glob$endOff <- segment_df$segment_end
+
+        glob$startOff <- loc$editing_data$startOff
+        glob$endOff <- loc$editing_data$endOff
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
     })
     observeEvent(input$save, {
@@ -166,7 +174,26 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       loc$refresh_observer <- loc$refresh_observer + 1
     })
 
-
+        # Delete memo ----
+    observeEvent(input$delete_memo, {
+     
+      delete_memo_record(
+        pool = glob$pool,
+        project = glob$active_project,
+        memo_id = loc$editing_data$memo_id,
+        user_id = glob$user$user_id
+        )
+      delete_segment_codes_db(
+        pool = glob$pool,
+        active_project = glob$active_project,
+        user_id = glob$user$user_id,
+        segment_id = loc$editing_data$segment_id
+      )
+        glob$startOff <- loc$editing_data$startOff
+        glob$endOff <- loc$editing_data$endOff
+        glob$memo_segment_observer <- glob$memo_segment_observer + 1
+        loc$refresh_observer <- loc$refresh_observer + 1
+    })
 
   })
 }
