@@ -139,31 +139,6 @@ export_memos <- function(pool, project) {
 }
 
 
-# dropdown2 function ----
-dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
-{
-    items <- c(list(...))
-    dropdownClass <- paste0("dropdown")
-    numItems <- length(items)
-    if (is.null(badgeStatus)) {
-        badge <- NULL
-    }
-    else {
-        badge <- dashboardLabel(status = badgeStatus, numItems)
-    }
-    shiny::tags$li(class = dropdownClass, id = id, shiny::tags$a(href = "#",
-                                                                 class = "dropdown-toggle",
-                                                                 `data-toggle` = "dropdown", 
-                                                                 icon, 
-                                                                 title, 
-                                                                 badge), 
-                   shiny::tags$ul(class = "dropdown-menu", 
-                                  style = "left: 0; right: auto; max-height: 80vh", 
-                                  shiny::tags$li(shiny::tags$ul(class = "menu", 
-                                                                shiny::tags$div(style = "margin-left: auto; margin-right: 0; width: 80%;",
-                                                                                items)))))
-}
-
 # memo table styling ----
 memo_table_options <- function() {
     list(
@@ -177,7 +152,7 @@ memo_table_options <- function() {
 
 # create memo as link ----
 memo_link <- function(id, text) {
-    js_fun <- "Shiny.setInputValue('memo_ui_1-selected_memo', this.name, {priority: 'event'});"
+    js_fun <- "Shiny.setInputValue('memo_ui_1-text_memo_click', this.name, {priority: 'event'});"
     quote_sign <- '"'
     paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', text, '</a>')
 }

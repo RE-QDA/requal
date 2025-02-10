@@ -79,7 +79,7 @@ app_server <- function(input, output, session) {
   mod_user_server("user_ui_1", glob)
 
   # memo
-  mod_memo_server("memo_ui_1", glob)
+  mod_memo_free_server("memo_ui_1", glob)
   
   # show admin interface
   observeEvent(glob$user$is_admin, {

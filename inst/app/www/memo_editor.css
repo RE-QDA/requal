@@ -60,3 +60,6 @@
     display: block;
 } */
   
+.free_memo.free_memo_show .dropdown_menu {
+  display: block;
+}

@@ -119,7 +119,15 @@ Shiny.addCustomMessageHandler('updateEditorInput', function(message) {
 });
 
 
+$(document).ready(function() {
+const freeMemoElement = document.querySelector('.free_memo');
 
+// Add a click event listener to the element
+freeMemoElement.addEventListener('click', function() {
+    // Toggle the 'free_memo_show' class on click
+    freeMemoElement.classList.toggle('free_memo_show');
+});
+});
 // let maxZ = 2;
 // // Function to handle double click
 // function handleDoubleClick(target) {

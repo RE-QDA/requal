@@ -20,6 +20,7 @@ mod_rql_button_ui <- function(id, label, icon, inputId = NULL){
       title = label,
       html = FALSE
     ),
+    hideOnClick = FALSE,
     size = "md", 
     width = "370px",
     icon = icon(icon, verify_fa = FALSE) %>% tagAppendAttributes(style = "color: #3c8dbc"), 
