@@ -193,7 +193,26 @@ mod_categories_server <- function(id, glob) {
 
     # Create edge -----------------------------------------
     observeEvent(input$edges_category, {
-      if (!is.null(glob$user) && glob$user$data$codebook_modify == 1) {
+        if (!is.null(glob$user) && glob$user$data$codebook_modify != 1) {
+            # re-render categories
+             output$categories_ui <- renderUI({
+              render_categories(
+                id = id,
+                active_project = glob$active_project,
+                pool = glob$pool,
+                user = glob$user
+              )
+             })
+        warn_user("You don't have permissions for modifying codes and categories.")
+      } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
+        # Can modify all codes and categories
+        add_category_code_record(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          edge = input$edges_category
+        )
+      } else if (!is.null(glob$user) && glob$user$data$codebook_modify == 1) {
         # Can only modify own codes and categories
         owns_code <- glob$codebook %>%
           dplyr::filter(code_id == input$edges_category$code_id) %>%
@@ -212,28 +231,72 @@ mod_categories_server <- function(id, glob) {
             edge = input$edges_category
           )
         } else {
-          warn_user("You don't have permissions for modifying codes and categories created by others.")
-          # TODO: delete code from category
+            # re-render categories
+             output$categories_ui <- renderUI({
+              render_categories(
+                id = id,
+                active_project = glob$active_project,
+                pool = glob$pool,
+                user = glob$user
+              )
+             })
+        warn_user("You don't have permissions for modifying codes and categories created by others.")
         }
-      } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
-        # Can modify all codes and categories
-        add_category_code_record(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          edge = input$edges_category
-        )
       }
     })
 
-    # Delete edge
+    # Delete edge ----
     observeEvent(input$edges_category_delete, {
-      delete_category_code_record(
-        pool = glob$pool,
-        active_project = glob$active_project,
-        user_id = glob$user$user_id,
-        edge = input$edges_category_delete
-      )
+      if (!is.null(glob$user) && glob$user$data$codebook_modify != 1) {
+            # re-render categories
+             output$categories_ui <- renderUI({
+              render_categories(
+                id = id,
+                active_project = glob$active_project,
+                pool = glob$pool,
+                user = glob$user
+              )
+             })
+        warn_user("You don't have permissions for modifying codes and categories.")
+      } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
+        # Can modify all codes and categories
+        delete_category_code_record(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          edge = input$edges_category_delete
+        )
+      } else if (!is.null(glob$user) && glob$user$data$codebook_modify == 1) {
+        # Can only modify own codes and categories
+        owns_code <- glob$codebook %>%
+          dplyr::filter(code_id == !!input$edges_category_delete$code_id) %>%
+          dplyr::pull(user_id) == glob$user$user_id
+
+        owns_category <- dplyr::tbl(glob$pool, "categories") %>%
+          dplyr::filter(category_id == !!input$edges_category_delete$category_id) %>%
+          dplyr::collect() %>%
+          dplyr::pull(user_id) == glob$user$user_id
+
+        if (all(c(owns_code, owns_category))) {
+            delete_category_code_record(
+              pool = glob$pool,
+              active_project = glob$active_project,
+              user_id = glob$user$user_id,
+              edge = input$edges_category_delete
+            )
+        } else {
+            # re-render categories
+             output$categories_ui <- renderUI({
+              render_categories(
+                id = id,
+                active_project = glob$active_project,
+                pool = glob$pool,
+                user = glob$user
+              )
+             })
+        warn_user("You don't have permissions for modifying codes and categories created by others.")
+        }
+      }
     })
 
     # return active categories details in glob$category ----
