@@ -65,15 +65,17 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       req(loc$refresh_observer > 0)
       if (type == "free_segment") {
         golem::invoke_js("resetSegmentMemoInput", list())
+      } else {
+      updateTextAreaInput(session = session, "memo_text_input", value = "")
       }
+      # reset memo id input
       golem::invoke_js(
         "updateEditorInput",
         list(
           ns_memo_id = ns("memo_id"),
-          id = ""
+          id = NULL
         )
       )
-      loc$memo_text_input <- ""
     })
     observeEvent(input$cancel, {
       loc$refresh_observer <- loc$refresh_observer + 1
