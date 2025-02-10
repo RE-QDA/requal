@@ -13,17 +13,16 @@ mod_memo_editor_ui <- function(id) {
     div(
       class = "memo_editor",
       div(
-        class = "memo_segment_container",
+        class = "memo_container",
         width = "100%",
-        uiOutput(ns("text_input_area"))
+        uiOutput(ns("text_input_area"), style = "height: 100%")
       ),
       div(
         style = "display: flex; flex-wrap: wrap;",
         width = "100%",
         actionButton(ns("cancel"), "Cancel"),
-        shinyjs::hidden(actionButton(ns("save"), "", icon = icon("save"), class = "btn-warning")),
+        shinyjs::hidden(actionButton(ns("save"), "Save", class = "btn-success")),
         shinyjs::hidden(actionButton(ns("create_new"), "Create new", class = "btn-success")),
-        shinyjs::hidden(actionButton(ns("save_close"), "Save & Close", class = "btn-success")),
         shinyjs::hidden(actionButton(ns("delete_memo"), "Delete", class = "btn-danger"))
       )
     )
@@ -45,109 +44,79 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     # Render composer/editor ----
     output$text_input_area <- renderUI({
       loc$editor_ui$taglist
-    })  
-    observeEvent(input$memo_id, {
-      if (isTruthy(input$memo_id)) {
-               golem::invoke_js("resetSegmentMemoInput")
-        # if memo_id is provided, collect data on existing memo
-        memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
-        memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
-          dplyr::filter(memo_id == !!memo_df$memo_id) |>
-          dplyr::collect()
-        segment_df <-  dplyr::tbl(pool, "segments") %>%
-            dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
-            dplyr::collect()
-        loc$editing_data <- list(
-            memo_id = memo_df$memo_id,
-            segment_id = memos_segments_map$segment_id,
-            memo_text = memo_df$memo_text,
-            startOff = segment_df$segment_start,
-            endOff = segment_df$segment_start
-        )
-        loc$can_modify <- find_memo_permission(memo_df$user_id, glob$user)
-        # render editor
-        loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$editing_data$memo_text)
-      } else {
-        # render composer
-        loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
+    })
+    observeEvent(input$memo_id,
+      {
+        if (isTruthy(input$memo_id)) {
+          collect_memo_data_LF()
+          loc$can_modify <- find_memo_permission(loc$editing_data$user_id, glob$user)
+          # render editor
+          loc$editor_ui <- editor_ui(type = NULL, ns = ns, memo_text = loc$editing_data$memo_text)
+        } else {
+          # render composer
+          loc$editor_ui <- editor_ui(type = type, ns = ns, memo_text = NULL)
+        }
+      },
+      ignoreNULL = FALSE
+    )
 
-      }
-    }, ignoreNULL = FALSE)
-
-   # Refresh composer
-   observeEvent(loc$refresh_observer, {
+    # Refresh composer ----
+    observeEvent(loc$refresh_observer, {
       req(loc$refresh_observer > 0)
-       golem::invoke_js("resetSegmentMemoInput", list())
-       golem::invoke_js("updateEditorInput", 
-              list(ns_memo_id = ns("memo_id"),
-                    id = ""))
+      if (type == "free_segment") {
+        golem::invoke_js("resetSegmentMemoInput", list())
+      }
+      golem::invoke_js(
+        "updateEditorInput",
+        list(
+          ns_memo_id = ns("memo_id"),
+          id = ""
+        )
+      )
       loc$memo_text_input <- ""
     })
     observeEvent(input$cancel, {
       loc$refresh_observer <- loc$refresh_observer + 1
     })
-    
+
 
     # Adjust UI to different editor states ----
     observeEvent(loc$editor_ui$editor_state, {
-        if (loc$editor_ui$editor_state == "composer") {
-           shinyjs::show("create_new", animType = "fade")
-           shinyjs::hide("save_close")
-           shinyjs::hide("save")
-           shinyjs::hide("delete_memo")
-        } else if(loc$editor_ui$editor_state == "editor") {
-           shinyjs::hide("create_new")
-           shinyjs::show("delete_memo")
-        }
+      if (loc$editor_ui$editor_state == "composer") {
+        shinyjs::show("create_new", animType = "fade")
+        shinyjs::hide("save")
+        shinyjs::hide("delete_memo")
+      } else if (loc$editor_ui$editor_state == "editor") {
+        shinyjs::hide("create_new")
+        shinyjs::show("delete_memo")
+      }
     })
 
-    # Monitor difference between saved and input text, adjust UI 
+    # Monitor difference between saved and input text, adjust UI
     observeEvent(input$memo_text_editor, {
-      if (input$memo_text_editor != loc$editing_data$memo_text && 
-      loc$editor_ui$editor_state == "editor") {
-           shinyjs::show("save", animType = "fade")
-           shinyjs::show("save_close", animType = "fade")
-        } else if (input$memo_text_editor == loc$editing_data$memo_text && 
-      loc$editor_ui$editor_state == "editor") {
-           shinyjs::hide("save")
-           shinyjs::hide("save_close")
-        }
+      if (input$memo_text_editor != loc$editing_data$memo_text &&
+        loc$editor_ui$editor_state == "editor") {
+        shinyjs::show("save", animType = "fade")
+      } else if (input$memo_text_editor == loc$editing_data$memo_text &&
+        loc$editor_ui$editor_state == "editor") {
+        shinyjs::hide("save")
+      }
     })
     # Consolidate input text ----
     # from different sources into loc$memo_text_input
     observeEvent(c(input$memo_text_editor, input$memo_text_input), {
       if (loc$editor_ui$editor_state == "editor") {
-              loc$memo_text_input <- input$memo_text_editor
+        loc$memo_text_input <- input$memo_text_editor
       } else {
-             loc$memo_text_input <- input$memo_text_input
+        loc$memo_text_input <- input$memo_text_input
       }
     })
-       
+
     # Add new free segment memo ----
     observeEvent(input$create_new, {
-      
-      if (type == "free_segment" & glob$endOff >= glob$startOff)
-       new_segment_id <- write_memo_segment_db(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          doc_id = glob$doc_selector,
-          code_id = NA,
-          glob$startOff,
-          glob$endOff
-        )
-      new_memo_id  <- add_memo_record(
-        pool = glob$pool,
-        project = glob$active_project,
-        text = loc$memo_text_input,
-        user_id = glob$user$user_id
-      )
-      new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
-    # the function below can be wrapped to a new add_memo_segment_map(...)
-      DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
-      glob$memo_segment_observer <- glob$memo_segment_observer + 1
-       loc$refresh_observer <- loc$refresh_observer + 1
-    #   #glob$memos_observer <- glob$memos_observer + 1 enable after memo screen exists to initialize the glob
+      create_memo_LF()
+      loc$refresh_observer <- loc$refresh_observer + 1
+      #   #glob$memos_observer <- glob$memos_observer + 1 enable after memo screen exists to initialize the glob
     })
 
     # Save edits ----
@@ -159,42 +128,116 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
         memo_id = loc$editing_data$memo_id,
         memo_text = loc$memo_text_input,
         user_id = glob$user$user_id
-        )
-
-        glob$startOff <- loc$editing_data$startOff
-        glob$endOff <- loc$editing_data$endOff
-        glob$memo_segment_observer <- glob$memo_segment_observer + 1
+      )
+      if (type == "free_segment") {
+      glob$startOff <- loc$editing_data$startOff
+      glob$endOff <- loc$editing_data$endOff
+      glob$memo_segment_observer <- glob$memo_segment_observer + 1
+      } else if (type == "free_memo") {
+        glob$free_memo_observer <- glob$free_memo_observer + 1
+      }
     })
     observeEvent(input$save, {
       loc$save_observer <- loc$save_observer + 1
     })
 
-    observeEvent(input$save_close, {
-      loc$save_observer <- loc$save_observer + 1
+    # Delete memo ----
+    observeEvent(input$delete_memo, {
+      delete_memo_LF()
+      if (type == "free_memo") glob$free_memo_observer <- glob$free_memo_observer + 1
       loc$refresh_observer <- loc$refresh_observer + 1
     })
 
-        # Delete memo ----
-    observeEvent(input$delete_memo, {
-     
-      delete_memo_record(
-        pool = glob$pool,
-        project = glob$active_project,
-        memo_id = loc$editing_data$memo_id,
-        user_id = glob$user$user_id
+    # create_memo_LF ----
+    create_memo_LF <- function() {
+      req(loc$memo_text_input)
+      ## create free segment ----
+      if (type == "free_segment" & glob$endOff >= glob$startOff) {
+        new_segment_id <- write_memo_segment_db(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          doc_id = glob$doc_selector,
+          code_id = NA,
+          glob$startOff,
+          glob$endOff
         )
-      delete_segment_codes_db(
-        pool = glob$pool,
-        active_project = glob$active_project,
-        user_id = glob$user$user_id,
-        segment_id = loc$editing_data$segment_id
+        new_memo_id <- add_memo_record(
+          pool = glob$pool,
+          project = glob$active_project,
+          text = loc$memo_text_input,
+          user_id = glob$user$user_id
+        )
+        new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
+        DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
+        glob$memo_segment_observer <- glob$memo_segment_observer + 1
+      } else if (type == "free_memo") {
+        ## create free memo ----
+        add_memo_record(
+          pool = glob$pool,
+          project = glob$active_project,
+          text = loc$memo_text_input,
+          user_id = glob$user$user_id
+        )
+        glob$free_memo_observer <- glob$free_memo_observer + 1
+      }
+    }
+
+    # collect_memo_data_LF -----
+    collect_memo_data_LF <- function() {
+      # if memo_id is provided, collect data on existing memo
+      memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
+      if (type == "free_segment") {
+        golem::invoke_js("resetSegmentMemoInput")
+        memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
+          dplyr::filter(memo_id == !!memo_df$memo_id) |>
+          dplyr::collect()
+        segment_df <- dplyr::tbl(pool, "segments") %>%
+          dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
+          dplyr::collect()
+        loc$editing_data <- list(
+        segment_id = memos_segments_map$segment_id,
+        startOff = segment_df$segment_start,
+        endOff = segment_df$segment_start
       )
+      } else if (type == "free_memo") {
+        NULL
+      }
+      loc$editing_data <- list(
+        user_id = memo_df$user_id,
+        memo_id = memo_df$memo_id,
+        memo_text = memo_df$memo_text
+      )
+    }
+    # delete_memo_LF ----
+    delete_memo_LF <- function() {
+      ## delete free segment ----
+      if (type == "free_segment") {
+        delete_memo_record(
+          pool = glob$pool,
+          project = glob$active_project,
+          memo_id = loc$editing_data$memo_id,
+          user_id = glob$user$user_id
+        )
+        delete_segment_codes_db(
+          pool = glob$pool,
+          active_project = glob$active_project,
+          user_id = glob$user$user_id,
+          segment_id = loc$editing_data$segment_id
+        )
         glob$startOff <- loc$editing_data$startOff
         glob$endOff <- loc$editing_data$endOff
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
-        loc$refresh_observer <- loc$refresh_observer + 1
-    })
-
+      } else if (type == "free_memo") {
+        ## delete free segment ----
+        delete_memo_record(
+          pool = glob$pool,
+          project = glob$active_project,
+          memo_id = loc$editing_data$memo_id,
+          user_id = glob$user$user_id
+        )
+      }
+    }
   })
 }
 
@@ -220,26 +263,41 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
 
 editor_ui <- function(type, ns, memo_text = NULL) {
-  
-    if (is.null(type)) {
-      list(editor_state = "editor",
-            taglist = textAreaInput(
-        ns("memo_text_editor"), 
-        NULL, 
-        value = if (!is.null(memo_text)) memo_text, 
-        width = "100%", 
+  if (is.null(type)) {
+    list(
+      editor_state = "editor",
+      taglist = textAreaInput(
+        ns("memo_text_editor"),
+        NULL,
+        value = if (!is.null(memo_text)) memo_text,
+        width = "100%",
         height = "100%",
-        resize = "vertical"
-      ) |> tagAppendAttributes(class = "memo_segment_input"))
-    } else {
-      golem::invoke_js("initializeIframeHandler")
-      list(editor_state = "composer",
-        taglist = div(
-        style = "width: 100%; height: 100%; resize: vertical",
+        resize = "none"
+      ) |> tagAppendAttributes(class = "memo_input")
+    )
+  } else if (type == "free_segment") {
+    golem::invoke_js("initializeIframeHandler")
+    list(
+      editor_state = "composer",
+      taglist = div(
+        style = "width: 100%; height: 100%;",
         tags$iframe(
-        src = "www/memo.html",
-        class = "memo_segment_input"
-      )))
-      
-    }
+          src = "www/memo.html",
+          class = "memo_input"
+        )
+      )
+    )
+  } else if (type != "free_segment") {
+    list(
+      editor_state = "composer",
+      taglist = textAreaInput(
+        ns("memo_text_input"),
+        NULL,
+        value = "",
+        width = "100%",
+        height = "100%",
+        resize = "none"
+      ) |> tagAppendAttributes(class = "memo_input")
+    )
+  }
 }

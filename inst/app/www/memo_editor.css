@@ -1,14 +1,16 @@
-.memo_segment_container {
-    resize: vertical; 
+.memo_container {
     overflow: hidden;
     scrollbar-width: none;
-    min-height: 20vh;
+    height: 20vh;
+    min-height: 10vh;
     max-height: 70vh;
+    resize: vertical;
   }
-.memo_segment_input {
+.memo_input {
   height: 100%; 
-  min-height: 25vh;
+  min-height: 20vh;
   max-height: 80vh;
+  scrollbar-width: none;
   width: 100%;
   border: 1px;
 }
@@ -60,6 +62,6 @@
     display: block;
 } */
   
-.free_memo.free_memo_show .dropdown_menu {
-  display: block;
+.free_memo_table {
+  line-height: 1;
 }
