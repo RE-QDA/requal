@@ -12,8 +12,7 @@ list_memo_records <- function(pool, project) {
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = substr(stringr::str_extract(.data$memo_name, "^[^\n]*"), 
-                               1, 50)) 
+            memo_name = entitle_memo(memo_name)) 
 }
 
 read_memo_by_id <- function(pool, project, memo_id) {
@@ -28,8 +27,8 @@ read_memo_by_id <- function(pool, project, memo_id) {
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
-                               1, 50)) 
+            memo_name = entitle_memo(memo_name)
+            )
 }
 
 find_memo_permission <- function(memo_user_id, user){

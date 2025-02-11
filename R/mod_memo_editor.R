@@ -76,6 +76,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           id = NULL
         )
       )
+      loc$memo_text_input <- ""
     })
     observeEvent(input$cancel, {
       loc$refresh_observer <- loc$refresh_observer + 1
@@ -95,7 +96,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     })
 
     # Monitor difference between saved and input text, adjust UI
-    observeEvent(input$memo_text_editor, {
+    observeEvent(c(input$memo_text_editor, loc$save_observer), {
       if (input$memo_text_editor != loc$editing_data$memo_text &&
         loc$editor_ui$editor_state == "editor") {
         shinyjs::show("save", animType = "fade")
@@ -138,6 +139,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       } else if (type == "free_memo") {
         glob$free_memo_observer <- glob$free_memo_observer + 1
       }
+      loc$editing_data$memo_text <- loc$memo_text_input
     })
     observeEvent(input$save, {
       loc$save_observer <- loc$save_observer + 1
@@ -152,6 +154,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
     # create_memo_LF ----
     create_memo_LF <- function() {
+      if (!isTruthy(loc$memo_text_input)) rql_message("Missing input for memo.")
       req(loc$memo_text_input)
       ## create free segment ----
       if (type == "free_segment" & glob$endOff >= glob$startOff) {

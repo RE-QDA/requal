@@ -64,8 +64,6 @@ shinyjs::hidden(shinydashboard::tabItems(
             mod_project_ui("mod_project_ui_1")),
     shinydashboard::tabItem("Data",
             mod_data_ui("data_1")),
-    shinydashboard::tabItem("Attributes",
-            mod_attributes_ui("attributes_ui_1")),
     shinydashboard::tabItem("Memos",
             mod_memo_ui("memo_ui_1")),
     shinydashboard::tabItem("Codebook",
@@ -95,11 +93,6 @@ set_left_menu <- function() {
                              "Data",
                              tabName = "Data",
                              icon = icon("database")
-                         ),
-                        shinydashboard::menuItem(
-                             "Attributes",
-                             tabName = "Attributes",
-                             icon = icon("table")
                          ),
                         shinydashboard::menuItem(
                              "Memos",
@@ -452,5 +445,9 @@ parse_memo_id  <- function(x) {
 as.integer(stringr::str_extract(x, "\\d+"))
 } 
 
+# Extract title from memo text
+entitle_memo <- function(memo_text) {
+  substr(stringr::str_extract(memo_text, "^[^\n]*"), 1, 100)
+}
 
 
