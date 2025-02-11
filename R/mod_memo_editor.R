@@ -152,6 +152,33 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       loc$refresh_observer <- loc$refresh_observer + 1
     })
 
+    #  observeEvent(input$delete_memo, {
+  
+    #   showModal(
+    #     modalDialog(
+    #       title = "Are you sure?",
+    #         tags$span("You are about to delete the memo and lose its content:",
+    #         tags$b(loc$memo$memo_name)),
+    #       easyClose = TRUE,
+    #       footer = tagList(
+    #         modalButton("Dismiss"),
+    #         actionButton(ns("delete_memo_confirmation"),
+    #           "Yes, I am sure.",
+    #           class = "btn-danger"
+    #         )
+    #       ),
+    #       fade = TRUE
+    #     )
+    #   )
+    # })
+
+    # observeEvent(input$delete_memo_confirmation, {
+    #    delete_memo_record(glob$pool, glob$active_project, input$selected_memo,
+    #     user_id = glob$user$user_id
+    #   )
+    # removeModal()
+    #   })
+
     # create_memo_LF ----
     create_memo_LF <- function() {
       if (!isTruthy(loc$memo_text_input)) rql_message("Missing input for memo.")

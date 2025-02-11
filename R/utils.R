@@ -362,6 +362,20 @@ dt_options <- function() {
         )
 }
 
+# DT Memos options
+dt_memo_options <- function() {
+  list(
+          paging = TRUE,
+          searching = TRUE,
+          fixedColumns = TRUE,
+          autoWidth = TRUE,
+          ordering = TRUE,
+          dom = "lfrtpBi",
+          buttons = c("csv")
+        )
+}
+
+
 # Requal menu buttons 
 
 rql_picker_UI <- function(inputId, label, choices = "", multiple = TRUE, none = "") { 
