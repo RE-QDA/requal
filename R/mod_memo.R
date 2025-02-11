@@ -10,15 +10,22 @@
 mod_memo_ui <- function(id) {
   ns <- NS(id)
   fluidRow(
-    div(
-          mod_memo_editor_ui(ns("memo_main_editor")),
-    ),
-    div(
-        actionButton(ns("thumbtack"), "", icon = icon("thumbtack"))
-        ),
+ div(
+  style = "display: flex; align-items: flex-start; margin-left:: 30px;",
+  div(
+    style = "min-width: 40vh;",
+    mod_memo_editor_ui(ns("memo_main_editor"))
+  ),
+  div(
+    style = "margin-left: 10px;",  # Adjust the spacing between the editor and the thumbtack if needed
+    actionButton(ns("pin"), "", icon = icon("thumbtack"), class = "pinned")
+  )
+),
     hr(),
-    fluidRow(style = "overflow-x: scroll",
+    fluidRow(
+      div(style = "margin-left: 30px; overflow-x: scroll",
     DT::dataTableOutput(ns("memo"))
+      )
     )
     # downloadButton(ns("export_memo"), label = "Export memos") %>% 
     #     tagAppendAttributes(style = "display: inline-block; float: right", class = "scrollable80")
@@ -97,7 +104,15 @@ mod_memo_server <- function(id, glob) {
 
     # pin ----
        observeEvent(input$pin, {
-        browser()
+        
+        insertUI("div.content-wrapper",  where = "afterBegin",
+        div(id = "pinned_memo", 
+            div(id = "pin_header", icon("thumbtack")),
+            div("Memo content")
+           )
+        )
+        golem::invoke_js("makeDraggable", list(id = "pinned_memo"))
+
       })
 
     # # Memo export ----
