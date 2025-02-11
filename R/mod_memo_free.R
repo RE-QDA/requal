@@ -58,7 +58,7 @@ mod_memo_free_server <- function(id, glob) {
       loc$memos_table <- DT::datatable(loc$visible_memos %>%
           dplyr::filter(!memo_id %in% memos_segments_map_vec)  %>% # filter for free memos
           dplyr::arrange(dplyr::desc(memo_id)) %>%
-          dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>%
+          dplyr::mutate(memo_name = memo_link(ns("text_memo_click"), memo_id, memo_name)) %>%
           dplyr::select(memo_name),
         options = memo_table_options(),
         class = "compact free_memo_table",

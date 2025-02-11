@@ -10,15 +10,13 @@
 mod_memo_ui <- function(id) {
   ns <- NS(id)
   div(
-    tags$b("Memos"),
-    uiOutput(ns("new_memo_btn")) %>% 
-        tagAppendAttributes(style = "display: inline-block; float: right"),
+    mod_memo_editor_ui(ns("memo_main_editor")),
     hr(),
     DT::dataTableOutput(ns("memo")), 
     hr(), 
     downloadButton(ns("export_memo"), label = "Export memos") %>% 
-        tagAppendAttributes(style = "display: inline-block; float: right")
-  ) %>% tagAppendAttributes(class = "scrollable80")
+        tagAppendAttributes(style = "display: inline-block; float: right", class = "scrollable80")
+  )
 }
 
 #' memo Server Functions
@@ -27,6 +25,7 @@ mod_memo_ui <- function(id) {
 mod_memo_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    mod_memo_editor_server("memo_main_editor", glob, type = "free_memo")
 
     memo_list <- reactiveVal()
     loc <- reactiveValues()
@@ -49,9 +48,9 @@ mod_memo_server <- function(id, glob) {
         memo_list(visible_memos) 
         
         DT::datatable(memo_list() %>%
-          dplyr::arrange(dplyr::desc(memo_id)) %>%
-          dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>%
-          dplyr::select(memo_name),
+           dplyr::arrange(dplyr::desc(memo_id)), #%>%
+          # dplyr::mutate(memo_name = memo_link(memo_id, memo_name)) %>%
+          # dplyr::select(memo_name),
         options = memo_table_options(),
         class = "compact",
         escape = FALSE,

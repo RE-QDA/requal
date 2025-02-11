@@ -65,7 +65,9 @@ shinyjs::hidden(shinydashboard::tabItems(
     shinydashboard::tabItem("Data",
             mod_data_ui("data_1")),
     shinydashboard::tabItem("Attributes",
-            mod_attributes_ui("attributes_1")),
+            mod_attributes_ui("attributes_ui_1")),
+    shinydashboard::tabItem("Memos",
+            mod_memo_ui("memo_ui_1")),
     shinydashboard::tabItem("Codebook",
             mod_codebook_ui("codebook_ui_1")),
     shinydashboard::tabItem("Annotate",
@@ -98,6 +100,11 @@ set_left_menu <- function() {
                              "Attributes",
                              tabName = "Attributes",
                              icon = icon("table")
+                         ),
+                        shinydashboard::menuItem(
+                             "Memos",
+                             tabName = "Memos",
+                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
                          ),
                          shinydashboard::menuItem(
                              "Codebook",

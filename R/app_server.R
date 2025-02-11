@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
 
 
   # attributes ----
-  mod_attributes_server("attributes_1", glob)
+  mod_attributes_server("attributes_ui_1", glob)
 
 
   # codebook  ----
@@ -79,8 +79,10 @@ app_server <- function(input, output, session) {
   mod_user_server("user_ui_1", glob)
 
   # memo
-  mod_memo_free_server("memo_ui_1", glob)
-  
+  mod_memo_server("memo_ui_1", glob)
+  ## free memo
+  mod_memo_free_server("free_memo_ui_1", glob)
+
   # show admin interface
   observeEvent(glob$user$is_admin, {
     if (req(glob$user$is_admin)){

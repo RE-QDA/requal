@@ -205,11 +205,10 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       } else if (type == "free_memo") {
         NULL
       }
-      loc$editing_data <- list(
-        user_id = memo_df$user_id,
-        memo_id = memo_df$memo_id,
-        memo_text = memo_df$memo_text
-      )
+      loc$editing_data$user_id <- memo_df$user_id
+      loc$editing_data$memo_id <- memo_df$memo_id
+      loc$editing_data$memo_text <- memo_df$memo_text
+      
     }
     # delete_memo_LF ----
     delete_memo_LF <- function() {
@@ -282,7 +281,7 @@ editor_ui <- function(type, ns, memo_text = NULL) {
     list(
       editor_state = "composer",
       taglist = div(
-        style = "width: 100%; height: 100%;",
+        style = "width: 100%; height: 100%; scrollbar-width: none;",
         tags$iframe(
           src = "www/memo.html",
           class = "memo_input"
