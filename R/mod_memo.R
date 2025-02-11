@@ -120,7 +120,7 @@ mod_memo_server <- function(id, glob) {
         div(
           id = pin_id, class = "pinned_memo",
           div(id = "pin_header", class = "pin_header", icon("thumbtack")),
-          div(pinned_text),
+          div(style = "height: calc(100% - 1px); overflow-y: auto; padding-bottom: 5px; scrollbar-width: none;", pinned_text),
           div(id = "resize_handle", style = "position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; cursor: se-resize; background-color: silver; border-bottom-right-radius: 10px;")
         )
       )
