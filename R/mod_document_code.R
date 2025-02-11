@@ -86,7 +86,7 @@ tags$script(HTML("
                       div(
                       style = "height: calc(1.5em + .75rem + 10px); display: flex; align-items: center; margin-top: 0.5em; margin-bottom: 0.5em;",
                       actionButton(ns("clear_iframe"), "", icon = icon("x"), title = "Clear form",
-                          style = "margin-right: 0px; padding-right: 0px; padding-left: 5px; position: absolute; font-size: x-small; color: gray; border: none; background: transparent;"),
+                          style = "margin-right: -15px; padding-right: 0px; padding-left: 5px; position: relative; font-size: x-small; color: gray; border: none; background: transparent;"),
                       tags$div(
                         style = "flex-grow: 1; height: calc(1.5em + .75rem + 10px);",
                         tags$iframe(

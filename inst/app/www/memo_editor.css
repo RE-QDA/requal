@@ -91,3 +91,27 @@
   position: fixed;
 }
 
+.inner_pin {
+  height: calc(100% - 1px);
+  overflow-y: auto;
+  padding-bottom: 5px;
+  scrollbar-width: none; /* Firefox-specific property to hide scrollbar */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  user-select: none;
+}
+
+/* For WebKit browsers (Chrome, Safari) to hide scrollbar */
+.inner_pin::-webkit-scrollbar {
+  display: none;
+}
+
+.resizer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  cursor: se-resize;
+  background-color: silver;
+  border-bottom-right-radius: 10px;
+}
