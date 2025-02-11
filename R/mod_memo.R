@@ -10,24 +10,26 @@
 mod_memo_ui <- function(id) {
   ns <- NS(id)
   fluidRow(
- div(
-  style = "display: flex; align-items: flex-start; margin-left:: 30px;",
-  div(
-    style = "min-width: 40vh;",
-    mod_memo_editor_ui(ns("memo_main_editor"))
-  ),
-  div(
-    style = "margin-left: 10px;",  # Adjust the spacing between the editor and the thumbtack if needed
-    actionButton(ns("pin"), "", icon = icon("thumbtack"), class = "pinned")
-  )
-),
+    div(
+      style = "display: flex; align-items: flex-start; margin-left: 30px;",
+      div(
+        style = "min-width: 40vh;",
+        mod_memo_editor_ui(ns("memo_main_editor"))
+      ),
+      div(
+        style = "display: flex; align-items: center; margin-left: 10px;", # Use flexbox for alignment
+        actionButton(ns("pin"), "", title = "Pin memo", icon = icon("thumbtack"), class = "pinned"),
+        actionButton(ns("unpin"), "", title = "Unpin memos", icon = icon("xmark"), class = "unpinned", style = "margin-left: 5px;")
+      )
+    ),
     hr(),
     fluidRow(
-      div(style = "margin-left: 30px; overflow-x: scroll",
-    DT::dataTableOutput(ns("memo"))
+      div(
+        style = "margin-left: 30px; overflow-x: scroll",
+        DT::dataTableOutput(ns("memo"))
       )
     )
-    # downloadButton(ns("export_memo"), label = "Export memos") %>% 
+    # downloadButton(ns("export_memo"), label = "Export memos") %>%
     #     tagAppendAttributes(style = "display: inline-block; float: right", class = "scrollable80")
   )
 }
@@ -42,78 +44,91 @@ mod_memo_server <- function(id, glob) {
     mod_memo_editor_server("memo_main_editor", glob, type = "free_memo")
 
     ## Observe free_memo_edit_click ----
-    observeEvent(req(input$text_memo_click), {
+    observeEvent(input$text_memo_click, {
+      req(input$text_memo_click)
       req(glob$free_memo_observer > 0)
-      golem::invoke_js("updateEditorInput", 
-              list(ns_memo_id = paste0(ns("memo_main_editor"), "-memo_id"),
-                    id = parse_memo_id(input$text_memo_click)))
-      golem::invoke_js("resetMemoClick", 
-              list(ns_text_memo_click = ns("text_memo_click")))
-    })
-
-    output$new_memo_btn <- renderUI({
-      req(glob$user$data)
-      if(glob$user$data$memo_modify == 1){
-        actionButton(ns("new_memo"), "New memo") 
-      }
+      loc$memo_id <- parse_memo_id(input$text_memo_click) # grab the active memo id for this module
+      golem::invoke_js(
+        "updateEditorInput",
+        list(
+          ns_memo_id = paste0(ns("memo_main_editor"), "-memo_id"),
+          id = loc$memo_id
+        )
+      )
+      golem::invoke_js(
+        "resetMemoClick",
+        list(ns_text_memo_click = ns("text_memo_click"))
+      )
     })
 
     output$memo <- DT::renderDataTable({
       if (isTruthy(glob$active_project)) {
         memo_table <- list_memo_records(glob$pool, glob$active_project)
-        if(glob$user$data$memo_other_view == 0 && nrow(memo_table) > 0){
-          memo_table <- memo_table %>% 
-            dplyr::filter(user_id == glob$user$user_id) 
+        if (glob$user$data$memo_other_view == 0 && nrow(memo_table) > 0) {
+          memo_table <- memo_table %>%
+            dplyr::filter(user_id == glob$user$user_id)
         }
         req(nrow(memo_table) > 0)
-        enriched_memo_table <- memo_table  |> 
+        loc$enriched_memo_table <- memo_table |>
           dplyr::left_join(
             memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
               dplyr::filter(memo_id %in% !!memo_table$memo_id) |>
-              dplyr::collect()
-            ) |> 
+              dplyr::collect(),
+              by = "memo_id"
+          ) |>
           dplyr::left_join(
             segment_df <- dplyr::tbl(pool, "segments") %>%
-              dplyr::select(segment_id, doc_id) |> 
+              dplyr::select(segment_id, doc_id) |>
               dplyr::filter(.data$segment_id %in% !!memos_segments_map$segment_id) %>%
-              dplyr::collect()
-          ) |> 
-         dplyr::left_join(
+              dplyr::collect(),
+              by = "segment_id"
+          ) |>
+          dplyr::left_join(
             documents_df <- dplyr::tbl(pool, "documents") %>%
               dplyr::select(doc_id, doc_name) %>%
               dplyr::filter(.data$doc_id %in% !!segment_df$doc_id) %>%
-              dplyr::collect()
-         ) |> 
+              dplyr::collect(),
+              by = "doc_id"
+          ) |>
           dplyr::mutate(
             memo_text = memo_name,
             memo_name = memo_link(ns("text_memo_click"), memo_id, memo_name)
-            ) |> 
-            dplyr::arrange(dplyr::desc(memo_id))
-            
-              DT::datatable(
-        enriched_memo_table,
-        filter = "top",
-        escape = FALSE,
-        extensions = c("Buttons"),
-        options = dt_memo_options(),
-        class = "display",
-        selection = "none"
-      )
+          ) |>
+          dplyr::arrange(dplyr::desc(memo_id))
+
+        DT::datatable(
+          loc$enriched_memo_table,
+          filter = "top",
+          escape = FALSE,
+          extensions = c("Buttons"),
+          options = dt_memo_options(),
+          class = "display",
+          selection = "none"
+        )
       }
     })
 
     # pin ----
-       observeEvent(input$pin, {
-        
-        insertUI("div.content-wrapper",  where = "afterBegin",
-        div(id = "pinned_memo", 
-            div(id = "pin_header", icon("thumbtack")),
-            div("Memo content")
-           )
-        )
-        golem::invoke_js("makeDraggable", list(id = "pinned_memo"))
+    observeEvent(input$pin, {
+      req(loc$memo_id)
+      pin_id <- paste0("pin_id-", loc$memo_id)
+      pinned_text <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id) |>
+        dplyr::pull(memo_text)
 
-      })
+      insertUI(
+        selector = "div.content-wrapper", where = "afterBegin",
+        div(
+          id = pin_id, class = "pinned_memo",
+          div(id = "pin_header", class = "pin_header", icon("thumbtack")),
+          div(pinned_text),
+          div(id = "resize_handle", style = "position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; cursor: se-resize; background-color: silver; border-bottom-right-radius: 10px;")
+        )
+      )
+      golem::invoke_js("makeDraggable", list(id = pin_id))
+    })
+    observeEvent(input$unpin, {
+      golem::invoke_js("removeAllPinnedMemos", list(class = "pinned_memo"))
+    })
 
     # # Memo export ----
     # output$export_memo <- downloadHandler(
@@ -125,6 +140,5 @@ mod_memo_server <- function(id, glob) {
     #         utils::write.csv(memos, file)
     #     }
     # )
-    
   })
 }

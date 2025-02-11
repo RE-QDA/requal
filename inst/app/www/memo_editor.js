@@ -136,6 +136,7 @@ Shiny.addCustomMessageHandler("makeDraggable", function(message) {
   // Check if the element is now in the DOM
   var element = document.getElementById(message.id);
   if (element) {
+    resizeElement(element);
     dragElement(element);
     observer.disconnect(); // Stop observing once the element is found and processed
   }
@@ -182,6 +183,42 @@ function dragElement(elmnt) {
     document.onmousemove = null;
   }
 }
+
+function resizeElement(elmnt) {
+  var startX, startY, startWidth, startHeight;
+  var resizer = document.getElementById('resize_handle');
+  
+  resizer.onmousedown = function(e) {
+    e.stopPropagation();  // Prevent the drag event from starting
+    initResize(e);
+  };
+
+  function initResize(e) {
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = parseInt(document.defaultView.getComputedStyle(elmnt).width, 10);
+    startHeight = parseInt(document.defaultView.getComputedStyle(elmnt).height, 10);
+    document.documentElement.addEventListener('mousemove', doResize, false);
+    document.documentElement.addEventListener('mouseup', stopResize, false);
+  }
+
+  function doResize(e) {
+    elmnt.style.width = (startWidth + e.clientX - startX) + 'px';
+    elmnt.style.height = (startHeight + e.clientY - startY) + 'px';
+  }
+
+  function stopResize(e) {
+    document.documentElement.removeEventListener('mousemove', doResize, false);
+    document.documentElement.removeEventListener('mouseup', stopResize, false);
+  }
+}
+
+Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
+  var elements = document.getElementsByClassName(message.class);
+  while(elements.length > 0){
+      elements[0].parentNode.removeChild(elements[0]);
+  }
+});
 // let maxZ = 2;
 // // Function to handle double click
 // function handleDoubleClick(target) {
