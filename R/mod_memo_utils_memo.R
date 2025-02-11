@@ -12,7 +12,7 @@ list_memo_records <- function(pool, project) {
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
+            memo_name = substr(stringr::str_extract(.data$memo_name, "^[^\n]*"), 
                                1, 50)) 
 }
 
