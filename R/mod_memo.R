@@ -71,20 +71,20 @@ mod_memo_server <- function(id, glob) {
         req(nrow(memo_table) > 0)
         loc$enriched_memo_table <- memo_table |>
           dplyr::left_join(
-            memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
+            memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") |>
               dplyr::filter(memo_id %in% !!memo_table$memo_id) |>
               dplyr::collect(),
               by = "memo_id"
           ) |>
           dplyr::left_join(
-            segment_df <- dplyr::tbl(pool, "segments") %>%
+            segment_df <- dplyr::tbl(glob$pool, "segments") %>%
               dplyr::select(segment_id, doc_id) |>
               dplyr::filter(.data$segment_id %in% !!memos_segments_map$segment_id) %>%
               dplyr::collect(),
               by = "segment_id"
           ) |>
           dplyr::left_join(
-            documents_df <- dplyr::tbl(pool, "documents") %>%
+            documents_df <- dplyr::tbl(glob$pool, "documents") %>%
               dplyr::select(doc_id, doc_name) %>%
               dplyr::filter(.data$doc_id %in% !!segment_df$doc_id) %>%
               dplyr::collect(),

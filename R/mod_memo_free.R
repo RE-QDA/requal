@@ -52,7 +52,7 @@ mod_memo_free_server <- function(id, glob) {
           loc$visible_memos <- loc$visible_memos %>% 
             dplyr::filter(user_id == glob$user$user_id) 
         }
-      memos_segments_map_vec <- dplyr::tbl(pool, "memos_segments_map") |>
+      memos_segments_map_vec <- dplyr::tbl(glob$pool, "memos_segments_map") |>
           dplyr::pull(memo_id)
 
       loc$memos_table <- DT::datatable(loc$visible_memos %>%
