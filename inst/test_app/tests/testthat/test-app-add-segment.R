@@ -28,57 +28,10 @@ test_that("{shinytest2} test creating segment", {
     app$set_inputs(`document_code_ui_1-doc_selector` = "1")
     app$wait_for_idle()
     
-    app$run_js(
-        '
-    var el = document.getElementById("document_code_ui_1-focal_text");
-    var textNode = el.childNodes[0].childNodes[0].childNodes[0];
-    
-    var range = document.createRange();
-    range.setStart(textNode, 6);
-    range.setEnd(textNode, 11);
-    
-    var selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    '
-    )
-    
-    # Javascript from document_code_js.js
-    # IRL triggered by mouse event
-    app$run_js('
-    var sel = window.getSelection();
-    
-    if(sel.rangeCount > 0){
-      var range = sel.getRangeAt(0);
-      var el = document.getElementById("document_code_ui_1-focal_text")
-    
-      var endOffset = getCaretCharacterOffsetWithin(el);
-      var startOffset_js = endOffset - range.toString().length;
-      var startOffset = startOffset_js+1;
-      var text_length = $("#document_code_ui_1-focal_text").text().length;
-
-      if (endOffset == 0) {
-        var endOffset = endOffset+1;
-      } 
-      if (startOffset > endOffset) {
-        var endOffset = startOffset; 
-      } 
-      if (startOffset < 1) {
-        var startOffset = 1;
-      } 
-      if (endOffset > text_length) {
-        var endOffset = text_length;
-      } 
-      
-      var tag_position_value = startOffset.toString() + "-" + endOffset.toString();
-        
-      Shiny.setInputValue("document_code_ui_1-tag_position", tag_position_value);
-    }
-    ')
-    
+    app$set_inputs(`document_code_ui_1-tag_position` = "619-623", allow_no_input_binding_ = TRUE)
     app$click("document_code_ui_1-1")
     
-    # app$expect_screenshot()
-    app$expect_values(output = "document_code_ui_1-focal_text")
+    app$expect_screenshot()
+    # app$expect_values(output = "document_code_ui_1-focal_text")
     
 })

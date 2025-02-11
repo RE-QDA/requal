@@ -9,7 +9,7 @@
 #' @importFrom shiny NS tagList
 mod_document_code_ui <- function(id) {
   ns <- NS(id)
-
+  
   fluidPage(
     tags$head(
       tags$script(HTML("
@@ -20,13 +20,13 @@ mod_document_code_ui <- function(id) {
     });
   });
 ")),
-  tags$script(HTML("
+tags$script(HTML("
     Shiny.addCustomMessageHandler('appendContent', function(message) {
       var article = document.getElementById(message.id);
       article.insertAdjacentHTML('beforeend', message.html);
     });
   ")),
-    tags$script(HTML("
+tags$script(HTML("
     Shiny.addCustomMessageHandler('clearArticle', function(message) {
       $('#article').empty();
     });
@@ -125,7 +125,7 @@ mod_document_code_ui <- function(id) {
 #' @noRd
 mod_document_code_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
-
+    
     # DEVNOTE
     # At this point, it is very messy, but a more suistainable pattern of building html
     # is implemented in text display rendering and it has been partially done
@@ -138,7 +138,7 @@ mod_document_code_server <- function(id, glob) {
     # btw, wrapping things in functions can make it more easily maintainable...
     # it seems a simple wrap suffices 
     # file with JS will also require some clean up
-
+    
     ns <- session$ns
     loc <- reactiveValues()
     segment_memos <- reactiveValues() # messages from nested module
@@ -209,12 +209,12 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(glob$codebook, {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1
     })
-
+    
     ## Code columns observer -----
     observeEvent(input$code_columns, {
       shinyjs::toggleClass(id = "codes_menu", "two_columns", asis = TRUE)
     })
-
+    
     ## Codes menu observer ---- 
     observeEvent(req(loc$codes_menu_observer), {
       req(loc$codes_menu_observer > 0) # ignore init value
@@ -223,22 +223,22 @@ mod_document_code_server <- function(id, glob) {
         glob$active_project,
         user = glob$user
       )
-
+      
       code_labels <- purrr::pmap(
-          list(
-            loc$codebook$code_id,
-            loc$codebook$code_name,
-            loc$codebook$code_color,
-            loc$codebook$code_description
-          ),
-          ~ generate_coding_tools(
-            ns = ns,
-            code_id = ..1,
-            code_name = ..2,
-            code_color = ..3,
-            code_desc = ..4
-          ))
-        
+        list(
+          loc$codebook$code_id,
+          loc$codebook$code_name,
+          loc$codebook$code_color,
+          loc$codebook$code_description
+        ),
+        ~ generate_coding_tools(
+          ns = ns,
+          code_id = ..1,
+          code_name = ..2,
+          code_color = ..3,
+          code_desc = ..4
+        ))
+      
       loc$codes_menu <- sortable::rank_list(
         input_id = "codes_menu",
         css_id = "codes_menu",
@@ -292,12 +292,12 @@ mod_document_code_server <- function(id, glob) {
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  glob$doc_selector)
       loc$total_chars <- nchar(loc$raw_text)
       paragraph_indices <- tibble::as_tibble(stringr::str_locate_all(loc$raw_text, "\n|\r")[[1]])
-      if (!nrow(paragraph_indices)) paragraph_indices  <- tibble::tibble(end = loc$total_chars)
+      if (!nrow(paragraph_indices)) paragraph_indices <- tibble::tibble(end = loc$total_chars)
       loc$paragraphs <- paragraph_indices %>%
-          dplyr::transmute(
+        dplyr::transmute(
           segment_start = as.integer(dplyr::lag(end+1, default = 1)),
           segment_end = as.integer(dplyr::lead(segment_start-1, default = max(end)))
-          ) %>% 
+        ) %>% 
         tibble::rowid_to_column("par_id") %>%
         dplyr::mutate(par_id = paste("par_id", par_id, sep = "-"))
 
@@ -377,22 +377,22 @@ mod_document_code_server <- function(id, glob) {
     
     ## Quick code tools ----
     observeEvent(input$quickcode, {
-        if (isTruthy(input$quickcode)) {
+      if (isTruthy(input$quickcode)) {
         non_matched_codes <- loc$codebook |> 
-        dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
-        dplyr::pull(code_id)
+          dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
+          dplyr::pull(code_id)
         purrr::map(non_matched_codes, shinyjs::hide)
         matched_codes <- loc$codebook$code_id[!loc$codebook$code_id %in% non_matched_codes]
         purrr::map(matched_codes, shinyjs::show)
       } else {
-           purrr::map(loc$codebook$code_id, shinyjs::show)
+        purrr::map(loc$codebook$code_id, shinyjs::show)
       }
     })
     # Clear quick code form
     observeEvent(input$clear_iframe, {
-        golem::invoke_js('refreshIframe', message = list())
-        # Refresh codes menu
-        purrr::map(loc$codebook$code_id, shinyjs::show)
+      golem::invoke_js('refreshIframe', message = list())
+      # Refresh codes menu
+      purrr::map(loc$codebook$code_id, shinyjs::show)
     })
     # After quickcode button is pressed
     observeEvent(req(input$quickcode_btn), {
@@ -410,7 +410,7 @@ mod_document_code_server <- function(id, glob) {
         )
         # Add new quickcode to codes database
         # and register the new code_id
-         loc$code <- add_quickcode_record(
+        loc$code <- add_quickcode_record(
           pool = glob$pool,
           project_id = glob$active_project,
           codes_df = codes_input_df, 
@@ -467,7 +467,7 @@ mod_document_code_server <- function(id, glob) {
           )
         )
       }
-
+      
       if (nrow(loc$marked_segments_df) == 0) {
         NULL
       } else if (nrow(loc$marked_segments_df) == 1) {
@@ -489,10 +489,10 @@ mod_document_code_server <- function(id, glob) {
         showModal(
           modalDialog(
             checkboxGroupInput(ns("codes_to_remove"),
-              label = "",
-              choiceValues = loc$marked_segments_df$segment_id,
-              choiceNames = loc$marked_segments_df$code_name,
-              selected = FALSE
+                               label = "",
+                               choiceValues = loc$marked_segments_df$segment_id,
+                               choiceNames = loc$marked_segments_df$code_name,
+                               selected = FALSE
             ),
             title = "Codes in this segment",
             "Remove selected codes from segment?",
@@ -500,8 +500,8 @@ mod_document_code_server <- function(id, glob) {
             footer = tagList(
               modalButton("Dismiss"),
               actionButton(ns("remove_codes_select"),
-                "Remove selected",
-                class = "btn-danger"
+                           "Remove selected",
+                           class = "btn-danger"
               )
             ),
             fade = TRUE
@@ -509,7 +509,7 @@ mod_document_code_server <- function(id, glob) {
         )
       }
     })
-
+    
     # Multiple segments removal ----
     observeEvent(input$remove_codes_select, {
       if (isTruthy(input$codes_to_remove)) {
@@ -521,7 +521,7 @@ mod_document_code_server <- function(id, glob) {
           segment_id = input$codes_to_remove
         )
         removeModal()
-
+        
         # Refresh text
         
         glob$startOff <- min(loc$marked_segments_df$segment_start)
@@ -545,7 +545,7 @@ mod_document_code_server <- function(id, glob) {
       }
       as.character(reported_range)
     })
-
+    
     # Local functions -------------------
     ## toggle_style_LF  -------------------
 
@@ -556,7 +556,7 @@ mod_document_code_server <- function(id, glob) {
       new_style_index <- (current_style_index %% length(values)) + 1
       # Update loc$highlight with the new style
       loc$highlight  <- values[new_style_index]
-        # Send a message to the client to toggle the style
+      # Send a message to the client to toggle the style
       #session$sendCustomMessage("toggleStyle", message = loc$highlight)
       if (loc$highlight == "background") {
         shinyjs::addClass(class = "background", selector = ".segment.code")
@@ -666,7 +666,7 @@ mod_document_code_server <- function(id, glob) {
   )
         )
     }
-
+    
     # returns glob$segments_observer and glob$codebook
   })
 }
