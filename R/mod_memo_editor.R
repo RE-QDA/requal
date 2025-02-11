@@ -221,10 +221,10 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
       if (type == "free_segment") {
         golem::invoke_js("resetSegmentMemoInput")
-        memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |>
+        memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") |>
           dplyr::filter(memo_id == !!memo_df$memo_id) |>
           dplyr::collect()
-        segment_df <- dplyr::tbl(pool, "segments") %>%
+        segment_df <- dplyr::tbl(glob$pool, "segments") %>%
           dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
           dplyr::collect()
         loc$editing_data <- list(
