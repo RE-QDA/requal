@@ -12,3 +12,6 @@ $run_dev.*
 ^\.github$
 _\.new\.png$
 ^codecov\.yml$
+^.*\.sqlite$
+^.*\.db$
+^\.quarto

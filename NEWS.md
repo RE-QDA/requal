@@ -1,3 +1,24 @@
+# requal 1.1.3 Rieppeleon
+
+__Release notes:__  
+
+- Navigation Enhancements
+  - Document badges attached to segments are now clickable links, enabling seamless transitions from the Analyze screen to the Annotate screen.
+- Quick Tagging
+  - Users can now create new codes on the fly, with the option to edit them later.
+- Code Editing Improvements
+  - Codes can be edited directly within the Codebook screen, eliminating the need for the previous merge workaround.
+- Highlight/Underline Toggle
+  - Users can switch the display of annotated segments between highlight and underline styles.
+- Adjustable Annotation Columns
+  - Customize the layout by adjusting the ratio between text and coding tools to suit your workflow.
+- Enhanced Two-Column View and Draggable Code Menu
+  - Greater flexibility with additional options for displaying codes in the Annotation screen.
+- Line counter
+  - Track and reference specific locations in your document with the new line counter.
+- Minor Fixes and Updates
+- New Tests
+
 # requal 1.1.2 Thuringothyris
 
 __Release notes:__  
