@@ -315,7 +315,10 @@ position: relative;
 .docpar span::selection  {
   background: rgb(0, 0, 0); 
   color: white;
-  border-bottom: 5px solid var(--code-color);
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
 }
 
 
