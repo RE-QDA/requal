@@ -71,8 +71,8 @@
   z-index: 10000;
   width: 20vh;
   height: 20vh;
-  min-width: 70px;
-  min-height: 70px;
+  min-width: 50px;
+  min-height: 50px;
 }
 
 .pin_header {
