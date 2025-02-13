@@ -20,17 +20,6 @@ mod_document_code_ui <- function(id) {
     });
   });
 ")),
-tags$script(HTML("
-    Shiny.addCustomMessageHandler('appendContent', function(message) {
-      var article = document.getElementById(message.id);
-      article.insertAdjacentHTML('beforeend', message.html);
-    });
-  ")),
-tags$script(HTML("
-    Shiny.addCustomMessageHandler('clearArticle', function(message) {
-      $('#article').empty();
-    });
-  "))
     ),
     fluidRow(
       style = "height: 90%",
@@ -316,7 +305,7 @@ mod_document_code_server <- function(id, glob) {
 
         text_plain <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {     
          paste0(
-            '<p id ="',
+            '<div class= "docpar_wrap"><div class="partext"><p id ="',
             par_id,
             '" class = "docpar" data-startend="',
             segment_start,
@@ -324,7 +313,7 @@ mod_document_code_server <- function(id, glob) {
             segment_end,
             '">',
             gsub("\n", "", htmltools::htmlEscape(substr(loc$raw_text, segment_start, segment_end))),
-            '<span class = "br">&#8203</span></p>')
+            '<span class = "br">&#8203</span></p></div><div p id = "info_', par_id,'" class="extra_info"></div></div>')
         })
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
       glob$startOff <- 1
@@ -574,6 +563,7 @@ mod_document_code_server <- function(id, glob) {
 
     ## edit_display_LF  -------------------
     edit_display_LF <- function() {
+      #browser()
       loc$par_index <- loc$paragraphs |> 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
         text_data <- load_doc_to_display(
@@ -612,27 +602,33 @@ mod_document_code_server <- function(id, glob) {
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
          
       memos_data <- text_data |> 
-        dplyr::select(par_id, span_id, memo_id) |> 
+        dplyr::select(par_id, memo_id) |> 
         dplyr::filter(par_id %in% par_ids) |> 
-        dplyr::select(-par_id) |> 
+        dplyr::mutate(par_id = paste0("info_", par_id)) |> 
         dplyr::filter(!is.na(memo_id)) |> 
         dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
         tidyr::unnest(cols = c("memo_id")) |>
-        dplyr::filter(span_id == max(span_id), .by = "memo_id") |> 
         dplyr::filter(memo_id != "memo") |> 
+        dplyr::distinct(memo_id, .keep_all = TRUE) |> 
         dplyr::inner_join(
           text_memos |> 
           dplyr::select(memo_id, text), 
           by = "memo_id"
-          ) 
+          )  |> 
+          dplyr::arrange(memo_id)
 
- 
-      purrr::pmap(memos_data, function(span_id, memo_id, text) {
+         golem::invoke_js("clearClassContent", list(class = "extra_info"))
+
+      purrr::pmap(memos_data, function(par_id, memo_id, text) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
-              insertUI(paste0("#", span_id), where = "afterEnd", ui = memo_html)
+              # golem::invoke_js("clearElementContent", list(id = par_id))
+              insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)
       })
-    }  
+    }  else {
+        golem::invoke_js("clearClassContent", list(class = "extra_info"))
+
+    }
    
     }
 

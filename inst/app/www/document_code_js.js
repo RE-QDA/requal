@@ -201,4 +201,24 @@ Shiny.addCustomMessageHandler('updateParagraphContent', function(message) {
     container.appendChild(tempElement.firstChild);
   }
 });
-    
+
+Shiny.addCustomMessageHandler('clearArticle', function(message) {
+  $('#article').empty();
+});
+
+Shiny.addCustomMessageHandler('clearElementContent', function(message) {
+  document.getElementById(message.id).innerHTML = '';
+});
+
+Shiny.addCustomMessageHandler('clearClassContent', function(message) {
+  let elements = document.getElementsByClassName(message.class);
+  for (let i = 0; i < elements.length; i++) {
+    elements[i].innerHTML = '';
+  }
+});
+
+Shiny.addCustomMessageHandler('appendContent', function(message) {
+  var article = document.getElementById(message.id);
+  article.insertAdjacentHTML('beforeend', message.html);
+});
+

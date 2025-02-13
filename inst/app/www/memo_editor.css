@@ -20,16 +20,16 @@
 
 .text_memo_btn {
   font-size: 100%;
-  margin-right: 5px;
+  /* margin-right: 5px;
   margin-left: 5px;
   margin-top: 3px;
-  background-color: white;
+  background-color: white; */
   color: silver;
-  padding-left: 3px;
-  padding-right: 3px;
+  padding-left: 5px;
+  /* padding-right: 3px;
   padding-bottom: 2px;
-  padding-top: 1px;
-  z-index: 2;
+  padding-top: 1px; */
+  position: relative;
 }
   
 .text_memo_btn::after {
@@ -52,7 +52,8 @@
   font-weight: normal;
   max-width: 300px;
   border: 1px solid silver;
-  z-index: inherit;
+  z-index: 2;
+  right: 0;
 }
   
 .text_memo_btn:hover::after {
@@ -114,4 +115,19 @@
   cursor: se-resize;
   background-color: silver;
   border-bottom-right-radius: 10px;
+}
+
+.docpar_wrap {
+  display: flex;
+  gap: 10px;  /* Space between text and gutter */
+}
+
+.partext {
+  flex-grow: 1;
+}
+
+.extra_info {
+  width: 40px;
+  background-color: yellow;
+  flex-shrink: 0;
 }
