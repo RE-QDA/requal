@@ -316,7 +316,7 @@ mod_document_code_server <- function(id, glob) {
 
         text_plain <- purrr::pmap_chr(loc$paragraphs, .f = function(par_id, segment_start, segment_end) {     
          paste0(
-            '<p id ="',
+            '<div class= "docpar_wrap"><div class="partext"><p id ="',
             par_id,
             '" class = "docpar" data-startend="',
             segment_start,
@@ -324,7 +324,7 @@ mod_document_code_server <- function(id, glob) {
             segment_end,
             '">',
             gsub("\n", "", htmltools::htmlEscape(substr(loc$raw_text, segment_start, segment_end))),
-            '<span class = "br">&#8203</span></p>')
+            '<span class = "br">&#8203</span></p></div><div class="extra_info"></div></div>')
         })
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
       glob$startOff <- 1

@@ -115,3 +115,18 @@
   background-color: silver;
   border-bottom-right-radius: 10px;
 }
+
+.docpar_wrap {
+  display: flex;
+  gap: 10px;  /* Space between text and gutter */
+}
+
+.partext {
+  flex-grow: 1;
+}
+
+.extra_info {
+  width: 40px;
+  background-color: yellow;
+  flex-shrink: 0;
+}
