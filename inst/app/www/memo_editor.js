@@ -103,7 +103,8 @@ document.addEventListener('click', (e) => {
       handleSingleClick(e.target);
   } else if (e.target.classList.contains('btn_code_id')) {
     e.preventDefault(); // Prevent default behavior if necessary
-    toggleSubcodes(e.target);
+    targetButton = e.target.closest('button');
+    toggleSubcodes(targetButton);
   }   
 });
 // Function to handle single click
