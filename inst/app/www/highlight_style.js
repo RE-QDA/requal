@@ -128,24 +128,21 @@ function toggleSubcodes(button) {
   const parentElement = button.closest('.code_container');
   // Find the direct subcodes element within the parent
   const subcodesElement = parentElement.querySelector(':scope > .subcodes');
-  console.log('subcodes' + subcodesElement)
 
-
-      // Toggle the display of the subcodes element
-      if (subcodesElement.style.display === 'none' || subcodesElement.style.display === '') {
-          subcodesElement.style.display = 'block';
-          console.log('godown')
-
-          // Set icon to caret-down when showing
-          button.querySelector('i').classList.remove('fa-caret-right');
-          button.querySelector('i').classList.add('fa-caret-down');
-      } else {
+  // Toggle the display of the subcodes element
+      if (subcodesElement.style.display === 'block' || subcodesElement.style.display === '') {
           subcodesElement.style.display = 'none';
+          console.log('button')
           // Set icon to caret-right when hiding
-          console.log('right')
-
           button.querySelector('i').classList.remove('fa-caret-down');
           button.querySelector('i').classList.add('fa-caret-right');
+
+      } else {
+            subcodesElement.style.display = 'block';
+            // Set icon to caret-down when showing
+            button.querySelector('i').classList.remove('fa-caret-right');
+            button.querySelector('i').classList.add('fa-caret-down');console.log('right')
+
       }
  
 }
