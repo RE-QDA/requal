@@ -101,7 +101,10 @@ document.addEventListener('click', (e) => {
     // Click on text memo icon
     if (e.target.classList.contains('text_memo_btn')) {
       handleSingleClick(e.target);
-  }
+  } else if (e.target.classList.contains('btn_code_id')) {
+    e.preventDefault(); // Prevent default behavior if necessary
+    toggleSubcodes(e.target);
+  }   
 });
 // Function to handle single click
 function handleSingleClick(target) {

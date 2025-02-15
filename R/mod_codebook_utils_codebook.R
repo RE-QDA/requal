@@ -210,9 +210,10 @@ gen_codes_ui <- function(code_id,
     id = paste0("code_container_", code_id),
     class = "code_container",
     draggable = "true",  # Make the div draggable
-    
+        div(style = "display: flex;",
+    tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
     # The box containing the code information
-    box(
+        box(
       code_description,
       id = paste0("code_id_", code_id),
       title = code_name,
@@ -235,7 +236,7 @@ gen_codes_ui <- function(code_id,
       `data-code_id` = code_id,
       class = "code_item",
       style = "max-width: 500px; background-color: #e0f7fa;"
-    ),
+    )),
     
     # The subcodes div where incoming elements will be inserted
     div(

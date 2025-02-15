@@ -350,13 +350,34 @@ position: relative;
   margin: 0px;
 }
 
+/* Style for the container div */
+.code_item {
+  min-width: 500px;
+}
+
 /* Style for the subcodes div */
 .subcodes {
 	border-left: 1px dashed silver;
 	padding-left: 2vh;
+  display: block;
+  transition: opacity 0.5s ease, max-height 0.5s ease;
 }
 
 /* Style when a draggable element is over a subcodes div */
 .code_item.dragover {
   background-color: #e0f7fa; 
+}
+
+/* Style for caret button */
+.btn_code_id {
+  background: transparent; 
+  border: none;
+  outline: none;
+}
+.btn_code_id:hover,
+.btn_code_id:focus,
+.btn_code_id:active {
+    background-color: transparent; /* Same background color */
+    border: none; /* Same border */
+    outline: none; /* No outline */
 }

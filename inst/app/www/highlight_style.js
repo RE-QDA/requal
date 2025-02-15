@@ -123,7 +123,29 @@ function extractNumberFromId(id) {
     return match ? match[0] : null; // Return the first match or null if no match is found
 }
 
-// Example usage
-var id = "code_container_123";
-var numberPart = extractNumberFromId(id);
-console.log(numberPart); // Outputs: 123
+function toggleSubcodes(button) {
+  // Find the code_container element as the parent
+  const parentElement = button.closest('.code_container');
+  // Find the direct subcodes element within the parent
+  const subcodesElement = parentElement.querySelector(':scope > .subcodes');
+  console.log('subcodes' + subcodesElement)
+
+
+      // Toggle the display of the subcodes element
+      if (subcodesElement.style.display === 'none' || subcodesElement.style.display === '') {
+          subcodesElement.style.display = 'block';
+          console.log('godown')
+
+          // Set icon to caret-down when showing
+          button.querySelector('i').classList.remove('fa-caret-right');
+          button.querySelector('i').classList.add('fa-caret-down');
+      } else {
+          subcodesElement.style.display = 'none';
+          // Set icon to caret-right when hiding
+          console.log('right')
+
+          button.querySelector('i').classList.remove('fa-caret-down');
+          button.querySelector('i').classList.add('fa-caret-right');
+      }
+ 
+}
