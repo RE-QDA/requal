@@ -184,7 +184,8 @@ list_db_codes <- function(pool, project_id, user) {
             code_name,
             code_description,
             code_color, 
-            user_id
+            user_id,
+            code_parent_id
         ) %>%
         dplyr::collect()
     
@@ -205,13 +206,12 @@ gen_codes_ui <- function(code_id,
                          code_description,
                          code_color, 
                          user_id) {
+
   # Create the main container div for the code
   div(
     id = paste0("code_container_", code_id),
     class = "code_container",
     draggable = "true",  # Make the div draggable
-        div(style = "display: flex;",
-    tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
     # The box containing the code information
         box(
       code_description,
@@ -236,12 +236,50 @@ gen_codes_ui <- function(code_id,
       `data-code_id` = code_id,
       class = "code_item",
       style = "max-width: 500px; background-color: #e0f7fa;"
-    )),
+    )
+  )
+}
+gen_codes_ui_2 <- function(code_id, code_name, code_description, code_color, user_id, children) {
+
+  # Create the main container div for the code
+  div(
+    id = paste0("code_container_", code_id),
+    class = "code_container",
+    draggable = "true",  # Make the div draggable
+    div(style = "display: flex;",
+        tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
+        # The box containing the code information
+        box(
+          code_description,
+          id = paste0("code_id_", code_id),
+          title = code_name,  # Ensure title is set
+          closable = FALSE,
+          width = NULL,
+          background = "light-blue",
+          collapsible = TRUE,
+          collapsed = TRUE,
+          boxToolSize = "md",
+          label = tagAppendAttributes(
+            boxLabel(
+              text = "code",
+              status = "warning"
+            ),
+            style = paste0("background-color:", code_color, " !important;"),
+            class = "custom_label"
+          ),
+          ""
+        ) %>% tagAppendAttributes(
+          `data-code_id` = code_id,
+          class = "code_item",
+          style = "max-width: 500px; background-color: #e0f7fa;"
+        )),
     
     # The subcodes div where incoming elements will be inserted
     div(
       id = paste0("subcodes_", code_id),
-      class = "subcodes"
+      class = "subcodes",
+      # Recursively generate UI for children
+      purrr::map(children, ~ gen_codes_ui_2(.x$id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
     )
   )
 }
@@ -283,22 +321,43 @@ delete_codes_segment_db <- function(pool,
 
 # Render codes -----
 
-render_codes <- function(pool, active_project, user) {
-    if (isTruthy(active_project)) {
-        project_codes <- list_db_codes(
-            pool = pool,
-            project_id = active_project, 
-            user = user
-        )
-        if (nrow(project_codes) == 0) {
-            "No codes have been created."
-        } else {
-            
-            purrr::pmap(project_codes, gen_codes_ui)
-        }
+render_codes_hierarchy <- function(pool, active_project, user) {
+  if (isTruthy(active_project)) {
+    project_codes <- list_db_codes(
+      pool = pool,
+      project_id = active_project, 
+      user = user
+    )
+    if (nrow(project_codes) == 0) {
+      "No codes have been created."
     } else {
-        "No active project."
+      # Build the tree structure
+      code_tree <- build_tree_structure(project_codes, "code_id", "code_parent_id")
+      
+      # Generate the UI recursively
+      purrr::map(code_tree, ~ gen_codes_ui_2(.x$id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
     }
+  } else {
+    "No active project."
+  }
+}
+render_codes <- function(pool, active_project, user) {
+  if (isTruthy(active_project)) {
+    project_codes <- list_db_codes(
+      pool = pool,
+      project_id = active_project, 
+      user = user
+    ) %>%
+    dplyr::select(-code_parent_id)
+    if (nrow(project_codes) == 0) {
+      "No codes have been created."
+    } else {
+      # Generate the UI recursively
+      purrr::pmap(project_codes, gen_codes_ui)
+    }
+  } else {
+    "No active project."
+  }
 }
 
 

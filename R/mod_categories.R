@@ -81,7 +81,7 @@ mod_categories_server <- function(id, glob) {
     # List existing codes in code boxes -------------------
     output$uncategorized <- renderUI({
       glob$codebook
-      render_codes_ui(id, glob$pool, glob$active_project, glob$user)
+      render_codes_ui(id, pool = glob$pool, active_project = glob$active_project, user = glob$user)
     })
 
     # List existing categories in category boxes ----------

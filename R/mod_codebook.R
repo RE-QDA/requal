@@ -112,7 +112,8 @@ mod_codebook_server <- function(id, glob) {
             glob$user
         )
   output$codes_ui <- renderUI({
-      render_codes(
+     browser()
+      render_codes_hierarchy(
         active_project = glob$active_project,
         pool = glob$pool, 
         user = glob$user

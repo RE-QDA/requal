@@ -348,11 +348,12 @@ position: relative;
 /* Style for the container div */
 .code_container {
   margin: 0px;
+  max-width: 50vh;
 }
 
 /* Style for the container div */
 .code_item {
-  min-width: 500px;
+  width: 100%;
 }
 
 /* Style for the subcodes div */

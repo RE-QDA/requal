@@ -47,7 +47,7 @@ gen_categories_ui <- function(id,
 }
 
 
-render_codes_ui <- function(id, pool, active_project, user){
+render_codes_ui <- function(id, pool, active_project, user) {
     ns <- NS(id)
     sortable::rank_list(
         input_id = ns("code_list"),
@@ -300,11 +300,12 @@ render_category_edges <- function(pool,
         project_id = active_project, 
         user = user
     ) %>%
-        dplyr::filter(code_id %in% category_edges)
+        dplyr::filter(code_id %in% category_edges) %>%
+        dplyr::select(-code_parent_id)
     
     if (nrow(project_codes) == 0) {
         NULL
     } else {
-        purrr::pmap(project_codes, gen_codes_ui)
-    }
+     purrr::pmap(project_codes, gen_codes_ui)
+   }
 }

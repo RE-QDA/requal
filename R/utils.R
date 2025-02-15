@@ -464,4 +464,34 @@ entitle_memo <- function(memo_text) {
   substr(stringr::str_extract(memo_text, "^[^\n]*"), 1, 100)
 }
 
-
+# build_tree_structure -----
+# Generalized function to build a tree structure from a dataframe
+build_tree_structure <- function(data, id_col, parent_id_col) {
+  # Helper function to recursively build the tree
+  build_tree <- function(current_id) {
+    # Find the current row based on the ID
+    current_row <- dplyr::filter(data, !!rlang::sym(id_col) == current_id)
+    
+    # Find children of the current ID
+    children <- dplyr::filter(data, !!rlang::sym(parent_id_col) == current_id)
+    
+    # Recursively build the tree for each child
+    children_list <- purrr::map(children[[id_col]], build_tree)
+    
+    # Extract all columns except the ID and parent ID
+    details <- current_row %>%
+      dplyr::select(-!!rlang::sym(id_col), -!!rlang::sym(parent_id_col)) %>%
+      as.list()
+    
+    # Return a list with all necessary details and children
+    c(details, list(children = children_list))
+  }
+  
+  # Find root nodes (those with NA as parent)
+  root_nodes <- dplyr::filter(data, is.na(!!rlang::sym(parent_id_col)))
+  
+  # Build the tree for each root node
+  tree_structure <- purrr::map(root_nodes[[id_col]], build_tree)
+  
+  tree_structure
+}
