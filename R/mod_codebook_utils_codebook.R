@@ -205,35 +205,44 @@ gen_codes_ui <- function(code_id,
                          code_description,
                          code_color, 
                          user_id) {
+  # Create the main container div for the code
+  div(
+    id = paste0("code_container_", code_id),
+    class = "code_container",
+    draggable = "true",  # Make the div draggable
+    
+    # The box containing the code information
     box(
-        code_description,
-        id = code_id,
-        title = code_name,
-        closable = FALSE,
-        width = NULL,
-        background = "light-blue",
-        collapsible = TRUE,
-        collapsed = TRUE,
-        boxToolSize = "md",
-        label = tagAppendAttributes(
-            boxLabel(
-                text = "code",
-                status = "warning"
-            ),
-            style = paste0("background-color:", code_color, " !important;"),
-            class = "custom_label"
+      code_description,
+      id = paste0("code_id_", code_id),
+      title = code_name,
+      closable = FALSE,
+      width = NULL,
+      background = "light-blue",
+      collapsible = TRUE,
+      collapsed = TRUE,
+      boxToolSize = "md",
+      label = tagAppendAttributes(
+        boxLabel(
+          text = "code",
+          status = "warning"
         ),
-        # dropdownMenu = boxDropdown(
-        #     boxDropdownItem("Edit"),
-        #     boxDropdownItem("Merge"),
-        #     boxDropdownItem("Delete")
-        # ),
-        ""
+        style = paste0("background-color:", code_color, " !important;"),
+        class = "custom_label"
+      ),
+      ""
     ) %>% tagAppendAttributes(
-        `data-code_id` = code_id,
-        class = "code_item",
-        style = "max-width: 500px"
-    ) 
+      `data-code_id` = code_id,
+      class = "code_item",
+      style = "max-width: 500px; background-color: #e0f7fa;"
+    ),
+    
+    # The subcodes div where incoming elements will be inserted
+    div(
+      id = paste0("subcodes_", code_id),
+      class = "subcodes"
+    )
+  )
 }
 
 # Delete codes from project ------
@@ -283,6 +292,7 @@ render_codes <- function(pool, active_project, user) {
         if (nrow(project_codes) == 0) {
             "No codes have been created."
         } else {
+            
             purrr::pmap(project_codes, gen_codes_ui)
         }
     } else {

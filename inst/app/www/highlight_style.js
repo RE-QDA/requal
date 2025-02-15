@@ -52,3 +52,78 @@
 //     }
 //   });
 // });
+
+$(document).ready(function() {
+    var dragged;
+
+    document.addEventListener('dragstart', function(event) {
+        // Store a reference to the dragged element
+        dragged = event.target.closest('.code_container'); // Ensure we get the entire container
+        console.log('Dragging:', dragged);
+        event.target.style.opacity = 0.5;
+    }, false);
+
+    document.addEventListener('dragend', function(event) {
+        event.target.style.opacity = '';
+    }, false);
+
+    document.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    }, false);
+
+    document.addEventListener('dragenter', function(event) {
+        // Highlight potential drop target when the draggable element enters it
+        if (event.target.classList.contains('subcodes')) {
+            event.target.style.background = '#f0f0f0';
+        }
+    }, false);
+
+    document.addEventListener('dragleave', function(event) {
+        // Reset background of potential drop target when the draggable element leaves it
+        if (event.target.classList.contains('subcodes')) {
+            event.target.style.background = '';
+        }
+    }, false);
+
+    document.addEventListener('drop', function(event) {
+        event.preventDefault();
+        
+        var targetContainer = event.target.closest('.code_container');
+        var parentId = 0; // Default to 0 for outside drop
+
+        if (targetContainer) {
+            var subcodesDiv = targetContainer.querySelector('.subcodes');
+
+            if (subcodesDiv) {
+                console.log('Dropped on:', subcodesDiv);
+                subcodesDiv.style.background = '';
+                subcodesDiv.appendChild(dragged);
+                parentId = targetContainer.id; // Set parentId to the target container's ID
+            }
+        } else {
+            var fallbackContainer = document.getElementById('codebook_ui_1-codes_ui');
+            if (fallbackContainer) {
+                console.log('Dropped outside valid target, moving to:', fallbackContainer);
+                fallbackContainer.insertBefore(dragged, fallbackContainer.firstChild);
+            }
+        }
+
+        // Set the input value in Shiny
+        var childId = extractNumberFromId(dragged.id); // Get the ID of the dragged element
+        if (parentId !== 0) {
+            parentId = extractNumberFromId(parentId)
+        }
+        Shiny.setInputValue('drop_event', { parent: parentId, child: childId }, { priority: 'event' });
+    }, false);
+});
+
+function extractNumberFromId(id) {
+    // Use a regular expression to match one or more digits
+    var match = id.match(/\d+/);
+    return match ? match[0] : null; // Return the first match or null if no match is found
+}
+
+// Example usage
+var id = "code_container_123";
+var numberPart = extractNumberFromId(id);
+console.log(numberPart); // Outputs: 123

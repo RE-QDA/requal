@@ -344,3 +344,19 @@ position: relative;
 .highlight-effect {
   animation: highlightFade 2s ease-out forwards;
 }
+
+/* Style for the container div */
+.code_container {
+  margin: 0px;
+}
+
+/* Style for the subcodes div */
+.subcodes {
+	border-left: 1px dashed silver;
+	padding-left: 2vh;
+}
+
+/* Style when a draggable element is over a subcodes div */
+.code_item.dragover {
+  background-color: #e0f7fa; 
+}
