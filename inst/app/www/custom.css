@@ -98,6 +98,7 @@ p.docpar {
   counter-increment: paragraph; /* Increment the counter for each paragraph */
   font-size: 110%; 
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 p.docpar::before {
   content: counter(paragraph); /* Display the current counter value */
