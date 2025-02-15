@@ -94,11 +94,11 @@ $(document).ready(function() {
         if (targetContainer) {
             var subcodesDiv = targetContainer.querySelector('.subcodes');
 
-            if (subcodesDiv) {
-                console.log('Dropped on:', subcodesDiv);
-                subcodesDiv.style.background = '';
-                subcodesDiv.appendChild(dragged);
-                parentId = targetContainer.id; // Set parentId to the target container's ID
+            // Insert dragged as the first child of subcodesDiv
+            if (subcodesDiv.firstChild) {
+                subcodesDiv.insertBefore(dragged, subcodesDiv.firstChild);
+            } else {
+                subcodesDiv.appendChild(dragged); // Fallback if no children exist
             }
         } else {
             var fallbackContainer = document.getElementById('codebook_ui_1-codes_ui');
