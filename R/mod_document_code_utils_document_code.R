@@ -540,6 +540,50 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
     
 }
 
+generate_coding_tools_tree <- function(ns, code_id, code_name, code_color, code_desc, children = list()) {
+  # Create the main button
+  main_button <- div(
+    actionButton(
+      inputId = ns(code_id),
+      label = code_name,
+      name = code_id,
+      class = "code-button-hierarchy",
+      title = paste(code_desc),
+      style = paste0("background: none;
+                      width: 100%;
+                      border-left: 5px solid ", code_color, ";"),
+      onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});")
+    ),
+    actionButton(
+      inputId = ns(paste0("more-", code_id)),
+      label = "",
+      name = code_id,
+      title = "Code info",
+      icon = icon("ellipsis-vertical"),
+      class = "code-menu-extra",
+      onclick = paste0("Shiny.setInputValue('", ns("selected_code_extra"), "', this.name, {priority: 'event'});")
+    )
+  )
+  
+  # Recursively generate UI for children
+  children_ui <- purrr::map(children, function(child) {
+    generate_coding_tools_tree(
+      ns = ns,
+      code_id = child$id,
+      code_name = child$code_name,
+      code_color = child$code_color,
+      code_desc = child$code_description,
+      children = child$children
+    )
+  })
+  
+  # Combine the main button with its children
+  div(
+    main_button,
+    div(style = "margin-left: 30px;", children_ui)
+  )
+}
+
 # Tooltip helper for overlaying codes ----
 
 blend_codes <- function(string_id, code_names_df) {

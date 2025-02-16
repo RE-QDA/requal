@@ -359,7 +359,8 @@ position: relative;
 /* Style for the subcodes div */
 .subcodes {
 	border-left: 1px dashed silver;
-	padding-left: 2vh;
+	padding-left: 30px;
+  margin-left: 15px;
   display: block;
   transition: opacity 0.5s ease, max-height 0.5s ease;
 }
@@ -374,6 +375,7 @@ position: relative;
   background: transparent; 
   border: none;
   outline: none;
+  min-width: 10px;
 }
 .btn_code_id:hover,
 .btn_code_id:focus,
@@ -381,4 +383,13 @@ position: relative;
     background-color: transparent; /* Same background color */
     border: none; /* Same border */
     outline: none; /* No outline */
+}
+
+.code_container:has(.btn_code_id) {
+  margin-left: -17px;  
+}
+
+#codebook_ui_1-codes_ui {
+  padding-left: 30px;  
+  width: 50vh;
 }

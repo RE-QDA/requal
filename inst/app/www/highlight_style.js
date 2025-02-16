@@ -55,11 +55,11 @@
 
 $(document).ready(function() {
     var dragged;
+    var originalContainer;
 
     document.addEventListener('dragstart', function(event) {
-        // Store a reference to the dragged element
-        dragged = event.target.closest('.code_container'); // Ensure we get the entire container
-        console.log('Dragging:', dragged);
+        dragged = event.target.closest('.code_container'); 
+        originalContainer = dragged.parentElement.closest('.code_container'); // Store the original container
         event.target.style.opacity = 0.5;
     }, false);
 
@@ -72,14 +72,12 @@ $(document).ready(function() {
     }, false);
 
     document.addEventListener('dragenter', function(event) {
-        // Highlight potential drop target when the draggable element enters it
         if (event.target.classList.contains('subcodes')) {
             event.target.style.background = '#f0f0f0';
         }
     }, false);
 
     document.addEventListener('dragleave', function(event) {
-        // Reset background of potential drop target when the draggable element leaves it
         if (event.target.classList.contains('subcodes')) {
             event.target.style.background = '';
         }
@@ -87,18 +85,39 @@ $(document).ready(function() {
 
     document.addEventListener('drop', function(event) {
         event.preventDefault();
-        
+
         var targetContainer = event.target.closest('.code_container');
-        var parentId = 0; // Default to 0 for outside drop
+        var parentId = 0;
 
         if (targetContainer) {
             var subcodesDiv = targetContainer.querySelector('.subcodes');
 
-            // Insert dragged as the first child of subcodesDiv
             if (subcodesDiv.firstChild) {
                 subcodesDiv.insertBefore(dragged, subcodesDiv.firstChild);
             } else {
-                subcodesDiv.appendChild(dragged); // Fallback if no children exist
+                subcodesDiv.appendChild(dragged);
+            }
+
+            var codeContainer = targetContainer.closest('.code_container');
+            if (codeContainer) {
+                var idMatch = codeContainer.id.match(/^code_container_(.+)$/);
+                if (idMatch) {
+                    codeId = idMatch[1];
+                }
+            }
+
+            if (codeId) {
+                var parentButtonId = 'btn_code_id_' + codeId;
+                if (!document.getElementById(parentButtonId)) {
+                    var toggleButton = document.createElement('button');
+                    toggleButton.id = parentButtonId;
+                    toggleButton.className = 'btn_code_id';
+                    toggleButton.innerHTML = '<i class="fas fa-caret-down btn_code_id"></i>';
+                    var boxWrap = targetContainer.querySelector('.box_wrap');
+                    if (boxWrap) {
+                        boxWrap.insertBefore(toggleButton, boxWrap.firstChild);
+                    }
+                }
             }
         } else {
             var fallbackContainer = document.getElementById('codebook_ui_1-codes_ui');
@@ -108,10 +127,20 @@ $(document).ready(function() {
             }
         }
 
-        // Set the input value in Shiny
-        var childId = extractNumberFromId(dragged.id); // Get the ID of the dragged element
+        // Check if the original container's subcodes div is empty
+        if (originalContainer) {
+            var originalSubcodesDiv = originalContainer.querySelector('.subcodes');
+            if (originalSubcodesDiv && !originalSubcodesDiv.firstChild) {
+                var originalToggleButton = originalContainer.querySelector('.btn_code_id');
+                if (originalToggleButton) {
+                    originalToggleButton.remove();
+                }
+            }
+        }
+
+        var childId = extractNumberFromId(dragged.id);
         if (parentId !== 0) {
-            parentId = extractNumberFromId(parentId)
+            parentId = extractNumberFromId(parentId);
         }
         Shiny.setInputValue('drop_event', { parent: parentId, child: childId }, { priority: 'event' });
     }, false);

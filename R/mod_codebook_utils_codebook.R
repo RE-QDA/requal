@@ -246,8 +246,8 @@ gen_codes_ui_2 <- function(code_id, code_name, code_description, code_color, use
     id = paste0("code_container_", code_id),
     class = "code_container",
     draggable = "true",  # Make the div draggable
-    div(style = "display: flex;",
-        tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
+    div(class = "box_wrap", style = "display: flex;",
+       if (length(children) > 0) tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
         # The box containing the code information
         box(
           code_description,
@@ -279,7 +279,7 @@ gen_codes_ui_2 <- function(code_id, code_name, code_description, code_color, use
       id = paste0("subcodes_", code_id),
       class = "subcodes",
       # Recursively generate UI for children
-      purrr::map(children, ~ gen_codes_ui_2(.x$id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
+      purrr::map(children, ~ gen_codes_ui_2(.x$code_id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
     )
   )
 }
@@ -333,9 +333,9 @@ render_codes_hierarchy <- function(pool, active_project, user) {
     } else {
       # Build the tree structure
       code_tree <- build_tree_structure(project_codes, "code_id", "code_parent_id")
-      
+      print(code_tree)
       # Generate the UI recursively
-      purrr::map(code_tree, ~ gen_codes_ui_2(.x$id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
+      purrr::map(code_tree, ~ gen_codes_ui_2(.x$code_id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
     }
   } else {
     "No active project."

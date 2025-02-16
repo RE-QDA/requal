@@ -478,9 +478,9 @@ build_tree_structure <- function(data, id_col, parent_id_col) {
     # Recursively build the tree for each child
     children_list <- purrr::map(children[[id_col]], build_tree)
     
-    # Extract all columns except the ID and parent ID
+    # Extract all columns except the parent ID
     details <- current_row %>%
-      dplyr::select(-!!rlang::sym(id_col), -!!rlang::sym(parent_id_col)) %>%
+      dplyr::select(-!!rlang::sym(parent_id_col)) %>%
       as.list()
     
     # Return a list with all necessary details and children
