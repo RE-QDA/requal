@@ -251,7 +251,7 @@ gen_codes_ui_2 <- function(code_id, code_name, code_description, code_color, use
         # The box containing the code information
         box(
           code_description,
-          id = paste0("code_id_", code_id),
+          id = paste0("box_code_id_", code_id),
           title = code_name,  # Ensure title is set
           closable = FALSE,
           width = NULL,

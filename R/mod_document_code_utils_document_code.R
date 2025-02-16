@@ -543,15 +543,15 @@ generate_coding_tools <- function(ns, code_id, code_name, code_color, code_desc)
 generate_coding_tools_tree <- function(ns, code_id, code_name, code_color, code_desc, children = list()) {
   # Create the main button
   main_button <- div(
+    div(class = "box_wrap", style = "display: flex;",
+    if (length(children) > 0) tags$button(id = paste0("btn_code_id_", code_id), tags$i(class = "fas fa-caret-down btn_code_id"), class = "btn_code_id"),
     actionButton(
       inputId = ns(code_id),
       label = code_name,
       name = code_id,
-      class = "code-button-hierarchy",
+      class = "code-button hierarchy",
       title = paste(code_desc),
-      style = paste0("background: none;
-                      width: 100%;
-                      border-left: 5px solid ", code_color, ";"),
+      style = paste0("--code-color: ", code_color, ";"),
       onclick = paste0("Shiny.setInputValue('", ns("selected_code"), "', this.name, {priority: 'event'});")
     ),
     actionButton(
@@ -560,16 +560,15 @@ generate_coding_tools_tree <- function(ns, code_id, code_name, code_color, code_
       name = code_id,
       title = "Code info",
       icon = icon("ellipsis-vertical"),
-      class = "code-menu-extra",
+      class = "code-menu-extra hierarchy",
       onclick = paste0("Shiny.setInputValue('", ns("selected_code_extra"), "', this.name, {priority: 'event'});")
-    )
+    ))
   )
-  
   # Recursively generate UI for children
   children_ui <- purrr::map(children, function(child) {
     generate_coding_tools_tree(
       ns = ns,
-      code_id = child$id,
+      code_id = child$code_id,
       code_name = child$code_name,
       code_color = child$code_color,
       code_desc = child$code_description,
@@ -578,9 +577,9 @@ generate_coding_tools_tree <- function(ns, code_id, code_name, code_color, code_
   })
   
   # Combine the main button with its children
-  div(
+  div(class = "code_container",
     main_button,
-    div(style = "margin-left: 30px;", children_ui)
+      div(class = "subcodes", children_ui)
   )
 }
 

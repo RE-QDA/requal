@@ -28,7 +28,9 @@
 .scrollable80#document_code_ui_1-code_list {
   margin-right: 0px;
   scrollbar-width: none;
+  overflow-x: clip;
 }
+
 [data-value="codetools_tabset"],
 [data-value="memotools_tabset"] {
   max-height: 80vh;
@@ -52,6 +54,16 @@
 .code-button {
     overflow: hidden;
     text-overflow: ellipsis;
+    background: none;
+    width: 100%;
+    border-left: 5px solid var(--code-color);
+}
+.code-button.hierarchy {
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+  border-left: 5px solid var(--code-color);
+  text-align: left;
 }
 
 .code-button:hover {
@@ -138,6 +150,33 @@ background: none;
 border: 0px !important;
 overflow: hidden;
 cursor: grab;
+}
+.rank-list-item {
+border-radius: 0px !important;
+display: block;
+padding: 0px !important;
+margin: 0px !important;
+background: none;
+border: 0px !important;
+overflow: hidden;
+cursor: grab;
+}
+
+#codes_menu .default-sortable:hover {
+  background-color: inherit; 
+  border: none; 
+}
+#codes_menu .rank-list-item:hover {
+  background-color: inherit; 
+  border: none; 
+}
+#codes_menu .default-sortable {
+  background-color: inherit; 
+  border: none; 
+}
+#codes_menu .rank-list-item {
+  background-color: inherit; 
+  border: none; 
 }
 
 .box.box-solid {
@@ -229,6 +268,13 @@ display: flex;
 position: relative;
 }
 
+#codes_menu .code_container {
+  padding-left: 15px;
+}
+#codes_menu .subcodes {
+  margin-left: 0px;
+}
+
 
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
@@ -282,6 +328,15 @@ position: relative;
   background: transparent;
   border: none;
   position: absolute;
+  margin-left: -21px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: silver; 
+}
+.hierarchy.code-menu-extra {
+  background: transparent;
+  border: none;
+  position: relative;
   margin-left: -21px;
   padding-left: 8px;
   padding-right: 8px;
@@ -386,7 +441,7 @@ position: relative;
 }
 
 .code_container:has(.btn_code_id) {
-  margin-left: -17px;  
+  margin-left: -18px;  
 }
 
 #codebook_ui_1-codes_ui {
