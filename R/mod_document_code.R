@@ -52,7 +52,7 @@ mod_document_code_ui <- function(id) {
         ),
         tags$div(
           id = "split-2",
-          style = "flex-grow: 1; flex-shrink: 1; overflow: auto;",
+          style = "flex-grow: 1; flex-shrink: 1; overflow: clip; height: 90vh",
           tabsetPanel(
             type = "tabs",
             id = ns("documentcode_tabset"),
