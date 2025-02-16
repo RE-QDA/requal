@@ -333,7 +333,6 @@ render_codes_hierarchy <- function(pool, active_project, user) {
     } else {
       # Build the tree structure
       code_tree <- build_tree_structure(project_codes, "code_id", "code_parent_id")
-      print(code_tree)
       # Generate the UI recursively
       purrr::map(code_tree, ~ gen_codes_ui_2(.x$code_id, .x$code_name, .x$code_description, .x$code_color, .x$user_id, .x$children))
     }
