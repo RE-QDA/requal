@@ -275,7 +275,6 @@ min_value <- min(paragraphs$segment_start)
 max_value <- max(paragraphs$segment_end)
 starts <- starts[starts >= min_value & starts <= max_value]
 ends <- ends[ends >= min_value & ends <= max_value]
-print(length(starts) == length(ends))
 
 events_df <- tibble::tibble(
   segment_start = starts,
