@@ -269,60 +269,22 @@ write_memo_segment_db <- function(
 # calculate code overlap for doc display ----
 calculate_code_overlap <- function(segments, paragraphs) {
 
-events_df <- dplyr::bind_rows(
-    paragraphs, segments
-) |> dplyr::select(segment_start, segment_end) |> 
-tidyr::pivot_longer(starts_with("segment"), names_to = "event", values_to = "position") |> 
-dplyr::arrange(position) 
+starts <- sort(unique(c(segments$segment_start, segments$segment_end + 1, paragraphs$segment_start)))
+ends <- sort(unique(c(segments$segment_end, segments$segment_start - 1, paragraphs$segment_end)))
+min_value <- min(paragraphs$segment_start)
+max_value <- max(paragraphs$segment_end)
+starts <- starts[starts >= min_value & starts <= max_value]
+ends <- ends[ends >= min_value & ends <= max_value]
+print(length(starts) == length(ends))
 
-events_df2 <- events_df |> 
-  dplyr::mutate(
-    test = ifelse(event == dplyr::lag(event), TRUE, FALSE),
-    lag_position = dplyr::lag(position)
-  ) |> 
-  dplyr::rowwise() |> 
-  dplyr::mutate(
-    extra_e = ifelse(event == "segment_start" & test, position - 1, NA),
-    extra_s = ifelse(event == "segment_end" & test, lag_position + 1, NA)
-  ) |> 
-  dplyr::ungroup()
- events_df3 <-  dplyr::bind_rows(
-    tibble::tibble(
-      event = "segment_start",
-      position = na.omit(events_df2$extra_s)
-    ),
-    tibble::tibble(
-      event = "segment_end",
-      position = na.omit(events_df2$extra_e)
-    ),
-    events_df2 |> dplyr::select(event, position)
-  ) |> 
-    dplyr::arrange(position, desc(event)) |> 
-    dplyr::distinct() 
-  events_prefinal <- events_df3 |> 
-    dplyr::mutate(row_id = cumsum(event == "segment_start")) |> 
-    dplyr::summarise(segment_start = min(position), segment_end=max(position), .by = "row_id") |> 
-    dplyr::select(-row_id)   |> 
-    dplyr::mutate(
-      lag_end = dplyr::lag(segment_end),
-      test = ifelse((segment_start - lag_end)>1, TRUE, FALSE)) |> 
-    dplyr::mutate(segment_end = ifelse(is.na(segment_end), dplyr::lead(segment_start)-1, segment_end)) |> 
-    dplyr::mutate(segment_start = ifelse(is.na(segment_start), dplyr::lag(segment_end)+1, segment_start)) 
+events_df <- tibble::tibble(
+  segment_start = starts,
+  segment_end = ends
+) |> 
+    tibble::rownames_to_column("span_id")
 
-missed_rows <- events_prefinal |> 
-dplyr::filter(test) |> 
-dplyr::mutate(segment_end = segment_start - 1, segment_start = lag_end + 1)
-
-events_final <- events_prefinal |> 
-dplyr::bind_rows(missed_rows) |> 
-  dplyr::arrange(segment_start) |> 
-  dplyr::filter(segment_start > 0) |> 
-    tibble::rownames_to_column("span_id") |> 
-    dplyr::select(-test, -lag_end)  
-
-
-named_starts <- stats::setNames(events_final$segment_start, events_final$span_id)
-named_ends <- stats::setNames(events_final$segment_start, events_final$span_id)
+named_starts <- stats::setNames(events_df$segment_start, events_df$span_id)
+named_ends <- stats::setNames(events_df$segment_start, events_df$span_id)
 
 long_codes <- segments |> 
 dplyr::mutate(span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
@@ -336,7 +298,7 @@ if (!("memo_id" %in% colnames(long_codes))) {
     long_codes <- long_codes |> 
     dplyr::mutate(memo_id = NA)
 }
-res <- events_final |> 
+res <- events_df |> 
 dplyr::left_join(long_codes, by = "span_id") |> 
 dplyr::summarise(
     segment_start = unique(segment_start),
