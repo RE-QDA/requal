@@ -335,6 +335,12 @@ mod_document_code_server <- function(id, glob) {
     # Display/edit text $display_observer -----
     observeEvent(loc$display_observer, {
       req(loc$display_observer > 0)
+                 loc$text_memos  <- load_memos_to_display(
+                          pool = glob$pool,
+                          active_project = glob$active_project,
+                          user = glob$user,
+                          doc_selector = glob$doc_selector
+                          ) 
       edit_display_LF()
       golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
     })
@@ -574,7 +580,7 @@ mod_document_code_server <- function(id, glob) {
 
     ## edit_display_LF  -------------------
     edit_display_LF <- function() {
-      #browser()
+   
       loc$par_index <- loc$paragraphs |> 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
         text_data <- load_doc_to_display(
@@ -602,14 +608,11 @@ mod_document_code_server <- function(id, glob) {
                 new_text <-purrr::map(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span>')
                   session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
             })
-      text_memos  <- load_memos_to_display(
-                          pool = glob$pool,
-                          active_project = glob$active_project,
-                          user = glob$user,
-                          doc_selector = glob$doc_selector
-                          )  
-        if (!is.null(text_memos)) {
-          text_memos <- text_memos |> 
+ 
+   
+
+        if (!is.null(loc$text_memos)) {
+        text_memos <- loc$text_memos |> 
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
          
       memos_data <- text_data |> 
@@ -628,17 +631,21 @@ mod_document_code_server <- function(id, glob) {
           )  |> 
           dplyr::arrange(memo_id)
 
-         golem::invoke_js("clearClassContent", list(class = "extra_info"))
+          if (nrow(memos_data) > 0) {
 
       purrr::pmap(memos_data, function(par_id, memo_id, text) {
               memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
-              # golem::invoke_js("clearElementContent", list(id = par_id))
+              golem::invoke_js("clearElementContent", list(id = par_id))
               insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)
       })
+          } else {
+            # this is for case when memo was deleted and does not show up in the database
+            # we can be certain that this is a single paragraph event
+              golem::invoke_js("clearElementContent", list(id = paste0("info_", par_ids)))
+          }
     }  else {
-        golem::invoke_js("clearClassContent", list(class = "extra_info"))
-
+       golem::invoke_js("clearClassContent", list(class = "extra_info"))
     }
    
     }
