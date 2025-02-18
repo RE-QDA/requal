@@ -427,6 +427,12 @@ update_db_schema <- function(pool) {
   } else {
     NULL
   }
+  # update for missing code_parent_id column
+  # to be supplanted in the future via
+  # comprehensive db check on startup (missing tables + missing columns)
+  if (!"code_parent_id" %in% colnames(pool::dbReadTable(pool, "codes"))) {
+        db_helper_column(pool, "codes", "code_parent_id", "add")
+        }
 }
 
 # Database functions ####
@@ -659,4 +665,3 @@ make_globals <- quote({
     }
   }
 })
-
