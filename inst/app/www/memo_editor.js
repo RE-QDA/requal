@@ -250,7 +250,10 @@ Shiny.addCustomMessageHandler("getMemoParagraph", function(message) {
           // Construct the new ID by appending "info_" to the paragraph's ID
           var newId = "info_" + paragraph.id;
           // Set the Shiny input 'active_memo_par' to the paragraph's ID
-          Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-active_memo_par', newId);
+          Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-active_memo_par', {
+            id: newId,
+            counter: Math.random()
+        });
       }
   });
 });

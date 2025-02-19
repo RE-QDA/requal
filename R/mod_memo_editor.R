@@ -200,6 +200,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           text = loc$memo_text_input,
           user_id = glob$user$user_id
         )
+       loc$memo_text_data <- loc$memo_text_input
         new_memo_segment_map <- data.frame(memo_id = loc$new_memo_id , segment_id = new_segment_id)
         DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
@@ -214,14 +215,18 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           user_id = glob$user$user_id
         )
         glob$free_memo_observer <- glob$free_memo_observer + 1
+
       }
     }
    ## update memo UI after create ----
     observeEvent(req(input$active_memo_par), {
+      print(loc$new_memo_id)
       print(input$active_memo_par)
-      memo_html <- span(icon("sticky-note", id = paste0("memo_id_", loc$new_memo_id ), class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_input, .noWS = c("outside", "after-begin", "before-end")),
+      print(loc$memo_text_input)
+      memo_html <- span(icon("sticky-note", id = paste0("memo_id_", loc$new_memo_id), class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_data, .noWS = c("outside", "after-begin", "before-end")),
                             .noWS = c("outside", "after-begin", "before-end"))
-     insertUI(paste0("#", input$active_memo_par), where = "afterBegin", ui = memo_html)
+                            print(memo_html)
+     insertUI(paste0("#", input$active_memo_par$id), where = "beforeEnd", ui = memo_html)
 
     })
 
