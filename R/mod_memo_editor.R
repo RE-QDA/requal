@@ -223,7 +223,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       print(loc$new_memo_id)
       print(input$active_memo_par)
       print(loc$memo_text_input)
-      memo_html <- span(icon("sticky-note", id = paste0("memo_id_", loc$new_memo_id), class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_data, .noWS = c("outside", "after-begin", "before-end")),
+      memo_html <- span(id = paste0("memo_id_", loc$new_memo_id), icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_data, .noWS = c("outside", "after-begin", "before-end")),
                             .noWS = c("outside", "after-begin", "before-end"))
                             print(memo_html)
      insertUI(paste0("#", input$active_memo_par$id), where = "beforeEnd", ui = memo_html)

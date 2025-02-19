@@ -625,7 +625,7 @@ mod_document_code_server <- function(id, glob) {
           if (nrow(memos_data) > 0) {
 
       purrr::pmap(memos_data, function(par_id, memo_id, text) {
-              memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
+              memo_html <- span(id = memo_id, icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
               golem::invoke_js("clearElementContent", list(id = par_id))
               insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)
