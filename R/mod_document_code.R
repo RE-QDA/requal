@@ -318,18 +318,13 @@ mod_document_code_server <- function(id, glob) {
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
       glob$startOff <- 1
       glob$endOff <- loc$total_chars
-      loc$display_observer <- loc$display_observer + 1
+      edit_display_LF()
+      edit_memos_LF()
   })
   
     # Display/edit text $display_observer -----
     observeEvent(loc$display_observer, {
       req(loc$display_observer > 0)
-                 loc$text_memos  <- load_memos_to_display(
-                          pool = glob$pool,
-                          active_project = glob$active_project,
-                          user = glob$user,
-                          doc_selector = glob$doc_selector
-                          ) 
       edit_display_LF()
       golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
     })
@@ -572,7 +567,7 @@ mod_document_code_server <- function(id, glob) {
    
       loc$par_index <- loc$paragraphs |> 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
-        text_data <- load_doc_to_display(
+        loc$text_data <- load_doc_to_display(
           pool = glob$pool
           ,
           active_project = glob$active_project
@@ -589,24 +584,31 @@ mod_document_code_server <- function(id, glob) {
           ,
           highlight = loc$highlight
         ) 
-        par_ids <- unique(text_data$par_id)
+        loc$par_ids <- unique(loc$text_data$par_id)
 
-        purrr::walk(par_ids, .f = function(x_par) {
-           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
+        purrr::walk(loc$par_ids , .f = function(x_par) {
+           par <- loc$text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
               spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
                 new_text <-purrr::map(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span>')
                   session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
             })
- 
+    }
    
-
+    ## edit_memos_LF  -------------------
+    edit_memos_LF <- function() {
+          loc$text_memos  <- load_memos_to_display(
+                          pool = glob$pool,
+                          active_project = glob$active_project,
+                          user = glob$user,
+                          doc_selector = glob$doc_selector
+                          ) 
         if (!is.null(loc$text_memos)) {
         text_memos <- loc$text_memos |> 
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
          
-      memos_data <- text_data |> 
+      memos_data <- loc$text_data |> 
         dplyr::select(par_id, memo_id) |> 
-        dplyr::filter(par_id %in% par_ids) |> 
+        dplyr::filter(par_id %in% loc$par_ids) |> 
         dplyr::mutate(par_id = paste0("info_", par_id)) |> 
         dplyr::filter(!is.na(memo_id)) |> 
         dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 

@@ -234,3 +234,23 @@ Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
 //     }
 //   }
 // });
+
+Shiny.addCustomMessageHandler("getMemoParagraph", function(message) {
+  // Get all paragraph elements with the class 'docpar'
+  var paragraphs = document.querySelectorAll('.docpar');
+  var target = parseInt(message.startOff, 10);
+  // Iterate over each paragraph to find the one with the matching startOff
+  paragraphs.forEach(function(paragraph) {
+      // Get the data-startend attribute and split it into start and end
+      var startEnd = paragraph.getAttribute('data-startend').split(' ');
+      var start = parseInt(startEnd[0], 10);
+      var end = parseInt(startEnd[1], 10);
+      // Check if message.startOff is between start and end
+      if (target >= start && target <= end) {
+          // Construct the new ID by appending "info_" to the paragraph's ID
+          var newId = "info_" + paragraph.id;
+          // Set the Shiny input 'active_memo_par' to the paragraph's ID
+          Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-active_memo_par', newId);
+      }
+  });
+});
