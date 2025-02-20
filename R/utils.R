@@ -94,11 +94,6 @@ set_left_menu <- function() {
                              tabName = "Data",
                              icon = icon("database")
                          ),
-                        shinydashboard::menuItem(
-                             "Memos",
-                             tabName = "Memos",
-                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
-                         ),
                          shinydashboard::menuItem(
                              "Codebook",
                              tabName = "Codebook",
@@ -108,6 +103,11 @@ set_left_menu <- function() {
                              "Annotate",
                              tabName = "Annotate",
                              icon = icon("marker")
+                         ),
+                         shinydashboard::menuItem(
+                             "Memos",
+                             tabName = "Memos",
+                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
                          ),
                          shinydashboard::menuItem(
                              "Analyze",

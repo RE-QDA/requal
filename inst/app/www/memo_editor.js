@@ -218,6 +218,7 @@ Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
       elements[0].parentNode.removeChild(elements[0]);
   }
 });
+
 // let maxZ = 2;
 // // Function to handle double click
 // function handleDoubleClick(target) {
@@ -254,5 +255,36 @@ Shiny.addCustomMessageHandler("getMemoParagraph", function(message) {
             counter: Math.random()
         });
       }
+  });
+});
+
+Shiny.addCustomMessageHandler("addMemoHighlight", function(message) {
+  var memo_class_name = "memo_id_" + message.id;
+  var elements = document.querySelectorAll("." + memo_class_name);
+
+  elements.forEach(function(element) {
+    if (!element.classList.contains("background")) {
+      element.classList.add("memo_highlight");
+    }
+  });
+});
+
+Shiny.addCustomMessageHandler("removeMemoFromText", function(message) {
+  var memo_class_name = "memo_id_" + message.id;
+  var elements = document.querySelectorAll("." + memo_class_name);
+
+  elements.forEach(function(element) {
+    // Remove the specific memo_class_name
+    element.classList.remove(memo_class_name);
+
+    // Check if there are any other classes that start with "memo_id_"
+    var hasOtherMemoIdClass = Array.from(element.classList).some(function(className) {
+      return className.startsWith("memo_id_") && className !== memo_class_name;
+    });
+
+    // If no other "memo_id_" class is present, remove the "memo" class
+    if (!hasOtherMemoIdClass) {
+      element.classList.remove("memo");
+    }
   });
 });

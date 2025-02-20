@@ -47,8 +47,8 @@ mod_memo_segment_server <- function(id, glob) {
     # observeEvent(input$memo_show, {
     #   glob$memo_show <- input$memo_show
     # })
-   observeEvent(glob$doc_selector, {
-    req(glob$doc_selector > 0)
+   observeEvent(glob$active_project, {
+
       shinyjs::show("memo_segment_editor")
     })
     

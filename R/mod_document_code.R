@@ -276,6 +276,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(loc$text_observer), {
       #browser()
       req(loc$text_observer > 0) # ignore init value
+      progress <- shiny::Progress$new()
+      progress$set(message = 'Loading document text.')
       golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  glob$doc_selector)
@@ -318,15 +320,19 @@ mod_document_code_server <- function(id, glob) {
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
       glob$startOff <- 1
       glob$endOff <- loc$total_chars
+           
+      progress$set(message = 'Loading document segments.')
       edit_display_LF()
+      progress$set(message = 'Loading document memos.')
       edit_memos_LF()
+      golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
+      progress$close()
   })
   
     # Display/edit text $display_observer -----
     observeEvent(loc$display_observer, {
       req(loc$display_observer > 0)
       edit_display_LF()
-      golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
     })
     observeEvent(c(req(input$doc_status), req(glob$analyze_link$segment_id)), {
       if (req(input$doc_status) == "loaded") {
@@ -554,9 +560,11 @@ mod_document_code_server <- function(id, glob) {
       } else if (loc$highlight == "underline") {
          shinyjs::removeClass(class = "background", selector = ".segment.code")
          shinyjs::addClass(class = "underline", selector = ".segment.code")
+         # shinyjs::addClass(class = "memo_highlight", selector = ".segment.memo")
          rql_message("Segment style: Underline")
       } else {
         shinyjs::removeClass(class = "underline", selector = ".segment.code")
+        # shinyjs::removeClass(class = "memo_highlight", selector = ".segment.memo")
         rql_message("Segment style: None")
       }
     }
@@ -583,7 +591,8 @@ mod_document_code_server <- function(id, glob) {
           codebook = glob$codebook
           ,
           highlight = loc$highlight
-        ) 
+        )  |> 
+        dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
         loc$par_ids <- unique(loc$text_data$par_id)
 
         purrr::walk(loc$par_ids , .f = function(x_par) {
@@ -625,7 +634,7 @@ mod_document_code_server <- function(id, glob) {
           if (nrow(memos_data) > 0) {
 
       purrr::pmap(memos_data, function(par_id, memo_id, text) {
-              memo_html <- span(id = memo_id, icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
+              memo_html <- span(id = memo_id, icon("sticky-note", class = "fas text_memo_btn", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
               golem::invoke_js("updateElementContent", list(id = par_id, content = ""))
               insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)

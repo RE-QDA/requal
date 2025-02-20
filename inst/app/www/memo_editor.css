@@ -1,3 +1,7 @@
+.memo {
+  font-style: italic;
+}
+
 .memo_container {
     overflow: hidden;
     scrollbar-width: none;
