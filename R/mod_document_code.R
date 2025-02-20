@@ -627,17 +627,11 @@ mod_document_code_server <- function(id, glob) {
       purrr::pmap(memos_data, function(par_id, memo_id, text) {
               memo_html <- span(id = memo_id, icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
-              golem::invoke_js("clearElementContent", list(id = par_id))
+              golem::invoke_js("updateElementContent", list(id = par_id, content = ""))
               insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)
       })
-          } else {
-            # this is for case when memo was deleted and does not show up in the database
-            # we can be certain that this is a single paragraph event
-              golem::invoke_js("clearElementContent", list(id = paste0("info_", par_ids)))
           }
-    }  else {
-       golem::invoke_js("clearClassContent", list(class = "extra_info"))
-    }
+    }  
    
     }
 

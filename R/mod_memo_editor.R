@@ -136,6 +136,8 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       glob$startOff <- loc$editing_data$startOff
       glob$endOff <- loc$editing_data$endOff
       glob$memo_segment_observer <- glob$memo_segment_observer + 1
+      memo_html <- icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_input, .noWS = c("outside", "after-begin", "before-end"))
+      golem::invoke_js("updateElementContent", list(id =  paste0("memo_id_", loc$editing_data$memo_id), content = as.character(memo_html)))
       } else if (type == "free_memo") {
         glob$free_memo_observer <- glob$free_memo_observer + 1
       }
@@ -220,12 +222,8 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     }
    ## update memo UI after create ----
     observeEvent(req(input$active_memo_par), {
-      print(loc$new_memo_id)
-      print(input$active_memo_par)
-      print(loc$memo_text_input)
       memo_html <- span(id = paste0("memo_id_", loc$new_memo_id), icon("sticky-note", class = "fas text_memo_btn memo", `data-memo` = loc$memo_text_data, .noWS = c("outside", "after-begin", "before-end")),
                             .noWS = c("outside", "after-begin", "before-end"))
-                            print(memo_html)
      insertUI(paste0("#", input$active_memo_par$id), where = "beforeEnd", ui = memo_html)
 
     })
@@ -274,6 +272,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
         glob$startOff <- loc$editing_data$startOff
         glob$endOff <- loc$editing_data$endOff
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
+        removeUI(selector = paste0("#memo_id_", loc$editing_data$memo_id))
       } else if (type == "free_memo") {
         ## delete free segment ----
         delete_memo_record(

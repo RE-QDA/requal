@@ -206,8 +206,8 @@ Shiny.addCustomMessageHandler('clearArticle', function(message) {
   $('#article').empty();
 });
 
-Shiny.addCustomMessageHandler('clearElementContent', function(message) {
-  document.getElementById(message.id).innerHTML = '';
+Shiny.addCustomMessageHandler('updateElementContent', function(message) {
+  document.getElementById(message.id).innerHTML = message.content;
 });
 
 Shiny.addCustomMessageHandler('clearClassContent', function(message) {

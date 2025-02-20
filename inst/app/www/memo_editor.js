@@ -105,8 +105,7 @@ document.addEventListener('click', (e) => {
 });
 // Function to handle single click
 function handleSingleClick(target) {
-  Shiny.setInputValue('document_code_ui_1-memo_segment_1-text_memo_click', target.id);
-}
+  Shiny.setInputValue('document_code_ui_1-memo_segment_1-text_memo_click', target.closest('span').id);}
 
 // Refresh memo id
 Shiny.addCustomMessageHandler('resetMemoClick', function(message) {

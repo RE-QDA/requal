@@ -10,12 +10,15 @@
 mod_memo_segment_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    mod_rql_hidden_ui_ui(ns("rql_hidden_ui_2"), title = "Toggle coding toolbox", hidden_tags = tagList(
-      div(
-        checkboxInput(ns("memo_show"), "Show memos", value = TRUE, width = "120px")
-      )
-    )),
+    # mod_rql_hidden_ui_ui(ns("rql_hidden_ui_2"), title = "Toggle coding toolbox", hidden_tags = tagList(
+    #   div(
+    #     checkboxInput(ns("memo_show"), "Show memos", value = TRUE, width = "120px")
+    #   )
+    # )),
+    shinyjs::hidden(div(id = ns("memo_segment_editor"),
     mod_memo_editor_ui(ns("memo_editor_1"))
+    )
+    )
   )
 }
 
@@ -26,7 +29,7 @@ mod_memo_segment_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
-    mod_rql_hidden_ui_server("rql_hidden_ui_2")
+    #mod_rql_hidden_ui_server("rql_hidden_ui_2")
    # memo editor segment
    mod_memo_editor_server("memo_editor_1", glob, type = "free_segment")
 
@@ -41,9 +44,14 @@ mod_memo_segment_server <- function(id, glob) {
     })
 
   
-    observeEvent(input$memo_show, {
-      glob$memo_show <- input$memo_show
+    # observeEvent(input$memo_show, {
+    #   glob$memo_show <- input$memo_show
+    # })
+   observeEvent(glob$doc_selector, {
+    req(glob$doc_selector > 0)
+      shinyjs::show("memo_segment_editor")
     })
+    
 
     return(NULL)
   })
