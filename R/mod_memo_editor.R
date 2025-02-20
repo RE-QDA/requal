@@ -115,7 +115,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       }
     })
 
-    # Add new free segment memo ----
+    # Add new free memo ----
     observeEvent(input$create_new, {
       create_memo_LF()
       loc$refresh_observer <- loc$refresh_observer + 1
@@ -186,10 +186,10 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     create_memo_LF <- function() {
       if (!isTruthy(loc$memo_text_input)) rql_message("Missing text input for memo.")
       req(loc$memo_text_input)
-      if (glob$doc_selector < 1) rql_message("Missing document input for memo.")
-      req(glob$doc_selector > 0)
       ## create free segment ----
       if (type == "free_segment" & glob$endOff >= glob$startOff) {
+        if (glob$doc_selector < 1) rql_message("Missing document input for memo.")
+        req(glob$doc_selector > 0)
         new_segment_id <- write_memo_segment_db(
           pool = glob$pool,
           active_project = glob$active_project,

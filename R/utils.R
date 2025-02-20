@@ -365,14 +365,21 @@ dt_options <- function() {
 # DT Memos options
 dt_memo_options <- function() {
   list(
-          paging = TRUE,
-          searching = TRUE,
-          fixedColumns = TRUE,
-          autoWidth = TRUE,
-          ordering = TRUE,
-          dom = "lfrtpBi",
-          buttons = c("csv")
-        )
+    paging = TRUE,
+    searching = TRUE,
+    fixedColumns = FALSE,
+    autoWidth = TRUE,  # Enable auto width adjustment
+    ordering = TRUE,
+    dom = "lfrtpBi",
+    buttons = c("csv"),
+    scrollX = TRUE,  # Enable horizontal scrolling
+    columnDefs = list(
+      list(width = '50px', targets = 0),  
+      list(width = '20vh', targets = 1),   
+      list(width = '20vh', targets = 2), 
+      list(width = '20vh', targets = 3)  
+    )
+  )
 }
 
 

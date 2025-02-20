@@ -25,7 +25,7 @@ mod_memo_ui <- function(id) {
     hr(),
     fluidRow(
       div(
-        style = "margin-left: 30px; overflow-x: scroll",
+        style = "margin-left: 30px; max-width: 80vh;",
         DT::dataTableOutput(ns("memo"))
       )
     )
@@ -41,8 +41,11 @@ mod_memo_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+    loc$memo_observer <- 0
     mod_memo_editor_server("memo_main_editor", glob, type = "free_memo")
-
+    observeEvent(glob$active_project, {
+         loc$memo_observer <- loc$memo_observer + 1
+    })
     ## Observe free_memo_edit_click ----
     observeEvent(input$text_memo_click, {
       req(input$text_memo_click)
@@ -61,7 +64,9 @@ mod_memo_server <- function(id, glob) {
       )
     })
 
-    output$memo <- DT::renderDataTable({
+    observeEvent(c(loc$memo_observer, glob$memo_segment_observer, glob$free_memo_observer), {
+      
+      output$memo <- DT::renderDataTable({
       if (isTruthy(glob$active_project)) {
         memo_table <- list_memo_records(glob$pool, glob$active_project)
         if (glob$user$data$memo_other_view == 0 && nrow(memo_table) > 0) {
@@ -91,13 +96,17 @@ mod_memo_server <- function(id, glob) {
               by = "doc_id"
           ) |>
           dplyr::mutate(
-            memo_text = memo_name,
-            memo_name = memo_link(ns("text_memo_click"), memo_id, memo_name)
-          ) |>
-          dplyr::arrange(dplyr::desc(memo_id))
+            memo_title = memo_link(ns("text_memo_click"), memo_id, memo_name),
+            memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
+              ) |>
+          dplyr::arrange(dplyr::desc(memo_id))  |> 
+          dplyr::select(memo_id, memo_title, memo_type, doc_name) 
 
         DT::datatable(
           loc$enriched_memo_table,
+          rownames = FALSE,
+          width = "800px",
+          colnames = c("ID" = "memo_id", "Title" = "memo_title", "Type" = "memo_type", "Document" = "doc_name"),
           filter = "top",
           escape = FALSE,
           extensions = c("Buttons"),
@@ -107,6 +116,7 @@ mod_memo_server <- function(id, glob) {
         )
       }
     })
+  })
 
     # pin ----
     observeEvent(input$pin, {

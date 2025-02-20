@@ -155,3 +155,15 @@ memo_link <- function(ns_input, id, text) {
     quote_sign <- '"'
     paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', ifelse(text == "", "untitled", text), '</a>')
 }
+
+# create memo segment as link ----
+memo_segment_link <- function(segment_document_id, segment_id) {
+    if (!is.na(segment_id)) {
+   link <-  actionLink(paste0("segment_id-", segment_id), label = "Segment-free", 
+        onclick = paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_id: ", segment_id, "}, {priority: 'event'});")
+    )
+    as.character(link)
+    } else {
+       "Free"
+    }
+}
