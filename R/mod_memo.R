@@ -64,7 +64,7 @@ mod_memo_server <- function(id, glob) {
     })
 
     observeEvent(c(loc$memo_observer, glob$memo_segment_observer, glob$free_memo_observer), {
-      
+
       output$memo <- DT::renderDataTable({
       if (isTruthy(glob$active_project)) {
         memo_table <- list_memo_records(glob$pool, glob$active_project)
@@ -82,7 +82,7 @@ mod_memo_server <- function(id, glob) {
           ) |>
           dplyr::left_join(
             segment_df <- dplyr::tbl(glob$pool, "segments") %>%
-              dplyr::select(segment_id, doc_id) |>
+              dplyr::select(segment_id, doc_id, segment_text) |>
               dplyr::filter(.data$segment_id %in% !!memos_segments_map$segment_id) %>%
               dplyr::collect(),
               by = "segment_id"
@@ -99,7 +99,7 @@ mod_memo_server <- function(id, glob) {
             memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
               ) |>
           dplyr::arrange(dplyr::desc(memo_id))  |> 
-          dplyr::select(memo_id, memo_title, memo_type, doc_name) 
+          dplyr::select(memo_id, memo_title = memo_name, memo_type, doc_name, memo_text, segment_text) 
 
         DT::datatable(
           loc$enriched_memo_table,
@@ -142,6 +142,7 @@ mod_memo_server <- function(id, glob) {
     
     # unpin -----
     observeEvent(input$unpin, {
+      print(input$unpin)
       removeUI(paste0("#", input$unpin))
     })
 

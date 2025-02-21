@@ -278,7 +278,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
         removeUI(selector = paste0("#memo_id_", loc$editing_data$memo_id))
         golem::invoke_js("removeMemoFromText", list(id = loc$editing_data$memo_id))
       } else if (type == "free_memo") {
-        ## delete free segment ----
+        ## delete free  ----
         delete_memo_record(
           pool = glob$pool,
           project = glob$active_project,

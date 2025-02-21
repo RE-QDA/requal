@@ -6,13 +6,12 @@ list_memo_records <- function(pool, project) {
         dplyr::filter(.data$project_id == local(as.integer(project))) %>%
         dplyr::select(
             memo_id,
-            memo_name = text, 
-            # memo_text = text, 
+            memo_text = text, 
             user_id
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = entitle_memo(memo_name)) 
+            memo_name = entitle_memo(memo_text)) 
 }
 
 read_memo_by_id <- function(pool, project, memo_id) {
