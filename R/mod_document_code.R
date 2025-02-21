@@ -374,6 +374,7 @@ mod_document_code_server <- function(id, glob) {
     ## Quick code tools ----
     observeEvent(input$quickcode, {
       if (isTruthy(input$quickcode)) {
+        removeUI("#code_extra_div")
         non_matched_codes <- loc$codebook |> 
           dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
           dplyr::pull(code_id)
@@ -655,12 +656,14 @@ mod_document_code_server <- function(id, glob) {
       code_info <- glob$codebook  |> dplyr::filter(
         code_id == selected_code_extra
       )
-      segments_info <- dplyr::tbl(pool, "segments") %>%
+      segments_count <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(project_id == active_project) %>%
             dplyr::filter(code_id == selected_code_extra) %>% 
-            dplyr::mutate(doc_group = ifelse(doc_id == active_doc, "this_document", "other_documents")) %>%
-            dplyr::count(doc_group) %>%
-            dplyr::collect()
+            dplyr::collect() %>% 
+            dplyr::summarise(
+              document_freq = sum(doc_id == active_doc),
+              total_freq = dplyr::n()
+            )
        insertUI(
          selector = sel,
          where = "afterEnd",
@@ -671,8 +674,8 @@ mod_document_code_server <- function(id, glob) {
         actionButton(ns("close_code_extra_div"), "", icon = icon("x"), style = "background: transparent; border: none; color: lightgray;")
       ),
       "Code:", tags$b(code_info$code_name), br(),
-      "Document:", tags$b(ifelse(is.na(segments_info$n[1]), 0, segments_info$n[1])), br(),
-      "Total:", tags$b(ifelse(is.na(sum(segments_info$n)), 0, sum(segments_info$n))), br()
+      "Document frequency:", tags$b(segments_count$document_freq), br(),
+      "Total frequency:", tags$b(segments_count$total_freq), br()
   )
         )
     }
