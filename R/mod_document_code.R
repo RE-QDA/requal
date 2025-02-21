@@ -322,7 +322,7 @@ mod_document_code_server <- function(id, glob) {
       glob$endOff <- loc$total_chars
            
       progress$set(message = 'Loading document segments.')
-      edit_display_LF()
+      edit_display_LF(reduce = TRUE)
       progress$set(message = 'Loading document memos.')
       edit_memos_LF()
       golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
@@ -334,8 +334,8 @@ mod_document_code_server <- function(id, glob) {
       req(loc$display_observer > 0)
       edit_display_LF()
     })
-    observeEvent(c(req(input$doc_status), req(glob$analyze_link$segment_id)), {
-      if (req(input$doc_status) == "loaded") {
+    observeEvent(c(input$doc_status, req(glob$analyze_link$segment_id)), {
+      if (input$doc_status == "loaded") {
           golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
           }
     })
@@ -571,7 +571,7 @@ mod_document_code_server <- function(id, glob) {
 
 
     ## edit_display_LF  -------------------
-    edit_display_LF <- function() {
+    edit_display_LF <- function(reduce = FALSE) {
    
       loc$par_index <- loc$paragraphs |> 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
@@ -591,8 +591,10 @@ mod_document_code_server <- function(id, glob) {
           codebook = glob$codebook
           ,
           highlight = loc$highlight
-        )  |> 
-        dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
+        )  
+        if (reduce) {
+        loc$text_data  <- loc$text_data |> dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
+        }
         loc$par_ids <- unique(loc$text_data$par_id)
 
         purrr::walk(loc$par_ids , .f = function(x_par) {
