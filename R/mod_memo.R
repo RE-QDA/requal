@@ -99,7 +99,7 @@ mod_memo_server <- function(id, glob) {
             memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
               ) |>
           dplyr::arrange(dplyr::desc(memo_id))  |> 
-          dplyr::select(memo_id, memo_title = memo_name, memo_type, doc_name, memo_text, segment_text) 
+          dplyr::select(memo_id, memo_title, memo_type, doc_name, memo_text, segment_text) 
 
         DT::datatable(
           loc$enriched_memo_table,

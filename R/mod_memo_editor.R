@@ -36,9 +36,12 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+    observeEvent(glob$active_project, {
     loc$memo_text_input <- ""
     loc$refresh_observer <- 0
     loc$save_observer <- 0
+    })
+
 
 
     # Render composer/editor ----
@@ -48,6 +51,12 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     observeEvent(input$memo_id,
       {
         if (isTruthy(input$memo_id)) {
+            # check if not removed elsewhere
+            check_memo <- exists_memo_db(glob$pool, input$memo_id)
+            if (!check_memo) {
+              warn_user("The memo appears to have been deleted elsewhere. Refresh the document.")
+              req(check_memo)
+            }
           collect_memo_data_LF()
           loc$can_modify <- find_memo_permission(loc$editing_data$user_id, glob$user)
           # render editor
@@ -260,6 +269,13 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     delete_memo_LF <- function() {
       ## delete free segment ----
       if (type == "free_segment") {
+        # check if not removed elsewhere
+        check_memo <- exists_memo_db(glob$pool, loc$editing_data$memo_id)
+        if (!check_memo) {
+          warn_user("The memo appears to have been deleted elsewhere. Refresh the document.")
+           req(check_memo)
+        }
+        
         delete_memo_record(
           pool = glob$pool,
           project = glob$active_project,
