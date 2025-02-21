@@ -300,6 +300,12 @@ position: relative;
 .background {
   background-color: var(--code-color);
 }
+.background::selection {
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
+}
 
 .underline {
   text-decoration: underline;
@@ -316,10 +322,6 @@ position: relative;
 .docpar span::selection  {
   background: rgb(0, 0, 0); 
   color: white;
-  text-decoration: underline;
-  text-decoration-color: var(--code-color);
-  text-decoration-thickness: 5px; 
-  text-underline-offset: 4px;
 }
 
 

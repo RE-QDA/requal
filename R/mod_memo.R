@@ -19,7 +19,6 @@ mod_memo_ui <- function(id) {
       div(
         style = "display: flex; align-items: center; margin-left: 10px;", # Use flexbox for alignment
         actionButton(ns("pin"), "", title = "Pin memo", icon = icon("thumbtack"), class = "pinned"),
-        actionButton(ns("unpin"), "", title = "Unpin memos", icon = icon("xmark"), class = "unpinned", style = "margin-left: 5px;")
       )
     ),
     hr(),
@@ -129,15 +128,21 @@ mod_memo_server <- function(id, glob) {
         selector = "div.content-wrapper", where = "afterBegin",
         div(
           id = pin_id, class = "pinned_memo",
-          div(id = "pin_header", class = "pin_header", icon("thumbtack")),
+          div(id = "pin_header", class = "pin_header", icon("thumbtack"),
+          div(class = "unpin", 
+          actionButton(paste0("unpin_", pin_id), "", icon("xmark"), class = "unpin_btn", `data-id` = pin_id, onclick =  "Shiny.setInputValue('memo_ui_1-unpin', this.dataset.id, {priority: 'event'})")
+            ),
+           ),
           div(class = "inner_pin", pinned_text),
           div(id = "resize_handle", class = "resizer")
         )
       )
       golem::invoke_js("makeDraggable", list(id = pin_id))
     })
+    
+    # unpin -----
     observeEvent(input$unpin, {
-      golem::invoke_js("removeAllPinnedMemos", list(class = "pinned_memo"))
+      removeUI(paste0("#", input$unpin))
     })
 
     # # Memo export ----

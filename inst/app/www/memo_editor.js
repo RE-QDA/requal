@@ -212,12 +212,7 @@ function resizeElement(elmnt) {
   }
 }
 
-Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
-  var elements = document.getElementsByClassName(message.class);
-  while(elements.length > 0){
-      elements[0].parentNode.removeChild(elements[0]);
-  }
-});
+
 
 // let maxZ = 2;
 // // Function to handle double click

@@ -84,11 +84,37 @@
   cursor: move;
 	background-color: transparent;
 	color: rgb(255, 75, 75);
-  width: 30px;
+  width: 100%;
   height: 30px;
 	margin-top: -15px;
   position: absolute;
+  display: flex;
 }
+
+.unpin {
+	border: none;
+	background: transparent;
+	margin-top: -15px;
+	flex-grow: 1;
+	text-align: right;
+}
+
+.unpin_btn {
+	border: none;
+	background: transparent;
+	padding-top: 10px;
+  outline: none; 
+}
+
+.unpin_btn:hover,
+.unpin_btn:active,
+.unpin_btn:focus {
+  border: none;
+  background: transparent;
+  padding-top: 10px;
+  outline: none;
+}
+
 
 .inner_pin {
   background-color: rgb(255, 255, 120);
@@ -128,6 +154,10 @@
 
 .partext {
   flex-grow: 1;
+}
+
+.unpin {
+
 }
 
 .extra_info {
