@@ -246,8 +246,8 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
       if (type == "free_segment") {
         golem::invoke_js("resetSegmentMemoInput")
-        memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") |>
-          dplyr::filter(memo_id == !!memo_df$memo_id) |>
+        memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") %>%
+          dplyr::filter(memo_id == !!memo_df$memo_id) %>%
           dplyr::collect()
         segment_df <- dplyr::tbl(glob$pool, "segments") %>%
           dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
@@ -338,7 +338,7 @@ editor_ui <- function(type, ns, memo_text = NULL) {
         width = "100%",
         height = "100%",
         resize = "none"
-      ) |> tagAppendAttributes(class = "memo_input")
+      ) %>% tagAppendAttributes(class = "memo_input")
     )
   } else if (type == "free_segment") {
     golem::invoke_js("initializeIframeHandler")
@@ -362,7 +362,7 @@ editor_ui <- function(type, ns, memo_text = NULL) {
         width = "100%",
         height = "100%",
         resize = "none"
-      ) |> tagAppendAttributes(class = "memo_input")
+      ) %>% tagAppendAttributes(class = "memo_input")
     )
   }
 }

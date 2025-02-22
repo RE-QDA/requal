@@ -375,8 +375,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$quickcode, {
       if (isTruthy(input$quickcode)) {
         removeUI("#code_extra_div")
-        non_matched_codes <- loc$codebook |> 
-          dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
+        non_matched_codes <- loc$codebook %>% 
+          dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) %>% 
           dplyr::pull(code_id)
         purrr::map(non_matched_codes, shinyjs::hide)
         matched_codes <- loc$codebook$code_id[!loc$codebook$code_id %in% non_matched_codes]
@@ -574,7 +574,7 @@ mod_document_code_server <- function(id, glob) {
     ## edit_display_LF  -------------------
     edit_display_LF <- function(reduce = FALSE) {
    
-      loc$par_index <- loc$paragraphs |> 
+      loc$par_index <- loc$paragraphs %>% 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
         loc$text_data <- load_doc_to_display(
           pool = glob$pool
@@ -594,14 +594,14 @@ mod_document_code_server <- function(id, glob) {
           highlight = loc$highlight
         )  
         if (reduce) {
-        loc$text_data  <- loc$text_data |> dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
+        loc$text_data  <- loc$text_data %>% dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
         }
         loc$par_ids <- unique(loc$text_data$par_id)
 
         purrr::walk(loc$par_ids , .f = function(x_par) {
-           par <- loc$text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
+           par <- loc$text_data %>% dplyr::filter(par_id == x_par)  %>% dplyr::select(-par_id)
               spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-                new_text <-purrr::map(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span>')
+                new_text <-purrr::map(spans, as.character) %>% paste0(collapse = "") %>% paste0('<span class = "br">&#8203</span>')
                   session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
             })
     }
@@ -615,23 +615,23 @@ mod_document_code_server <- function(id, glob) {
                           doc_selector = glob$doc_selector
                           ) 
         if (!is.null(loc$text_memos)) {
-        text_memos <- loc$text_memos |> 
+        text_memos <- loc$text_memos %>% 
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
          
-      memos_data <- loc$text_data |> 
-        dplyr::select(par_id, memo_id) |> 
-        dplyr::filter(par_id %in% loc$par_ids) |> 
-        dplyr::mutate(par_id = paste0("info_", par_id)) |> 
-        dplyr::filter(!is.na(memo_id)) |> 
-        dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
-        tidyr::unnest(cols = c("memo_id")) |>
-        dplyr::filter(memo_id != "memo") |> 
-        dplyr::distinct(memo_id, .keep_all = TRUE) |> 
+      memos_data <- loc$text_data %>% 
+        dplyr::select(par_id, memo_id) %>% 
+        dplyr::filter(par_id %in% loc$par_ids) %>% 
+        dplyr::mutate(par_id = paste0("info_", par_id)) %>% 
+        dplyr::filter(!is.na(memo_id)) %>% 
+        dplyr::mutate(memo_id = strsplit(memo_id, " ")) %>% 
+        tidyr::unnest(cols = c("memo_id")) %>%
+        dplyr::filter(memo_id != "memo") %>% 
+        dplyr::distinct(memo_id, .keep_all = TRUE) %>% 
         dplyr::inner_join(
-          text_memos |> 
+          text_memos %>% 
           dplyr::select(memo_id, text), 
           by = "memo_id"
-          )  |> 
+          )  %>% 
           dplyr::arrange(memo_id)
 
           if (nrow(memos_data) > 0) {
@@ -653,7 +653,7 @@ mod_document_code_server <- function(id, glob) {
       selected_code_extra <- as.integer(input$selected_code_extra)
       active_project <- as.integer(glob$active_project)
       active_doc <- as.integer(glob$doc_selector)
-      code_info <- glob$codebook  |> dplyr::filter(
+      code_info <- glob$codebook  %>% dplyr::filter(
         code_id == selected_code_extra
       )
       segments_count <- dplyr::tbl(pool, "segments") %>%

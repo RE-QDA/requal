@@ -279,26 +279,26 @@ ends <- ends[ends >= min_value & ends <= max_value]
 events_df <- tibble::tibble(
   segment_start = starts,
   segment_end = ends
-) |> 
+) %>% 
     tibble::rownames_to_column("span_id")
 
 named_starts <- stats::setNames(events_df$segment_start, events_df$span_id)
 named_ends <- stats::setNames(events_df$segment_start, events_df$span_id)
 
-long_codes <- segments |> 
+long_codes <- segments %>% 
 dplyr::mutate(span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
 intersect(
     names(named_starts[named_starts >= x]),
     names(named_ends[named_ends <= y])
 )
-})) |> tidyr::unnest(cols = c(span_id)) |> dplyr::select(-segment_end, -segment_start)
+})) %>% tidyr::unnest(cols = c(span_id)) %>% dplyr::select(-segment_end, -segment_start)
 
 if (!("memo_id" %in% colnames(long_codes))) {
-    long_codes <- long_codes |> 
+    long_codes <- long_codes %>% 
     dplyr::mutate(memo_id = NA)
 }
-res <- events_df |> 
-dplyr::left_join(long_codes, by = "span_id") |> 
+res <- events_df %>% 
+dplyr::left_join(long_codes, by = "span_id") %>% 
 dplyr::summarise(
     segment_start = unique(segment_start),
     segment_end = unique(segment_end),
@@ -306,12 +306,12 @@ dplyr::summarise(
     code_id = format_class_id(code_id, "code"),
     memo_id = format_class_id(memo_id, "memo"),
     .by = span_id
-) |> 
-dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "")) |> 
+) %>% 
+dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "")) %>% 
 dplyr::left_join(
     dplyr::select(paragraphs, par_id, segment_start), by = "segment_start"
-) |> 
-tidyr::fill(par_id, .direction = "down")  |> 
+) %>% 
+tidyr::fill(par_id, .direction = "down")  %>% 
 dplyr::mutate(span_id = paste0(par_id, "-span-", span_id))
 return(res) 
 }
@@ -330,17 +330,17 @@ load_doc_to_display <- function(pool,
     segments <- load_segments_db(pool, 
                         active_project,
                         user,
-                        doc_selector) |> 
+                        doc_selector) %>% 
                     dplyr::filter(segment_start <= max_end,
                                 segment_end >= min_start)
 
     memos_index <- segments$segment_id[is.na(segments$code_id)]
-    memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") |> 
-        dplyr::filter(segment_id %in% memos_index) |> 
+    memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") %>% 
+        dplyr::filter(segment_id %in% memos_index) %>% 
         dplyr::collect()
 
     if (nrow(memos_segments_map) > 0) {
-        segments <- segments |> 
+        segments <- segments %>% 
             dplyr::left_join(memos_segments_map, by = "segment_id")
     }
 
@@ -383,21 +383,21 @@ load_memos_to_display <- function(pool,
     memoed_segments <- load_segments_db(pool = pool, 
                                        active_project = active_project,
                                        user = user,
-                                       doc_selector = doc_selector)  |> 
-                            dplyr::filter(is.na(code_id)) |> 
+                                       doc_selector = doc_selector)  %>% 
+                            dplyr::filter(is.na(code_id)) %>% 
                             dplyr::pull(segment_id)
     memo_res <- NULL
     if (length(memoed_segments) > 0) {
         # Map segments to memos
-        memo_seg <- dplyr::tbl(pool, "memos_segments_map") |> 
-            dplyr::filter(segment_id %in% memoed_segments) |> 
+        memo_seg <- dplyr::tbl(pool, "memos_segments_map") %>% 
+            dplyr::filter(segment_id %in% memoed_segments) %>% 
             dplyr::collect()
         # Get info about memo content
-        memo_data <- dplyr::tbl(pool, "memos")  |> 
-            dplyr::filter(memo_id %in% !!unique(memo_seg$memo_id)) |>  
+        memo_data <- dplyr::tbl(pool, "memos")  %>% 
+            dplyr::filter(memo_id %in% !!unique(memo_seg$memo_id)) %>%  
             dplyr::collect() 
         # Bind memo details to mapped memos
-        memo_res <- memo_seg |> 
+        memo_res <- memo_seg %>% 
                     dplyr::left_join(memo_data, by = "memo_id") 
     }
     memo_res

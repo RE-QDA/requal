@@ -116,8 +116,8 @@ delete_memo_record <- function(pool, project, memo_id, user_id) {
 
 # check memo exists -----
 exists_memo_db <- function(pool, memo_id) {
-    check_df <- dplyr::tbl(pool, "memos") |> 
-      dplyr::filter(.data$memo_id == local(as.integer(memo_id))) |> 
+    check_df <- dplyr::tbl(pool, "memos") %>% 
+      dplyr::filter(.data$memo_id == local(as.integer(memo_id))) %>% 
       dplyr::collect()  # Collect the data into a local data frame
     
     if (nrow(check_df) > 0) {

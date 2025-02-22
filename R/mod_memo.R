@@ -73,32 +73,32 @@ mod_memo_server <- function(id, glob) {
             dplyr::filter(user_id == glob$user$user_id)
         }
         req(nrow(memo_table) > 0)
-        loc$enriched_memo_table <- memo_table |>
+        loc$enriched_memo_table <- memo_table %>%
           dplyr::left_join(
-            memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") |>
-              dplyr::filter(memo_id %in% !!memo_table$memo_id) |>
+            memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") %>%
+              dplyr::filter(memo_id %in% !!memo_table$memo_id) %>%
               dplyr::collect(),
               by = "memo_id"
-          ) |>
+          ) %>%
           dplyr::left_join(
             segment_df <- dplyr::tbl(glob$pool, "segments") %>%
-              dplyr::select(segment_id, doc_id, segment_text) |>
+              dplyr::select(segment_id, doc_id, segment_text) %>%
               dplyr::filter(.data$segment_id %in% !!memos_segments_map$segment_id) %>%
               dplyr::collect(),
               by = "segment_id"
-          ) |>
+          ) %>%
           dplyr::left_join(
             documents_df <- dplyr::tbl(glob$pool, "documents") %>%
               dplyr::select(doc_id, doc_name) %>%
               dplyr::filter(.data$doc_id %in% !!segment_df$doc_id) %>%
               dplyr::collect(),
               by = "doc_id"
-          ) |>
+          ) %>%
           dplyr::mutate(
             memo_title = memo_link(ns("text_memo_click"), memo_id, memo_name),
             memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
-              ) |>
-          dplyr::arrange(dplyr::desc(memo_id))  |> 
+              ) %>%
+          dplyr::arrange(dplyr::desc(memo_id))  %>% 
           dplyr::select(memo_id, memo_title, memo_type, doc_name, memo_text, segment_text) 
 
         DT::datatable(
@@ -121,7 +121,7 @@ mod_memo_server <- function(id, glob) {
     observeEvent(input$pin, {
       req(loc$memo_id)
       pin_id <- paste0("pin_id-", loc$memo_id)
-      pinned_text <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id) |>
+      pinned_text <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id) %>%
         dplyr::pull(memo_text)
 
       insertUI(
@@ -142,7 +142,6 @@ mod_memo_server <- function(id, glob) {
     
     # unpin -----
     observeEvent(input$unpin, {
-      print(input$unpin)
       removeUI(paste0("#", input$unpin))
     })
 
