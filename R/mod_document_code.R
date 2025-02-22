@@ -133,6 +133,7 @@ mod_document_code_server <- function(id, glob) {
     segment_memos <- reactiveValues() # messages from nested module
     loc$highlight <- "background"
     loc$code <- NULL
+    mod_memo_segment_server("memo_segment_1", glob)
     observeEvent(req(glob$active_project), {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
@@ -145,7 +146,6 @@ mod_document_code_server <- function(id, glob) {
     glob$memo_segment_observer <- 0
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
-    mod_memo_segment_server("memo_segment_1", glob)
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
