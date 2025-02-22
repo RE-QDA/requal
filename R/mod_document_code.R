@@ -334,8 +334,8 @@ mod_document_code_server <- function(id, glob) {
       req(loc$display_observer > 0)
       edit_display_LF()
     })
-    observeEvent(c(input$doc_status, req(glob$analyze_link$segment_id)), {
-      if (input$doc_status == "loaded") {
+    observeEvent(req(glob$analyze_link$segment_id), {
+      while (input$doc_status == "loading") {
           golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
           }
     })
