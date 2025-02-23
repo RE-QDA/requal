@@ -23,7 +23,7 @@ qualitative coding.
 To use `requal`, you need to have the [R
 language](https://www.r-project.org) installed and running on your
 machine. You can download and install R from
-[here](https://cloud.r-project.org)). You will also need a web browser
+[here](https://cran.r-project.org/). You will also need a web browser
 with JavaScript support (i.e. any of the standard issue browsers like
 Firefox, Chrome, or Safari).
 
@@ -106,7 +106,7 @@ website](https://requal.fsv.cuni.cz/).
 > de-identification. This will allow you to perform de-identification
 > locally and collaboratively analyze the de-identified dataset online.
 
-## Acknowledgment
+## Acknowledgement
 
 The application development has been supported by The Technology Agency
 of the Czech Republic, project n. TL05000054, and CLS INFRA Fellowship
