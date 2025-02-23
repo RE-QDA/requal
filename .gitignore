@@ -13,3 +13,4 @@ requal_users.sqlite
 *_.new.png
 /inst/
 /.quarto/
+renv

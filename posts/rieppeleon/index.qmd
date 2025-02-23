@@ -1,0 +1,16 @@
+---
+title: "Rieppeleon (v1.1.3)"
+description: "Announcement of a new Requal release."
+author: "requal"
+date: "2025-02-23"
+categories:
+  - releases
+---
+
+Rieppeleon emphasizes enhancements in code editing and the annotation experience. After this release, the development version will transition to a refactored backend functionality. This approach ensures that a version with a stable, time-tested backend receives the latest UI improvements.
+
+For more details, you can read the full [Rieppeleon release notes](https://github.com/RE-QDA/requal/releases/tag/v1.1.3).
+
+To update your Requal installation, download the [requal_1.1.3.9001.tar.gz](https://github.com/RE-QDA/requal/releases/download/v1.1.3/requal_1.1.3.9001.tar.gz) file from the [Releases page](https://github.com/RE-QDA/requal/releases). Then, run the remotes::install_local(file.choose()) command in the [R](https://www.r-project.org/) console.
+
+_Source: [Requal GitHub Discussions](https://github.com/RE-QDA/requal/discussions/157)_
