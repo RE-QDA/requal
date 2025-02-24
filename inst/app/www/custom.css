@@ -104,7 +104,7 @@ article {
   padding-right: 10px;
   position: relative; /* Position relative for absolute positioning of numbers */
 }
-p.docpar {
+.docpar_wrap {
   margin: 0px 0px 5px 0px;
   position: relative;
   counter-increment: paragraph; /* Increment the counter for each paragraph */
@@ -112,11 +112,11 @@ p.docpar {
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-p.docpar::before {
+.docpar_wrap::before {
   content: counter(paragraph); /* Display the current counter value */
   position: absolute;
   left: -45px; /* Negative offset to place numbers in the padding area */
-  width: 30px; /* Fixed width for alignment */
+  min-width: 30px; /* Fixed width for alignment */
   text-align: right; 
   font-family: 'Courier New', Courier, monospace; 
   color: #959595; 
@@ -357,6 +357,12 @@ position: relative;
 .background {
   background-color: var(--code-color);
 }
+.background::selection {
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
+}
 
 .underline {
   text-decoration: underline;
@@ -365,7 +371,7 @@ position: relative;
   text-underline-offset: 4px;
 }
 
-.memo.underline {
+.memo_highlight {
   background-color: rgb(255, 255, 140); 
 }
 
@@ -373,10 +379,6 @@ position: relative;
 .docpar span::selection  {
   background: rgb(0, 0, 0); 
   color: white;
-  text-decoration: underline;
-  text-decoration-color: var(--code-color);
-  text-decoration-thickness: 5px; 
-  text-underline-offset: 4px;
 }
 
 

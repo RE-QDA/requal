@@ -109,8 +109,7 @@ document.addEventListener('click', (e) => {
 });
 // Function to handle single click
 function handleSingleClick(target) {
-  Shiny.setInputValue('document_code_ui_1-memo_segment_1-text_memo_click', target.id);
-}
+  Shiny.setInputValue('document_code_ui_1-memo_segment_1-text_memo_click', target.closest('span').id);}
 
 // Refresh memo id
 Shiny.addCustomMessageHandler('resetMemoClick', function(message) {
@@ -217,12 +216,8 @@ function resizeElement(elmnt) {
   }
 }
 
-Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
-  var elements = document.getElementsByClassName(message.class);
-  while(elements.length > 0){
-      elements[0].parentNode.removeChild(elements[0]);
-  }
-});
+
+
 // let maxZ = 2;
 // // Function to handle double click
 // function handleDoubleClick(target) {
@@ -238,3 +233,57 @@ Shiny.addCustomMessageHandler("removeAllPinnedMemos", function(message) {
 //     }
 //   }
 // });
+
+Shiny.addCustomMessageHandler("getMemoParagraph", function(message) {
+  // Get all paragraph elements with the class 'docpar'
+  var paragraphs = document.querySelectorAll('.docpar');
+  var target = parseInt(message.startOff, 10);
+  // Iterate over each paragraph to find the one with the matching startOff
+  paragraphs.forEach(function(paragraph) {
+      // Get the data-startend attribute and split it into start and end
+      var startEnd = paragraph.getAttribute('data-startend').split(' ');
+      var start = parseInt(startEnd[0], 10);
+      var end = parseInt(startEnd[1], 10);
+      // Check if message.startOff is between start and end
+      if (target >= start && target <= end) {
+          // Construct the new ID by appending "info_" to the paragraph's ID
+          var newId = "info_" + paragraph.id;
+          // Set the Shiny input 'active_memo_par' to the paragraph's ID
+          Shiny.setInputValue('document_code_ui_1-memo_segment_1-memo_editor_1-active_memo_par', {
+            id: newId,
+            counter: Math.random()
+        });
+      }
+  });
+});
+
+Shiny.addCustomMessageHandler("addMemoHighlight", function(message) {
+  var memo_class_name = "memo_id_" + message.id;
+  var elements = document.querySelectorAll("." + memo_class_name);
+
+  elements.forEach(function(element) {
+    if (!element.classList.contains("background")) {
+      element.classList.add("memo_highlight");
+    }
+  });
+});
+
+Shiny.addCustomMessageHandler("removeMemoFromText", function(message) {
+  var memo_class_name = "memo_id_" + message.id;
+  var elements = document.querySelectorAll("." + memo_class_name);
+
+  elements.forEach(function(element) {
+    // Remove the specific memo_class_name
+    element.classList.remove(memo_class_name);
+
+    // Check if there are any other classes that start with "memo_id_"
+    var hasOtherMemoIdClass = Array.from(element.classList).some(function(className) {
+      return className.startsWith("memo_id_") && className !== memo_class_name;
+    });
+
+    // If no other "memo_id_" class is present, remove the "memo" class
+    if (!hasOtherMemoIdClass) {
+      element.classList.remove("memo");
+    }
+  });
+});

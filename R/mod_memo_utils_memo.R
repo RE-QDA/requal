@@ -6,13 +6,12 @@ list_memo_records <- function(pool, project) {
         dplyr::filter(.data$project_id == local(as.integer(project))) %>%
         dplyr::select(
             memo_id,
-            memo_name = text, 
-            # memo_text = text, 
+            memo_text = text, 
             user_id
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = entitle_memo(memo_name)) 
+            memo_name = entitle_memo(memo_text)) 
 }
 
 read_memo_by_id <- function(pool, project, memo_id) {
@@ -115,6 +114,20 @@ delete_memo_record <- function(pool, project, memo_id, user_id) {
     
 }
 
+# check memo exists -----
+exists_memo_db <- function(pool, memo_id) {
+    check_df <- dplyr::tbl(pool, "memos") %>% 
+      dplyr::filter(.data$memo_id == local(as.integer(memo_id))) %>% 
+      dplyr::collect()  # Collect the data into a local data frame
+    
+    if (nrow(check_df) > 0) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+
+
 export_memos <- function(pool, project) {
    
     dplyr::tbl(pool, "memos") %>%
@@ -128,11 +141,7 @@ export_memos <- function(pool, project) {
                          dplyr::select(user_id, user_name), by = "user_id") %>% 
     dplyr::select(-user_id) %>% 
     dplyr::collect()  %>% 
-    dplyr::mutate(
-            memo_title = substr(
-                stringr::str_extract(.data$memo_text, "\\A.*"), 
-                               1, 50)
-                ) %>% 
+    dplyr::mutate(memo_title = entitle_memo(.data$memo_text)) %>% 
     dplyr::relocate(memo_title, 2)
 
 }
@@ -154,4 +163,16 @@ memo_link <- function(ns_input, id, text) {
     js_fun <- paste0("Shiny.setInputValue('", ns_input, "', this.name, {priority: 'event'});")
     quote_sign <- '"'
     paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', ifelse(text == "", "untitled", text), '</a>')
+}
+
+# create memo segment as link ----
+memo_segment_link <- function(segment_document_id, segment_id) {
+    if (!is.na(segment_id)) {
+   link <-  actionLink(paste0("segment_id-", segment_id), label = "Segment-free", 
+        onclick = paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_id: ", segment_id, "}, {priority: 'event'});")
+    )
+    as.character(link)
+    } else {
+       "Free"
+    }
 }

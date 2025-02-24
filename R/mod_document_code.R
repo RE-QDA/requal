@@ -133,6 +133,7 @@ mod_document_code_server <- function(id, glob) {
     segment_memos <- reactiveValues() # messages from nested module
     loc$highlight <- "background"
     loc$code <- NULL
+    mod_memo_segment_server("memo_segment_1", glob)
     observeEvent(req(glob$active_project), {
     loc$codes_menu_observer <- 0
     loc$code_action_observer <- 0
@@ -145,7 +146,6 @@ mod_document_code_server <- function(id, glob) {
     glob$memo_segment_observer <- 0
     golem::invoke_js('clearArticle', list())
     golem::invoke_js('refreshIframe', list())
-    mod_memo_segment_server("memo_segment_1", glob)
     })
     mod_rql_hidden_ui_server("rql_hidden_ui_1")
     # Observers - definitions ----
@@ -287,6 +287,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(loc$text_observer), {
       #browser()
       req(loc$text_observer > 0) # ignore init value
+      progress <- shiny::Progress$new()
+      progress$set(message = 'Loading document text.')
       golem::invoke_js('clearArticle', list())
       # define text values that may be useful outside of this observer
       loc$raw_text <- load_doc_db(glob$pool, glob$active_project,  glob$doc_selector)
@@ -329,24 +331,25 @@ mod_document_code_server <- function(id, glob) {
       golem::invoke_js("appendContent", list(id = "article", html = paste(text_plain, collapse = "")))
       glob$startOff <- 1
       glob$endOff <- loc$total_chars
-      loc$display_observer <- loc$display_observer + 1
+           
+      progress$set(message = 'Loading document segments.')
+      edit_display_LF(reduce = TRUE)
+      progress$set(message = 'Loading document memos.')
+      edit_memos_LF()
+      golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
+      progress$close()
   })
   
     # Display/edit text $display_observer -----
     observeEvent(loc$display_observer, {
       req(loc$display_observer > 0)
-                 loc$text_memos  <- load_memos_to_display(
-                          pool = glob$pool,
-                          active_project = glob$active_project,
-                          user = glob$user,
-                          doc_selector = glob$doc_selector
-                          ) 
       edit_display_LF()
-      golem::invoke_js("setArticleStatusValue", list(status = "loaded"))
     })
-    observeEvent(c(req(input$doc_status), req(glob$analyze_link$segment_id)), {
-      if (req(input$doc_status) == "loaded") {
+    observeEvent(c(input$doc_status, req(glob$analyze_link$segment_id)), {
+      
+      if (input$doc_status == "loaded") {
           golem::invoke_js('scrollToSegment', list(target_id = glob$analyze_link$segment_id))
+          glob$analyze_link$segment_id <- NULL
           }
     })
     # Coding tools ------------------------------------------------------------
@@ -384,8 +387,9 @@ mod_document_code_server <- function(id, glob) {
     ## Quick code tools ----
     observeEvent(input$quickcode, {
       if (isTruthy(input$quickcode)) {
-        non_matched_codes <- loc$codebook |> 
-          dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) |> 
+        removeUI("#code_extra_div")
+        non_matched_codes <- loc$codebook %>% 
+          dplyr::filter(!stringr::str_detect(code_name, paste0("(?i)", input$quickcode))) %>% 
           dplyr::pull(code_id)
         purrr::map(non_matched_codes, shinyjs::hide)
         matched_codes <- loc$codebook$code_id[!loc$codebook$code_id %in% non_matched_codes]
@@ -570,20 +574,22 @@ mod_document_code_server <- function(id, glob) {
       } else if (loc$highlight == "underline") {
          shinyjs::removeClass(class = "background", selector = ".segment.code")
          shinyjs::addClass(class = "underline", selector = ".segment.code")
+         # shinyjs::addClass(class = "memo_highlight", selector = ".segment.memo")
          rql_message("Segment style: Underline")
       } else {
         shinyjs::removeClass(class = "underline", selector = ".segment.code")
+        # shinyjs::removeClass(class = "memo_highlight", selector = ".segment.memo")
         rql_message("Segment style: None")
       }
     }
 
 
     ## edit_display_LF  -------------------
-    edit_display_LF <- function() {
+    edit_display_LF <- function(reduce = FALSE) {
    
-      loc$par_index <- loc$paragraphs |> 
+      loc$par_index <- loc$paragraphs %>% 
         dplyr::filter(segment_start <= glob$endOff, segment_end >= glob$startOff) 
-        text_data <- load_doc_to_display(
+        loc$text_data <- load_doc_to_display(
           pool = glob$pool
           ,
           active_project = glob$active_project
@@ -599,54 +605,58 @@ mod_document_code_server <- function(id, glob) {
           codebook = glob$codebook
           ,
           highlight = loc$highlight
-        ) 
-        par_ids <- unique(text_data$par_id)
+        )  
+        if (reduce) {
+        loc$text_data  <- loc$text_data %>% dplyr::filter(any(!is.na(segment_id)), .by = "par_id") 
+        }
+        loc$par_ids <- unique(loc$text_data$par_id)
 
-        purrr::walk(par_ids, .f = function(x_par) {
-           par <- text_data |> dplyr::filter(par_id == x_par)  |> dplyr::select(-par_id)
+        purrr::walk(loc$par_ids , .f = function(x_par) {
+           par <- loc$text_data %>% dplyr::filter(par_id == x_par)  %>% dplyr::select(-par_id)
               spans <- purrr::pmap(par, make_span, raw_text = loc$raw_text, highlight = loc$highlight) 
-                new_text <-purrr::map(spans, as.character) |> paste0(collapse = "") |> paste0('<span class = "br">&#8203</span>')
+                new_text <-purrr::map(spans, as.character) %>% paste0(collapse = "") %>% paste0('<span class = "br">&#8203</span>')
                   session$sendCustomMessage("updateParagraphContent", list(id = x_par, data = new_text))
             })
- 
+    }
    
-
+    ## edit_memos_LF  -------------------
+    edit_memos_LF <- function() {
+          loc$text_memos  <- load_memos_to_display(
+                          pool = glob$pool,
+                          active_project = glob$active_project,
+                          user = glob$user,
+                          doc_selector = glob$doc_selector
+                          ) 
         if (!is.null(loc$text_memos)) {
-        text_memos <- loc$text_memos |> 
+        text_memos <- loc$text_memos %>% 
                       dplyr::mutate(memo_id = paste0("memo_id_", memo_id))
          
-      memos_data <- text_data |> 
-        dplyr::select(par_id, memo_id) |> 
-        dplyr::filter(par_id %in% par_ids) |> 
-        dplyr::mutate(par_id = paste0("info_", par_id)) |> 
-        dplyr::filter(!is.na(memo_id)) |> 
-        dplyr::mutate(memo_id = strsplit(memo_id, " ")) |> 
-        tidyr::unnest(cols = c("memo_id")) |>
-        dplyr::filter(memo_id != "memo") |> 
-        dplyr::distinct(memo_id, .keep_all = TRUE) |> 
+      memos_data <- loc$text_data %>% 
+        dplyr::select(par_id, memo_id) %>% 
+        dplyr::filter(par_id %in% loc$par_ids) %>% 
+        dplyr::mutate(par_id = paste0("info_", par_id)) %>% 
+        dplyr::filter(!is.na(memo_id)) %>% 
+        dplyr::mutate(memo_id = strsplit(memo_id, " ")) %>% 
+        tidyr::unnest(cols = c("memo_id")) %>%
+        dplyr::filter(memo_id != "memo") %>% 
+        dplyr::distinct(memo_id, .keep_all = TRUE) %>% 
         dplyr::inner_join(
-          text_memos |> 
+          text_memos %>% 
           dplyr::select(memo_id, text), 
           by = "memo_id"
-          )  |> 
+          )  %>% 
           dplyr::arrange(memo_id)
 
           if (nrow(memos_data) > 0) {
 
       purrr::pmap(memos_data, function(par_id, memo_id, text) {
-              memo_html <- span(icon("sticky-note", id = memo_id, class = "fas text_memo_btn memo", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
+              memo_html <- span(id = memo_id, icon("sticky-note", class = "fas text_memo_btn", `data-memo` = text, .noWS = c("outside", "after-begin", "before-end")),
                              .noWS = c("outside", "after-begin", "before-end"))
-              golem::invoke_js("clearElementContent", list(id = par_id))
+              golem::invoke_js("updateElementContent", list(id = par_id, content = ""))
               insertUI(paste0("#", par_id), where = "afterBegin", ui = memo_html)
       })
-          } else {
-            # this is for case when memo was deleted and does not show up in the database
-            # we can be certain that this is a single paragraph event
-              golem::invoke_js("clearElementContent", list(id = paste0("info_", par_ids)))
           }
-    }  else {
-       golem::invoke_js("clearClassContent", list(class = "extra_info"))
-    }
+    }  
    
     }
 
@@ -656,15 +666,17 @@ mod_document_code_server <- function(id, glob) {
       selected_code_extra <- as.integer(input$selected_code_extra)
       active_project <- as.integer(glob$active_project)
       active_doc <- as.integer(glob$doc_selector)
-      code_info <- glob$codebook  |> dplyr::filter(
+      code_info <- glob$codebook  %>% dplyr::filter(
         code_id == selected_code_extra
       )
-      segments_info <- dplyr::tbl(pool, "segments") %>%
+      segments_count <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(project_id == active_project) %>%
             dplyr::filter(code_id == selected_code_extra) %>% 
-            dplyr::mutate(doc_group = ifelse(doc_id == active_doc, "this_document", "other_documents")) %>%
-            dplyr::count(doc_group) %>%
-            dplyr::collect()
+            dplyr::collect() %>% 
+            dplyr::summarise(
+              document_freq = sum(doc_id == active_doc),
+              total_freq = dplyr::n()
+            )
        insertUI(
          selector = sel,
          where = "afterEnd",
@@ -675,8 +687,8 @@ mod_document_code_server <- function(id, glob) {
         actionButton(ns("close_code_extra_div"), "", icon = icon("x"), style = "background: transparent; border: none; color: lightgray;")
       ),
       "Code:", tags$b(code_info$code_name), br(),
-      "Document:", tags$b(ifelse(is.na(segments_info$n[1]), 0, segments_info$n[1])), br(),
-      "Total:", tags$b(ifelse(is.na(sum(segments_info$n)), 0, sum(segments_info$n))), br()
+      "Document frequency:", tags$b(segments_count$document_freq), br(),
+      "Total frequency:", tags$b(segments_count$total_freq), br()
   )
         )
     }

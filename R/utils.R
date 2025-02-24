@@ -94,11 +94,6 @@ set_left_menu <- function() {
                              tabName = "Data",
                              icon = icon("database")
                          ),
-                        shinydashboard::menuItem(
-                             "Memos",
-                             tabName = "Memos",
-                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
-                         ),
                          shinydashboard::menuItem(
                              "Codebook",
                              tabName = "Codebook",
@@ -108,6 +103,11 @@ set_left_menu <- function() {
                              "Annotate",
                              tabName = "Annotate",
                              icon = icon("marker")
+                         ),
+                         shinydashboard::menuItem(
+                             "Memos",
+                             tabName = "Memos",
+                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
                          ),
                          shinydashboard::menuItem(
                              "Analyze",
@@ -365,16 +365,34 @@ dt_options <- function() {
 # DT Memos options
 dt_memo_options <- function() {
   list(
-          paging = TRUE,
-          searching = TRUE,
-          fixedColumns = TRUE,
-          autoWidth = TRUE,
-          ordering = TRUE,
-          dom = "lfrtpBi",
-          buttons = c("csv")
+    paging = TRUE,
+    searching = TRUE,
+    fixedColumns = FALSE,
+    autoWidth = TRUE,  # Enable auto width adjustment
+    ordering = TRUE,
+    dom = "lfrtpBi",
+    buttons = list(
+      list(
+        extend = 'csv',
+        exportOptions = list(
+          columns = c(0, 1, 2, 3, 4, 5) # Specify indices of columns to include in the export
         )
+      )
+    ),
+    scrollX = TRUE, 
+    columnDefs = list(
+      # Visibility settings
+      list(visible = TRUE, targets = c(0, 1, 2, 3)),  # Show these columns
+      list(visible = FALSE, targets = c(4, 5)),       # Hide these columns
+      
+      # Width settings
+      list(width = '50px', targets = 0),  
+      list(width = '20vh', targets = 1),   
+      list(width = '20vh', targets = 2), 
+      list(width = '20vh', targets = 3)
+    )
+  )
 }
-
 
 # Requal menu buttons 
 

@@ -36,9 +36,12 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+    observeEvent(glob$active_project, {
     loc$memo_text_input <- ""
     loc$refresh_observer <- 0
     loc$save_observer <- 0
+    })
+
 
 
     # Render composer/editor ----
@@ -48,6 +51,12 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     observeEvent(input$memo_id,
       {
         if (isTruthy(input$memo_id)) {
+            # check if not removed elsewhere
+            check_memo <- exists_memo_db(glob$pool, input$memo_id)
+            if (!check_memo) {
+              warn_user("The memo appears to have been deleted elsewhere. Refresh the document.")
+              req(check_memo)
+            }
           collect_memo_data_LF()
           loc$can_modify <- find_memo_permission(loc$editing_data$user_id, glob$user)
           # render editor
@@ -115,7 +124,7 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       }
     })
 
-    # Add new free segment memo ----
+    # Add new free memo ----
     observeEvent(input$create_new, {
       create_memo_LF()
       loc$refresh_observer <- loc$refresh_observer + 1
@@ -136,6 +145,9 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       glob$startOff <- loc$editing_data$startOff
       glob$endOff <- loc$editing_data$endOff
       glob$memo_segment_observer <- glob$memo_segment_observer + 1
+      memo_html <- icon("sticky-note", class = "fas text_memo_btn", `data-memo` = loc$memo_text_input, .noWS = c("outside", "after-begin", "before-end"))
+      golem::invoke_js("updateElementContent", list(id =  paste0("memo_id_", loc$editing_data$memo_id), content = as.character(memo_html)))
+      # golem::invoke_js("addMemoHighlight", list(id =  paste0("memo_id_", loc$editing_data$memo_id)))
       } else if (type == "free_memo") {
         glob$free_memo_observer <- glob$free_memo_observer + 1
       }
@@ -181,10 +193,12 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
     # create_memo_LF ----
     create_memo_LF <- function() {
-      if (!isTruthy(loc$memo_text_input)) rql_message("Missing input for memo.")
+      if (!isTruthy(loc$memo_text_input)) rql_message("Missing text input for memo.")
       req(loc$memo_text_input)
       ## create free segment ----
       if (type == "free_segment" & glob$endOff >= glob$startOff) {
+        if (glob$doc_selector < 1) rql_message("Missing document input for memo.")
+        req(glob$doc_selector > 0)
         new_segment_id <- write_memo_segment_db(
           pool = glob$pool,
           active_project = glob$active_project,
@@ -194,15 +208,18 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           glob$startOff,
           glob$endOff
         )
-        new_memo_id <- add_memo_record(
+        loc$new_memo_id <- add_memo_record(
           pool = glob$pool,
           project = glob$active_project,
           text = loc$memo_text_input,
           user_id = glob$user$user_id
         )
-        new_memo_segment_map <- data.frame(memo_id = new_memo_id, segment_id = new_segment_id)
+       loc$memo_text_data <- loc$memo_text_input
+        new_memo_segment_map <- data.frame(memo_id = loc$new_memo_id , segment_id = new_segment_id)
         DBI::dbWriteTable(glob$pool, "memos_segments_map", new_memo_segment_map, append = TRUE, row.names = FALSE)
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
+        golem::invoke_js("getMemoParagraph", list(startOff = glob$startOff))
+
       } else if (type == "free_memo") {
         ## create free memo ----
         add_memo_record(
@@ -212,8 +229,16 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
           user_id = glob$user$user_id
         )
         glob$free_memo_observer <- glob$free_memo_observer + 1
+
       }
     }
+   ## update memo UI after create ----
+    observeEvent(req(input$active_memo_par), {
+      memo_html <- span(id = paste0("memo_id_", loc$new_memo_id), icon("sticky-note", class = "fas text_memo_btn", `data-memo` = loc$memo_text_data, .noWS = c("outside", "after-begin", "before-end")),
+                            .noWS = c("outside", "after-begin", "before-end"))
+     insertUI(paste0("#", input$active_memo_par$id), where = "beforeEnd", ui = memo_html)
+
+    })
 
     # collect_memo_data_LF -----
     collect_memo_data_LF <- function() {
@@ -221,8 +246,8 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
       memo_df <- read_memo_by_id(glob$pool, glob$active_project, input$memo_id)
       if (type == "free_segment") {
         golem::invoke_js("resetSegmentMemoInput")
-        memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") |>
-          dplyr::filter(memo_id == !!memo_df$memo_id) |>
+        memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") %>%
+          dplyr::filter(memo_id == !!memo_df$memo_id) %>%
           dplyr::collect()
         segment_df <- dplyr::tbl(glob$pool, "segments") %>%
           dplyr::filter(.data$segment_id == !!memos_segments_map$segment_id) %>%
@@ -244,6 +269,13 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
     delete_memo_LF <- function() {
       ## delete free segment ----
       if (type == "free_segment") {
+        # check if not removed elsewhere
+        check_memo <- exists_memo_db(glob$pool, loc$editing_data$memo_id)
+        if (!check_memo) {
+          warn_user("The memo appears to have been deleted elsewhere. Refresh the document.")
+           req(check_memo)
+        }
+        
         delete_memo_record(
           pool = glob$pool,
           project = glob$active_project,
@@ -259,8 +291,10 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
         glob$startOff <- loc$editing_data$startOff
         glob$endOff <- loc$editing_data$endOff
         glob$memo_segment_observer <- glob$memo_segment_observer + 1
+        removeUI(selector = paste0("#memo_id_", loc$editing_data$memo_id))
+        golem::invoke_js("removeMemoFromText", list(id = loc$editing_data$memo_id))
       } else if (type == "free_memo") {
-        ## delete free segment ----
+        ## delete free  ----
         delete_memo_record(
           pool = glob$pool,
           project = glob$active_project,
@@ -304,7 +338,7 @@ editor_ui <- function(type, ns, memo_text = NULL) {
         width = "100%",
         height = "100%",
         resize = "none"
-      ) |> tagAppendAttributes(class = "memo_input")
+      ) %>% tagAppendAttributes(class = "memo_input")
     )
   } else if (type == "free_segment") {
     golem::invoke_js("initializeIframeHandler")
@@ -328,7 +362,7 @@ editor_ui <- function(type, ns, memo_text = NULL) {
         width = "100%",
         height = "100%",
         resize = "none"
-      ) |> tagAppendAttributes(class = "memo_input")
+      ) %>% tagAppendAttributes(class = "memo_input")
     )
   }
 }
