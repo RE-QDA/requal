@@ -48,7 +48,7 @@ mod_memo_free_server <- function(id, glob) {
     observeEvent(glob$free_memo_observer, {
       req(glob$free_memo_observer > 0)
       loc$visible_memos <- list_memo_records(glob$pool, glob$active_project)
-        if(glob$user$data$memo_other_view == 0 && nrow(visible_memos) > 0){
+        if(glob$user$data$memo_other_view == 0 && nrow(loc$visible_memos) > 0){
           loc$visible_memos <- loc$visible_memos %>% 
             dplyr::filter(user_id == glob$user$user_id) 
         }
