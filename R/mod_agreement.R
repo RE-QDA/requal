@@ -107,7 +107,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         if (length(unique(segments$user_id)) > 1) {
           overlap_df <- calculate_code_overlap_by_users(segments) %>%
@@ -133,7 +134,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         if (length(unique(segments$user_id)) > 1) {
           segment_summary <- segments %>% 
@@ -167,7 +169,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>% 
+          dplyr::filter(!is.na(code_id))
         
         codes <- load_codes_names(
           active_project = glob$active_project,
@@ -212,7 +215,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         codes <- load_codes_names(
           active_project = glob$active_project,
@@ -262,7 +266,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -297,7 +302,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -332,7 +338,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -373,7 +380,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         users <- load_users_names(
           pool = glob$pool,
@@ -425,7 +433,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
           dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
@@ -492,7 +501,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
           dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
@@ -566,7 +576,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
           dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
@@ -633,7 +644,8 @@ mod_agreement_server <- function(id, glob) {
         segments <- load_all_segments_db(
           pool = glob$pool,
           active_project = glob$active_project
-        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders))
+        ) %>% dplyr::filter(user_id %in% as.numeric(input$repro_coders)) %>%
+          dplyr::filter(!is.na(code_id))
         
         attr_user_map <- dplyr::tbl(glob$pool, "attributes_users_map") %>% 
           dplyr::filter(project_id == !!as.numeric(glob$active_project) & 
