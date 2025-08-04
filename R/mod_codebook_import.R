@@ -20,7 +20,8 @@ mod_codebook_import_ui <- function(id) {
       )
     ),
     tags$hr(),
-    checkboxInput(ns("header"), "Header", TRUE),
+    checkboxInput(ns("header"), "Header (file includes column names)", TRUE),
+    "",
     radioButtons(
       ns("sep"),
       "Separator",
@@ -57,7 +58,7 @@ mod_codebook_import_server <- function(id) {
       )
 
       showModal(modalDialog(
-        title = "Map imported columns",
+        title = "Declare imported columns",
         selectInput(
           ns("code_name"),
           "Select column for code name",
@@ -159,22 +160,47 @@ mod_codebook_import_server <- function(id) {
         selected_columns <- c(selected_columns, input$code_color)
       }
 
-      # Select the specified columns from the data frame
+      # Create and process dataframe
       preview_df <- loc$input_df %>%
-        dplyr::select(all_of(selected_columns))
-
-      # Truncate the code description if it is part of the selected columns
-      if (input$code_description %in% selected_columns) {
-        preview_df <- preview_df %>%
-          dplyr::mutate(
-            !!input$code_description := stringr::str_trunc(
-              .data[[input$code_description]],
-              width = 30,
-              side = "right",
-              ellipsis = "..."
+        dplyr::select(all_of(selected_columns)) %>%
+        {
+          if (
+            isTruthy(input$code_description) &&
+              input$code_description %in% selected_columns
+          ) {
+            dplyr::mutate(
+              .,
+              !!input$code_description := stringr::str_trunc(
+                .data[[input$code_description]],
+                width = 30,
+                side = "right",
+                ellipsis = "..."
+              )
             )
-          )
+          } else {
+            .
+          }
+        }
+
+      # Rename columns to standardized names
+      column_names <- names(preview_df)
+      new_names <- column_names
+
+      # Map original column names to display names
+      if (input$code_name %in% column_names) {
+        new_names[new_names == input$code_name] <- "Code name"
       }
+      if (
+        isTruthy(input$code_description) &&
+          input$code_description %in% column_names
+      ) {
+        new_names[new_names == input$code_description] <- "Code description"
+      }
+      if (isTruthy(input$code_color) && input$code_color %in% column_names) {
+        new_names[new_names == input$code_color] <- "Code color"
+      }
+
+      names(preview_df) <- new_names
 
       # Render the datatable
       datatable <- DT::datatable(
@@ -183,15 +209,15 @@ mod_codebook_import_server <- function(id) {
         options = list(dom = 't', ordering = FALSE)
       )
 
-      # Apply color formatting if 'Code color' is part of the selected columns
-      if (input$code_color %in% selected_columns) {
+      # Apply color styling if needed (use new column name)
+      if (
+        isTruthy(input$code_color) && input$code_color %in% selected_columns
+      ) {
+        unique_colors <- unique(preview_df[["Code color"]])
         datatable <- datatable %>%
           DT::formatStyle(
-            input$code_color,
-            backgroundColor = DT::styleEqual(
-              unique(preview_df[[input$code_color]]),
-              unique(preview_df[[input$code_color]])
-            )
+            "Code color",
+            backgroundColor = DT::styleEqual(unique_colors, unique_colors)
           )
       }
 
@@ -210,3 +236,57 @@ mod_codebook_import_server <- function(id) {
 
 ## To be copied in the server
 # mod_codebook_import_server("codebook_import_1")
+
+convert_to_rgb <- function(color) {
+  # Check if the color is a vector of three numeric values first
+  if (
+    is.numeric(color) && length(color) == 3 && all(color >= 0 & color <= 255)
+  ) {
+    return(paste0("rgb(", paste(color, collapse = ", "), ")"))
+  }
+
+  # Ensure color is a character string for regex operations
+  if (!is.character(color) || length(color) != 1) {
+    return(FALSE)
+  }
+
+  # Improved regex for checking if the color is already in the rgb(r, g, b) format
+  if (
+    grepl(
+      "^rgb\\s*\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*\\)$",
+      color
+    )
+  ) {
+    return(color)
+  }
+
+  # Check if the color is in hex format
+  if (grepl("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", color)) {
+    # Convert hex to rgb
+    hex_to_rgb <- function(hex) {
+      hex <- gsub("#", "", hex)
+      if (nchar(hex) == 3) {
+        hex <- paste0(rep(strsplit(hex, "")[[1]], each = 2), collapse = "")
+      }
+      rgb_vals <- as.numeric(strtoi(
+        substring(hex, seq(1, 6, 2), seq(2, 6, 2)),
+        16
+      ))
+      return(paste0("rgb(", paste(rgb_vals, collapse = ", "), ")"))
+    }
+    return(hex_to_rgb(color))
+  }
+
+  # Check if the color is comma-separated RGB values (e.g., "234, 121, 21")
+  if (grepl("^\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*$", color)) {
+    # Extract the numbers
+    rgb_vals <- as.numeric(strsplit(gsub("\\s", "", color), ",")[[1]])
+    # Validate that all values are in the valid range (0-255)
+    if (all(rgb_vals >= 0 & rgb_vals <= 255)) {
+      return(paste0("rgb(", paste(rgb_vals, collapse = ", "), ")"))
+    }
+  }
+
+  # If no format is matched, return FALSE
+  return(FALSE)
+}
