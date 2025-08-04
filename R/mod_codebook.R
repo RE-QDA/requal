@@ -145,8 +145,6 @@ mod_codebook_server <- function(id, glob) {
           permission = "codebook_modify"
         )
 
-        mod_codebook_import_ui("codebook_import_1")
-
         glob$codebook <- list_db_codes(
           glob$pool,
           glob$active_project,
@@ -316,6 +314,9 @@ mod_codebook_server <- function(id, glob) {
         )
       }
     })
+
+    #---Import codebook-----------------------------------------------------
+    mod_codebook_import_server("codebook_import_1")
 
     output$export_codebook <- downloadHandler(
       filename = function() {
