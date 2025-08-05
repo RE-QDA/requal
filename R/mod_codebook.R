@@ -41,6 +41,11 @@ mod_codebook_ui <- function(id) {
             icon = "minus"
           ),
           mod_rql_button_ui(
+            ns("code_export_ui"),
+            label = "Export codebook",
+            icon = "download"
+          ),
+          mod_rql_button_ui(
             ns("code_import_ui"),
             label = "Import codebook",
             icon = "upload"
@@ -64,8 +69,7 @@ mod_codebook_ui <- function(id) {
         value = "categories",
         mod_categories_ui("categories_ui_1")
       )
-    ),
-    downloadButton(ns("export_codebook"), label = "CSV")
+    )
   )
 }
 
@@ -145,6 +149,16 @@ mod_codebook_server <- function(id, glob) {
           permission = "codebook_modify"
         )
 
+        #---Export codebook UI --------------
+        mod_rql_button_server(
+          id = "code_export_ui",
+          custom_title = "Export codebook",
+          custom_tagList = downloadButton(ns("export_codebook"), label = "CSV"),
+          glob,
+          permission = TRUE
+        )
+
+        #---Codebook display --------------
         glob$codebook <- list_db_codes(
           glob$pool,
           glob$active_project,
