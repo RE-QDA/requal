@@ -16,7 +16,9 @@ mod_codebook_import_ui <- function(id) {
       accept = c(
         "text/csv",
         "text/comma-separated-values,text/plain",
-        ".csv"
+        ".csv",
+        "text/tab-separated-values",
+        ".tsv"
       )
     ),
     tags$hr(),
@@ -247,18 +249,24 @@ mod_codebook_import_server <- function(id, glob) {
       removeModal()
       # Writing imported codes to database
       # check if code names are unique
-      browser()
-      code_names <- list_db_codes(
+
+      # Get the saved and imported code names
+      code_names_saved <- list_db_codes(
         pool = glob$pool,
         project_id = glob$active_project,
         user = glob$user
       )$code_name
 
-      if (
-        !length(c(code_names, loc$output_df[["Code description"]])) ==
-          length(unique(c(code_names, loc$output_df[["Code description"]])))
-      ) {
-        warn_user("Conflicting code names found. Code names should be unique.")
+      code_names_imported <- as.character(loc$output_df[["Code name"]])
+
+      # Check for conflicts and duplications
+      conflict_exists <- any(code_names_imported %in% code_names_saved)
+      duplication_exists <- any(duplicated(code_names_imported))
+
+      if (conflict_exists || duplication_exists) {
+        warn_user(
+          "Conflicting or duplicate code names found. Code names should be unique."
+        )
         req(FALSE) # abort if not unique
       }
 
@@ -275,17 +283,28 @@ mod_codebook_import_server <- function(id, glob) {
       }
       imported_df <- data.frame(
         project_id = glob$active_project,
-        code_name = loc$output_df[["Code name"]],
+        code_name = code_names_imported,
         code_description = code_description,
         code_color = code_color,
         user_id = glob$user$user_id
       )
 
-      add_codes_record(
-        pool = glob$pool,
-        project_id = glob$active_project,
-        codes_df = imported_df,
-        user_id = glob$user$user_id
+      # Split the data frame into a list of one-row data frames
+      rows_list <- split(imported_df, seq(nrow(imported_df)))
+      # Iterate over each one-row data frame
+      purrr::map(rows_list, function(row_df) {
+        add_codes_record(
+          pool = glob$pool,
+          project_id = glob$active_project,
+          codes_df = row_df, # Pass the one-row data frame
+          user_id = glob$user$user_id
+        )
+      })
+      # update codebook
+      glob$codebook <- list_db_codes(
+        glob$pool,
+        glob$active_project,
+        glob$user
       )
       # update codebook observer
       glob$codebook_observer <- glob$codebook_observer + 1
