@@ -46,6 +46,7 @@ mod_codebook_import_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
 
+    # Load import file -----
     observeEvent(input$import, {
       req(input$file)
       loc$input_df <- read.csv(
@@ -54,6 +55,7 @@ mod_codebook_import_server <- function(id, glob) {
         sep = input$sep
       )
 
+      # Import wizard -----
       # This pop-up modal serves as an import wizard
       showModal(modalDialog(
         title = "Specify imported codes",
@@ -98,7 +100,7 @@ mod_codebook_import_server <- function(id, glob) {
         DT::dataTableOutput(ns("preview")),
         footer = tagList(
           modalButton("Cancel"),
-          actionButton(ns("confirm"), "Confirm")
+          shinyjs::disabled(actionButton(ns("confirm"), "Confirm"))
         )
       ))
     })
@@ -106,6 +108,12 @@ mod_codebook_import_server <- function(id, glob) {
     # This observer ensures that column names available to user
     # are updating so that no column can be selected twice
     observeEvent(c(input$code_name, input$code_description, input$code_color), {
+      if (isTruthy(input$code_name)) {
+        shinyjs::enable("confirm")
+      } else {
+        shinyjs::disable("confirm")
+      }
+
       updateSelectInput(
         session,
         "code_name",
@@ -147,6 +155,7 @@ mod_codebook_import_server <- function(id, glob) {
       )
     })
 
+    # Processing imported df -----
     observeEvent(c(input$code_name, input$code_description, input$code_color), {
       req(input$code_name)
 
@@ -245,6 +254,7 @@ mod_codebook_import_server <- function(id, glob) {
       datatable
     })
 
+    # Import execute -----
     observeEvent(input$confirm, {
       removeModal()
       # Writing imported codes to database
@@ -312,12 +322,7 @@ mod_codebook_import_server <- function(id, glob) {
   })
 }
 
-## To be copied in the UI
-# mod_codebook_import_ui("codebook_import_1")
-
-## To be copied in the server
-# mod_codebook_import_server("codebook_import_1")
-
+# Helper function for this module -----
 convert_to_rgb <- function(color) {
   # Check if the color is a vector of three numeric values first
   if (
