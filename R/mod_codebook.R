@@ -316,7 +316,7 @@ mod_codebook_server <- function(id, glob) {
     })
 
     #---Import codebook-----------------------------------------------------
-    mod_codebook_import_server("codebook_import_1")
+    mod_codebook_import_server("codebook_import_1", glob = glob)
 
     output$export_codebook <- downloadHandler(
       filename = function() {

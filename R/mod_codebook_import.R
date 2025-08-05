@@ -20,7 +20,11 @@ mod_codebook_import_ui <- function(id) {
       )
     ),
     tags$hr(),
-    checkboxInput(ns("header"), "Header (file includes column names)", TRUE),
+    checkboxInput(
+      ns("header"),
+      "Header (the file includes column names)",
+      TRUE
+    ),
     "",
     radioButtons(
       ns("sep"),
@@ -28,15 +32,14 @@ mod_codebook_import_ui <- function(id) {
       choices = c(Comma = ",", Semicolon = ";", Tab = "\t"),
       selected = ","
     ),
-    actionButton(ns("import"), "Import"),
-    tableOutput(ns("contents")) # Ensure the table output is included in the UI
+    actionButton(ns("import"), "Import")
   )
 }
 
 #' codebook_import Server Functions
 #'
 #' @noRd
-mod_codebook_import_server <- function(id) {
+mod_codebook_import_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
@@ -48,17 +51,10 @@ mod_codebook_import_server <- function(id) {
         header = input$header,
         sep = input$sep
       )
-      loc$available_colnames <- colnames(loc$input_df)
-      loc$used_colnames <- NA
-      # Initialize the imported_df with blank columns
-      loc$imported_df <- tibble::tibble(
-        `Code name` = "",
-        `Code description` = "",
-        `Code color` = ""
-      )
 
+      # This pop-up modal serves as an import wizard
       showModal(modalDialog(
-        title = "Declare imported columns",
+        title = "Specify imported codes",
         selectInput(
           ns("code_name"),
           "Select column for code name",
@@ -70,7 +66,8 @@ mod_codebook_import_server <- function(id) {
             )
           ),
           selected = ""
-        ),
+        ) %>%
+          tagAppendAttributes(class = "required"),
         selectInput(
           ns("code_description"),
           "Select column for code description",
@@ -103,6 +100,9 @@ mod_codebook_import_server <- function(id) {
         )
       ))
     })
+
+    # This observer ensures that column names available to user
+    # are updating so that no column can be selected twice
     observeEvent(c(input$code_name, input$code_description, input$code_color), {
       updateSelectInput(
         session,
@@ -145,11 +145,10 @@ mod_codebook_import_server <- function(id) {
       )
     })
 
-    # Render preview of the data frame with selected columns
-    output$preview <- DT::renderDT({
+    observeEvent(c(input$code_name, input$code_description, input$code_color), {
       req(input$code_name)
 
-      # Initialize a list to store selected columns
+      # Initialize a vector of selected columns
       selected_columns <- input$code_name
 
       # Conditionally add optional columns if they are specified
@@ -160,73 +159,136 @@ mod_codebook_import_server <- function(id) {
         selected_columns <- c(selected_columns, input$code_color)
       }
 
-      # Create and process dataframe
-      preview_df <- loc$input_df %>%
-        dplyr::select(all_of(selected_columns)) %>%
-        {
-          if (
-            isTruthy(input$code_description) &&
-              input$code_description %in% selected_columns
-          ) {
-            dplyr::mutate(
-              .,
-              !!input$code_description := stringr::str_trunc(
-                .data[[input$code_description]],
-                width = 30,
-                side = "right",
-                ellipsis = "..."
-              )
-            )
-          } else {
-            .
-          }
-        }
+      # Create and process preview dataframe
+      loc$output_df <- loc$input_df %>%
+        dplyr::select(all_of(selected_columns))
 
-      # Rename columns to standardized names
-      column_names <- names(preview_df)
-      new_names <- column_names
+      # modify preview if needed
+      # display ellipses for long code descriptions
+      if (
+        isTruthy(input$code_description) &&
+          input$code_description %in% selected_columns
+      ) {
+        loc$output_df[[input$code_description]] <- stringr::str_trunc(
+          loc$output_df[[input$code_description]],
+          width = 30,
+          side = "right",
+          ellipsis = "..."
+        )
+      }
+      # modify preview if needed
+      # check and convert code colors
+      if (
+        isTruthy(input$code_color) &&
+          input$code_color %in% selected_columns
+      ) {
+        loc$output_df[[input$code_color]] <- purrr::map_chr(
+          loc$output_df[[input$code_color]],
+          convert_to_rgb
+        )
+
+        if (any(is.na(loc$output_df[[input$code_color]]))) {
+          rql_message(
+            "Could not identify colors in the selected column. Resorting to default."
+          )
+          loc$output_df[[input$code_color]] <- "rgb(255,255,0)"
+        }
+      }
 
       # Map original column names to display names
-      if (input$code_name %in% column_names) {
-        new_names[new_names == input$code_name] <- "Code name"
+      if (input$code_name %in% names(loc$output_df)) {
+        names(loc$output_df)[which(
+          names(loc$output_df) == input$code_name
+        )] <- "Code name"
       }
       if (
         isTruthy(input$code_description) &&
-          input$code_description %in% column_names
+          input$code_description %in% names(loc$output_df)
       ) {
-        new_names[new_names == input$code_description] <- "Code description"
+        names(loc$output_df)[which(
+          names(loc$output_df) == input$code_description
+        )] <- "Code description"
       }
-      if (isTruthy(input$code_color) && input$code_color %in% column_names) {
-        new_names[new_names == input$code_color] <- "Code color"
+      if (
+        isTruthy(input$code_color) &&
+          input$code_color %in% names(loc$output_df)
+      ) {
+        names(loc$output_df)[which(
+          names(loc$output_df) == input$code_color
+        )] <- "Code color"
       }
+    })
 
-      names(preview_df) <- new_names
-
-      # Render the datatable
+    # Render the datatable
+    output$preview <- DT::renderDT({
+      # The preview should not be generated if code_name is not supplied
+      req(input$code_name)
       datatable <- DT::datatable(
-        preview_df,
+        head(loc$output_df),
         escape = FALSE,
         options = list(dom = 't', ordering = FALSE)
       )
-
       # Apply color styling if needed (use new column name)
       if (
-        isTruthy(input$code_color) && input$code_color %in% selected_columns
+        isTruthy(input$code_color) && "Code color" %in% names(loc$output_df)
       ) {
-        unique_colors <- unique(preview_df[["Code color"]])
+        unique_colors <- unique(loc$output_df[["Code color"]])
         datatable <- datatable %>%
           DT::formatStyle(
             "Code color",
             backgroundColor = DT::styleEqual(unique_colors, unique_colors)
           )
       }
-
+      # render datatable
       datatable
     })
 
     observeEvent(input$confirm, {
       removeModal()
-      # Final processing of the data frame can be done here
+      # Writing imported codes to database
+      # check if code names are unique
+      browser()
+      code_names <- list_db_codes(
+        pool = glob$pool,
+        project_id = glob$active_project,
+        user = glob$user
+      )$code_name
+
+      if (
+        !length(c(code_names, loc$output_df[["Code description"]])) ==
+          length(unique(c(code_names, loc$output_df[["Code description"]])))
+      ) {
+        warn_user("Conflicting code names found. Code names should be unique.")
+        req(FALSE) # abort if not unique
+      }
+
+      # If unique check passed, proceed with writing to database
+      if ("Code description" %in% names(loc$output_df)) {
+        code_description <- loc$output_df[["Code description"]]
+      } else {
+        code_description <- NA
+      }
+      if ("Code color" %in% names(loc$output_df)) {
+        code_color <- loc$output_df[["Code color"]]
+      } else {
+        code_color <- "rgb(255,255,0)"
+      }
+      imported_df <- data.frame(
+        project_id = glob$active_project,
+        code_name = loc$output_df[["Code name"]],
+        code_description = code_description,
+        code_color = code_color,
+        user_id = glob$user$user_id
+      )
+
+      add_codes_record(
+        pool = glob$pool,
+        project_id = glob$active_project,
+        codes_df = imported_df,
+        user_id = glob$user$user_id
+      )
+      # update codebook observer
+      glob$codebook_observer <- glob$codebook_observer + 1
     })
   })
 }
@@ -288,5 +350,5 @@ convert_to_rgb <- function(color) {
   }
 
   # If no format is matched, return FALSE
-  return(FALSE)
+  return(NA)
 }
