@@ -319,6 +319,12 @@ merge_codes <- function(pool,
     log_merge_code_record(pool, project_id = active_project, merge_from, merge_to, user_id)
 }
 
+# convert color to hex code
+convert_colour_to_hex <- function(color){
+    col_num <- as.numeric(stringr::str_extract_all(color, "[0-9]{1,3}", simplify = TRUE))
+    grDevices::rgb(red = col_num[1], green = col_num[2], blue = col_num[3], maxColorValue = 255)
+}
+
 # prepare data.frame with codes and categories to export
 get_codebook_export_table <- function(glob){
     categories <- dplyr::tbl(glob$pool, "categories") %>% 
@@ -336,8 +342,9 @@ get_codebook_export_table <- function(glob){
         dplyr::inner_join(categories, by = "category_id") 
     
     dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>% 
-        dplyr::group_by(code_id, code_name, code_description) %>% 
-        dplyr::summarise(categories = paste0(category_title, collapse = " | "))
+        dplyr::group_by(code_id, code_name, code_description, code_color) %>% 
+        dplyr::summarise(categories = paste0(category_title, collapse = " | ")) %>%
+        dplyr::mutate(code_color = purrr::map_chr(code_color, convert_colour_to_hex))
 }
 
 # Edit codes ------

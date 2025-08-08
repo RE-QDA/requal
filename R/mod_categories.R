@@ -193,48 +193,101 @@ mod_categories_server <- function(id, glob) {
 
     # Create edge -----------------------------------------
     observeEvent(input$edges_category, {
-      if (!is.null(glob$user) && glob$user$data$codebook_modify == 1) {
-        # Can only modify own codes and categories
-        owns_code <- glob$codebook %>%
-          dplyr::filter(code_id == input$edges_category$code_id) %>%
-          dplyr::pull(user_id) == glob$user$user_id
+      # check ownership
+     owns_code <- glob$codebook %>%
+       dplyr::filter(code_id == !!input$edges_category$code_id) %>%
+       dplyr::pull(user_id) == glob$user$user_id
 
-        owns_category <- dplyr::tbl(glob$pool, "categories") %>%
-          dplyr::filter(category_id == !!input$edges_category$category_id) %>%
-          dplyr::collect() %>%
-          dplyr::pull(user_id) == glob$user$user_id
+     owns_category <- dplyr::tbl(glob$pool, "categories") %>%
+       dplyr::filter(category_id == !!input$edges_category$category_id) %>%
+       dplyr::collect() %>%
+       dplyr::pull(user_id) == glob$user$user_id
 
-        if (all(c(owns_code, owns_category))) {
-          add_category_code_record(
-            pool = glob$pool,
-            active_project = glob$active_project,
-            user_id = glob$user$user_id,
-            edge = input$edges_category
-          )
-        } else {
-          warn_user("You don't have permissions for modifying codes and categories created by others.")
-          # TODO: delete code from category
-        }
-      } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
-        # Can modify all codes and categories
-        add_category_code_record(
-          pool = glob$pool,
-          active_project = glob$active_project,
-          user_id = glob$user$user_id,
-          edge = input$edges_category
-        )
-      }
-    })
+     # initialize as negative permission
+     permission_check <- FALSE
 
-    # Delete edge
-    observeEvent(input$edges_category_delete, {
-      delete_category_code_record(
+     if (!is.null(glob$user) && glob$user$data$codebook_modify != 1) {
+       # User has no permissions
+       warn_user("You don't have permissions for modifying codes and categories.")
+     } else if (all(c(owns_code, owns_category))) {
+       # Edge belongs to user
+       permission_check <- TRUE
+     } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
+       # Edge belongs to others but user can modify all codes and categories
+       permission_check <- TRUE
+     } else {
+       # User can edit own edges but this edge belongs to others
+       warn_user("You don't have permissions for modifying codes and categories created by others.")
+     }
+
+     if (permission_check) {
+      add_category_code_record(
         pool = glob$pool,
         active_project = glob$active_project,
         user_id = glob$user$user_id,
-        edge = input$edges_category_delete
+        edge = input$edges_category
       )
+     } else {
+       # re-render categories
+       output$categories_ui <- renderUI({
+         render_categories(
+           id = id,
+           active_project = glob$active_project,
+           pool = glob$pool,
+           user = glob$user
+         )
+       })
+     }
     })
+
+    # Delete edge ----
+    observeEvent(input$edges_category_delete, {
+     # check ownership
+     owns_code <- glob$codebook %>%
+       dplyr::filter(code_id == !!input$edges_category_delete$code_id) %>%
+       dplyr::pull(user_id) == glob$user$user_id
+
+     owns_category <- dplyr::tbl(glob$pool, "categories") %>%
+       dplyr::filter(category_id == !!input$edges_category_delete$category_id) %>%
+       dplyr::collect() %>%
+       dplyr::pull(user_id) == glob$user$user_id
+
+     # initialize as negative permission
+     permission_check <- FALSE
+
+     if (!is.null(glob$user) && glob$user$data$codebook_modify != 1) {
+       # User has no permissions
+       warn_user("You don't have permissions for modifying codes and categories.")
+     } else if (all(c(owns_code, owns_category))) {
+       # Edge belongs to user
+       permission_check <- TRUE
+     } else if (!is.null(glob$user) && glob$user$data$codebook_other_modify == 1) {
+       # Edge belongs to others but user can modify all codes and categories
+       permission_check <- TRUE
+     } else {
+       # User can edit own edges but this edge belongs to others
+       warn_user("You don't have permissions for modifying codes and categories created by others.")
+     }
+
+     if (permission_check) {
+       delete_category_code_record(
+         pool = glob$pool,
+         active_project = glob$active_project,
+         user_id = glob$user$user_id,
+         edge = input$edges_category_delete
+       )
+     } else {
+       # re-render categories
+       output$categories_ui <- renderUI({
+         render_categories(
+           id = id,
+           active_project = glob$active_project,
+           pool = glob$pool,
+           user = glob$user
+         )
+       })
+     }
+   })
 
     # return active categories details in glob$category ----
   })

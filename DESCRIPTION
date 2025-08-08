@@ -78,3 +78,5 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Language: en-US
+URL: https://github.com/RE-QDA/requal
+BugReports: https://github.com/RE-QDA/requal/issues

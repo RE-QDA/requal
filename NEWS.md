@@ -1,3 +1,8 @@
+# requal DEV version
+
+- Codebook import
+  - code names, descriptions, and colors can be imported via a CSV file
+
 # requal 1.1.3 Rieppeleon
 
 __Release notes:__  
