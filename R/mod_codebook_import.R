@@ -222,6 +222,10 @@ convert_to_rgb <- function(color) {
     return(paste0("rgb(", paste(color, collapse = ", "), ")"))
   }
 
+  if(color %in% grDevices::colors()){
+    return(paste0("rgb(", paste0(grDevices::col2rgb(color)[, 1], collapse = ", "), ")"))
+  }
+
   # Ensure color is a character string for regex operations
   if (!is.character(color) || length(color) != 1) {
     return(FALSE)
@@ -265,7 +269,7 @@ convert_to_rgb <- function(color) {
   }
 
   # If no format is matched, return FALSE
-  return(NA)
+  return(NA_character_)
 }
 
 
@@ -312,7 +316,7 @@ process_color_column <- function(df, color_col_name) {
       rql_message(
         "Could not identify colors in the selected column. Resorting to default."
       )
-      df[[color_col_name]] <- "rgb(255,255,0)"
+      df[[color_col_name]][is.na(df[[color_col_name]])] <- "rgb(255, 255, 0)"
     }
   }
   return(df)
