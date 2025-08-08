@@ -2,6 +2,20 @@
 
 - Codebook import
   - code names, descriptions, and colors can be imported via a CSV file
+- Segment memos
+  - memos can be added to any transcript segment
+- UI changes
+  - new tab for memo overview
+  - new subtab for segment memos in annotation tab
+  - selected memos can be pinned to screen
+  - new universal memo editor 
+  - improved linking between memoed and coded segments and source documents
+  - more information on codes accessible from the annotation tab
+- Backend changes
+  - more efficient and straightforward calculation of overlaps
+  - refactored generation of valid html for transcript
+  - more metadata included in displayed transcripts
+
 
 # requal 1.1.3 Rieppeleon
 

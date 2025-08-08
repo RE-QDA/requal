@@ -6,14 +6,12 @@ list_memo_records <- function(pool, project) {
         dplyr::filter(.data$project_id == local(as.integer(project))) %>%
         dplyr::select(
             memo_id,
-            memo_name = text, 
-            # memo_text = text, 
+            memo_text = text, 
             user_id
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
-                               1, 50)) 
+            memo_name = entitle_memo(memo_text)) 
 }
 
 read_memo_by_id <- function(pool, project, memo_id) {
@@ -28,8 +26,8 @@ read_memo_by_id <- function(pool, project, memo_id) {
         ) %>%
         dplyr::collect() %>% 
         dplyr::mutate(
-            memo_name = substr(stringr::str_extract(.data$memo_name, "\\A.*"), 
-                               1, 50)) 
+            memo_name = entitle_memo(memo_name)
+            )
 }
 
 find_memo_permission <- function(memo_user_id, user){
@@ -56,11 +54,16 @@ add_memo_record <- function(pool, project, text, user_id) {
         memo_id <- dplyr::tbl(pool, "memos") %>% 
             dplyr::filter(.data$project_id == !!memo_df$project_id, 
                           .data$text == !!memo_df$text) %>% 
+            dplyr::filter(memo_id == max(memo_id))  %>% 
             dplyr::pull(memo_id)
-        log_add_memo_record(pool, memo_df$project_id, memo_df %>% 
-                                dplyr::mutate(memo_id = max(memo_id)), 
-                            user_id = user_id)
+        log_add_memo_record(pool, 
+                            project = memo_df$project_id, 
+                            user_id = user_id,
+                            df = memo_df %>% 
+                                dplyr::mutate(memo_id = max(memo_id))
+                            )
     }
+    return(memo_id)
 }
 
 # render memos -----
@@ -111,6 +114,20 @@ delete_memo_record <- function(pool, project, memo_id, user_id) {
     
 }
 
+# check memo exists -----
+exists_memo_db <- function(pool, memo_id) {
+    check_df <- dplyr::tbl(pool, "memos") %>% 
+      dplyr::filter(.data$memo_id == local(as.integer(memo_id))) %>% 
+      dplyr::collect()  # Collect the data into a local data frame
+    
+    if (nrow(check_df) > 0) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+
+
 export_memos <- function(pool, project) {
    
     dplyr::tbl(pool, "memos") %>%
@@ -124,40 +141,11 @@ export_memos <- function(pool, project) {
                          dplyr::select(user_id, user_name), by = "user_id") %>% 
     dplyr::select(-user_id) %>% 
     dplyr::collect()  %>% 
-    dplyr::mutate(
-            memo_title = substr(
-                stringr::str_extract(.data$memo_text, "\\A.*"), 
-                               1, 50)
-                ) %>% 
+    dplyr::mutate(memo_title = entitle_memo(.data$memo_text)) %>% 
     dplyr::relocate(memo_title, 2)
 
 }
 
-
-# dropdown2 function ----
-dropdownBlock2 <- function (..., id, icon = NULL, title = NULL, badgeStatus = "danger") 
-{
-    items <- c(list(...))
-    dropdownClass <- paste0("dropdown")
-    numItems <- length(items)
-    if (is.null(badgeStatus)) {
-        badge <- NULL
-    }
-    else {
-        badge <- dashboardLabel(status = badgeStatus, numItems)
-    }
-    shiny::tags$li(class = dropdownClass, id = id, shiny::tags$a(href = "#",
-                                                                 class = "dropdown-toggle",
-                                                                 `data-toggle` = "dropdown", 
-                                                                 icon, 
-                                                                 title, 
-                                                                 badge), 
-                   shiny::tags$ul(class = "dropdown-menu", 
-                                  style = "left: 0; right: auto; max-height: 80vh", 
-                                  shiny::tags$li(shiny::tags$ul(class = "menu", 
-                                                                shiny::tags$div(style = "margin-left: auto; margin-right: 0; width: 80%;",
-                                                                                items)))))
-}
 
 # memo table styling ----
 memo_table_options <- function() {
@@ -171,8 +159,20 @@ memo_table_options <- function() {
 }
 
 # create memo as link ----
-memo_link <- function(id, text) {
-    js_fun <- "Shiny.setInputValue('memo_ui_1-selected_memo', this.name, {priority: 'event'});"
+memo_link <- function(ns_input, id, text) {
+    js_fun <- paste0("Shiny.setInputValue('", ns_input, "', this.name, {priority: 'event'});")
     quote_sign <- '"'
-    paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', text, '</a>')
+    paste0('<a class="action-button memo_name shiny-bound-input" href="#" name="', id, '" onclick=', quote_sign,js_fun,quote_sign, '">', ifelse(text == "", "untitled", text), '</a>')
+}
+
+# create memo segment as link ----
+memo_segment_link <- function(segment_document_id, segment_id) {
+    if (!is.na(segment_id)) {
+   link <-  actionLink(paste0("segment_id-", segment_id), label = "Segment-free", 
+        onclick = paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_id: ", segment_id, "}, {priority: 'event'});")
+    )
+    as.character(link)
+    } else {
+       "Free"
+    }
 }

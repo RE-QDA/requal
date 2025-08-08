@@ -1,0 +1,167 @@
+.memo {
+  font-style: italic;
+}
+
+.memo_container {
+    overflow: hidden;
+    scrollbar-width: none;
+    height: 20vh;
+    min-height: 10vh;
+    max-height: 70vh;
+    resize: vertical;
+  }
+.memo_input {
+  height: 100%; 
+  min-height: 20vh;
+  max-height: 80vh;
+  scrollbar-width: none;
+  width: 100%;
+  border: 1px;
+}
+.memo_editor .action-button {
+    flex: auto;
+  }
+
+.text_memo_btn {
+  font-size: 100%;
+  /* margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 3px;
+  background-color: white; */
+  color: silver;
+  padding-left: 5px;
+  /* padding-right: 3px;
+  padding-bottom: 2px;
+  padding-top: 1px; */
+  position: relative;
+}
+  
+.text_memo_btn::after {
+  content: attr(data-memo);
+  display: none; /* Initially hidden */
+  position: absolute;
+  background: rgb(255, 255, 120);
+  text-align: left;
+  color: black;
+  font-size: small;
+  padding: 10px;
+  min-width: 200px;
+  min-height: 200px;
+  margin-top: -3px;
+  border-radius: 10px;
+  user-select: none;
+  font: initial;
+  font-size: medium;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  max-width: 300px;
+  border: 1px solid silver;
+  z-index: 2;
+  right: 0;
+}
+  
+.text_memo_btn:hover::after {
+    display: block;
+  }
+/* .text_memo_btn.show_memo::after {
+    display: block;
+} */
+  
+.free_memo_table {
+  line-height: 1;
+}
+
+.pinned_memo {
+  position: absolute;
+  z-index: 10000;
+  width: 20vh;
+  height: 20vh;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.pin_header {
+  cursor: move;
+	background-color: transparent;
+	color: rgb(255, 75, 75);
+  width: 100%;
+  height: 30px;
+	margin-top: -15px;
+  position: absolute;
+  display: flex;
+}
+
+.unpin {
+	border: none;
+	background: transparent;
+	margin-top: -15px;
+	flex-grow: 1;
+	text-align: right;
+}
+
+.unpin_btn {
+	border: none;
+	background: transparent;
+	padding-top: 10px;
+  outline: none; 
+}
+
+.unpin_btn:hover,
+.unpin_btn:active,
+.unpin_btn:focus {
+  border: none;
+  background: transparent;
+  padding-top: 10px;
+  outline: none;
+}
+
+
+.inner_pin {
+  background-color: rgb(255, 255, 120);
+  border: 1px solid silver;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  height: calc(100% - 1px);
+  overflow-y: auto;
+  padding-bottom: 5px;
+  scrollbar-width: none; /* Firefox-specific property to hide scrollbar */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  user-select: none;
+}
+
+/* For WebKit browsers (Chrome, Safari) to hide scrollbar */
+.inner_pin::-webkit-scrollbar {
+  display: none;
+}
+
+.resizer {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  cursor: se-resize;
+  background-color: silver;
+  border-bottom-right-radius: 10px;
+}
+
+.docpar_wrap {
+  display: flex;
+  gap: 10px;  /* Space between text and gutter */
+}
+
+.partext {
+  flex-grow: 1;
+}
+
+.unpin {
+
+}
+
+.extra_info {
+  width: 40px;
+  background-color: inherit;
+  flex-shrink: 0;
+}

@@ -22,7 +22,7 @@ mod_project_ui <- function(id) {
             div(
               mod_rql_button_ui(ns("project_edit_tool"),
                 label = "Edit project",
-                icon = "pencil",
+                icon = "edit",
                 inputId = ns("project_edit_menu")
               )
             ) %>% tagAppendAttributes(style = "padding-right: 25px;"),

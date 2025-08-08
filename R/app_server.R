@@ -32,7 +32,7 @@ app_server <- function(input, output, session) {
   
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
-    shinyjs::show(id = "btn-memo")
+    shinyjs::show(id = "btn-free_memo")
     shinyjs::show(selector = "div.tab-content")
     glob$users_observer <- 0
     glob$segments_observer <- 0
@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
 
 
   # attributes ----
-  mod_attributes_server("attributes_1", glob)
+  mod_attributes_server("attributes_ui_1", glob)
 
 
   # codebook  ----
@@ -80,6 +80,8 @@ app_server <- function(input, output, session) {
 
   # memo
   mod_memo_server("memo_ui_1", glob)
+  ## free memo
+  mod_memo_free_server("free_memo_ui_1", glob)
 
   # show admin interface
   observeEvent(glob$user$is_admin, {
@@ -93,7 +95,7 @@ app_server <- function(input, output, session) {
       updateTabsetPanel(session, "tab_menu", input$analyze_link$tab_menu)
       glob$analyze_link <- list(
         doc_id = input$analyze_link$doc_id,
-        segment_start = input$analyze_link$segment_start
+        segment_id = input$analyze_link$segment_id
         )
   })
 
