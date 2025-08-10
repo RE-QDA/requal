@@ -1,5 +1,5 @@
 with_help <- function(tag = NULL, help_item = NULL) {
-  # Create help button with namespaced ID
+  # Create help button
   help_button <- div(
     class = "help-icon",
     style = "
@@ -95,15 +95,15 @@ help_items <- function(help_item) {
           tags$ul(
             tags$li(
               tags$b("Code name"),
-              " (required) This is the unique identifier for each code."
+              "(required) This is the unique identifier for each code."
             ),
             tags$li(
               tags$b("Code description"),
-              " (optional) A brief explanation or details about the code."
+              "(optional) A brief explanation or details about the code."
             ),
             tags$li(
               tags$b("Code color"),
-              " (optional) The color associated with the code, which can be specified in RGB (e.g., 'rgb(255, 0, 0)') or HEX format (e.g., '#FF0000')."
+              "(optional) The color associated with the code, which can be specified in RGB (e.g., 'rgb(255, 0, 0)') or HEX format (e.g., '#FF0000')."
             )
           )
         ),
