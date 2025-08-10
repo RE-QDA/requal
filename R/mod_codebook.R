@@ -143,7 +143,10 @@ mod_codebook_server <- function(id, glob) {
         #---Import codebook UI --------------
         mod_rql_button_server(
           id = "code_import_ui",
-          custom_title = "Import codebook",
+          custom_title = with_help(
+            "Import codebook",
+            help_item = "codebook_csv_import"
+          ),
           custom_tagList = mod_codebook_import_ui(ns("codebook_import_1")),
           glob,
           permission = "codebook_modify"
