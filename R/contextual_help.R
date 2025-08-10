@@ -74,10 +74,12 @@ with_help <- function(tag = NULL, help_item = NULL) {
   # Return wrapped content
   div(
     style = "display: inline-block;",
-    onmouseover = "this.querySelector('.help-icon').style.visibility = 'visible';",
-    onmouseout = "this.querySelector('.help-icon').style.visibility = 'hidden';",
-    tag,
-    help_button,
+    div(
+      onmouseover = "this.querySelector('.help-icon').style.visibility = 'visible';",
+      onmouseout = "this.querySelector('.help-icon').style.visibility = 'hidden';",
+      tag,
+      help_button
+    ),
     shinyjs::hidden(help_element)
   )
 }
