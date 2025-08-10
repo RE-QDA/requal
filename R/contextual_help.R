@@ -83,29 +83,36 @@ with_help <- function(tag = NULL, help_item = NULL) {
     shinyjs::hidden(help_element)
   )
 }
-# Function to generate help content based on item
+# Function to generate help content based on  help item
 help_items <- function(help_item) {
   switch(
     help_item,
     "codebook_csv_import" = list(
-      title = "Importing codebooks from CSV",
+      title = "Importing Codebooks from CSV",
       content = div(
-        "The CSV file file can have columns designating the following:",
+        "To import codebooks from a CSV file, the file can include columns for the following content:",
         tags$ul(
-          tags$li("Code name (required)"),
-          tags$li("Code description (optional)"),
-          tags$li("Code color (optional)")
-        )
-      )
-    ),
-    "agreement_metrics_select" = list(
-      title = "Importing codebooks from CSV",
-      content = div(
-        "The CSV file file can have columns designating the following:",
+          tags$li(
+            "Code name (required): This is the unique identifier for each code."
+          ),
+          tags$li(
+            "Code description (optional): A brief explanation or details about the code."
+          ),
+          tags$li(
+            "Code color (optional): The color associated with the code, which can be specified in RGB (e.g., 'rgb(255, 0, 0)') or HEX format (e.g., '#FF0000')."
+          )
+        ),
+        br(),
+        "Note that the specific column names in the CSV file do not matter, as long as the CSV input is correctly formatted. You can map the column names to the corresponding codebook content in the import wizard.",
+        br(),
+        "When importing the CSV file, you can specify certain properties to ensure it is processed correctly:",
         tags$ul(
-          tags$li("Code name (required)"),
-          tags$li("Code description (optional)"),
-          tags$li("Code color (optional)")
+          tags$li(
+            "Header: Select this option if the first row of the CSV contains column names. This helps in identifying the columns correctly. The default value presumes that the first row of the file contains column names."
+          ),
+          tags$li(
+            "Separator: Define the character used to separate values in the file, such as a comma (',') or semicolon (';'). The default value is a comma (',')."
+          )
         )
       )
     )
