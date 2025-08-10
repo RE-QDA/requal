@@ -90,28 +90,37 @@ help_items <- function(help_item) {
     "codebook_csv_import" = list(
       title = "Importing Codebooks from CSV",
       content = div(
-        "To import codebooks from a CSV file, the file can include columns for the following content:",
-        tags$ul(
-          tags$li(
-            "Code name (required): This is the unique identifier for each code."
-          ),
-          tags$li(
-            "Code description (optional): A brief explanation or details about the code."
-          ),
-          tags$li(
-            "Code color (optional): The color associated with the code, which can be specified in RGB (e.g., 'rgb(255, 0, 0)') or HEX format (e.g., '#FF0000')."
+        p(
+          "To import codebooks from a CSV file, the file can include columns for the following content:",
+          tags$ul(
+            tags$li(
+              tags$b("Code name"),
+              " (required) This is the unique identifier for each code."
+            ),
+            tags$li(
+              tags$b("Code description"),
+              " (optional) A brief explanation or details about the code."
+            ),
+            tags$li(
+              tags$b("Code color"),
+              " (optional) The color associated with the code, which can be specified in RGB (e.g., 'rgb(255, 0, 0)') or HEX format (e.g., '#FF0000')."
+            )
           )
         ),
-        br(),
-        "Note that the specific column names in the CSV file do not matter, as long as the CSV input is correctly formatted. You can map the column names to the corresponding codebook content in the import wizard.",
-        br(),
-        "When importing the CSV file, you can specify certain properties to ensure it is processed correctly:",
-        tags$ul(
-          tags$li(
-            "Header: Select this option if the first row of the CSV contains column names. This helps in identifying the columns correctly. The default value presumes that the first row of the file contains column names."
-          ),
-          tags$li(
-            "Separator: Define the character used to separate values in the file, such as a comma (',') or semicolon (';'). The default value is a comma (',')."
+        p(
+          "Note that the specific column names in the CSV file do not matter, as long as the CSV input is correctly formatted. You can map the column names to the corresponding codebook content in the import wizard.",
+        ),
+        p(
+          "When importing the CSV file, you can specify certain properties to ensure it is processed correctly:",
+          tags$ul(
+            tags$li(
+              tags$b("Header"),
+              "Select this option if the first row of the CSV contains column names. This helps in identifying the columns correctly. The default value assumes that the first row of the file contains column names."
+            ),
+            tags$li(
+              tags$b("Separator"),
+              "Define the character used to separate values in the file, such as a comma (',') or semicolon (';'). The default value is a comma (',')."
+            )
           )
         )
       )
