@@ -1,0 +1,19 @@
+---
+title: "Introduction to Requal: Increasing transparency and reflexivity of qualitative coding"
+description: "Recording of the IASSIST webinar."
+author: "requal"
+date: "2025-08-11"
+categories:
+  - presentations
+---
+
+
+As a part of the *Workshop Series on Tools for Qualitative Research*, organized by [International Association for Social Science Information Service and Technology](https://iassistdata.org/) (IASSIST), a virtual webinar was held on June 12, 2025. Martin Hájek gave a presentation entitled "Introduction to Requal: Increasing Transparency and Reflexivity of Qualitative Coding." The webinar offered an overview of Requal's functionality, which was discussed from the perspective of a researcher striving to make qualitative coding more reproducible. 
+
+For those who missed the live event, a recording of the webinar is available for viewing. You can watch the full presentation below:
+
+{{< video https://www.youtube.com/watch?v=b_UdlAPU_QE >}}
+
+Presentation materials are available from the [Zenodo repository](https://doi.org/10.5281/zenodo.15665091).
+
+_Source: [IASSIST YouTube Channel](http://www.youtube.com/@iassistdata2423)_
