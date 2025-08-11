@@ -1,8 +1,9 @@
-with_help <- function(tag = NULL, help_item = NULL) {
+with_help <- function(tag = NULL, help_item = NULL, visible = FALSE) {
   # Create help button
   help_button <- div(
     class = "help-icon",
-    style = "
+    style = paste(
+      "
             display: inline-block;
             width: 16px;
             height: 16px;
@@ -16,8 +17,9 @@ with_help <- function(tag = NULL, help_item = NULL) {
             margin-left: 5px;
             cursor: pointer;
             vertical-align: middle;
-            visibility: hidden;
-          ",
+            visibility: ",
+      if (visible) "visible;" else "hidden;"
+    ),
     onclick = paste0(
       "Shiny.setInputValue('show_help', {item: '",
       help_item,
@@ -75,8 +77,16 @@ with_help <- function(tag = NULL, help_item = NULL) {
   div(
     style = "display: inline-block;",
     div(
-      onmouseover = "this.querySelector('.help-icon').style.visibility = 'visible';",
-      onmouseout = "this.querySelector('.help-icon').style.visibility = 'hidden';",
+      onmouseover = if (!visible) {
+        "this.querySelector('.help-icon').style.visibility = 'visible';"
+      } else {
+        NULL
+      },
+      onmouseout = if (!visible) {
+        "this.querySelector('.help-icon').style.visibility = 'hidden';"
+      } else {
+        NULL
+      },
       tag,
       help_button
     ),

@@ -145,7 +145,8 @@ mod_codebook_server <- function(id, glob) {
           id = "code_import_ui",
           custom_title = with_help(
             "Import codebook",
-            help_item = "codebook_csv_import"
+            help_item = "codebook_csv_import",
+            visible = TRUE
           ),
           custom_tagList = mod_codebook_import_ui(ns("codebook_import_1")),
           glob,
