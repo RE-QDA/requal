@@ -88,13 +88,13 @@ app_server <- function(input, output, session) {
   })
 
   # observe screens
-    observeEvent(input$analyze_link,{
-      updateTabsetPanel(session, "tab_menu", input$analyze_link$tab_menu)
-      glob$analyze_link <- list(
-        doc_id = input$analyze_link$doc_id,
-        segment_id = input$analyze_link$segment_id
-        )
-
+  observeEvent(input$analyze_link, {
+    updateTabsetPanel(session, "tab_menu", input$analyze_link$tab_menu)
+    glob$analyze_link <- list(
+      doc_id = input$analyze_link$doc_id,
+      segment_id = input$analyze_link$segment_id
+    )
+  })
   # Observers for the help system
   observeEvent(input$show_help, {
     item <- input$show_help$item
