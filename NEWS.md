@@ -15,7 +15,8 @@
   - more efficient and straightforward calculation of overlaps
   - refactored generation of valid html for transcript
   - more metadata included in displayed transcripts
-
+- Contextual help
+  - functionality to display contextual help 
 
 # requal 1.1.3 Rieppeleon
 
