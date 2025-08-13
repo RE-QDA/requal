@@ -7,7 +7,8 @@ create_code_UI <- function(ns) {
             ns("code_name"),
             label = "Code name",
             placeholder = "Short but informative name"
-        ) %>% tagAppendAttributes(class = "required"),
+        ) %>%
+            tagAppendAttributes(class = "required"),
         textAreaInput(
             ns("code_desc"),
             label = "Code description",
@@ -20,26 +21,24 @@ create_code_UI <- function(ns) {
             showColour = "background",
             closeOnClick = TRUE
         ),
-        actionButton(ns("code_add"),
-                     label = "Create"
-        )
-    )  %>% tagAppendAttributes(style = "text-align: left")
+        actionButton(ns("code_add"), label = "Create")
+    ) %>%
+        tagAppendAttributes(style = "text-align: left")
 }
 
 merge_code_UI <- function(ns, pool, project, user) {
-    
     req(user$data)
-    
+
     codes <- list_db_codes(
         pool,
-        project_id = project, 
+        project_id = project,
         user = user
     )
-    
-    if(user$data$codebook_other_modify == 0){
-        codes <- codes %>% 
+
+    if (user$data$codebook_other_modify == 0) {
+        codes <- codes %>%
             dplyr::filter(user_id == !!user$user_id)
-    }   
+    }
     tags$div(
         selectInput(
             ns("merge_from"),
@@ -55,26 +54,23 @@ merge_code_UI <- function(ns, pool, project, user) {
             selected = "",
             multiple = FALSE
         ),
-        actionButton(ns("code_merge"),
-                     label = "Merge",
-                     class = "btn-warning"
-        )
-    )  %>% tagAppendAttributes(style = "text-align: left")
+        actionButton(ns("code_merge"), label = "Merge", class = "btn-warning")
+    ) %>%
+        tagAppendAttributes(style = "text-align: left")
 }
 
 
 edit_code_UI <- function(ns, pool, project, user) {
-    
     req(user$data)
-    
+
     codes <- list_db_codes(
         pool,
-        project_id = project, 
+        project_id = project,
         user = user
     )
-    
-    if(user$data$codebook_other_modify == 0){
-        codes <- codes %>% 
+
+    if (user$data$codebook_other_modify == 0) {
+        codes <- codes %>%
             dplyr::filter(user_id == !!user$user_id)
     }
     tags$div(
@@ -91,11 +87,12 @@ edit_code_UI <- function(ns, pool, project, user) {
         textInput(
             ns("edit_code_name"),
             label = "Code name"
-        ) %>% tagAppendAttributes(class = "required"),
+        ) %>%
+            tagAppendAttributes(class = "required"),
         textAreaInput(
             ns("edit_code_desc"),
             label = "Code description"
-                ),
+        ),
         colourpicker::colourInput(
             ns("edit_color_pick"),
             label = "Highlight",
@@ -103,25 +100,22 @@ edit_code_UI <- function(ns, pool, project, user) {
             showColour = "background",
             closeOnClick = TRUE
         ),
-        actionButton(ns("code_edit_btn"),
-                     label = "Edit",
-                     class = "btn-warning"
-        )
-    )  %>% tagAppendAttributes(style = "text-align: left")
+        actionButton(ns("code_edit_btn"), label = "Edit", class = "btn-warning")
+    ) %>%
+        tagAppendAttributes(style = "text-align: left")
 }
 
 delete_code_UI <- function(ns, pool, project, user) {
-    
     req(user$data)
-    
+
     codes <- list_db_codes(
         pool,
-        project_id = project, 
+        project_id = project,
         user = user
     )
-    
-    if(user$data$codebook_other_modify == 0){
-        codes <- codes %>% 
+
+    if (user$data$codebook_other_modify == 0) {
+        codes <- codes %>%
             dplyr::filter(user_id == !!user$user_id)
     }
     tags$div(
@@ -135,11 +129,9 @@ delete_code_UI <- function(ns, pool, project, user) {
                 closeAfterSelect = "true"
             )
         ),
-        actionButton(ns("code_del_btn"),
-                     label = "Delete",
-                     class = "btn-danger"
-        )
-    )  %>% tagAppendAttributes(style = "text-align: left")
+        actionButton(ns("code_del_btn"), label = "Delete", class = "btn-danger")
+    ) %>%
+        tagAppendAttributes(style = "text-align: left")
 }
 
 # TODO
@@ -167,44 +159,42 @@ delete_code_UI <- function(ns, pool, project, user) {
 
 # List codes--------------------------------------------------------
 
-
 # Read codes from the DB
 
 #' @importFrom rlang .env
 #' @importFrom rlang .data
 list_db_codes <- function(pool, project_id, user) {
-    
     ## To pass R CMD check and define DB variables as global variables for the function https://www.r-bloggers.com/2019/08/no-visible-binding-for-global-variable/
     code_id <- code_name <- code_description <- code_color <- NULL
-    
+
     project_codes <- dplyr::tbl(pool, "codes") %>%
         dplyr::filter(.data$project_id == as.integer(.env$project_id)) %>%
         dplyr::select(
             code_id,
             code_name,
             code_description,
-            code_color, 
+            code_color,
             user_id
         ) %>%
         dplyr::collect()
-    
-    if(!is.null(user$data) && user$data$codebook_other_view == 0){
-        project_codes <- project_codes %>% 
+
+    if (!is.null(user$data) && user$data$codebook_other_view == 0) {
+        project_codes <- project_codes %>%
             dplyr::filter(user_id == user$user_id)
     }
-    
+
     return(project_codes)
 }
 
 
-
-
 # Generate boxes of codes -----
-gen_codes_ui <- function(code_id,
-                         code_name,
-                         code_description,
-                         code_color, 
-                         user_id) {
+gen_codes_ui <- function(
+    code_id,
+    code_name,
+    code_description,
+    code_color,
+    user_id
+) {
     box(
         code_description,
         id = code_id,
@@ -229,46 +219,44 @@ gen_codes_ui <- function(code_id,
         #     boxDropdownItem("Delete")
         # ),
         ""
-    ) %>% tagAppendAttributes(
-        `data-code_id` = code_id,
-        class = "code_item",
-        style = "max-width: 500px"
-    ) 
+    ) %>%
+        tagAppendAttributes(
+            `data-code_id` = code_id,
+            class = "code_item",
+            style = "max-width: 500px"
+        )
 }
 
 # Delete codes from project ------
 delete_db_codes <-
-    function(pool, 
-             active_project,
-             delete_code_id, 
-             user_id) {
-        
-        DBI::dbExecute(pool,
-                   glue::glue_sql("DELETE from codes
+    function(pool, active_project, delete_code_id, user_id) {
+        DBI::dbExecute(
+            pool,
+            glue::glue_sql(
+                "DELETE from codes
                    WHERE code_id IN ({delete_code_id})",
-                   .con = pool)
-                   )
+                .con = pool
+            )
+        )
 
-        
         log_delete_code_record(pool, active_project, delete_code_id, user_id)
     }
-# Delete codes from segments table 
+# Delete codes from segments table
 
-
-delete_codes_segment_db <- function(pool, 
-                                    active_project,
-                                    user_id,
-                                    code_id) {
-    
+delete_codes_segment_db <- function(pool, active_project, user_id, code_id) {
     # delete code from a segment
-    query <- glue::glue_sql("DELETE FROM segments
+    query <- glue::glue_sql(
+        "DELETE FROM segments
                        WHERE project_id = {active_project}
-                       AND code_id = {code_id}", 
-                       .con = pool)
-    
-    purrr::walk(query, function(x) {DBI::dbExecute(pool, x)})
-    
-   #todo log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)
+                       AND code_id = {code_id}",
+        .con = pool
+    )
+
+    purrr::walk(query, function(x) {
+        DBI::dbExecute(pool, x)
+    })
+
+    #todo log_delete_segment_record(pool, project_id = active_project, segment_id, user_id)
 }
 
 # Render codes -----
@@ -277,7 +265,7 @@ render_codes <- function(pool, active_project, user) {
     if (isTruthy(active_project)) {
         project_codes <- list_db_codes(
             pool = pool,
-            project_id = active_project, 
+            project_id = active_project,
             user = user
         )
         if (nrow(project_codes) == 0) {
@@ -293,82 +281,160 @@ render_codes <- function(pool, active_project, user) {
 
 # Merge codes ------
 
-merge_codes <- function(pool,
-                        active_project,
-                        merge_from,
-                        merge_to, 
-                        user_id) {
+merge_codes <- function(pool, active_project, merge_from, merge_to, user_id) {
     # should rewrite all merge from ids to the value of merge to in segments
-    update_segments_sql <- glue::glue_sql("UPDATE segments
+    update_segments_sql <- glue::glue_sql(
+        "UPDATE segments
                  SET code_id = {merge_to}
-                 WHERE code_id = {merge_from}", .con = pool)
+                 WHERE code_id = {merge_from}",
+        .con = pool
+    )
     DBI::dbExecute(pool, update_segments_sql)
-    
+
     # should delete merge from row from codes
-    delete_code_category_sql <- glue::glue_sql("DELETE FROM categories_codes_map WHERE code_id = {merge_from}",
-                                      .con = pool
+    delete_code_category_sql <- glue::glue_sql(
+        "DELETE FROM categories_codes_map WHERE code_id = {merge_from}",
+        .con = pool
     )
     DBI::dbExecute(pool, delete_code_category_sql)
 
-    delete_code_sql <- glue::glue_sql("DELETE FROM codes WHERE code_id = {merge_from}",
-                                      .con = pool
+    delete_code_sql <- glue::glue_sql(
+        "DELETE FROM codes WHERE code_id = {merge_from}",
+        .con = pool
     )
     DBI::dbExecute(pool, delete_code_sql)
-    
+
     # should log action with from-to ids
-    log_merge_code_record(pool, project_id = active_project, merge_from, merge_to, user_id)
+    log_merge_code_record(
+        pool,
+        project_id = active_project,
+        merge_from,
+        merge_to,
+        user_id
+    )
 }
 
 # convert color to hex code
-convert_colour_to_hex <- function(color){
-    col_num <- as.numeric(stringr::str_extract_all(color, "[0-9]{1,3}", simplify = TRUE))
-    grDevices::rgb(red = col_num[1], green = col_num[2], blue = col_num[3], maxColorValue = 255)
+convert_colour_to_hex <- function(color) {
+    col_num <- as.numeric(stringr::str_extract_all(
+        color,
+        "[0-9]{1,3}",
+        simplify = TRUE
+    ))
+    grDevices::rgb(
+        red = col_num[1],
+        green = col_num[2],
+        blue = col_num[3],
+        maxColorValue = 255
+    )
 }
 
 # prepare data.frame with codes and categories to export
-get_codebook_export_table <- function(glob){
-    categories <- dplyr::tbl(glob$pool, "categories") %>% 
-        dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>% 
-        dplyr::select(category_id, category_name, category_description) %>% 
-        dplyr::collect() %>% 
-        dplyr::mutate(category_title = dplyr::if_else(
-            !is.na(category_description) & category_description != "",
-            paste0(category_name, " (", category_description, ")"), 
-            category_name)) %>% 
+get_codebook_export_table <- function(glob) {
+    categories <- dplyr::tbl(glob$pool, "categories") %>%
+        dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
+        dplyr::select(category_id, category_name, category_description) %>%
+        dplyr::collect() %>%
+        dplyr::mutate(
+            category_title = dplyr::if_else(
+                !is.na(category_description) & category_description != "",
+                paste0(category_name, " (", category_description, ")"),
+                category_name
+            )
+        ) %>%
         dplyr::select(-c(category_name, category_description))
-    
-    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>% 
-        dplyr::collect() %>% 
-        dplyr::inner_join(categories, by = "category_id") 
-    
-    dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>% 
-        dplyr::group_by(code_id, code_name, code_description, code_color) %>% 
-        dplyr::summarise(categories = paste0(category_title, collapse = " | ")) %>%
-        dplyr::mutate(code_color = purrr::map_chr(code_color, convert_colour_to_hex))
+
+    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
+        dplyr::collect() %>%
+        dplyr::inner_join(categories, by = "category_id")
+
+    dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>%
+        dplyr::group_by(code_id, code_name, code_description, code_color) %>%
+        dplyr::summarise(
+            categories = paste0(category_title, collapse = " | ")
+        ) %>%
+        dplyr::mutate(
+            code_color = purrr::map_chr(code_color, convert_colour_to_hex)
+        )
 }
 
 # Edit codes ------
 
-edit_db_codes <- function(pool,
-                        active_project,
-                        user_id,
-                        edit_code_id,
-                        edit_code_name,
-                        edit_code_description,
-                        edit_code_color) {
-
-    update_code_sql <- glue::glue_sql("UPDATE codes
+edit_db_codes <- function(
+    pool,
+    active_project,
+    user_id,
+    edit_code_id,
+    edit_code_name,
+    edit_code_description,
+    edit_code_color
+) {
+    update_code_sql <- glue::glue_sql(
+        "UPDATE codes
                  SET code_name = {edit_code_name}, code_description = {edit_code_description}, code_color = {edit_code_color}
-                 WHERE code_id = {edit_code_id}", .con = pool)
+                 WHERE code_id = {edit_code_id}",
+        .con = pool
+    )
     DBI::dbExecute(pool, update_code_sql)
-    
-    log_edit_code_record(pool, project_id = active_project, 
-                         changes = list(
-                             code_id = edit_code_id, 
-                             code_name = edit_code_name, 
-                             code_color = edit_code_color,
-                             code_description = edit_code_description), 
-                         user_id)
+
+    log_edit_code_record(
+        pool,
+        project_id = active_project,
+        changes = list(
+            code_id = edit_code_id,
+            code_name = edit_code_name,
+            code_color = edit_code_color,
+            code_description = edit_code_description
+        ),
+        user_id
+    )
 
     rql_message(paste("Code", edit_code_name, "was updated."))
+}
+
+# Utilities for expandig/collapsing codes ------
+expand_codes <- function(session) {
+    ns_id <- session$ns("codes_ui") # The container ID for codes
+
+    shinyjs::removeClass(
+        class = "collapsed-box",
+        selector = paste0("#", ns_id, " .code_item .box")
+    )
+    shinyjs::show(selector = paste0("#", ns_id, " .code_item .box-body"))
+    shinyjs::removeClass(
+        class = "fa-plus",
+        selector = paste0("#", ns_id, " .code_item .fa-plus")
+    )
+    shinyjs::addClass(
+        class = "fa-minus",
+        selector = paste0("#", ns_id, " .code_item i")
+    )
+    updateActionButton(
+        session,
+        "toggle_all_codes",
+        icon = icon("compress-arrows-alt")
+    )
+}
+
+collapse_codes <- function(session) {
+    ns_id <- session$ns("codes_ui")
+
+    shinyjs::addClass(
+        class = "collapsed-box",
+        selector = paste0("#", ns_id, " .code_item .box")
+    )
+    shinyjs::hide(selector = paste0("#", ns_id, " .code_item .box-body"))
+    shinyjs::removeClass(
+        class = "fa-minus",
+        selector = paste0("#", ns_id, " .code_item .fa-minus")
+    )
+    shinyjs::addClass(
+        class = "fa-plus",
+        selector = paste0("#", ns_id, " .code_item i")
+    )
+    updateActionButton(
+        session,
+        "toggle_all_codes",
+        icon = icon("expand-arrows-alt")
+    )
 }

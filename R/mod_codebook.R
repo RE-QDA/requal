@@ -56,6 +56,13 @@ mod_codebook_ui <- function(id) {
           column(
             width = 10,
             br(),
+            actionButton(
+              ns("toggle_all_codes"),
+              label = NULL,
+              icon = icon("expand-arrows-alt"),
+              title = "Expand/Collapse",
+              style = "color: silver; background: none; border: none; padding: 0; margin: 0;"
+            ),
             uiOutput(
               ns("codes_ui")
             ) %>%
@@ -346,6 +353,13 @@ mod_codebook_server <- function(id, glob) {
       }
     )
 
+    observeEvent(input$toggle_all_codes, {
+      if (input$toggle_all_codes %% 2 == 1) {
+        expand_codes(session = session)
+      } else {
+        collapse_codes(session = session)
+      }
+    })
     # end of server module function
   })
 }

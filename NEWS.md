@@ -11,6 +11,7 @@
   - new universal memo editor 
   - improved linking between memoed and coded segments and source documents
   - more information on codes accessible from the annotation tab
+  - collapse/expand codes and categories boxes
 - Backend changes
   - more efficient and straightforward calculation of overlaps
   - refactored generation of valid html for transcript
