@@ -1,0 +1,17 @@
+---
+title: "Try Requal on macOS"
+description: "Installing standalone Requal on macOS (experimental)."
+author: "requal"
+date: "2025-08-15"
+categories:
+  - software
+---
+
+Running Requal through R is and will remain the primary way to use the app. This has several advantages, including the ability to run Requal on different operating systems or access to messages sent from Requal to the R console. However, for the ease of use, we are also experimenting with a standalone version of Requal. A first version of standalone Requal for macOS is available [here](https://owncloud.cesnet.cz/index.php/s/oWBZcb9ruzXeZxB/download).
+
+__Instructions:__
+
+Simply download and unpack the zip file and run the `Requal.app` file (or copy it to your Applications folder).
+
+
+This is still in experimental stage and we are curious to hear about your experience, e.g. in [Requal Discussions](https://github.com/RE-QDA/requal/discussions).

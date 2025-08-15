@@ -28,11 +28,18 @@
     "text": "Requal logo\n\n\nRequal is a free and open-source CAQDAS application engineered as an interface for annotating text and qualitative data. Its primary objective is to enhance reproducibility in qualitative research by promoting transparency, openness, reflexivity, and collaboration. The application operates cross-platform in web browsers and is built with the Shiny framework for the R language environment."
   },
   {
-    "objectID": "posts/thuringothyris/index.html",
-    "href": "posts/thuringothyris/index.html",
-    "title": "Thuringothyris (v1.1.2)",
+    "objectID": "posts/soc-coffee-2024-05-16/index.html",
+    "href": "posts/soc-coffee-2024-05-16/index.html",
+    "title": "Requal at Sociological Coffee",
     "section": "",
-    "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.9002.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
+    "text": "Martin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University."
+  },
+  {
+    "objectID": "posts/rieppeleon/index.html",
+    "href": "posts/rieppeleon/index.html",
+    "title": "Rieppeleon (v1.1.3)",
+    "section": "",
+    "text": "Rieppeleon emphasizes enhancements in code editing and the annotation experience. After this release, the development version will transition to a refactored backend functionality. This approach ensures that a version with a stable, time-tested backend receives the latest UI improvements.\nFor more details, you can read the full Rieppeleon release notes.\nTo update your Requal installation, download the requal_1.1.3.9001.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
   },
   {
     "objectID": "contact.html",
@@ -63,25 +70,18 @@
     "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative online qualitative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight tool for coding text and its further analysis with R.\nROCK - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.\nIramuteq - graphical user interface for geometrical text analyses in R.\nCATMA - annotation and query software tuned for literary and historical documents."
   },
   {
-    "objectID": "posts/rieppeleon/index.html",
-    "href": "posts/rieppeleon/index.html",
-    "title": "Rieppeleon (v1.1.3)",
+    "objectID": "posts/try-macOS-install/index.html",
+    "href": "posts/try-macOS-install/index.html",
+    "title": "Try Requal on macOS",
     "section": "",
-    "text": "Rieppeleon emphasizes enhancements in code editing and the annotation experience. After this release, the development version will transition to a refactored backend functionality. This approach ensures that a version with a stable, time-tested backend receives the latest UI improvements.\nFor more details, you can read the full Rieppeleon release notes.\nTo update your Requal installation, download the requal_1.1.3.9001.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
+    "text": "Running Requal through R is and will remain the primary way to use the app. This has several advantages, including the ability to run Requal on different operating systems or access to messages sent from Requal to the R console. However, for the ease of use, we are also experimenting with a standalone version of Requal. A first version of standalone Requal for macOS is available here.\nInstructions:\nSimply download and unpack the zip file and run the Requal.app file (or copy it to your Applications folder).\nThis is still in experimental stage and we are curious to hear about your experience, e.g. in Requal Discussions."
   },
   {
-    "objectID": "posts/soc-coffee-2024-05-16/index.html",
-    "href": "posts/soc-coffee-2024-05-16/index.html",
-    "title": "Requal at Sociological Coffee",
+    "objectID": "posts/thuringothyris/index.html",
+    "href": "posts/thuringothyris/index.html",
+    "title": "Thuringothyris (v1.1.2)",
     "section": "",
-    "text": "Martin Hájek presented Requal at Sociological Coffee held by the Department of Sociology of the Faculty of Humanities, Charles University."
-  },
-  {
-    "objectID": "posts.html",
-    "href": "posts.html",
-    "title": "Requal posts",
-    "section": "",
-    "text": "Introduction to Requal: Increasing transparency and reflexivity of qualitative coding\n\n\n\n\n\n\npresentations\n\n\n\nRecording of the IASSIST webinar.\n\n\n\n\n\nAug 11, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRieppeleon (v1.1.3)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nFeb 23, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nThuringothyris (v1.1.2)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
+    "text": "The Thuringothyris update brings several smaller changes to the Requal user interface, along with bug fixes and improvements such as more export functions for memos and codebooks. Thuringothyris is intended as a precursor to the upcoming more substantial enhancements.\nFor more details, you can read the full Thuringothyris release notes.\nTo update your Requal installation, download the requal_1.1.2.9002.tar.gz file from the Releases page. Then, run the remotes::install_local(file.choose()) command in the R console.\nSource: Requal GitHub Discussions"
   },
   {
     "objectID": "posts/ IASSIST-webinar-2025-06-12/index.html",
@@ -89,5 +89,12 @@
     "title": "Introduction to Requal: Increasing transparency and reflexivity of qualitative coding",
     "section": "",
     "text": "As a part of the Workshop Series on Tools for Qualitative Research, organized by International Association for Social Science Information Service and Technology (IASSIST), a virtual webinar was held on June 12, 2025. Martin Hájek gave a presentation entitled “Introduction to Requal: Increasing Transparency and Reflexivity of Qualitative Coding.” The webinar offered an overview of Requal’s functionality, which was discussed from the perspective of a researcher striving to make qualitative coding more reproducible.\nFor those who missed the live event, a recording of the webinar is available for viewing. You can watch the full presentation below:\n\nPresentation materials are available from the Zenodo repository.\nSource: IASSIST YouTube Channel"
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Requal posts",
+    "section": "",
+    "text": "Try Requal on macOS\n\n\n\n\n\n\nsoftware\n\n\n\nInstalling standalone Requal on macOS (experimental).\n\n\n\n\n\nAug 15, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to Requal: Increasing transparency and reflexivity of qualitative coding\n\n\n\n\n\n\npresentations\n\n\n\nRecording of the IASSIST webinar.\n\n\n\n\n\nAug 11, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRieppeleon (v1.1.3)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nFeb 23, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nThuringothyris (v1.1.2)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
   }
 ]
