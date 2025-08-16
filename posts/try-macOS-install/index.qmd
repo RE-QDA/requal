@@ -7,12 +7,12 @@ categories:
   - software
 ---
 
-Running Requal through R is and will remain the primary way to use the app. This has several advantages, including the ability to run Requal on different operating systems or access to messages sent from Requal to the R console. However, for the ease of use, we are also experimenting with a standalone version of Requal. A first version of [standalone Requal for macOS](https://owncloud.cesnet.cz/index.php/s/oWBZcb9ruzXeZxB/download) is now available.
+Running Requal through R is and will remain the primary way to use the app. This has several advantages, including the ability to run Requal on different operating systems or access to messages sent from Requal to the R console. However, for the ease of use, we are also experimenting with a standalone version of Requal. A first version of [standalone Requal for macOS](https://owncloud.cesnet.cz/index.php/s/84N90w7bOqwdKVg/download) is now available.
 
 __Instructions:__
 
-Simply download and unpack the [zip file](https://owncloud.cesnet.cz/index.php/s/oWBZcb9ruzXeZxB/download) and run the `Requal.app` file (or copy it to your Applications folder).
+Simply download and mount the [disk image file](https://owncloud.cesnet.cz/index.php/s/84N90w7bOqwdKVgdownload) and move the `Requal.app` file to your Applications folder.
 
-As the Requal macOS app is not certified by Apple, you will be asked for permission to open it after the first run. Go to `System Preferences` -> `Security & Privacy` and select  `Open Anyway` for `Requal.app`.
+As the Requal macOS app is not certified by Apple, you will be asked for a permission to open it when running for the first time. Go to `System Preferences` -> `Security & Privacy` and select  `Open Anyway` for `Requal.app`.
 
 This is still in experimental stage and we are providing the macOS app for beta-testing. We are curious to hear about your experience (both negative and positive) with running standalone Requal, e.g. in [Requal Discussions](https://github.com/RE-QDA/requal/discussions).
