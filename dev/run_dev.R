@@ -23,7 +23,7 @@ golem::document_and_reload()
 # (run_app(
 #  mode = "local",
 #  options = list("launch.browser")
-#))
+# ))
 
 
 # (run_app(

@@ -303,7 +303,8 @@ db_call_df_ordered <- tibble::tibble(
     "segments", 
     "memos", 
     "attributes", 
-    "attribute_values"
+    "attribute_values",
+    "memos_segments_map"
   ))
 
 db_call_df <- dplyr::full_join(
@@ -316,33 +317,6 @@ db_call_df_unordered <- tibble::tibble(
   table = names(db_call),
   sql = db_call
 )
-
-# Arrange by priority as required by postgres
-db_call_df_ordered <- tibble::tibble(
-  table = c(
-    "projects", 
-    "requal_version", 
-    "users", 
-    "user_permissions", 
-    "logs",
-    "documents", 
-    "codes", 
-    "categories", 
-    "categories_codes_map", 
-    "cases", 
-    "cases_documents_map", 
-    "segments", 
-    "memos", 
-    "attributes", 
-    "attribute_values"
-  ))
-
-db_call_df <- dplyr::full_join(
-  db_call_df_ordered,
-  db_call_df_unordered,
-  by = "table"
-)
-
 
 
 create_db_schema <- function(pool) {

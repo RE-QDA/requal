@@ -33,6 +33,7 @@ load_all_segments_db <- function(pool, active_project) {
         
         segments <- dplyr::tbl(pool, "segments") %>%
             dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+            dplyr::filter(!is.na(.data$code_id)) %>% # remove memoed segments
             dplyr::select(user_id, 
                           code_id,
                           doc_id, 
@@ -40,7 +41,7 @@ load_all_segments_db <- function(pool, active_project) {
                           segment_start,
                           segment_end) %>%
             dplyr::left_join(., users, by = "user_id", suffix = c(".x", ".y")) %>% 
-            dplyr::collect()
+            dplyr::collect()  
         
         return(segments)
     } else {""}

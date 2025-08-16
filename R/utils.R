@@ -59,31 +59,13 @@ dummy <- function(){
 set_dashboard_body <- function() {
     
     shinydashboard::dashboardBody( 
-        # css for control bar icon
-        tags$head(tags$style(HTML('
-#launchpad_icon{
-  margin-right: 10px;
-  color: white;
-  animation-name: launchpad-animation;
-  animation-duration: 1s;
-  animation-iteration-count: 1;
-}
-
-@keyframes launchpad-animation {
-  from {color: white;}
-  to {color: red;}
-}
-
-  '))),
-
 shinyjs::hidden(shinydashboard::tabItems(
-    
     shinydashboard::tabItem("Project",
             mod_project_ui("mod_project_ui_1")),
     shinydashboard::tabItem("Data",
             mod_data_ui("data_1")),
-    shinydashboard::tabItem("Attributes",
-            mod_attributes_ui("attributes_1")),
+    shinydashboard::tabItem("Memos",
+            mod_memo_ui("memo_ui_1")),
     shinydashboard::tabItem("Codebook",
             mod_codebook_ui("codebook_ui_1")),
     shinydashboard::tabItem("Annotate",
@@ -112,11 +94,6 @@ set_left_menu <- function() {
                              tabName = "Data",
                              icon = icon("database")
                          ),
-                        shinydashboard::menuItem(
-                             "Attributes",
-                             tabName = "Attributes",
-                             icon = icon("table")
-                         ),
                          shinydashboard::menuItem(
                              "Codebook",
                              tabName = "Codebook",
@@ -126,6 +103,11 @@ set_left_menu <- function() {
                              "Annotate",
                              tabName = "Annotate",
                              icon = icon("marker")
+                         ),
+                         shinydashboard::menuItem(
+                             "Memos",
+                             tabName = "Memos",
+                             icon = icon("sticky-note", verify_fa = FALSE, class = "fas")
                          ),
                          shinydashboard::menuItem(
                              "Analyze",
@@ -380,6 +362,38 @@ dt_options <- function() {
         )
 }
 
+# DT Memos options
+dt_memo_options <- function() {
+  list(
+    paging = TRUE,
+    searching = TRUE,
+    fixedColumns = FALSE,
+    autoWidth = TRUE,  # Enable auto width adjustment
+    ordering = TRUE,
+    dom = "lfrtpBi",
+    buttons = list(
+      list(
+        extend = 'csv',
+        exportOptions = list(
+          columns = c(0, 1, 2, 3, 4, 5) # Specify indices of columns to include in the export
+        )
+      )
+    ),
+    scrollX = TRUE, 
+    columnDefs = list(
+      # Visibility settings
+      list(visible = TRUE, targets = c(0, 1, 2, 3)),  # Show these columns
+      list(visible = FALSE, targets = c(4, 5)),       # Hide these columns
+      
+      # Width settings
+      list(width = '50px', targets = 0),  
+      list(width = '20vh', targets = 1),   
+      list(width = '20vh', targets = 2), 
+      list(width = '20vh', targets = 3)
+    )
+  )
+}
+
 # Requal menu buttons 
 
 rql_picker_UI <- function(inputId, label, choices = "", multiple = TRUE, none = "") { 
@@ -443,3 +457,29 @@ db_update_value <- function(pool, table, col_val, by_col_val){
       res <- purrr::map(query, ~tryCatch({DBI::dbExecute(pool, .x)}))
       
 }
+
+
+# format class HTML
+
+format_class_id <- function(x, class_name = NULL)   {
+class_string <- purrr::map_chr(unique(na.omit(x)), function(y) paste0(class_name, "_id_", y))
+if (length(class_string) > 0) {
+  class_string <- paste(class_name, paste(class_string, collapse = " "), collapse = " ") 
+} else {
+   class_string <- ""
+}
+class_string
+}
+
+
+# parse memo id from string
+parse_memo_id  <- function(x) {
+as.integer(stringr::str_extract(x, "\\d+"))
+} 
+
+# Extract title from memo text
+entitle_memo <- function(memo_text) {
+  substr(stringr::str_extract(memo_text, "^[^\n]*"), 1, 100)
+}
+
+
