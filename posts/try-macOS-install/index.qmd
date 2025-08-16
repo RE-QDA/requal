@@ -13,5 +13,6 @@ __Instructions:__
 
 Simply download and unpack the [zip file](https://owncloud.cesnet.cz/index.php/s/oWBZcb9ruzXeZxB/download) and run the `Requal.app` file (or copy it to your Applications folder).
 
+As the Requal macOS app is not certified by Apple, you will be asked for permission to open it after the first run. Go to `System Preferences` -> `Security & Privacy` and select  `Open Anyway` for `Requal.app`.
 
-This is still in experimental stage and we are curious to hear about your experience, e.g. in [Requal Discussions](https://github.com/RE-QDA/requal/discussions).
+This is still in experimental stage and we are providing the macOS app for beta-testing. We are curious to hear about your experience (both negative and positive) with running standalone Requal, e.g. in [Requal Discussions](https://github.com/RE-QDA/requal/discussions).
