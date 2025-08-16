@@ -6,6 +6,12 @@ Requal provides basic functionality for annotating documents in plain text with 
 
 ## Installation
 
+::: {.callout-tip}
+## Tip for adventurous macOS users
+
+Try directly installing the standalone [macOS version of the Requal app](/posts/try-macOS-install/index.qmd) (experimental).
+:::
+
 ### Server version
 
 To use the server version, you need to install Requal on a server or ask your organization's IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:
