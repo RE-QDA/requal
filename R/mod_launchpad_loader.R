@@ -66,22 +66,6 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             }
           )
 
-          observeEvent(glob$pool, {
-            # Query the PRAGMA foreign_keys setting
-            result <- pool::dbGetQuery(glob$pool, "PRAGMA foreign_keys;")
-            foreign_keys_status <- result[[1]]
-            print(sprintf(
-              "console.log('PRAGMA foreign_keys: %s');",
-              foreign_keys_status
-            ))
-            # Use shinyjs to send the result to the JavaScript console
-            js_code <- sprintf(
-              "console.log('PRAGMA foreign_keys: %s');",
-              foreign_keys_status
-            )
-            shinyjs::runjs(js_code)
-          })
-
           reactive({
             onStop(function() {
               print("closing pool")
