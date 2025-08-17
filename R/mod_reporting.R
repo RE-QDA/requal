@@ -90,7 +90,8 @@ mod_reporting_server <- function(id, glob) {
         filter = "top",
         extensions = c("Buttons"),
         options = dt_options(),
-        class = "display"
+        class = "display", 
+        rownames = FALSE
       )
     })
   })

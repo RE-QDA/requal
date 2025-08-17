@@ -12,15 +12,18 @@ mod_doc_manager_ui <- function(id) {
   tagList(
     fluidRow(
       class = "module_tools",
-      mod_rql_button_ui(ns("doc_create_ui"),
+      mod_rql_button_ui(
+        ns("doc_create_ui"),
         label = "Create document",
         icon = "plus"
       ),
-      mod_rql_button_ui(ns("doc_upload_ui"),
+      mod_rql_button_ui(
+        ns("doc_upload_ui"),
         label = "Upload file",
         icon = "upload"
       ),
-      mod_rql_button_ui(ns("doc_delete_ui"),
+      mod_rql_button_ui(
+        ns("doc_delete_ui"),
         label = "Delete document",
         icon = "minus"
       ),
@@ -51,7 +54,6 @@ mod_doc_manager_server <- function(id, glob) {
       }
     })
 
-
     #---Create doc UI --------------
     mod_rql_button_server(
       id = "doc_create_ui",
@@ -78,7 +80,6 @@ mod_doc_manager_server <- function(id, glob) {
       glob,
       permission = "data_modify"
     )
-
 
     # list documents initially ----
     observeEvent(glob$active_project, {
@@ -107,8 +108,10 @@ mod_doc_manager_server <- function(id, glob) {
     # observe documents actions ----
     # document input ----
     observeEvent(input$doc_add, {
-      if ((!req(input$doc_name) %in% c("", names(glob$documents))) &
-        isTruthy(input$doc_text)) {
+      if (
+        (!req(input$doc_name) %in% c("", names(glob$documents))) &
+          isTruthy(input$doc_text)
+      ) {
         add_input_document(
           pool = glob$pool,
           project = glob$active_project,
@@ -131,15 +134,18 @@ mod_doc_manager_server <- function(id, glob) {
 
         updateTextInput(
           session = session,
-          "doc_name", value = ""
+          "doc_name",
+          value = ""
         )
         updateTextAreaInput(
           session = session,
-          "doc_description", value = ""
+          "doc_description",
+          value = ""
         )
         updateTextAreaInput(
           session = session,
-          "doc_text", value = ""
+          "doc_text",
+          value = ""
         )
         shinyWidgets::updatePickerInput(
           session = session,
@@ -147,7 +153,9 @@ mod_doc_manager_server <- function(id, glob) {
           choices = glob$documents
         )
       } else {
-        warn_user("Documents need to have a content and their names must be unique.")
+        warn_user(
+          "Documents need to have a content and their names must be unique."
+        )
       }
     })
 
@@ -185,16 +193,23 @@ mod_doc_manager_server <- function(id, glob) {
 
     observeEvent(input$doc_upload_add, {
       if (
-
-        ((!input$doc_upload_name %in% c("", names(glob$documents))) & !is.null(input$doc_path)) |
-          (!is.null(input$doc_path) && (!input$doc_path[["name"]] %in% names(glob$documents)))) {
+        ((!input$doc_upload_name %in% c("", names(glob$documents))) &
+          !is.null(input$doc_path)) |
+          (!is.null(input$doc_path) &&
+            (!input$doc_path[["name"]] %in% names(glob$documents)))
+      ) {
         if (isTruthy(input$doc_path[["datapath"]])) {
-          doc_upload_text <- paste0(readLines(input$doc_path[["datapath"]]), collapse = "\n")
+          doc_upload_text <- paste0(
+            readLines(input$doc_path[["datapath"]], encoding = input$encoding),
+            collapse = "\n"
+          )
 
           if (input$encoding != "UTF-8") {
-            doc_upload_text <- iconv(doc_upload_text,
+            doc_upload_text <- iconv(
+              doc_upload_text,
               from = input$encoding,
-              to = "UTF-8", sub = ""
+              to = "UTF-8",
+              sub = ""
             )
           }
 
@@ -221,15 +236,10 @@ mod_doc_manager_server <- function(id, glob) {
             }
           )
 
-
-
-
-
-
-
-
           if (add_document == "failed") {
-            warn_user("The uploaded document produced errors. Delete the document and upload it again with correctly set encoding.")
+            warn_user(
+              "The uploaded document produced errors. Delete the document and upload it again with correctly set encoding."
+            )
           }
 
           output$doc_list_table <- make_doc_table(
@@ -260,12 +270,15 @@ mod_doc_manager_server <- function(id, glob) {
           )
           updateTextAreaInput(
             session = session,
-            "doc_upload_description", value = ""
+            "doc_upload_description",
+            value = ""
           )
           shinyjs::reset("doc_path")
         }
       } else {
-        warn_user("Documents need to have a content and their names must be unique.")
+        warn_user(
+          "Documents need to have a content and their names must be unique."
+        )
         shinyjs::reset("doc_path")
       }
     })

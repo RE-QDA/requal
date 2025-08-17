@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-Assisted Qualitative Data Analysis
-Version: 1.2.1.9001
+Version: 1.2.3
 Authors@R:
     c(
      person(given = "Radim",
@@ -78,3 +78,5 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Language: en-US
+URL: https://github.com/RE-QDA/requal
+BugReports: https://github.com/RE-QDA/requal/issues
