@@ -107,14 +107,20 @@ mod_codebook_server <- function(id, glob) {
           glob,
           permission = "codebook_modify"
         )
-  output$codes_ui <- renderUI({
-      render_codes_hierarchy(
-        active_project = glob$active_project,
-        pool = glob$pool, 
-        user = glob$user
-      )
-    })
-})
+
+        #---Codebook display --------------
+        glob$codebook <- list_db_codes(
+          glob$pool,
+          glob$active_project,
+          glob$user
+        )
+        output$codes_ui <- renderUI({
+          render_codes_hierarchy(
+            active_project = glob$active_project,
+            pool = glob$pool,
+            user = glob$user
+          )
+        })
   
         #---Merge code UI --------------
         mod_rql_button_server(
@@ -178,19 +184,6 @@ mod_codebook_server <- function(id, glob) {
           permission = TRUE
         )
 
-        #---Codebook display --------------
-        glob$codebook <- list_db_codes(
-          glob$pool,
-          glob$active_project,
-          glob$user
-        )
-        output$codes_ui <- renderUI({
-          render_codes(
-            active_project = glob$active_project,
-            pool = glob$pool,
-            user = glob$user
-          )
-        })
       }
     )
 
