@@ -17,7 +17,11 @@
   - refactored generation of valid html for transcript
   - more metadata included in displayed transcripts
 - Contextual help
-  - functionality to display contextual help 
+  - functionality to display contextual help
+- Fixed bugs
+  - foreign keys now enforced in SQLite
+  - default document encoding is now processed explicitly
+  - other minor fixes
 
 # requal 1.1.3 Rieppeleon
 
