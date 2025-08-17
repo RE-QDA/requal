@@ -1,3 +1,16 @@
+#launchpad_icon{
+  margin-right: 10px;
+  color: white;
+  animation-name: launchpad-animation;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+}
+
+@keyframes launchpad-animation {
+  from {color: white;}
+  to {color: red;}
+}
+
 .custom_label {
   color: black !important;
 }
@@ -10,6 +23,16 @@
     border: none;
     height:80vh;
     overflow-y:scroll;
+    margin-right: 15px;
+}
+.scrollable80#document_code_ui_1-code_list {
+  margin-right: 0px;
+  scrollbar-width: none;
+}
+[data-value="codetools_tabset"],
+[data-value="memotools_tabset"] {
+  max-height: 80vh;
+  scrollbar-width: none;
 }
 .scrollable90{
     border: none;
@@ -59,26 +82,32 @@ white-space: nowrap;
 vertical-align: baseline;
 border-radius: .25em;
 background-color: white;
+max-width: 50%;
+text-wrap: wrap;
 }
 
 article {
   counter-reset: paragraph; /* Initialize the counter for paragraphs */
-  padding-left: 45px; /* Create space for the line numbers */
+  padding-left: 70px; /* Create space for the line numbers */
+  padding-right: 10px;
   position: relative; /* Position relative for absolute positioning of numbers */
 }
-p.docpar {
+.docpar_wrap {
   margin: 0px 0px 5px 0px;
   position: relative;
   counter-increment: paragraph; /* Increment the counter for each paragraph */
+  font-size: 110%; 
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
-p.docpar::before {
+.docpar_wrap::before {
   content: counter(paragraph); /* Display the current counter value */
   position: absolute;
   left: -45px; /* Negative offset to place numbers in the padding area */
-  width: 30px; /* Fixed width for alignment */
-  text-align: right; /* Align numbers to the right */
-  font-family: 'Courier New', Courier, monospace; /* Specify a monospace font */
-  color: #959595; /* Style the numbers */
+  min-width: 30px; /* Fixed width for alignment */
+  text-align: right; 
+  font-family: 'Courier New', Courier, monospace; 
+  color: #959595; 
   pointer-events: none; /* Prevent interaction */
   user-select: none; /* Prevent selection */
 }
@@ -87,15 +116,6 @@ p.docpar::before {
   height: 0px;
   width: 0px;
 }
-
-b.segment {
-  font-weight: normal;
-  text-decoration-thickness: 5px !important; 
-  text-underline-offset: 3px !important;
-}
-
-
-
 
 .category-rank-list {
 -webkit-border-radius: 1px;
@@ -127,13 +147,17 @@ margin-right: 0px !important;
 margin-bottom: 5px !important; 
 }
 
-.memo ul {
+.box .box-title {
+  padding-right: 70px;
+}
+
+.free_memo ul {
 left: auto !important;
 right: 0 !important;
 width: 375px;
 }
 
-#btn-memo > ul > li > ul > div {
+#btn-free_memo > ul > li > ul > div {
 margin-left: -20px !important;
 margin-right: auto !important; 
 width: 100% !important;  
@@ -182,9 +206,6 @@ width: 100% !important;
 }
 
 .split > #split-1 {
-  padding-top: 5px !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
   background-color: #ffffff !important;
 }
 .gutter {
@@ -205,25 +226,9 @@ padding: 0px;
 margin-left: -0.3em;
 margin-right: -0.3em;
 display: flex;
+position: relative;
 }
 
-.docpar::selection {
-  background: rgba(255, 223, 0, 0.75); /* A more contrasting yellow */
-  color: black;
-  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: red;
-}
-
-.docpar b::selection {
-  background: rgba(255, 223, 0, 0.5); /* A more contrasting yellow with some transparency */
-  color: black;
-  text-decoration: underline; /* Fallback for browsers that don't support advanced styles */
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: red;
-}
 
 .quickcode {
   height: calc(1.5em + .75rem + 2px);
@@ -234,3 +239,110 @@ display: flex;
     display: grid;
     grid-template-columns: 1fr 1fr; /* Creates two columns of equal width */
    }
+
+/* stretch default shiny widgets */
+  .full-width {
+    width: 100% !important;
+  }
+
+/* Style for the document selection row */
+.doc_sel_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: #ecf0f5;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+/* Styles for advanced toolbox */
+.toolbox-button {
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  font-size:10px;
+  margin-bottom: 5px;
+}
+.toolbox-button:hover,
+.toolbox-button:focus {
+  background: #ccccc333;
+}
+.toolbox-button:focus:not(:hover) {
+  background: transparent; 
+}
+
+.code-menu-extra {
+  background: transparent;
+  border: none;
+  position: absolute;
+  margin-left: -21px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: silver; 
+}
+.code-menu-extra:hover {
+  background: transparent;
+  border: none;
+}
+.code-menu-extra:click {
+  background: transparent;
+}
+
+/* Styles for in-text highlights */
+
+.background {
+  background-color: var(--code-color);
+}
+.background::selection {
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
+}
+
+.underline {
+  text-decoration: underline;
+  text-decoration-color: var(--code-color);
+  text-decoration-thickness: 5px; 
+  text-underline-offset: 4px;
+}
+
+.memo_highlight {
+  background-color: rgb(255, 255, 140); 
+}
+
+.docpar::selection,
+.docpar span::selection  {
+  background: rgb(0, 0, 0); 
+  color: white;
+}
+
+
+@keyframes highlightFade {
+  0% {
+    background-color: silver;
+  }
+  25% {
+    background-color: rgb(250, 250, 150);
+  }
+  50% {
+    background-color: silver;
+  }
+  75% {
+    background-color: rgb(250, 250, 150);
+  }
+  100% {
+    background-color: var(--code-color);
+  }
+}
+
+.highlight-effect {
+  animation: highlightFade 2s ease-out forwards;
+}

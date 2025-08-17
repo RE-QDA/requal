@@ -50,7 +50,7 @@ load_segments_analysis <- function(pool,
 
 
 
-format_segments <- function(segment_start, segment_text, segment_document_id, segment_document_name, segment_code, segment_color) {
+format_segments <- function(segment_id, segment_text, segment_document_id, segment_document_name, segment_code, segment_color) {
 
 
   tags$div(
@@ -60,8 +60,8 @@ format_segments <- function(segment_start, segment_text, segment_document_id, se
 
 tags$div(
   tags$div(class = "segment_badge",
-       actionLink(paste0("segment_start-", segment_start), label = segment_document_name, 
-       onclick =  paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_start: ", segment_start, "}, {priority: 'event'});")
+       actionLink(paste0("segment_id-", segment_id), label = segment_document_name, 
+       onclick =  paste0("Shiny.setInputValue('analyze_link', {tab_menu: 'Annotate', doc_id: ", segment_document_id,", segment_id: ", segment_id, "}, {priority: 'event'});")
       )
        ),
 

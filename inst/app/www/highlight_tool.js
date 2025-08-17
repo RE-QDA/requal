@@ -1,165 +1,244 @@
+// $(document).ready(function() {
+//   Shiny.addCustomMessageHandler('highlightSegments', function(message) {
+//     const processSegments = (elements, styleType) => {
+//       elements.forEach(segment_coded => {
+//         const colors = segment_coded.getAttribute('data-color').split(' | ');
+//         const color = averageColor(colors);
+//         // console.log('Style Type:', styleType);
+//         // console.log('Colors:', colors);
+//         // console.log('Computed Color:', color);
 
-Shiny.addCustomMessageHandler('wrapTextWithBold', function(message) {
-    const startOffset = message.startOffset;
-    const endOffset = message.endOffset;
-    const newId = message.newId;
-    const color = message.color;
-    const title = message.title;
-    wrapTextWithBold(startOffset, endOffset, newId, color, title);
-  });
-  
-  
-  function wrapTextWithBold(startOffset, endOffset, newId, color, title) {
-    const container = document.querySelector('#article');
-    if (!container) {
-      console.error("Container not found");
-      return;
-    }
-  
-    let globalOffset = 0;
-  
-    Array.from(container.childNodes).forEach((p) => {
-      if (p.nodeType === Node.ELEMENT_NODE && p.tagName.toLowerCase() === 'p') {
-        let plainText = '';
-        let bTagPositions = [];
-        Array.from(p.childNodes).forEach(child => {
-          if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'b') {
-            bTagPositions.push({pos: plainText.length, type: 'start', id: child.id, color: child.getAttribute('data-color'), title: child.title});
-            plainText += child.textContent;
-            bTagPositions.push({pos: plainText.length, type: 'end', id: child.id});
-          } else if (child.nodeType === Node.TEXT_NODE) {
-            plainText += child.textContent;
-          }
-        });
-  
-        if (globalOffset <= endOffset && globalOffset + plainText.length >= startOffset) {
-          const paragraphStart = Math.max(startOffset - globalOffset, 0);
-          const paragraphEnd = Math.min(endOffset - globalOffset, plainText.length);
-          bTagPositions.push({pos: paragraphStart, type: 'start', id: newId, color: color, title: title});
-          bTagPositions.push({pos: paragraphEnd, type: 'end', id: newId});
-        }
-  
-        bTagPositions.sort((a, b) => a.pos - b.pos || (a.type === 'end' ? -1 : 1));
-  
-        let finalBTagPositions = [];
-        let openTags = [];
-        let openColors = [];
-        let openTitles = [];
-        for (let i = 0; i < bTagPositions.length - 1; i++) {
-          if (bTagPositions[i].type === 'start') {
-            openTags.push(bTagPositions[i].id);
-            openColors.push(bTagPositions[i].color);
-            openTitles.push(bTagPositions[i].title);
-          } else {
-            const index = openTags.indexOf(bTagPositions[i].id);
-            openTags.splice(index, 1);
-            openColors.splice(index, 1);
-            openTitles.splice(index, 1);
-          }
-          if (bTagPositions[i].pos !== bTagPositions[i+1].pos && openTags.length > 0) {
-            let avgColor = "rgb(0,0,0)";
-            if (openColors.length > 0) {
-              let r = 0, g = 0, b = 0;
-              openColors.forEach(color => {
-                let match = color.match(/\d+/g);
-                r += parseInt(match[0]);
-                g += parseInt(match[1]);
-                b += parseInt(match[2]);
-              });
-              r = Math.round(r / openColors.length);
-              g = Math.round(g / openColors.length);
-              b = Math.round(b / openColors.length);
-              avgColor = `rgb(${r},${g},${b})`;
-            }
-            finalBTagPositions.push({start: bTagPositions[i].pos, end: bTagPositions[i+1].pos, id: openTags.join('+'), color: avgColor, title: openTitles.join(' | ')});
-          }
-        }
-  
-        p.innerHTML = '';
-        let currentOffset = 0;
-        finalBTagPositions.forEach((position) => {
-          if (position.start !== position.end) {
-            const before = document.createTextNode(plainText.slice(currentOffset, position.start));
-            const middle = document.createElement('b');
-            middle.id = position.id;
-            middle.title = position.title;
-            middle.setAttribute('data-color', position.color);
-            middle.classList.add('segment'); 
-            middle.textContent = plainText.slice(position.start, position.end);
-            middle.setAttribute('onclick', "Shiny.setInputValue('document_code_ui_1-clicked_title', this.title, {priority: 'event'});");
-            p.appendChild(before);
-            p.appendChild(middle);
-            currentOffset = position.end;
-          }
-        });
-        const after = document.createTextNode(plainText.slice(currentOffset));
-        p.appendChild(after);
-  
-        globalOffset += plainText.length;
-      }
-    });
-  }
-  // // Auxiliary function to add highlight in the browser
-  // $( document ).ready(function() {
-  //   Shiny.addCustomMessageHandler('highlight', function(message) {
-  //     var startOff = message.startOff;
-  //     var endOff = message.endOff;
-  //     console.log(startOff)
-  //     console.log(endOff)
-  //     wrapSelection(startOff, endOff);
-  //   })
-  // });
-  
-  // function wrapSelection(startOffset, endOffset) {
-  //   let currentOffset = 0;
-  
-  //   function traverse(node) {
-  //       if (node.nodeType === Node.TEXT_NODE) {
-  //           const textLength = node.textContent.length;
-  
-  //           // If the startOffset is within this text node
-  //           if (startOffset >= currentOffset && startOffset < currentOffset + textLength) {
-  //               const start = startOffset - currentOffset;
-  //               const before = node.textContent.slice(0, start);
-  //               const after = node.textContent.slice(start);
-  //               const newNode = document.createElement('b');
-  //               newNode.textContent = after;
-  //               node.textContent = before;
-  //               node.parentNode.insertBefore(newNode, node.nextSibling);
-  //           }
-  
-  //           // If the endOffset is within this text node
-  //           if (endOffset > currentOffset && endOffset <= currentOffset + textLength) {
-  //               const end = endOffset - currentOffset;
-  //               const boldNode = node.nextSibling;
-  //               const before = boldNode.textContent.slice(0, end);
-  //               const after = boldNode.textContent.slice(end);
-  //               const newNode = document.createTextNode(after);
-  //               boldNode.textContent = before;
-  //               boldNode.parentNode.insertBefore(newNode, boldNode.nextSibling);
-  //           }
-  
-  //           currentOffset += textLength;
-  //       } else {
-  //           for (let child of node.childNodes) {
-  //               traverse(child);
-  //           }
-  //       }
-  //   }
-  
-  //   traverse(document.querySelector('article'));
-  // }
-  
-  // <article id="article">
-  // <p id = "1">Text <b id="1">of</b> paragraph 1</p>
-  // <p id = "2">Text of paragraph 2</p>
-  // <p id = "3">Text of paragraph 3</p>
-  // <p id = "4">Text of paragraph 4</p>
-  // </article>
-  
-  // <article id="article">
-  // <p id = "1"><b id = "2">Text </b><b id="1+2">of</b><b id="2"> paragraph 1</b></p>
-  // <p id = "2"><b id = "2">Text of paragraph 2</b></p>
-  // <p id = "3"><b id = "2">Text</b> of paragraph 3</p>
-  // <p id = "4">Text of paragraph 4</p>
-  // </article>
+//         if (styleType === 'underline') {
+//           segment_coded.style.textDecoration = `underline ${color}`;
+//           segment_coded.style.backgroundColor = ''; // Clear background if previously set
+//         } else {
+//           segment_coded.style.backgroundColor = color;
+//           segment_coded.style.textDecoration = ''; // Clear underline if previously set
+//         }
+//       });
+//     };
+
+//     const ids = Array.isArray(message.ids) ? message.ids : [message.ids]; // Ensure ids is an array
+
+//     const targetNode = document.getElementById("article");
+
+//     const observer = new MutationObserver((mutationsList, observer) => {
+//       ids.forEach(id => {
+//         const container = document.getElementById(id);
+//         if (container) {
+//           const segments = container.querySelectorAll('.segment-coded');
+//           if (segments.length > 0) {
+//             // console.log(`Segments found in #${id}:`, segments.length);
+//             processSegments(segments, message.styleType || 'background');
+//             observer.disconnect(); // Stop observing once the elements are processed
+//           }
+//         } else {
+//           console.log(`Container with ID #${id} not found.`);
+//         }
+//       });
+//     });
+
+//     // Start observing the document body for changes
+//     observer.observe(targetNode, { childList: true, attributes: true, subtree: true });
+//   });
+// });
+
+// function averageColor(colors) {
+//   const rgbColors = colors.map(color => {
+//     const matches = color.match(/\d+/g);
+//     return matches ? matches.map(Number) : [0, 0, 0];
+//   });
+
+//   const avgColor = rgbColors.reduce((acc, color) => {
+//     return acc.map((value, index) => value + color[index]);
+//   }, [0, 0, 0]).map(value => Math.round(value / colors.length));
+
+//   return `rgb(${avgColor.join(',')})`;
+// }
+
+
+// function averageColor(colors) {
+//   const rgbColors = colors.map(color => {
+//       const matches = color.match(/\d+/g);
+//       // console.log(matches);
+//       return matches ? matches.map(Number) : [0, 0, 0];
+//   });
+
+//   const avgColor = rgbColors.reduce((acc, color) => {
+//       return acc.map((value, index) => value + color[index]);
+//   }, [0, 0, 0]).map(value => Math.round(value / colors.length));
+
+//   return `rgb(${avgColor.join(',')})`;
+// }
+
+
+
+// // Add code
+// //function (startOffset, endOffset, newId, color, title) {
+
+// Shiny.addCustomMessageHandler('AddCode', function(message) {
+//   const startOffset = message.startOffset;
+//   const endOffset = message.endOffset;
+//   const newId = message.newId;
+//   const color = message.color;
+//   const title = message.title;
+//   AddCode(startOffset, endOffset, newId, color, title);
+// });
+
+// function AddCode(startOffset, endOffset, newId, color, title) {
+//   // Convert R's 1-based indexing to JavaScript's 0-based indexing
+//   startOffset = startOffset - 1;
+//   endOffset = endOffset - 1;
+
+//   const paragraphs = document.querySelectorAll('.docpar');
+
+//   paragraphs.forEach((paragraph) => {
+//     const [paraStart, paraEnd] = paragraph.getAttribute('data-startend').split(' ').map(num => Number(num) - 1); // Convert to 0-based
+    
+//     if (endOffset >= paraStart && startOffset <= paraEnd) {
+//       // Step 1: Collect all text and existing styles
+//       let fullText = '';
+//       const charStyles = new Array(paraEnd - paraStart + 1).fill().map(() => ({
+//         colors: new Set(),
+//         titles: new Set(),
+//         codes: new Set()
+//       }));
+
+//       // First collect the full text content
+//       const textNodes = [];
+//       let currentPos = 0;
+      
+//       paragraph.childNodes.forEach(node => {
+//         if (node.nodeType === Node.TEXT_NODE || (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'SPAN' && !node.classList.contains('br'))) {
+//           const text = node.textContent;
+//           if (node.nodeType === Node.ELEMENT_NODE) {
+//             const [spanStart, spanEnd] = node.getAttribute('data-startend').split(' ').map(num => Number(num) - 1);
+//             const relativeStart = spanStart - paraStart;
+            
+//             // Fill any gaps
+//             while (currentPos < relativeStart) {
+//               fullText += ' ';
+//               currentPos++;
+//             }
+            
+//             fullText += text;
+//             currentPos = spanEnd - paraStart;
+
+//             // Add existing styles
+//             if (node.getAttribute('data-color')) {
+//               const colors = node.getAttribute('data-color').split(' | ');
+//               const titles = node.title ? node.title.split(' | ') : [];
+//               const codes = node.getAttribute('data-codes') ? node.getAttribute('data-codes').split(' | ') : [];
+              
+//               for (let i = relativeStart; i < spanEnd - paraStart; i++) {
+//                 colors.forEach(c => charStyles[i].colors.add(c));
+//                 titles.forEach(t => charStyles[i].titles.add(t));
+//                 codes.forEach(c => charStyles[i].codes.add(c));
+//               }
+//             }
+//           } else {
+//             fullText += text;
+//             currentPos += text.length;
+//           }
+//         }
+//       });
+
+//       // Add new highlight
+//       const relativeStart = Math.max(0, startOffset - paraStart);
+//       const relativeEnd = Math.min(charStyles.length, endOffset - paraStart + 1);
+      
+//       for (let i = relativeStart; i < relativeEnd; i++) {
+//         charStyles[i].colors.add(color);
+//         charStyles[i].titles.add(title);
+//         charStyles[i].codes.add(newId);
+//       }
+
+//       // Step 2: Create segments based on style changes
+//       const segments = [];
+//       let currentSegment = null;
+
+//       for (let i = 0; i < charStyles.length; i++) {
+//         const styleKey = JSON.stringify({
+//           colors: Array.from(charStyles[i].colors).sort(),
+//           titles: Array.from(charStyles[i].titles).sort(),
+//           codes: Array.from(charStyles[i].codes).sort()
+//         });
+
+//         if (!currentSegment || currentSegment.styleKey !== styleKey) {
+//           if (currentSegment) {
+//             segments.push(currentSegment);
+//           }
+//           currentSegment = {
+//             start: i,
+//             end: i + 1,
+//             styleKey,
+//             colors: Array.from(charStyles[i].colors),
+//             titles: Array.from(charStyles[i].titles),
+//             codes: Array.from(charStyles[i].codes)
+//           };
+//         } else {
+//           currentSegment.end = i + 1;
+//         }
+//       }
+//       if (currentSegment) {
+//         segments.push(currentSegment);
+//       }
+
+//       // Step 3: Rebuild the paragraph
+//       paragraph.innerHTML = '';
+      
+//       segments.forEach(segment => {
+//         const span = document.createElement('span');
+//         // Convert back to 1-based indexing for data-startend
+//         span.setAttribute('data-startend', 
+//           `${segment.start + paraStart + 1} ${segment.end + paraStart + 1}`
+//         );
+//         span.textContent = fullText.slice(segment.start, segment.end);
+
+//         if (segment.colors.length > 0) {
+//           span.className = 'segment code';
+//           span.setAttribute('data-color', segment.colors.join(' | '));
+//           // Use the most recently added color (last in sorted array)
+//           span.style.backgroundColor = segment.colors[segment.colors.length - 1];
+//           span.title = segment.titles.join(' | ');
+//           span.setAttribute('data-codes', segment.codes.join(' | '));
+//           span.setAttribute('onclick', 
+//             "Shiny.setInputValue('document_code_ui_1-clicked_title', this.title, {priority: 'event'});"
+//           );
+//         }
+
+//         paragraph.appendChild(span);
+//       });
+
+//       // Restore break span
+//       const brSpan = document.createElement('span');
+//       brSpan.className = 'br';
+//       brSpan.textContent = '​';
+//       paragraph.appendChild(brSpan);
+//     }
+//   });
+// }
+
+// Select the <article> element or any other parent element you want to limit the listener to
+// const articleElement = document.querySelector('article');
+
+// if (articleElement) {
+//   articleElement.addEventListener('click', (e) => {
+//     // Check if the clicked element is an <i> tag with the 'text_memo_btn' class
+//     if (e.target.tagName.toLowerCase() === 'i' && e.target.classList.contains('text_memo_btn')) {
+//       e.stopPropagation(); // Prevent the event from bubbling up to parent elements
+
+//       console.log('Clicked element:', e.target);
+//       console.log('Class list before toggle:', e.target.classList);
+
+//       e.target.classList.toggle('show-memo');
+
+//       console.log('Class list after toggle:', e.target.classList);
+
+//       // Optionally, send a message to Shiny if needed
+//       Shiny.setInputValue('document_code_ui_1-text_memo_click', e.target.id + ' ' + Math.random());
+//     }
+//   });
+// }
+
+
