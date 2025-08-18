@@ -91,6 +91,7 @@
   display: flex;
 }
 
+
 .unpin {
 	border: none;
 	background: transparent;
@@ -99,11 +100,17 @@
 	text-align: right;
 }
 
+.unpin:hover .unpin_btn {
+  visibility: visible;
+}
+
+
 .unpin_btn {
 	border: none;
 	background: transparent;
 	padding-top: 10px;
   outline: none; 
+  visibility: hidden;
 }
 
 .unpin_btn:hover,
@@ -113,8 +120,8 @@
   background: transparent;
   padding-top: 10px;
   outline: none;
+  visibility: visible
 }
-
 
 .inner_pin {
   background-color: rgb(255, 255, 120);
