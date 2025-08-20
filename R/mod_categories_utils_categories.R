@@ -27,6 +27,7 @@ gen_categories_ui <- function(
             collapsible = TRUE,
             collapsed = TRUE,
             label = NULL,
+            class = "category_subcontainer",
             sortable::rank_list(
                 input_id = glue::glue(ns("category_list_{category_id}")),
                 text = NULL,
@@ -401,18 +402,34 @@ expand_categories <- function(session) {
 
     shinyjs::removeClass(
         class = "collapsed-box",
-        selector = paste0("#", ns_id, " .category-container > div > .box")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container .box:not(.category_subcontainer .box)"
+        )
     )
     shinyjs::show(
-        selector = paste0("#", ns_id, " .category-container > div > .box-body")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container .box-body:not(.category_subcontainer .box-body)"
+        )
     )
     shinyjs::removeClass(
-        class = "fa-plus",
-        selector = paste0("#", ns_id, " .category-container > div > .box i")
+        class = "fa-minus fa-plus",
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container  .box-header:not(.category_subcontainer .box-header) i:nth-child(1)"
+        )
     )
     shinyjs::addClass(
         class = "fa-minus",
-        selector = paste0("#", ns_id, " .category-container > div > .box i")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container   .box-header:not(.category_subcontainer .box-header) i:nth-child(1)"
+        )
     )
 
     updateActionButton(
@@ -427,18 +444,34 @@ collapse_categories <- function(session) {
 
     shinyjs::addClass(
         class = "collapsed-box",
-        selector = paste0("#", ns_id, " .category-container > div > .box")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container .box:not(.category_subcontainer .box)"
+        )
     )
     shinyjs::hide(
-        selector = paste0("#", ns_id, " .category-container > div > .box-body")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container .box-body:not(.category_subcontainer .box-body)"
+        )
     )
     shinyjs::removeClass(
-        class = "fa-minus",
-        selector = paste0("#", ns_id, " .category-container > div > .box i")
+        class = "fa-minus fa-plus",
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container  .box-header:not(.category_subcontainer .box-header) i:nth-child(1)"
+        )
     )
     shinyjs::addClass(
         class = "fa-plus",
-        selector = paste0("#", ns_id, " .category-container > div > .box i")
+        selector = paste0(
+            "#",
+            ns_id,
+            " .category-container  .box-header:not(.category_subcontainer .box-header) i:nth-child(1)"
+        )
     )
 
     updateActionButton(
