@@ -358,7 +358,10 @@ expand_codes_cat <- function(session) {
         class = "collapsed-box",
         selector = paste0("#", ns_id, " .code_item .box")
     )
-    shinyjs::show(selector = paste0("#", ns_id, " .code_item .box-body"))
+    shinyjs::show(
+        selector = paste0("#", ns_id, " .code_item .box-body"),
+        anim = TRUE
+    )
     shinyjs::removeClass(
         class = "fa-plus",
         selector = paste0("#", ns_id, " .code_item .fa-plus")
@@ -413,7 +416,8 @@ expand_categories <- function(session) {
             "#",
             ns_id,
             " .category-container .box-body:not(.category_subcontainer .box-body)"
-        )
+        ),
+        anim = TRUE
     )
     shinyjs::removeClass(
         class = "fa-minus fa-plus",

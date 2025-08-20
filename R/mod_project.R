@@ -19,18 +19,18 @@ mod_project_ui <- function(id) {
         tagList(
           fluidRow(
             class = "module_tools",
-            div(
-              mod_rql_button_ui(ns("project_edit_tool"),
-                label = "Edit project",
-                icon = "edit",
-                inputId = ns("project_edit_menu")
-              )
-            ) %>% tagAppendAttributes(style = "padding-right: 25px;"),
-            div(mod_rql_button_ui(ns("project_delete_tool"),
+            mod_rql_button_ui(
+              ns("project_edit_tool"),
+              label = "Edit project",
+              icon = "edit",
+              inputId = ns("project_edit_menu")
+            ),
+            mod_rql_button_ui(
+              ns("project_delete_tool"),
               label = "Delete project",
               icon = "trash",
               inputId = ns("project_delete_menu")
-            )) %>% tagAppendAttributes(style = "padding-right: 25px;") #,
+            )
             #mod_rql_button_ui(ns("project_import_tool"),
             #  label = "Import project",
             #  icon = "file-import",
@@ -93,8 +93,10 @@ mod_project_server <- function(id, glob) {
 
     observeEvent(loc$project_df, {
       loc$project_name <- loc$project_df %>% dplyr::pull(project_name)
-      loc$project_description <- loc$project_df %>% dplyr::pull(project_description)
-      loc$project_date <- format(loc$project_df %>% dplyr::pull(created_at),
+      loc$project_description <- loc$project_df %>%
+        dplyr::pull(project_description)
+      loc$project_date <- format(
+        loc$project_df %>% dplyr::pull(created_at),
         format = "%Y-%m-%d %H:%M:%S"
       )
     })
@@ -105,8 +107,16 @@ mod_project_server <- function(id, glob) {
       id = "project_edit_tool",
       custom_title = "Edit project",
       custom_tagList = tagList(
-        textInput(ns("project_edit_name"), "Project name", value = loc$project_name),
-        textAreaInput(ns("project_edit_description"), "Project description", value = loc$project_description),
+        textInput(
+          ns("project_edit_name"),
+          "Project name",
+          value = loc$project_name
+        ),
+        textAreaInput(
+          ns("project_edit_description"),
+          "Project description",
+          value = loc$project_description
+        ),
         actionButton(ns("project_edit_save"), "Save")
       ),
       glob,
@@ -119,9 +129,12 @@ mod_project_server <- function(id, glob) {
       if (input$project_edit_name != loc$project_name) {
         res <- DBI::dbExecute(
           glob$pool,
-          glue::glue_sql("UPDATE projects
+          glue::glue_sql(
+            "UPDATE projects
                  SET project_name = {input$project_edit_name}
-                 WHERE project_id = {active_project}", .con = glob$pool)
+                 WHERE project_id = {active_project}",
+            .con = glob$pool
+          )
         )
         updateTextInput(
           session = session,
@@ -132,9 +145,12 @@ mod_project_server <- function(id, glob) {
       if (input$project_edit_description != loc$project_description) {
         res <- DBI::dbExecute(
           glob$pool,
-          glue::glue_sql("UPDATE projects
+          glue::glue_sql(
+            "UPDATE projects
                  SET project_description = {input$project_edit_description}
-                 WHERE project_id = {active_project}", .con = glob$pool)
+                 WHERE project_id = {active_project}",
+            .con = glob$pool
+          )
         )
         updateTextInput(
           session = session,
@@ -145,7 +161,11 @@ mod_project_server <- function(id, glob) {
 
       loc$project_df <- dplyr::tbl(glob$pool, "projects") %>%
         dplyr::filter(project_id == local(as.integer(glob$active_project)))
-      shinyjs::removeClass(paste0("sw-content-", ns("project_edit_menu")), "sw-show", asis = TRUE)
+      shinyjs::removeClass(
+        paste0("sw-content-", ns("project_edit_menu")),
+        "sw-show",
+        asis = TRUE
+      )
       showNotification("Changes to project were saved.")
     })
 
@@ -154,7 +174,11 @@ mod_project_server <- function(id, glob) {
       id = "project_delete_tool",
       custom_title = "Delete project",
       custom_tagList = tagList(
-        actionButton(ns("project_edit_delete"), "Delete project", class = "btn-danger")
+        actionButton(
+          ns("project_edit_delete"),
+          "Delete project",
+          class = "btn-danger"
+        )
       ),
       glob,
       permission = "project_owner"
@@ -164,13 +188,16 @@ mod_project_server <- function(id, glob) {
       showModal(
         modalDialog(
           title = "Are you sure?",
-            tags$span("You are about to delete the project",
+          tags$span(
+            "You are about to delete the project",
             tags$b(loc$project_name),
-            "and lose all data associated with it!"),
+            "and lose all data associated with it!"
+          ),
           easyClose = TRUE,
           footer = tagList(
             modalButton("Dismiss"),
-            actionButton(ns("confirmation"),
+            actionButton(
+              ns("confirmation"),
               "Yes, I am sure.",
               class = "btn-danger"
             )
@@ -183,7 +210,8 @@ mod_project_server <- function(id, glob) {
     observeEvent(input$confirmation, {
       res <- DBI::dbExecute(
         glob$pool,
-        glue::glue_sql("DELETE from projects
+        glue::glue_sql(
+          "DELETE from projects
                    WHERE project_id IN ({glob$active_project})",
           .con = glob$pool
         )
