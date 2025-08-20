@@ -55,13 +55,29 @@ mod_codebook_ui <- function(id) {
           class = "module_content",
           column(
             width = 10,
-            br(),
-            actionButton(
-              ns("toggle_all_codes"),
-              label = NULL,
-              icon = icon("expand-arrows-alt"),
-              title = "Expand/Collapse",
-              style = "color: silver; background: none; border: none; padding: 0; margin: 0;"
+            div(
+              style = "max-width: 500px;",
+              mod_rql_hidden_ui_ui(
+                ns("rql_hidden_codetools"),
+                title = "Toggle extra tools",
+                hidden_tags = tagList(
+                  div(
+                    class = "extra_tools",
+                    textInput(
+                      ns("code_search"),
+                      label = NULL,
+                      value = "",
+                      placeholder = "Search codes",
+                    ),
+                    actionButton(
+                      ns("toggle_all_codes"),
+                      label = NULL,
+                      icon = icon("expand-arrows-alt"),
+                      title = "Expand/Collapse all"
+                    )
+                  )
+                )
+              )
             ),
             uiOutput(
               ns("codes_ui")
@@ -186,6 +202,19 @@ mod_codebook_server <- function(id, glob) {
 
       }
     )
+
+    #---Search and filter -------------
+    mod_rql_hidden_ui_server("rql_hidden_codetools")
+
+    observeEvent(input$code_search, {
+      filter_search(
+        search_term = input$code_search,
+        named_ids = stats::setNames(
+          glob$codebook$code_id,
+          glob$codebook$code_name
+        )
+      )
+    })
 
     #---Create new code------------------------------------------------------
     observeEvent(input$code_add, {

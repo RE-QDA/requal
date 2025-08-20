@@ -466,7 +466,10 @@ expand_codes <- function(session) {
         class = "collapsed-box",
         selector = paste0("#", ns_id, " .code_item .box")
     )
-    shinyjs::show(selector = paste0("#", ns_id, " .code_item .box-body"))
+    shinyjs::show(
+        selector = paste0("#", ns_id, " .code_item .box-body"),
+        anim = TRUE
+    )
     shinyjs::removeClass(
         class = "fa-plus",
         selector = paste0("#", ns_id, " .code_item .fa-plus")
@@ -502,5 +505,49 @@ collapse_codes <- function(session) {
         session,
         "toggle_all_codes",
         icon = icon("expand-arrows-alt")
+    )
+}
+
+#' Filter and show/hide elements based on text matching
+#'
+#' @param search_term Character string to search for (can be NULL or empty)
+#' @param named_ids Named vector where names are searchable text and values are element IDs
+#' @param remove_ui_selector Optional character string - UI element to remove (e.g., "#code_extra_div")
+#' @param case_sensitive Logical - whether search should be case sensitive (default: FALSE)
+#'
+filter_search <- function(
+    search_term,
+    named_ids,
+    remove_ui_selector = NULL,
+    case_sensitive = FALSE
+) {
+    # Remove UI element if specified
+    if (!is.null(remove_ui_selector)) {
+        removeUI(remove_ui_selector)
+    }
+
+    # Get all IDs
+    all_ids <- unname(named_ids)
+
+    # Build regex pattern
+    pattern <- if (case_sensitive) search_term else paste0("(?i)", search_term)
+
+    # Find matching names
+    matching_names <- stringr::str_detect(names(named_ids), pattern)
+
+    # Get matching and non-matching IDs
+    matched_ids <- unname(named_ids[matching_names])
+    non_matched_ids <- unname(named_ids[!matching_names])
+
+    # Hide non-matching elements
+    purrr::map(
+        non_matched_ids,
+        ~ shinyjs::hide(selector = paste0("#", .x))
+    )
+
+    # Show matching elements
+    purrr::map(
+        matched_ids,
+        ~ shinyjs::show(selector = paste0("#", .x))
     )
 }

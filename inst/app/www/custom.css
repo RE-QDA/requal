@@ -36,6 +36,13 @@
   max-height: 80vh;
   scrollbar-width: none;
 }
+
+.extra_tools {
+  display: flex; 
+  align-items: baseline;
+  gap: 10px;
+}
+
 .scrollable90{
     border: none;
     height:90vh;
