@@ -45,19 +45,22 @@
   color: black;
   font-size: small;
   padding: 10px;
-  min-width: 200px;
-  min-height: 200px;
-  margin-top: -3px;
+  min-width: 20vw;
+  min-height: 15vh;
+  margin-top: -15px;
+  margin-right: 10px;
   border-radius: 10px;
   user-select: none;
   font: initial;
   font-size: medium;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
-  max-width: 300px;
+  max-width: 40vw;
+  max-height: 30vh;
   border: 1px solid silver;
   z-index: 2;
   right: 0;
+  overflow-y: scroll;
 }
   
 .text_memo_btn:hover::after {
