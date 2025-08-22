@@ -16,3 +16,5 @@ Simply download and mount the [disk image file](https://owncloud.cesnet.cz/index
 As the Requal macOS app is not certified by Apple, you will be asked for a permission to open it when running for the first time. Go to `System Preferences` -> `Security & Privacy` and select  `Open Anyway` for `Requal.app`.
 
 This is still in experimental stage and we are providing the macOS app for beta-testing. We are curious to hear about your experience (both negative and positive) with running standalone Requal, e.g. in [Requal Discussions](https://github.com/RE-QDA/requal/discussions).
+
+Of course, if the standalone app is not working, you can always use Requal through the standard R installation.
