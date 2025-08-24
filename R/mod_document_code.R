@@ -461,6 +461,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$quickcode, {
       if (isTruthy(input$quickcode)) {
         removeUI("#code_extra_div")
+        # Backlight reset
+        loc$backlight_code_id <- NULL
         non_matched_codes <- loc$codebook %>%
           dplyr::filter(
             !stringr::str_detect(code_name, paste0("(?i)", input$quickcode))
@@ -513,8 +515,6 @@ mod_document_code_server <- function(id, glob) {
           1,
           (glob$codebook_observer + 1)
         )
-        # Backlight reset
-        loc$backlight_code_id <- NULL
         # Notify user
         rql_message(paste(input$quickcode, "added to codebook."))
         golem::invoke_js('refreshIframe', message = list())
