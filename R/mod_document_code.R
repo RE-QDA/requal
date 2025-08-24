@@ -513,6 +513,8 @@ mod_document_code_server <- function(id, glob) {
           1,
           (glob$codebook_observer + 1)
         )
+        # Backlight reset
+        loc$backlight_code_id <- NULL
         # Notify user
         rql_message(paste(input$quickcode, "added to codebook."))
         golem::invoke_js('refreshIframe', message = list())
