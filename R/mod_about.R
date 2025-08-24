@@ -12,9 +12,13 @@ mod_about_ui <- function(id) {
   # Citation info ----
   rql_citation <- utils::citation("requal")
   # Extract authors
-  authors <- sapply(as.character(rql_citation$author), function(x) strsplit(x, " ")) # Split the author names into first and last names
+  authors <- sapply(as.character(rql_citation$author), function(x) {
+    strsplit(x, " ")
+  }) # Split the author names into first and last names
   # Format the authors as "Last name, Initial."
-  formatted_authors <- sapply(authors, function(x) paste0(x[2], ", ", substr(x[1], 1, 1), "."))
+  formatted_authors <- sapply(authors, function(x) {
+    paste0(x[2], ", ", substr(x[1], 1, 1), ".")
+  })
   # Combine the authors into a single string
   author_string <- paste(formatted_authors, collapse = ", ")
   year <- rql_citation$year
@@ -22,13 +26,25 @@ mod_about_ui <- function(id) {
   version <- as.character(packageVersion("requal"))
   rql_url <- rql_citation$url
   # Construct the APA citation
-  apa_citation <- paste0(author_string, " (", year, "). ", tags$i(title), ". (Version ", version, "). &lt;", rql_url, "&gt;")
+  apa_citation <- paste0(
+    author_string,
+    " (",
+    year,
+    "). ",
+    tags$i(title),
+    ". (Version ",
+    version,
+    "). &lt;",
+    rql_url,
+    "&gt;"
+  )
   # UI starts here ----
   tagList(
     h2(
       tags$a(
-        href = "https://requal.fsv.cuni.cz/",
-        tags$img(src = "www/requal_logo.png", width = "5%"), target = "_blank"
+        href = "https://requal.app/",
+        tags$img(src = "www/requal_logo.png", width = "5%"),
+        target = "_blank"
       ),
       "requal CAQDAS"
     ),
@@ -37,11 +53,19 @@ mod_about_ui <- function(id) {
     p(),
     p(
       "For help, consult ",
-      a("requal Wiki", href = "https://github.com/RE-QDA/requal/wiki", target = "_blank"),
+      a(
+        "requal Wiki",
+        href = "https://github.com/RE-QDA/requal/wiki",
+        target = "_blank"
+      ),
       ".",
       br(),
       "Leave feedback on our ",
-      a("GitHub page", href = "https://github.com/RE-QDA/requal/issues", target = "_blank"),
+      a(
+        "GitHub page",
+        href = "https://github.com/RE-QDA/requal/issues",
+        target = "_blank"
+      ),
       "."
     ),
     p(),
@@ -66,7 +90,8 @@ mod_about_ui <- function(id) {
       )
     ),
     p("To cite package", tags$code("requal"), "in publications use:"),
-    HTML(apa_citation), p(),
+    HTML(apa_citation),
+    p(),
     p("A BibTeX entry for LaTeX users:"),
     tags$pre(paste(utils::toBibtex(utils::citation("requal")), collapse = "\n"))
   )
@@ -83,7 +108,9 @@ mod_about_server <- function(id, glob) {
       paste0(
         "The current project was created with requal version ",
         dplyr::tbl(glob$pool, "requal_version") %>%
-          dplyr::filter(.data$project_id == local(as.numeric(glob$active_project))) %>%
+          dplyr::filter(
+            .data$project_id == local(as.numeric(glob$active_project))
+          ) %>%
           dplyr::pull(version),
         "."
       )
@@ -92,7 +119,8 @@ mod_about_server <- function(id, glob) {
     output$version_package <- renderText({
       paste0(
         "The current version of requal package installed is ",
-        packageVersion("requal"), "."
+        packageVersion("requal"),
+        "."
       )
     })
   })

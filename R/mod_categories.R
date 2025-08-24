@@ -14,14 +14,11 @@ mod_categories_ui <- function(id) {
   tagList(
     fluidRow(
       class = "module_tools",
-      div(
-        mod_rql_button_ui(
-          ns("category_create"),
-          label = "Create category",
-          icon = "plus"
-        )
-      ) %>%
-        tagAppendAttributes(style = "padding-right: 25px;"),
+      mod_rql_button_ui(
+        ns("category_create"),
+        label = "Create category",
+        icon = "plus"
+      ),
       mod_rql_button_ui(
         ns("category_delete"),
         label = "Delete category",
