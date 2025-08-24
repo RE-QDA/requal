@@ -380,7 +380,7 @@ mod_codebook_server <- function(id, glob) {
       },
       content = function(file) {
         codebook <- get_codebook_export_table(glob)
-        utils::write.csv(codebook, file)
+        utils::write.csv(codebook, file, fileEncoding = "UTF-8")
       }
     )
 
