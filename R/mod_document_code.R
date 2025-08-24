@@ -661,18 +661,24 @@ mod_document_code_server <- function(id, glob) {
     })
 
     # Backlight ------
-    observeEvent(c(input$code_extra_backlight, loc$code_action_observer), {
-      if (button_is_on(req(input$code_extra_backlight))) {
-        if (!isTruthy(loc$backlight_code_id)) {
-          loc$backlight_observer <- 1
+    observeEvent(
+      c(
+        input$code_extra_backlight,
+        glob$segments_observer
+      ),
+      {
+        if (button_is_on(req(input$code_extra_backlight))) {
+          if (!isTruthy(loc$backlight_code_id)) {
+            loc$backlight_observer <- 1
+          } else {
+            loc$backlight_observer <- loc$backlight_observer + 1
+          }
+          loc$backlight_code_id <- paste0("code_id_", input$js_backlight_value)
         } else {
-          loc$backlight_observer <- loc$backlight_observer + 1
+          loc$backlight_code_id <- NULL
         }
-        loc$backlight_code_id <- paste0("code_id_", input$js_backlight_value)
-      } else {
-        loc$backlight_code_id <- NULL
       }
-    })
+    )
 
     observeEvent(c(loc$backlight_observer, loc$backlight_code_id), {
       if (isTruthy(loc$backlight_code_id)) {
