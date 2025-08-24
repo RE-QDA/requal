@@ -72,11 +72,13 @@
 .code_extra_backlight {
   background: none !important;
   color: black !important;
+  text-decoration-line: none !important;
 }
 
 .code_extra_frontlight {
   background: none !important;
   color: #bbb;
+  text-decoration-line: none !important;
 }
 
 .quote {
