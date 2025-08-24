@@ -64,6 +64,21 @@
   white-space: initial;
   text-overflow: initial;
 }
+
+.code_extra_btn{
+  padding: 3px;
+}
+
+.code_extra_backlight {
+  background: none !important;
+  color: black !important;
+}
+
+.code_extra_frontlight {
+  background: none !important;
+  color: #bbb;
+}
+
 .quote {
 font-size: medium;
 line-height: 1;
