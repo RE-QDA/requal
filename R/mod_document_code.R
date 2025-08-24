@@ -531,6 +531,7 @@ mod_document_code_server <- function(id, glob) {
     })
     observeEvent(req(input$close_code_extra_div), {
       removeUI("#code_extra_div")
+      loc$backlight_code_id <- NULL
     })
 
     # Segment removal ----------
@@ -642,35 +643,21 @@ mod_document_code_server <- function(id, glob) {
     })
 
     # Backlight ------
-
-    observeEvent(
-      c(input$code_extra_backlight, loc$code_action_observer),
-      {
-        if (button_is_on(req(input$code_extra_backlight))) {
-          if (!isTruthy(loc$backlight_code_id)) {
-            loc$backlight_observer <- 1
-          } else {
-            loc$backlight_observer <- loc$backlight_observer + 1
-          }
-          loc$backlight_code_id <- paste0("code_id_", input$js_backlight_value)
-          cat("Backlight ON: ", loc$backlight_code_id, "\n")
+    observeEvent(c(input$code_extra_backlight, loc$code_action_observer), {
+      if (button_is_on(req(input$code_extra_backlight))) {
+        if (!isTruthy(loc$backlight_code_id)) {
+          loc$backlight_observer <- 1
         } else {
-          loc$backlight_code_id <- NULL
-          # Reset the input value
-          golem::invoke_js(
-            "Shiny.setInputValue",
-            "js_backlight_value",
-            NULL
-          )
-          cat("Backlight OFF\n")
+          loc$backlight_observer <- loc$backlight_observer + 1
         }
+        loc$backlight_code_id <- paste0("code_id_", input$js_backlight_value)
+      } else {
+        loc$backlight_code_id <- NULL
       }
-    )
+    })
 
     observeEvent(c(loc$backlight_observer, loc$backlight_code_id), {
       if (isTruthy(loc$backlight_code_id)) {
-        cat("Applying backlight to: ", loc$backlight_code_id, "\n")
-
         # Add frontlight class to all docpar elements
         shinyjs::addClass(
           class = "code_extra_frontlight",
@@ -682,7 +669,8 @@ mod_document_code_server <- function(id, glob) {
           class = "code_extra_frontlight",
           selector = paste0(".code:not(.", loc$backlight_code_id, ")")
         )
-        # Clean up frontlight class from all code elements
+
+        # Remove backlight class from all non-targeted code elements
         shinyjs::removeClass(
           class = "code_extra_backlight",
           selector = paste0(".code:not(.", loc$backlight_code_id, ")")
@@ -694,8 +682,6 @@ mod_document_code_server <- function(id, glob) {
           selector = paste0(".", loc$backlight_code_id)
         )
       } else {
-        cat("Removing all backlight and frontlight classes\n")
-
         # Remove backlight class from all code elements
         shinyjs::removeClass(
           class = "code_extra_backlight",
