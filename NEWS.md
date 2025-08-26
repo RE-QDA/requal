@@ -4,6 +4,8 @@
   - code names, descriptions, and colors can be imported via a CSV file
 - Segment memos
   - memos can be added to any transcript segment
+- Backlight 
+  - Taguette-inspired function to foreground selected codes in annotation  
 - UI changes
   - new tab for memo overview
   - new subtab for segment memos in annotation tab
