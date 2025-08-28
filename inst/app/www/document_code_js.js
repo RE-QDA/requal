@@ -36,40 +36,58 @@ function getCaretCharacterOffsetWithin(element) {
   return caretOffset;
 }
 
-// Function to send calculated positions to Shiny
-$( document ).ready(function() {
-document.addEventListener('mouseup', function () {
-    var sel = window.getSelection();
-    // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
-    
-    if(sel.rangeCount > 0){
-      var range = sel.getRangeAt(0);
-      var el = document.getElementById("document_code_ui_1-focal_text")
-    
+function calculateOffsets() {
+  var sel = window.getSelection();
+  
+  // Ensure the selection is within the desired element
+  if (sel.rangeCount > 0) {
+    var range = sel.getRangeAt(0);
+    var el = document.getElementById("document_code_ui_1-focal_text");
+
+    // Check if the selection is within the element
+    if (el.contains(range.commonAncestorContainer)) {
       var endOffset = getCaretCharacterOffsetWithin(el);
       var startOffset_js = endOffset - range.toString().length;
-      var startOffset = startOffset_js+1;
+      var startOffset = startOffset_js + 1;
       var text_length = $('#document_code_ui_1-focal_text').text().length;
 
       if (endOffset == 0) {
-        var endOffset = endOffset+1;
-      } 
+        endOffset = endOffset + 1;
+      }
       if (startOffset > endOffset) {
-        var endOffset = startOffset; 
-      } 
+        endOffset = startOffset;
+      }
       if (startOffset < 1) {
-        var startOffset = 1;
-      } 
+        startOffset = 1;
+      }
       if (endOffset > text_length) {
-        var endOffset = text_length;
-      } 
-      
+        endOffset = text_length;
+      }
+
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-        console.log("tag_position" + tag_position_value)
+      console.log("tag_position: " + tag_position_value);
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }
-}, false);
-})
+  }
+}
+
+// Add event listeners for mouse and keyboard selection adjustments
+document.addEventListener('mouseup', calculateOffsets);
+document.addEventListener('keyup', (event) => {
+  // Check if the shift key is held down and an arrow key is pressed
+  if (event.shiftKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+    calculateOffsets();
+  }
+});
+
+
+document.addEventListener('keyup', (event) => {
+  // Check if the shift key is held down and an arrow key is pressed
+  if (event.shiftKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+    calculateOffsets();
+  }
+});
+
 // Obtain information from iframe and send to Shiny
 $(document).ready(function() {
   var iframe = document.getElementsByTagName('iframe')[0];
