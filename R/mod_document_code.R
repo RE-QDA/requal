@@ -69,6 +69,7 @@ mod_document_code_ui <- function(id) {
                 class = "scrollable80",
                 .noWS = "outside"
               ),
+              tags$span(id = "custom-cursor", class = "custom-cursor"),
               .noWS = "outside"
             )
           )
