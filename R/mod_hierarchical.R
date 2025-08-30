@@ -1,165 +1,4 @@
-# 2. JAVASCRIPT LOGIC
-create_js_code <- function(namespace) {
-  paste0(
-    'function initializeDragAndDrop() {
-      const containerSelector = ".',
-    namespace,
-    '-tree-container";
-      const dropZoneSelector = ".',
-    namespace,
-    '-subtree";
-      const rootSelector = "#',
-    namespace,
-    '-root";
-
-      let draggedElement = null;
-      let originalParent = null;
-
-      const rootElement = document.getElementById("',
-    namespace,
-    '-root");
-      if (!rootElement) {
-          console.error("Root element not found:", "',
-    namespace,
-    '-root");
-          return;
-      }
-
-      rootElement.addEventListener("dragstart", function(event) {
-          const target = event.target.closest(containerSelector);
-          if (target && target.getAttribute("draggable") === "true") {
-              draggedElement = target;
-              originalParent = target.parentElement.closest(containerSelector);
-              $(target).find(".tree_custom").addClass("dragging");
-              event.dataTransfer.effectAllowed = "move";
-
-              // Create a root drop overlay
-              const rootDropOverlay = document.createElement("div");
-              rootDropOverlay.id = "',
-    namespace,
-    '-root-drop-overlay";
-              rootDropOverlay.textContent = "/";
-              rootDropOverlay.style.position = "absolute";
-              rootDropOverlay.style.top = "0";
-              rootDropOverlay.style.left = "-10px"; 
-              rootDropOverlay.style.width = "5%";
-              rootDropOverlay.style.height = "100%";
-              rootDropOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
-              rootDropOverlay.style.color = "#fff";
-              rootDropOverlay.style.display = "flex";
-              rootDropOverlay.style.alignItems = "center";
-              rootDropOverlay.style.justifyContent = "center";
-              rootDropOverlay.style.pointerEvents = "auto"; // Enable pointer events
-              rootElement.style.position = "relative";
-              rootElement.appendChild(rootDropOverlay);
-
-              // Add event listener for drop on overlay
-              rootDropOverlay.addEventListener("dragover", function(event) {
-                  event.preventDefault();
-                  event.dataTransfer.dropEffect = "move";
-              });
-
-              rootDropOverlay.addEventListener("drop", function(event) {
-                  event.preventDefault();
-                  if (!draggedElement) return;
-
-                  // Move to root
-                  $(".highlight-drop").removeClass("highlight-drop");
-
-                  Shiny.setInputValue("',
-    namespace,
-    '-tree_move", {
-                      child_id: parseInt(draggedElement.dataset.id),
-                      new_parent_id: null,
-                      timestamp: Date.now()
-                  }, { priority: "event" });
-              });
-          }
-      });
-
-      rootElement.addEventListener("dragend", function(event) {
-          if (event.target === draggedElement) {
-              $(event.target).find(".tree_custom").removeClass("dragging");
-              draggedElement = null;
-              originalParent = null;
-
-              // Remove the root drop overlay
-              const rootDropOverlay = document.getElementById("',
-    namespace,
-    '-root-drop-overlay");
-              if (rootDropOverlay) {
-                  rootDropOverlay.remove();
-              }
-          }
-      });
-
-      rootElement.addEventListener("dragover", function(event) {
-          event.preventDefault();
-          event.dataTransfer.dropEffect = "move";
-      });
-
-      rootElement.addEventListener("dragenter", function(event) {
-          if (!draggedElement) return;
-          const dropTarget = event.target.closest(dropZoneSelector + ", " + rootSelector);
-          if (dropTarget && !draggedElement.contains(dropTarget)) {
-              $(dropTarget).addClass("highlight-drop");
-          }
-      });
-
-      rootElement.addEventListener("dragleave", function(event) {
-          const dropTarget = event.target.closest(dropZoneSelector + ", " + rootSelector);
-          if (dropTarget) {
-              $(dropTarget).removeClass("highlight-drop");
-          }
-      });
-
-      rootElement.addEventListener("drop", function(event) {
-          event.preventDefault();
-          if (!draggedElement) return;
-
-          let newParentId = null;
-          const containerTarget = event.target.closest(containerSelector);
-
-          // Determine if the drop target is a valid container
-          if (containerTarget && !draggedElement.contains(containerTarget)) {
-              newParentId = containerTarget.dataset.id;
-          } else {
-              // If the drop is outside any valid container, move to root
-              newParentId = null;
-          }
-
-          $(".highlight-drop").removeClass("highlight-drop");
-
-          Shiny.setInputValue("',
-    namespace,
-    '-tree_move", {
-              child_id: parseInt(draggedElement.dataset.id),
-              new_parent_id: newParentId,
-              timestamp: Date.now()
-          }, { priority: "event" });
-      });
-
-      rootElement.addEventListener("click", function(event) {
-          const toggleButton = event.target.closest(".tree_toggle");
-          if (toggleButton) {
-              event.stopPropagation();
-              toggleSubtree(toggleButton);
-          }
-      });
-    }
-
-    function toggleSubtree(button) {
-      const container = button.closest(".tree_container");
-      const subtree = container.querySelector(".tree_subtree");
-      const icon = button.querySelector("i");
-
-      $(subtree).toggle();
-      $(icon).toggleClass("fa-caret-down fa-caret-right");
-    }'
-  )
-}
-
-# 3. BUILD HTML FUNCTION
+# 1. BUILD HTML FUNCTION (same as before)
 build_tree <- function(df, ns, parent_id = NA_integer_) {
   children <- if (is.na(parent_id)) {
     df[is.na(df$parent), , drop = FALSE]
@@ -211,44 +50,31 @@ build_tree <- function(df, ns, parent_id = NA_integer_) {
   })
 }
 
-# 4. SHINY MODULE UI
+# 2. SHINY MODULE UI (CSS removed - put in your CSS file)
 mod_tree_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
-    tags$head(
-      tags$link(
-        rel = "stylesheet",
-        href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      ),
-      tags$style(HTML(paste0(
-        ".tree_toggle { background: none; border: none; padding: 2px 4px; cursor: pointer; font-size: 12px; margin-right: 8px; color: #666; }
-         .tree_toggle:hover { background-color: #f0f0f0; border-radius: 2px; }
-         .tree_container[draggable='true'] { cursor: default; }
-         .tree_container[draggable='true'].dragging { cursor: move; }
-         .tree_header { display: flex; align-items: center; }
-         .tree_subtree { border-left: 1px dashed silver; padding-left: 30px; margin-left: 15px; display: block; transition: opacity 0.3s ease; }
-         .tree_custom { margin-left: 8px; }
-         .highlight-drop { background-color: rgba(0, 123, 255, 0.1); }
-         .dragging { opacity: 0.5; }
-         #",
-        id,
-        "-root { border: 2px dashed transparent; border-radius: 4px; min-height: 60px; padding: 10px; transition: all 0.2s ease; }
-         #",
-        id,
-        "-root.highlight-drop { background-color: rgba(0, 123, 255, 0.1); }"
-      )))
-    ),
+    # Include the global JS file
+    tags$script(src = "js/tree_drag_drop.js"),
     h3("Draggable Tree Structure"),
     div(id = ns("root"), class = "tree_root", uiOutput(ns("tree_structure"))),
-    tags$script(HTML(create_js_code(ns(NULL)))),
-    tags$script(HTML(
-      'document.addEventListener("DOMContentLoaded", function() { initializeDragAndDrop(); });'
-    ))
+    # Simple one-time initialization
+    tags$script(HTML(paste0(
+      'setTimeout(function() { 
+        if (typeof window.initTreeDragDrop === "function") {
+          window.initTreeDragDrop("',
+      id,
+      '");
+        } else {
+          console.error("initTreeDragDrop function not found");
+        }
+      }, 200);'
+    )))
   )
 }
 
-# 5. SHINY MODULE SERVER
+# 3. SHINY MODULE SERVER (simplified - no constant re-initialization)
 mod_tree_server <- function(id, tree_data) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -259,6 +85,16 @@ mod_tree_server <- function(id, tree_data) {
     })
 
     observeEvent(input$tree_move, {
+      cat(
+        "Tree move event for",
+        id,
+        ":",
+        input$tree_move$child_id,
+        "->",
+        input$tree_move$new_parent_id,
+        "\n"
+      )
+
       event_data <- input$tree_move
       current_tree <- loc$reactive_tree
       child_id <- as.integer(event_data$child_id)
@@ -300,3 +136,19 @@ mod_tree_server <- function(id, tree_data) {
     ))
   })
 }
+
+# 4. USAGE - Multiple instances work automatically:
+#
+# UI:
+# fluidPage(
+#   mod_tree_ui("tree1"),      # Gets namespace "tree1"
+#   mod_tree_ui("tree2"),      # Gets namespace "tree2"
+#   mod_tree_ui("codebook")    # Gets namespace "codebook"
+# )
+#
+# Server:
+# function(input, output, session) {
+#   mod_tree_server("tree1", tree_data_1)
+#   mod_tree_server("tree2", tree_data_2)
+#   mod_tree_server("codebook", codebook_data)
+# }

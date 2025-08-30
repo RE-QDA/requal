@@ -1,3 +1,7 @@
+/* Tree Drag & Drop Styles */
+/* Add this to your custom CSS file */
+
+/* Toggle button styles */
 .tree_toggle {
   background: none;
   border: none;
@@ -13,14 +17,21 @@
   border-radius: 2px;
 }
 
+/* Container styles */
 .tree_container[draggable='true'] {
-  cursor: default;
+  cursor: grab;
+}
+
+.tree_container[draggable='true']:active {
+  cursor: grabbing;
 }
 
 .tree_container[draggable='true'].dragging {
-  cursor: move;
+  opacity: 0.5;
+  cursor: grabbing;
 }
 
+/* Layout styles */
 .tree_header {
   display: flex;
   align-items: center;
@@ -36,25 +47,31 @@
 
 .tree_custom {
   margin-left: 8px;
+  user-select: none; /* Prevent text selection during drag */
 }
 
+/* Drag & drop visual feedback */
 .highlight-drop {
-  background-color: rgba(0, 123, 255, 0.1);
+  background-color: rgba(0, 123, 255, 0.2) !important;
+  border: 2px dashed #007bff !important;
+  border-radius: 4px;
 }
 
 .dragging {
   opacity: 0.5;
 }
 
-/* Replace `your-id` with the actual ID you want to use */
-#your-id-root {
+/* Root container styles */
+.tree_root {
   border: 2px dashed transparent;
   border-radius: 4px;
   min-height: 60px;
   padding: 10px;
   transition: all 0.2s ease;
+  position: relative;
 }
 
-#your-id-root.highlight-drop {
+.tree_root.highlight-drop {
   background-color: rgba(0, 123, 255, 0.1);
+  border-color: #007bff;
 }
