@@ -53,6 +53,7 @@ mod_codebook_ui <- function(id) {
         ),
         fluidRow(
           class = "module_content",
+          style = "max-height: 80vh",
           column(
             width = 10,
             div(
@@ -79,10 +80,10 @@ mod_codebook_ui <- function(id) {
                 )
               )
             ),
-            uiOutput(
+            div(mod_tree_ui(
               ns("codes_ui")
-            ) %>%
-              tagAppendAttributes(class = "scrollable90")
+            )) %>%
+              tagAppendAttributes(class = "scrollable80")
           )
         )
       ),
@@ -130,14 +131,40 @@ mod_codebook_server <- function(id, glob) {
           glob$active_project,
           glob$user
         )
-        output$codes_ui <- renderUI({
-          render_codes_hierarchy(
-            active_project = glob$active_project,
-            pool = glob$pool,
-            user = glob$user
-          )
-        })
-  
+
+        loc$code_tree_df <- data.frame(
+          id = glob$codebook$code_id,
+          name = glob$codebook$code_name,
+          parent = glob$codebook$code_parent_id,
+          is_draggable = TRUE,
+          custom_tags = purrr::pmap_chr(
+            list(
+              code_id = glob$codebook$code_id,
+              code_name = glob$codebook$code_name,
+              code_description = glob$codebook$code_description,
+              code_color = glob$codebook$code_color,
+              user_id = glob$codebook$user_id
+            ),
+            function(
+              code_id,
+              code_name,
+              code_description,
+              code_color,
+              user_id
+            ) {
+              as.character(gen_codes_ui_2(
+                code_id,
+                code_name,
+                code_description,
+                code_color,
+                user_id
+              ))
+            }
+          ),
+          stringsAsFactors = FALSE
+        )
+        mod_tree_server("codes_ui", loc$code_tree_df)
+
         #---Merge code UI --------------
         mod_rql_button_server(
           id = "code_merge_ui",
@@ -199,7 +226,6 @@ mod_codebook_server <- function(id, glob) {
           glob,
           permission = TRUE
         )
-
       }
     )
 

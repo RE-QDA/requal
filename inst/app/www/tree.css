@@ -1,0 +1,60 @@
+.tree_toggle {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  color: #666;
+}
+
+.tree_toggle:hover {
+  background-color: #f0f0f0;
+  border-radius: 2px;
+}
+
+.tree_container[draggable='true'] {
+  cursor: default;
+}
+
+.tree_container[draggable='true'].dragging {
+  cursor: move;
+}
+
+.tree_header {
+  display: flex;
+  align-items: center;
+}
+
+.tree_subtree {
+  border-left: 1px dashed silver;
+  padding-left: 30px;
+  margin-left: 15px;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.tree_custom {
+  margin-left: 8px;
+}
+
+.highlight-drop {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+/* Replace `your-id` with the actual ID you want to use */
+#your-id-root {
+  border: 2px dashed transparent;
+  border-radius: 4px;
+  min-height: 60px;
+  padding: 10px;
+  transition: all 0.2s ease;
+}
+
+#your-id-root.highlight-drop {
+  background-color: rgba(0, 123, 255, 0.1);
+}

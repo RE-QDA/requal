@@ -1,26 +1,3 @@
-library(shiny)
-library(shinyjs)
-library(purrr)
-
-# 1. THE DATA
-test_df <- data.frame(
-  id = c(1, 2, 3, 4),
-  name = c("A", "B", "C", "D"),
-  parent = c(NA, NA, 2, 3),
-  is_draggable = c(TRUE, TRUE, TRUE, TRUE),
-  stringsAsFactors = FALSE
-)
-
-test_df$custom_tags <- list(
-  list(p("This is item A with custom content", style = "color: blue;")),
-  list(div(
-    "Item B has a special div",
-    style = "background: yellow; padding: 5px;"
-  )),
-  list(p("Some description for C")),
-  list(em("With emphasis"))
-)
-
 # 2. JAVASCRIPT LOGIC
 create_js_code <- function(namespace) {
   paste0(
@@ -64,7 +41,7 @@ create_js_code <- function(namespace) {
               rootDropOverlay.textContent = "/";
               rootDropOverlay.style.position = "absolute";
               rootDropOverlay.style.top = "0";
-              rootDropOverlay.style.left = "0";
+              rootDropOverlay.style.left = "-10px"; 
               rootDropOverlay.style.width = "5%";
               rootDropOverlay.style.height = "100%";
               rootDropOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
@@ -200,7 +177,7 @@ build_tree <- function(df, ns, parent_id = NA_integer_) {
     custom_content <- if (
       !is.null(child$custom_tags) && length(child$custom_tags[[1]]) > 0
     ) {
-      child$custom_tags[[1]]
+      HTML(child$custom_tags[[1]])
     } else {
       NULL
     }
@@ -239,7 +216,6 @@ mod_tree_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
-    useShinyjs(),
     tags$head(
       tags$link(
         rel = "stylesheet",
@@ -324,50 +300,3 @@ mod_tree_server <- function(id, tree_data) {
     ))
   })
 }
-
-# 6. DEMO APPLICATION
-ui <- fluidPage(
-  title = "Production Tree Module",
-  tags$h2("Production-Ready Draggable Tree"),
-  tags$p(
-    "Drag items to reorganize the tree structure. Items can be nested or moved to root level."
-  ),
-  fluidRow(
-    column(8, mod_tree_ui("main_tree")),
-    column(
-      4,
-      tags$h4("Tree State"),
-      verbatimTextOutput("tree_state"),
-      tags$h4("Last Move"),
-      verbatimTextOutput("last_move_info")
-    )
-  )
-)
-
-server <- function(input, output, session) {
-  tree_module <- mod_tree_server("main_tree", test_df)
-
-  output$tree_state <- renderPrint({
-    tree_data <- tree_module$tree_data()
-    tree_data[, c("id", "name", "parent")]
-  })
-
-  output$last_move_info <- renderPrint({
-    move_event <- tree_module$last_move()
-    if (!is.null(move_event)) {
-      list(
-        child_moved = move_event$child_id,
-        new_parent = if (is.null(move_event$new_parent_id)) {
-          "ROOT"
-        } else {
-          move_event$new_parent_id
-        },
-        timestamp = move_event$timestamp
-      )
-    } else {
-      "No moves yet"
-    }
-  })
-}
-
-shinyApp(ui = ui, server = server)
