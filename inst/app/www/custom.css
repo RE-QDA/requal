@@ -282,8 +282,8 @@ width: 100% !important;
   cursor: col-resize;
 }
 
-#rank-list-codes_menu {
-background-color: transparent;
+.codes_menu {
+background-color: white;
 border: none;
 padding: 0px;
 margin-left: -0.3em;
@@ -292,13 +292,40 @@ display: flex;
 position: relative;
 }
 
-#codes_menu .code_container {
-  padding-left: 15px;
-  max-width: none;
+#document_code_ui_1-doc_codes_ui-tree_structure {
+  width: 98%;
 }
-#codes_menu .subcodes {
-  margin-left: 0px;
+.codes_menu .tree_custom {
+  width: 100%;
 }
+
+
+.codes_menu .tree_subtree {
+  padding: 0;
+  margin-left: 15px; /* Increased margin for better nesting visibility */
+}
+
+.codes_menu .tree_toggle {
+  display: inline-block; /* Ensure toggle buttons are aligned horizontally */
+  padding: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-right: -10px;
+  cursor: pointer; /* Indicate interactivity */
+}
+
+.codes_menu .tree_subtree .tree_toggle {
+  padding: 5px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-right: -10px;
+}
+
+.codes_menu .tree_custom {
+  padding: 0;
+  margin-left: 15px; /* Increased margin for better alignment */
+}
+
 
 
 .quickcode {

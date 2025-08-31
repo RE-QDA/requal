@@ -604,8 +604,7 @@ generate_coding_tools_tree <- function(
   code_id,
   code_name,
   code_color,
-  code_desc,
-  children = list()
+  code_desc
 ) {
   # Create the main button
   main_button <- div(
@@ -613,13 +612,7 @@ generate_coding_tools_tree <- function(
       id = paste0("box_wrap_", ns(code_id)),
       class = "box_wrap",
       style = "display: flex;",
-      if (length(children) > 0) {
-        tags$button(
-          id = paste0("btn_code_id_", code_id),
-          tags$i(class = "fas fa-caret-down btn_code_id"),
-          class = "btn_code_id"
-        )
-      },
+
       actionButton(
         inputId = ns(code_id),
         label = code_name,
@@ -647,24 +640,6 @@ generate_coding_tools_tree <- function(
         )
       )
     )
-  )
-  # Recursively generate UI for children
-  children_ui <- purrr::map(children, function(child) {
-    generate_coding_tools_tree(
-      ns = ns,
-      code_id = child$code_id,
-      code_name = child$code_name,
-      code_color = child$code_color,
-      code_desc = child$code_description,
-      children = child$children
-    )
-  })
-
-  # Combine the main button with its children
-  div(
-    class = "code_container",
-    main_button,
-    div(class = "subcodes", children_ui)
   )
 }
 

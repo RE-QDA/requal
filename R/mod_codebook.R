@@ -104,6 +104,9 @@ mod_codebook_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+    observeEvent(loc$code_tree_df, {
+      mod_tree_server("codes_ui", loc$code_tree_df)
+    })
 
     # initialize codebook upon load
     observeEvent(
@@ -163,7 +166,6 @@ mod_codebook_server <- function(id, glob) {
           ),
           stringsAsFactors = FALSE
         )
-        mod_tree_server("codes_ui", loc$code_tree_df)
 
         #---Merge code UI --------------
         mod_rql_button_server(

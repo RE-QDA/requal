@@ -64,22 +64,7 @@ mod_tree_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # Include the global JS file
-    tags$script(src = "js/tree_drag_drop.js"),
-    h3("Draggable Tree Structure"),
-    uiOutput(ns("tree_structure")), # This will be the main container
-    # Simple one-time initialization
-    tags$script(HTML(paste0(
-      'setTimeout(function() { 
-      if (typeof window.initTreeDragDrop === "function") {
-        window.initTreeDragDrop("',
-      id,
-      '");
-      } else {
-        console.error("initTreeDragDrop function not found");
-      }
-    }, 200);'
-    )))
+    uiOutput(ns("tree_structure")) # This will be the main container
   )
 }
 
