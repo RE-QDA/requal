@@ -75,3 +75,7 @@
   background-color: rgba(0, 123, 255, 0.1);
   border-color: #007bff;
 }
+
+.tree_subtree.force-hidden {
+    display: none !important;
+}
