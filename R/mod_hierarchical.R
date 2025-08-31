@@ -21,23 +21,33 @@ build_tree <- function(df, ns, parent_id = NA_integer_) {
       NULL
     }
 
+    # Include a caret placeholder for all nodes
+    caret_icon <- '<div class="tree_toggle">
+  <i class="fa fa-caret-right"></i>
+</div>'
+
+    subtree_class <- if (has_children) {
+      paste("tree_subtree", ns("subtree"), "force-hidden")
+    } else {
+      paste("tree_subtree", ns("subtree"))
+    }
+
     container <- div(
       class = paste("tree_container", ns("tree-container")),
       `data-id` = child$id,
       div(
         class = "tree_header",
-        if (has_children) {
-          tags$button(
-            class = "tree_toggle",
-            HTML('<i class="fa fa-caret-down"></i>')
-          )
-        },
+        tags$button(
+          class = "tree_toggle",
+          HTML(caret_icon),
+          style = if (has_children) "" else "visibility: hidden;"
+        ),
         if (!is.null(custom_content)) {
           div(class = "tree_custom", custom_content)
         }
       ),
       div(
-        class = paste("tree_subtree", ns("subtree")),
+        class = subtree_class,
         build_tree(df, ns, parent_id = child$id)
       )
     )
@@ -49,7 +59,6 @@ build_tree <- function(df, ns, parent_id = NA_integer_) {
     container
   })
 }
-
 # 2. SHINY MODULE UI (CSS removed - put in your CSS file)
 mod_tree_ui <- function(id) {
   ns <- NS(id)
@@ -81,7 +90,9 @@ mod_tree_server <- function(id, tree_data) {
     loc <- reactiveValues(reactive_tree = tree_data)
 
     output$tree_structure <- renderUI({
-      build_tree(loc$reactive_tree, ns)
+      isolate({
+        build_tree(loc$reactive_tree, ns)
+      })
     })
 
     observeEvent(input$tree_move, {

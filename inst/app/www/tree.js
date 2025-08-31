@@ -105,11 +105,15 @@ $(document).ready(function() {
     }
 
     if (targetSubtree) {
-        // Just move the element - don't touch any states
-        if (targetSubtree.firstElementChild) {
-            targetSubtree.insertBefore(draggedElement, targetSubtree.firstElementChild);
-        } else {
-            targetSubtree.appendChild(draggedElement);
+        // Move the dragged element
+        targetSubtree.appendChild(draggedElement);
+
+        // Initialize the caret as expanded
+        const toggleButton = target.querySelector('.tree_toggle i');
+        if (toggleButton) {
+            toggleButton.classList.remove('fa-caret-right');
+            toggleButton.classList.add('fa-caret-down');
+            toggleButton.style.visibility = 'visible';
         }
 
         // Clear highlights
@@ -117,7 +121,7 @@ $(document).ready(function() {
             el.classList.remove('highlight-drop');
         });
 
-        // Tell Shiny about the move (just data, no UI changes)
+        // Notify Shiny about the move
         const childId = parseInt(draggedElement.dataset.id);
         Shiny.setInputValue(currentNamespace + "-tree_move", {
             child_id: childId,
