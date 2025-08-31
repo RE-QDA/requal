@@ -53,125 +53,125 @@
 //   });
 // });
 
-$(document).ready(function() {
-    var dragged;
-    var originalContainer;
+// $(document).ready(function() {
+//     var dragged;
+//     var originalContainer;
 
-    document.addEventListener('dragstart', function(event) {
-        dragged = event.target.closest('.code_container'); 
-        originalContainer = dragged.parentElement.closest('.code_container'); // Store the original container
-        event.target.style.opacity = 0.5;
-    }, false);
+//     document.addEventListener('dragstart', function(event) {
+//         dragged = event.target.closest('.code_container'); 
+//         originalContainer = dragged.parentElement.closest('.code_container'); // Store the original container
+//         event.target.style.opacity = 0.5;
+//     }, false);
 
-    document.addEventListener('dragend', function(event) {
-        event.target.style.opacity = '';
-    }, false);
+//     document.addEventListener('dragend', function(event) {
+//         event.target.style.opacity = '';
+//     }, false);
 
-    document.addEventListener('dragover', function(event) {
-        event.preventDefault();
-    }, false);
+//     document.addEventListener('dragover', function(event) {
+//         event.preventDefault();
+//     }, false);
 
-    document.addEventListener('dragenter', function(event) {
-        if (event.target.classList.contains('subcodes')) {
-            event.target.style.background = '#f0f0f0';
-        }
-    }, false);
+//     document.addEventListener('dragenter', function(event) {
+//         if (event.target.classList.contains('subcodes')) {
+//             event.target.style.background = '#f0f0f0';
+//         }
+//     }, false);
 
-    document.addEventListener('dragleave', function(event) {
-        if (event.target.classList.contains('subcodes')) {
-            event.target.style.background = '';
-        }
-    }, false);
+//     document.addEventListener('dragleave', function(event) {
+//         if (event.target.classList.contains('subcodes')) {
+//             event.target.style.background = '';
+//         }
+//     }, false);
 
-    document.addEventListener('drop', function(event) {
-        event.preventDefault();
+//     document.addEventListener('drop', function(event) {
+//         event.preventDefault();
 
-        var targetContainer = event.target.closest('.code_container');
-        var parentId = 0;
+//         var targetContainer = event.target.closest('.code_container');
+//         var parentId = 0;
 
-        if (targetContainer) {
-            var subcodesDiv = targetContainer.querySelector('.subcodes');
+//         if (targetContainer) {
+//             var subcodesDiv = targetContainer.querySelector('.subcodes');
 
-            if (subcodesDiv.firstChild) {
-                subcodesDiv.insertBefore(dragged, subcodesDiv.firstChild);
-            } else {
-                subcodesDiv.appendChild(dragged);
-            }
+//             if (subcodesDiv.firstChild) {
+//                 subcodesDiv.insertBefore(dragged, subcodesDiv.firstChild);
+//             } else {
+//                 subcodesDiv.appendChild(dragged);
+//             }
 
-            var codeContainer = targetContainer.closest('.code_container');
-            if (codeContainer) {
-                var idMatch = codeContainer.id.match(/^code_container_(.+)$/);
-                if (idMatch) {
-                    codeId = idMatch[1];
-                }
-            }
+//             var codeContainer = targetContainer.closest('.code_container');
+//             if (codeContainer) {
+//                 var idMatch = codeContainer.id.match(/^code_container_(.+)$/);
+//                 if (idMatch) {
+//                     codeId = idMatch[1];
+//                 }
+//             }
 
-            if (codeId) {
-                var parentButtonId = 'btn_code_id_' + codeId;
-                if (!document.getElementById(parentButtonId)) {
-                    var toggleButton = document.createElement('button');
-                    toggleButton.id = parentButtonId;
-                    toggleButton.className = 'btn_code_id';
-                    toggleButton.innerHTML = '<i class="fas fa-caret-down btn_code_id"></i>';
-                    var boxWrap = targetContainer.querySelector('.box_wrap');
-                    if (boxWrap) {
-                        boxWrap.insertBefore(toggleButton, boxWrap.firstChild);
-                    }
-                }
-            }
-        } else {
-            var fallbackContainer = document.getElementById('codebook_ui_1-codes_ui');
-            if (fallbackContainer) {
-                console.log('Dropped outside valid target, moving to:', fallbackContainer);
-                fallbackContainer.insertBefore(dragged, fallbackContainer.firstChild);
-            }
-        }
+//             if (codeId) {
+//                 var parentButtonId = 'btn_code_id_' + codeId;
+//                 if (!document.getElementById(parentButtonId)) {
+//                     var toggleButton = document.createElement('button');
+//                     toggleButton.id = parentButtonId;
+//                     toggleButton.className = 'btn_code_id';
+//                     toggleButton.innerHTML = '<i class="fas fa-caret-down btn_code_id"></i>';
+//                     var boxWrap = targetContainer.querySelector('.box_wrap');
+//                     if (boxWrap) {
+//                         boxWrap.insertBefore(toggleButton, boxWrap.firstChild);
+//                     }
+//                 }
+//             }
+//         } else {
+//             var fallbackContainer = document.getElementById('codebook_ui_1-codes_ui');
+//             if (fallbackContainer) {
+//                 console.log('Dropped outside valid target, moving to:', fallbackContainer);
+//                 fallbackContainer.insertBefore(dragged, fallbackContainer.firstChild);
+//             }
+//         }
 
-        // Check if the original container's subcodes div is empty
-        if (originalContainer) {
-            var originalSubcodesDiv = originalContainer.querySelector('.subcodes');
-            if (originalSubcodesDiv && !originalSubcodesDiv.firstChild) {
-                var originalToggleButton = originalContainer.querySelector('.btn_code_id');
-                if (originalToggleButton) {
-                    originalToggleButton.remove();
-                }
-            }
-        }
+//         // Check if the original container's subcodes div is empty
+//         if (originalContainer) {
+//             var originalSubcodesDiv = originalContainer.querySelector('.subcodes');
+//             if (originalSubcodesDiv && !originalSubcodesDiv.firstChild) {
+//                 var originalToggleButton = originalContainer.querySelector('.btn_code_id');
+//                 if (originalToggleButton) {
+//                     originalToggleButton.remove();
+//                 }
+//             }
+//         }
 
-        var childId = extractNumberFromId(dragged.id);
-        if (parentId !== 0) {
-            parentId = extractNumberFromId(parentId);
-        }
-        Shiny.setInputValue('drop_event', { parent: parentId, child: childId }, { priority: 'event' });
-    }, false);
-});
+//         var childId = extractNumberFromId(dragged.id);
+//         if (parentId !== 0) {
+//             parentId = extractNumberFromId(parentId);
+//         }
+//         Shiny.setInputValue('drop_event', { parent: parentId, child: childId }, { priority: 'event' });
+//     }, false);
+// });
 
-function extractNumberFromId(id) {
-    // Use a regular expression to match one or more digits
-    var match = id.match(/\d+/);
-    return match ? match[0] : null; // Return the first match or null if no match is found
-}
+// function extractNumberFromId(id) {
+//     // Use a regular expression to match one or more digits
+//     var match = id.match(/\d+/);
+//     return match ? match[0] : null; // Return the first match or null if no match is found
+// }
 
-function toggleSubcodes(button) {
-  // Find the code_container element as the parent
-  const parentElement = button.closest('.code_container');
-  // Find the direct subcodes element within the parent
-  const subcodesElement = parentElement.querySelector(':scope > .subcodes');
+// function toggleSubcodes(button) {
+//   // Find the code_container element as the parent
+//   const parentElement = button.closest('.code_container');
+//   // Find the direct subcodes element within the parent
+//   const subcodesElement = parentElement.querySelector(':scope > .subcodes');
 
-  // Toggle the display of the subcodes element
-      if (subcodesElement.style.display === 'block' || subcodesElement.style.display === '') {
-          subcodesElement.style.display = 'none';
-          console.log('button')
-          // Set icon to caret-right when hiding
-          button.querySelector('i').classList.remove('fa-caret-down');
-          button.querySelector('i').classList.add('fa-caret-right');
+//   // Toggle the display of the subcodes element
+//       if (subcodesElement.style.display === 'block' || subcodesElement.style.display === '') {
+//           subcodesElement.style.display = 'none';
+//           console.log('button')
+//           // Set icon to caret-right when hiding
+//           button.querySelector('i').classList.remove('fa-caret-down');
+//           button.querySelector('i').classList.add('fa-caret-right');
 
-      } else {
-            subcodesElement.style.display = 'block';
-            // Set icon to caret-down when showing
-            button.querySelector('i').classList.remove('fa-caret-right');
-            button.querySelector('i').classList.add('fa-caret-down');console.log('right')
+//       } else {
+//             subcodesElement.style.display = 'block';
+//             // Set icon to caret-down when showing
+//             button.querySelector('i').classList.remove('fa-caret-right');
+//             button.querySelector('i').classList.add('fa-caret-down');console.log('right')
 
-      }
+//       }
  
-}
+// }
