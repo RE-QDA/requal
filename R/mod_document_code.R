@@ -235,6 +235,7 @@ mod_document_code_server <- function(id, glob) {
       glob$doc_selector <- input$doc_selector
       loc$codes_menu_observer <- loc$codes_menu_observer + 1 # must run first
       loc$text_observer <- loc$text_observer + 1
+      removeUI("#code_extra_div") # remove code extra div so values can recalculate
     })
 
     ## Observe refresh ----
@@ -460,6 +461,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(input$quickcode, {
       if (isTruthy(input$quickcode)) {
         removeUI("#code_extra_div")
+        # Backlight reset
+        loc$backlight_code_id <- NULL
         non_matched_codes <- loc$codebook %>%
           dplyr::filter(
             !stringr::str_detect(code_name, paste0("(?i)", input$quickcode))
@@ -522,11 +525,15 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(input$selected_code_extra), {
       req(glob$doc_selector)
       removeUI("#code_extra_div")
-      sel <- paste0("#", ns(paste0("more-", input$selected_code_extra)))
-      generate_code_extra_LF(sel)
+      loc$code_extra_sel <- paste0(
+        "#",
+        ns(paste0("more-", input$selected_code_extra))
+      )
+      generate_code_extra_LF()
     })
     observeEvent(req(input$close_code_extra_div), {
       removeUI("#code_extra_div")
+      loc$backlight_code_id <- NULL
     })
 
     # Segment removal ----------
@@ -635,6 +642,70 @@ mod_document_code_server <- function(id, glob) {
         reported_range <- input$tag_position
       }
       as.character(reported_range)
+    })
+
+    # Backlight ------
+    observeEvent(
+      c(
+        input$code_extra_backlight,
+        glob$segments_observer
+      ),
+      {
+        if (button_is_on(req(input$code_extra_backlight))) {
+          if (!isTruthy(loc$backlight_code_id)) {
+            loc$backlight_observer <- 1
+          } else {
+            loc$backlight_observer <- loc$backlight_observer + 1
+          }
+          loc$backlight_code_id <- paste0("code_id_", input$js_backlight_value)
+        } else {
+          loc$backlight_code_id <- NULL
+        }
+      }
+    )
+
+    observeEvent(c(loc$backlight_observer, loc$backlight_code_id), {
+      if (isTruthy(loc$backlight_code_id)) {
+        # Add frontlight class to all docpar elements
+        shinyjs::addClass(
+          class = "code_extra_frontlight",
+          selector = ".docpar"
+        )
+
+        # Add frontlight class to all code elements except the targeted one
+        shinyjs::addClass(
+          class = "code_extra_frontlight",
+          selector = paste0(".code:not(.", loc$backlight_code_id, ")")
+        )
+
+        # Remove backlight class from all non-targeted code elements
+        shinyjs::removeClass(
+          class = "code_extra_backlight",
+          selector = paste0(".code:not(.", loc$backlight_code_id, ")")
+        )
+
+        # Add backlight class to the targeted code element
+        shinyjs::addClass(
+          class = "code_extra_backlight",
+          selector = paste0(".", loc$backlight_code_id)
+        )
+      } else {
+        # Remove backlight class from all code elements
+        shinyjs::removeClass(
+          class = "code_extra_backlight",
+          selector = ".code"
+        )
+        # Remove frontlight class from all code elements
+        shinyjs::removeClass(
+          class = "code_extra_frontlight",
+          selector = ".code"
+        )
+        # Remove frontlight class from all docpar elements
+        shinyjs::removeClass(
+          class = "code_extra_frontlight",
+          selector = ".docpar"
+        )
+      }
     })
 
     # Local functions -------------------
@@ -758,7 +829,7 @@ mod_document_code_server <- function(id, glob) {
     }
 
     ## generate_code_extra_LF  -------------------
-    generate_code_extra_LF <- function(sel) {
+    generate_code_extra_LF <- function() {
       doc_group <- NULL
       selected_code_extra <- as.integer(input$selected_code_extra)
       active_project <- as.integer(glob$active_project)
@@ -776,7 +847,7 @@ mod_document_code_server <- function(id, glob) {
           total_freq = dplyr::n()
         )
       insertUI(
-        selector = sel,
+        selector = loc$code_extra_sel,
         where = "afterEnd",
         ui = tags$div(
           id = "code_extra_div",
@@ -798,7 +869,19 @@ mod_document_code_server <- function(id, glob) {
           br(),
           "Total frequency:",
           tags$b(segments_count$total_freq),
-          br()
+          br(),
+          actionButton(
+            ns("code_extra_backlight"),
+            label = NULL,
+            icon = icon("glasses"),
+            `data-code_id` = selected_code_extra,
+            onclick = paste0(
+              "Shiny.setInputValue('",
+              ns("js_backlight_value"),
+              "', this.getAttribute('data-code_id'), {priority: 'event'});"
+            )
+          ) %>%
+            tagAppendAttributes(class = "code_extra_btn")
         )
       )
     }
