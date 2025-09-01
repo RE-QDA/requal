@@ -222,3 +222,14 @@ Shiny.addCustomMessageHandler('appendContent', function(message) {
   article.insertAdjacentHTML('beforeend', message.html);
 });
 
+Shiny.addCustomMessageHandler('toggle_icon_angles', function(message) {
+          let btn = document.getElementById(message.id);
+          let icon = btn.querySelector('i');
+          if (icon.classList.contains('fa-angles-up')) {
+            icon.classList.remove('fa-angles-up');
+            icon.classList.add('fa-angles-down');
+          } else {
+            icon.classList.remove('fa-angles-down');
+            icon.classList.add('fa-angles-up');
+          }
+});
