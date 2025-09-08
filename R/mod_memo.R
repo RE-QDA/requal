@@ -31,7 +31,7 @@ mod_memo_ui <- function(id) {
     fluidRow(
       style = "margin-left: 30px;",
       div(
-        style = "max-width: 80%;",
+        style = "width: 60vw;",
         DT::dataTableOutput(ns("memo"))
       )
     )
@@ -145,7 +145,7 @@ mod_memo_server <- function(id, glob) {
             DT::datatable(
               loc$enriched_memo_table,
               rownames = FALSE,
-              width = "80%",
+              width = "100%",
               colnames = c(
                 "ID" = "memo_id",
                 "Title" = "memo_title",
