@@ -533,7 +533,6 @@ mod_document_code_server <- function(id, glob) {
 
       generate_code_extra_LF()
     })
-    observe(print(loc$selected_code_extra))
     observeEvent(c(loc$selected_code_extra, glob$segments_observer), {
       req(loc$selected_code_extra)
       loc$segments_count <- dplyr::tbl(glob$pool, "segments") %>%
