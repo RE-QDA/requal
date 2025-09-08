@@ -18,13 +18,20 @@ mod_memo_ui <- function(id) {
       ),
       div(
         style = "display: flex; align-items: center; margin-left: 10px;", # Use flexbox for alignment
-        actionButton(ns("pin"), "", title = "Pin memo", icon = icon("thumbtack"), class = "pinned"),
+        actionButton(
+          ns("pin"),
+          "",
+          title = "Pin memo",
+          icon = icon("thumbtack"),
+          class = "pinned"
+        ),
       )
     ),
     hr(),
     fluidRow(
+      style = "margin-left: 30px;",
       div(
-        style = "margin-left: 30px; max-width: 80vh;",
+        style = "max-width: 80vw;",
         DT::dataTableOutput(ns("memo"))
       )
     )
@@ -63,78 +70,133 @@ mod_memo_server <- function(id, glob) {
       )
     })
 
-    observeEvent(c(loc$memo_observer, glob$memo_segment_observer, glob$free_memo_observer), {
-      output$memo <- DT::renderDataTable({
-        if (isTruthy(glob$active_project)) {
-          memo_table <- list_memo_records(glob$pool, glob$active_project)
-          if (glob$user$data$memo_other_view == 0 && nrow(memo_table) > 0) {
-            memo_table <- memo_table %>%
-              dplyr::filter(user_id == glob$user$user_id)
-          }
-          req(nrow(memo_table) > 0)
-          memos_segments_map <- dplyr::tbl(glob$pool, "memos_segments_map") %>%
-            dplyr::filter(memo_id %in% !!memo_table$memo_id) %>%
-            dplyr::collect()
-          segment_df <- dplyr::tbl(glob$pool, "segments") %>%
-            dplyr::select(segment_id, doc_id, segment_text) %>%
-            dplyr::filter(.data$segment_id %in% !!memos_segments_map$segment_id) %>%
-            dplyr::collect()
-          documents_df <- dplyr::tbl(glob$pool, "documents") %>%
-            dplyr::select(doc_id, doc_name) %>%
-            dplyr::filter(.data$doc_id %in% !!segment_df$doc_id) %>%
-            dplyr::collect()
-          loc$enriched_memo_table <- memo_table %>%
-            dplyr::left_join(
-              memos_segments_map,
-              by = "memo_id"
+    observeEvent(
+      c(loc$memo_observer, glob$memo_segment_observer, glob$free_memo_observer),
+      {
+        output$memo <- DT::renderDataTable({
+          if (isTruthy(glob$active_project)) {
+            memo_table <- list_memo_records(glob$pool, glob$active_project)
+            if (glob$user$data$memo_other_view == 0 && nrow(memo_table) > 0) {
+              memo_table <- memo_table %>%
+                dplyr::filter(user_id == glob$user$user_id)
+            }
+            req(nrow(memo_table) > 0)
+            memos_segments_map <- dplyr::tbl(
+              glob$pool,
+              "memos_segments_map"
             ) %>%
-            dplyr::left_join(
-              segment_df,
-              by = "segment_id"
-            ) %>%
-            dplyr::left_join(
-              documents_df,
-              by = "doc_id"
-            ) %>%
-            dplyr::mutate(
-              memo_title = memo_link(ns("text_memo_click"), memo_id, memo_name),
-              memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
-            ) %>%
-            dplyr::arrange(dplyr::desc(memo_id)) %>%
-            dplyr::select(memo_id, memo_title, memo_type, doc_name, memo_text, segment_text)
+              dplyr::filter(memo_id %in% !!memo_table$memo_id) %>%
+              dplyr::collect()
+            segment_df <- dplyr::tbl(glob$pool, "segments") %>%
+              dplyr::select(segment_id, doc_id, segment_text) %>%
+              dplyr::filter(
+                .data$segment_id %in% !!memos_segments_map$segment_id
+              ) %>%
+              dplyr::collect()
+            documents_df <- dplyr::tbl(glob$pool, "documents") %>%
+              dplyr::select(doc_id, doc_name) %>%
+              dplyr::filter(.data$doc_id %in% !!segment_df$doc_id) %>%
+              dplyr::collect()
+            user_df <- dplyr::tbl(glob$pool, "users") %>%
+              dplyr::filter(.data$user_id %in% !!memo_table$user_id) %>%
+              dplyr::select(user_id, user_name, user_login) %>%
+              dplyr::collect()
+            loc$enriched_memo_table <- memo_table %>%
+              dplyr::left_join(
+                memos_segments_map,
+                by = "memo_id"
+              ) %>%
+              dplyr::left_join(
+                segment_df,
+                by = "segment_id"
+              ) %>%
+              dplyr::left_join(
+                documents_df,
+                by = "doc_id"
+              ) %>%
+              dplyr::left_join(
+                user_df,
+                by = "user_id"
+              ) %>%
+              dplyr::mutate(
+                memo_title = memo_link(
+                  ns("text_memo_click"),
+                  memo_id,
+                  memo_name
+                ),
+                memo_type = purrr::map2_chr(
+                  doc_id,
+                  segment_id,
+                  memo_segment_link
+                )
+              ) %>%
+              dplyr::arrange(dplyr::desc(memo_id)) %>%
+              dplyr::select(
+                memo_id,
+                memo_title,
+                memo_type,
+                doc_name,
+                memo_text,
+                segment_text,
+                user_name,
+                user_id
+              )
 
-          DT::datatable(
-            loc$enriched_memo_table,
-            rownames = FALSE,
-            width = "800px",
-            colnames = c("ID" = "memo_id", "Title" = "memo_title", "Type" = "memo_type", "Document" = "doc_name"),
-            filter = "top",
-            escape = FALSE,
-            extensions = c("Buttons"),
-            options = dt_memo_options(),
-            class = "display",
-            selection = "none"
-          )
-        }
-      })
-    })
+            DT::datatable(
+              loc$enriched_memo_table,
+              rownames = FALSE,
+              width = "80%",
+              colnames = c(
+                "ID" = "memo_id",
+                "Title" = "memo_title",
+                "Type" = "memo_type",
+                "Document" = "doc_name",
+                "Creator" = "user_name",
+                "Creator ID" = "user_id"
+              ),
+              filter = "top",
+              escape = FALSE,
+              extensions = c("Buttons"),
+              options = dt_memo_options(),
+              class = "display",
+              selection = "none"
+            )
+          }
+        })
+      }
+    )
 
     # pin ----
     observeEvent(input$pin, {
       req(loc$memo_id)
       pin_id <- paste0("pin_id-", loc$memo_id)
-      pinned_text <- read_memo_by_id(glob$pool, glob$active_project, loc$memo_id) %>%
+      pinned_text <- read_memo_by_id(
+        glob$pool,
+        glob$active_project,
+        loc$memo_id
+      ) %>%
         dplyr::pull(memo_text)
 
       insertUI(
-        selector = "div.content-wrapper", where = "afterBegin",
+        selector = "div.content-wrapper",
+        where = "afterBegin",
         div(
-          id = pin_id, class = "pinned_memo",
+          id = pin_id,
+          class = "pinned_memo",
           div(
-            id = "pin_header", class = "pin_header", icon("thumbtack"),
+            id = "pin_header",
+            class = "pin_header",
+            icon("thumbtack"),
             div(
               class = "unpin",
-              actionButton(paste0("unpin_", pin_id), "", icon("xmark"), class = "unpin_btn", `data-id` = pin_id, onclick = "Shiny.setInputValue('memo_ui_1-unpin', this.dataset.id, {priority: 'event'})")
+              actionButton(
+                paste0("unpin_", pin_id),
+                "",
+                icon("xmark"),
+                class = "unpin_btn",
+                `data-id` = pin_id,
+                onclick = "Shiny.setInputValue('memo_ui_1-unpin', this.dataset.id, {priority: 'event'})"
+              )
             ),
           ),
           div(class = "inner_pin", pinned_text),
