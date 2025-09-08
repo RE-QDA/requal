@@ -222,3 +222,86 @@ memo_segment_link <- function(segment_document_id, segment_id) {
         "Free"
     }
 }
+
+
+# Helper function to enrich memo table
+enrich_memo_table <- function(memo_table, pool, ns) {
+    memos_segments_map <- dplyr::tbl(pool, "memos_segments_map") %>%
+        dplyr::filter(memo_id %in% !!memo_table$memo_id) %>%
+        dplyr::collect()
+
+    segment_df <- dplyr::tbl(pool, "segments") %>%
+        dplyr::select(segment_id, doc_id, segment_text) %>%
+        dplyr::filter(segment_id %in% !!memos_segments_map$segment_id) %>%
+        dplyr::collect()
+
+    documents_df <- dplyr::tbl(pool, "documents") %>%
+        dplyr::select(doc_id, doc_name) %>%
+        dplyr::filter(doc_id %in% !!segment_df$doc_id) %>%
+        dplyr::collect()
+
+    user_df <- dplyr::tbl(pool, "users") %>%
+        dplyr::filter(user_id %in% !!memo_table$user_id) %>%
+        dplyr::select(user_id, user_name, user_login) %>%
+        dplyr::collect()
+
+    memo_table %>%
+        dplyr::left_join(memos_segments_map, by = "memo_id") %>%
+        dplyr::left_join(segment_df, by = "segment_id") %>%
+        dplyr::left_join(documents_df, by = "doc_id") %>%
+        dplyr::left_join(user_df, by = "user_id") %>%
+        dplyr::mutate(
+            memo_title = memo_link(ns("text_memo_click"), memo_id, memo_name),
+            memo_type = purrr::map2_chr(doc_id, segment_id, memo_segment_link)
+        ) %>%
+        dplyr::arrange(dplyr::desc(memo_id)) %>%
+        dplyr::select(
+            memo_id,
+            memo_title,
+            memo_type,
+            doc_name,
+            memo_text,
+            segment_text,
+            user_name,
+            user_id
+        )
+}
+
+# Helper function to pin a memo
+pin_memo <- function(memo_id, pool, active_project, ns) {
+    pin_id <- paste0("pin_id-", memo_id)
+    pinned_text <- read_memo_by_id(pool, active_project, memo_id) %>%
+        dplyr::pull(memo_text)
+
+    insertUI(
+        selector = "div.content-wrapper",
+        where = "afterBegin",
+        div(
+            id = pin_id,
+            class = "pinned_memo",
+            div(
+                id = "pin_header",
+                class = "pin_header",
+                icon("thumbtack"),
+                div(
+                    class = "unpin",
+                    actionButton(
+                        paste0("unpin_", pin_id),
+                        "",
+                        icon("xmark"),
+                        class = "unpin_btn",
+                        `data-id` = pin_id,
+                        onclick = paste0(
+                            "Shiny.setInputValue('",
+                            ns("unpin"),
+                            "', this.dataset.id, {priority: 'event'})"
+                        )
+                    )
+                )
+            ),
+            div(class = "inner_pin", pinned_text),
+            div(id = "resize_handle", class = "resizer")
+        )
+    )
+    golem::invoke_js("makeDraggable", list(id = pin_id))
+}
