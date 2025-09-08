@@ -31,7 +31,7 @@ mod_memo_ui <- function(id) {
     fluidRow(
       style = "margin-left: 30px;",
       div(
-        style = "max-width: 80vw;",
+        style = "max-width: 80%;",
         DT::dataTableOutput(ns("memo"))
       )
     )
