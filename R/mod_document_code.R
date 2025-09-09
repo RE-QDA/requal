@@ -530,8 +530,8 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(req(loc$code_extra_sel), {
       req(glob$doc_selector)
       removeUI("#code_extra_div")
-
       generate_code_extra_LF()
+      loc$code_extra_sel <- NULL
     })
     observeEvent(c(loc$selected_code_extra, glob$segments_observer), {
       req(loc$selected_code_extra)
@@ -562,6 +562,7 @@ mod_document_code_server <- function(id, glob) {
       removeUI("#code_extra_div")
       loc$backlight_code_id <- NULL
       loc$selected_code_extra <- NULL
+      loc$code_extra_sel <- NULL
     })
 
     # Segment removal ----------
