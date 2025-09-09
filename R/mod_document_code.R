@@ -236,6 +236,7 @@ mod_document_code_server <- function(id, glob) {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1 # must run first
       loc$text_observer <- loc$text_observer + 1
       removeUI("#code_extra_div") # remove code extra div so values can recalculate
+      loc$selected_code_extra <- NULL # reset code extra div observer
     })
 
     ## Observe refresh ----
