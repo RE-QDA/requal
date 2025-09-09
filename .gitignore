@@ -19,3 +19,5 @@ tests/test.requal
 # dev stuff
 test-iframe.R
 wip.R
+
+/.quarto/

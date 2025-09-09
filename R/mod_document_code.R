@@ -236,6 +236,7 @@ mod_document_code_server <- function(id, glob) {
       loc$codes_menu_observer <- loc$codes_menu_observer + 1 # must run first
       loc$text_observer <- loc$text_observer + 1
       removeUI("#code_extra_div") # remove code extra div so values can recalculate
+      loc$selected_code_extra <- NULL # reset code extra div observer
     })
 
     ## Observe refresh ----
@@ -522,18 +523,47 @@ mod_document_code_server <- function(id, glob) {
     })
 
     ## Codes extras -----
-    observeEvent(req(input$selected_code_extra), {
+    # Observe changes to input$selected_code_extra and update the reactive value
+    observeEvent(input$selected_code_extra, {
+      loc$selected_code_extra <- input$selected_code_extra
+    })
+    # When selected_code_extra changes generate code extra UI
+    observeEvent(req(loc$code_extra_sel), {
       req(glob$doc_selector)
       removeUI("#code_extra_div")
+      generate_code_extra_LF()
+      loc$code_extra_sel <- NULL
+    })
+    observeEvent(c(loc$selected_code_extra, glob$segments_observer), {
+      req(loc$selected_code_extra)
+      loc$segments_count <- dplyr::tbl(glob$pool, "segments") %>%
+        dplyr::filter(project_id == local(as.integer(glob$active_project))) %>%
+        dplyr::filter(code_id == local(as.integer(loc$selected_code_extra))) %>%
+        dplyr::collect() %>%
+        dplyr::summarise(
+          document_freq = sum(doc_id == local(as.integer(glob$doc_selector))),
+          total_freq = dplyr::n()
+        )
       loc$code_extra_sel <- paste0(
         "#",
-        ns(paste0("more-", input$selected_code_extra))
+        ns(paste0("more-", loc$selected_code_extra))
       )
-      generate_code_extra_LF()
+      shinyjs::html(
+        "code_extra_freq",
+        loc$segments_count$document_freq,
+        asis = TRUE
+      )
+      shinyjs::html(
+        "code_extra_total_freq",
+        loc$segments_count$total_freq,
+        asis = TRUE
+      )
     })
     observeEvent(req(input$close_code_extra_div), {
       removeUI("#code_extra_div")
       loc$backlight_code_id <- NULL
+      loc$selected_code_extra <- NULL
+      loc$code_extra_sel <- NULL
     })
 
     # Segment removal ----------
@@ -830,22 +860,13 @@ mod_document_code_server <- function(id, glob) {
 
     ## generate_code_extra_LF  -------------------
     generate_code_extra_LF <- function() {
-      doc_group <- NULL
-      selected_code_extra <- as.integer(input$selected_code_extra)
-      active_project <- as.integer(glob$active_project)
-      active_doc <- as.integer(glob$doc_selector)
+      selected_code_extra <- as.integer(loc$selected_code_extra)
+
       code_info <- glob$codebook %>%
         dplyr::filter(
           code_id == selected_code_extra
         )
-      segments_count <- dplyr::tbl(glob$pool, "segments") %>%
-        dplyr::filter(project_id == active_project) %>%
-        dplyr::filter(code_id == selected_code_extra) %>%
-        dplyr::collect() %>%
-        dplyr::summarise(
-          document_freq = sum(doc_id == active_doc),
-          total_freq = dplyr::n()
-        )
+
       insertUI(
         selector = loc$code_extra_sel,
         where = "afterEnd",
@@ -865,10 +886,16 @@ mod_document_code_server <- function(id, glob) {
           tags$b(code_info$code_name),
           br(),
           "Document frequency:",
-          tags$b(segments_count$document_freq),
+          tags$b(tags$span(
+            id = "code_extra_freq",
+            loc$segments_count$document_freq
+          )),
           br(),
           "Total frequency:",
-          tags$b(segments_count$total_freq),
+          tags$b(tags$span(
+            id = "code_extra_total_freq",
+            loc$segments_count$total_freq
+          )),
           br(),
           actionButton(
             ns("code_extra_backlight"),

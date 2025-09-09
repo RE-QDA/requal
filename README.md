@@ -40,17 +40,22 @@ these steps (assuming you have R installed on your machine):
     `remotes::install_local(file.choose())` and selecting the downloaded
     release file on your hard-drive.
 
+Alternatively, simply install the `requal` package from
+[R-Universe](https://re-qda.r-universe.dev/requal) by copying and
+pasting the following single-line command into the R console:
+
+    install.packages("requal", repos = c("https://re-qda.r-universe.dev", "https://cloud.r-project.org"))
+
 #### Development version
 
 The development version contains the latest features, but might be less
 stable than a [released
 version](https://github.com/RE-QDA/requal/releases).
 
-You can install the development version of `requal` from
-[GitHub](https://github.com/) by running this code in R:
+You can install the development version of `requal` by running this code
+in R:
 
-    install.packages("devtools")
-    devtools::install_github("RE-QDA/requal")
+    install.packages("requal", repos = c("https://hlageek.r-universe.dev", "https://cloud.r-project.org"))
 
 ## Usage
 
