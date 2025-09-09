@@ -536,11 +536,11 @@ mod_document_code_server <- function(id, glob) {
     observeEvent(c(loc$selected_code_extra, glob$segments_observer), {
       req(loc$selected_code_extra)
       loc$segments_count <- dplyr::tbl(glob$pool, "segments") %>%
-        dplyr::filter(project_id == as.integer(glob$active_project)) %>%
-        dplyr::filter(code_id == as.integer(loc$selected_code_extra)) %>%
+        dplyr::filter(project_id == local(as.integer(glob$active_project))) %>%
+        dplyr::filter(code_id == local(as.integer(loc$selected_code_extra))) %>%
         dplyr::collect() %>%
         dplyr::summarise(
-          document_freq = sum(doc_id == as.integer(glob$doc_selector)),
+          document_freq = sum(doc_id == local(as.integer(glob$doc_selector))),
           total_freq = dplyr::n()
         )
       loc$code_extra_sel <- paste0(
