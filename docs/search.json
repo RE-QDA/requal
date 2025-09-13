@@ -4,21 +4,14 @@
     "href": "get_started.html",
     "title": "Getting started",
     "section": "",
-    "text": "Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive."
+    "text": "Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.\nYou can try the demo version of Requal on the server of Charles University:\nYou have multiple options to install and use Requal, depending on your preferences and resources:"
   },
   {
     "objectID": "get_started.html#installation",
     "href": "get_started.html#installation",
     "title": "Getting started",
     "section": "Installation",
-    "text": "Installation\n\n\n\n\n\n\nTip for adventurous macOS users\n\n\n\nTry directly installing the standalone macOS version of the Requal app (experimental).\n\n\n\nServer version\nTo use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:\n\nhttps://requal.fsv.cuni.cz/demo\nuser: demo\npswd: requal123\n\n\n\nDesktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases. The installation file is in the requal_&lt;VERSION_NUMBER&gt;.tar.gz format.\nOpen the R console and install the remotes package by running install.packages(\"remotes\") command.\nInstall the requal package by running remotes::install_local(file.choose()) command and selecting the downloaded release file on your hard drive."
-  },
-  {
-    "objectID": "get_started.html#usage-desktop",
-    "href": "get_started.html#usage-desktop",
-    "title": "Getting started",
-    "section": "Usage (desktop)",
-    "text": "Usage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen\n\n\n\nDevelopment version (desktop)\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"devtools\")\ndevtools::install_github(\"RE-QDA/requal\")"
+    "text": "Installation\nThis section provides instructions for different options to install Requal.\n\nServer version\nThe server version is intended for online teamwork or teaching. To use the server version, you need to install Requal on a server or ask your organization’s IT staff to install it for you. Requal Wiki contains a basic guide for a server setup.\n\n\nDesktop version\nTo use Requal, you need to have the R language installed and running on your machine. You can download and install R from here. You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).\nYou can install Requal from GitHub by following these steps (assuming you have R installed on your machine):\n\nDownload the current release of Requal from Releases. The installation file is in the requal_&lt;VERSION_NUMBER&gt;.tar.gz format.\nOpen the R console and install the remotes package by running install.packages(\"remotes\") command.\nInstall the requal package by running remotes::install_local(file.choose()) command and selecting the downloaded release file on your hard drive.\n\n\nUsage (desktop)\nAfter installation, the Requal app can be launched from the R console with the following command:\nrequal::run_app()\n\n\n\nRequal start screen\n\n\n\n\n\nDevelopment version\nThe development version contains the latest features, but might be less stable than a released version.\nYou can install the development version of Requal from GitHub by running this code in R:\ninstall.packages(\"remotes\")\nremotes::install_github(\"RE-QDA/requal\")\nUsage is the same as in the server and desktop versions."
   },
   {
     "objectID": "index.html",
@@ -46,28 +39,35 @@
     "href": "contact.html",
     "title": "Contact",
     "section": "",
-    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app.\n\nMeet the team:\n\nRadim Hladík\nMichael Škvrňák\nNina Fárová\nMartin Hájek\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app."
   },
   {
     "objectID": "contact.html#help-contribution",
     "href": "contact.html#help-contribution",
     "title": "Contact",
     "section": "",
-    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app.\n\nMeet the team:\n\nRadim Hladík\nMichael Škvrňák\nNina Fárová\nMartin Hájek\n\n\nA guidebook on reproducibility-enhancing strategies used in Requal is available here (Czech language only).\nCite Requal:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version […]."
+    "text": "Need help?\n\nConsult the Requal Wiki\n\nHave an issue?\n\nReport it via GitHub Issues.\n\nWant to share your ideas or tips?\n\nContribute to the Requal Discussions.\n\nHave another question?\n\nSend email to team@requal.app."
   },
   {
-    "objectID": "contact.html#acknowledgement",
-    "href": "contact.html#acknowledgement",
+    "objectID": "contact.html#meet-the-team",
+    "href": "contact.html#meet-the-team",
     "title": "Contact",
-    "section": "Acknowledgement",
-    "text": "Acknowledgement\nThe application development has been supported by:\n\nThe Technology Agency of the Czech Republic, project n. TL05000054\nCLS INFRA Fellowship Programme"
+    "section": "Meet the team",
+    "text": "Meet the team\nRequal is developed through the collaboration of sociologists from the Institute of Philosophy of the Czech Academy of Sciences, the Institute of Sociology of the Czech Academy of Sciences, and the Faculty of Social Sciences of Charles University:\n\nRadim Hladík\n\ngeneral inquiries, Requal roadmap, development, features and troubleshooting, GitHub issues\n\nMichael Škvrňák\n\nmaintenance inquiries, development, features and troubleshooting, GitHub issues\n\nNina Fárová\n\naccessibility support\n\nMartin Hájek\n\nusage inquiries, recommendations for teaching QDA with Requal, Requal Wiki, YouTube tutorials\n\n\nIf you use Requal in your work, please cite as:\n\nHladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version no. […]. &lt;https://github.com/RE-QDA/requal&gt;."
+  },
+  {
+    "objectID": "contact.html#acknowledgements",
+    "href": "contact.html#acknowledgements",
+    "title": "Contact",
+    "section": "Acknowledgements",
+    "text": "Acknowledgements\nThe application development has been supported by:\n\nThe Technology Agency of the Czech Republic, project n. TL05000054\nCLS INFRA Fellowship Programme"
   },
   {
     "objectID": "contact.html#other-foss-caqdas",
     "href": "contact.html#other-foss-caqdas",
     "title": "Contact",
     "section": "Other FOSS CAQDAS",
-    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for QDA in R.\nTaguette - straightforward and collaborative online qualitative coding.\nQualCoder - feature-rich alternative to proprietary CAQDAS.\nOpenQDA - open-source collaborative CAQDAS in the cloud.\nQCoder - lightweight tool for coding text and its further analysis with R.\nROCK - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.\nIramuteq - graphical user interface for geometrical text analyses in R.\nCATMA - annotation and query software tuned for literary and historical documents."
+    "text": "Other FOSS CAQDAS\nRequal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:\n\nRQDA - this deserves a special mention as our original source of motivation and inspiration for conducting QDA in R environment\nTaguette - straightforward and collaborative online or offline qualitative coding application\nLibreQDA - a Taguette fork with some nice additional features such as code coloring and overlay or academic identity logon\nQualCoder - a feature-rich alternative to proprietary CAQDAS, including processing of audiovisual data\nOpenQDA - open-source collaborative CAQDAS in the cloud\nQCoder - lightweight tool for coding text and its further analysis with R\nROCK - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility\nIramuteq - graphical user interface for geometrical text analyses in R\nCATMA - annotation and query software tuned for literary and historical documents\nSonal - a free Windows application particularly well-suited for qualitative analysis of audio interviews and their transcriptions"
   },
   {
     "objectID": "posts/try-macOS-install/index.html",
@@ -95,6 +95,6 @@
     "href": "posts.html",
     "title": "Requal posts",
     "section": "",
-    "text": "Try Requal on macOS\n\n\n\n\n\n\nsoftware\n\n\n\nInstalling standalone Requal on macOS (experimental).\n\n\n\n\n\nAug 15, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to Requal: Increasing transparency and reflexivity of qualitative coding\n\n\n\n\n\n\npresentations\n\n\n\nRecording of the IASSIST webinar.\n\n\n\n\n\nAug 11, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRieppeleon (v1.1.3)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nFeb 23, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nThuringothyris (v1.1.2)\n\n\n\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRequal at Sociological Coffee\n\n\n\n\n\n\nevents\n\n\npresentations\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\n\nNo matching items"
+    "text": "Try Requal on macOS\n\n\n\nsoftware\n\n\n\nInstalling standalone Requal on macOS (experimental).\n\n\n\n\n\nAug 15, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nIntroduction to Requal: Increasing transparency and reflexivity of qualitative coding\n\n\n\npresentations\n\n\n\nRecording of the IASSIST webinar.\n\n\n\n\n\nAug 11, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRieppeleon (v1.1.3)\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nFeb 23, 2025\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nThuringothyris (v1.1.2)\n\n\n\nreleases\n\n\n\nAnnouncement of a new Requal release.\n\n\n\n\n\nMay 18, 2024\n\n\nrequal\n\n\n\n\n\n\n\n\n\n\n\n\nRequal at Sociological Coffee\n\n\n\nevents\n\npresentations\n\n\n\nMartin Hájek presented Requal at Charles University.\n\n\n\n\n\nMay 16, 2024\n\n\nrequal\n\n\n\n\n\nNo matching items"
   }
 ]

@@ -12,19 +12,26 @@ title: "Contact"
   - Contribute to the [Requal Discussions](https://github.com/RE-QDA/requal/discussions).
 - Have another question?
   - Send email to [team@requal.app](mailto:team@requal.app). 
-- Meet the team:
-  - [Radim Hladík](https://stss.flu.cas.cz/all/people/radim-hladik)
-  - [Michael Škvrňák](https://www.soc.cas.cz/en/staff/michael-skvrnak)
-  - [Nina Fárová](https://www.soc.cas.cz/en/staff/nina-farova)
-  - [Martin Hájek](https://fsv.cuni.cz/en/contacts/people/14960739)
 
-A guidebook on reproducibility-enhancing strategies used in Requal is available [here (Czech language only)](http://github.com/RE-QDA/requal/files/11720758/Strategie.pdf). 
+## Meet the team
 
-Cite Requal: 
+Requal is developed through the collaboration of sociologists from the [Institute of Philosophy of the Czech Academy of Sciences](https://www.flu.cas.cz/en/), the [Institute of Sociology of the Czech Academy of Sciences](https://www.soc.cas.cz/en/), and the [Faculty of Social Sciences of Charles University](https://iss.fsv.cuni.cz/en):
 
-> Hladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version [...].
+- [Radim Hladík](https://stss.flu.cas.cz/all/people/radim-hladik)
+  - general inquiries, Requal roadmap, development, features and troubleshooting, [GitHub issues](https://github.com/RE-QDA/requal/issues)
+- [Michael Škvrňák](https://www.soc.cas.cz/en/staff/michael-skvrnak)
+  - maintenance inquiries, development, features and troubleshooting, [GitHub issues](https://github.com/RE-QDA/requal/issues)
+- [Nina Fárová](https://www.soc.cas.cz/en/staff/nina-farova)
+  - accessibility support
+- [Martin Hájek](https://fsv.cuni.cz/en/contacts/people/14960739) 
+  - usage inquiries, recommendations for teaching QDA with Requal, [Requal Wiki](https://github.com/RE-QDA/requal/wiki/), [YouTube tutorials](https://www.youtube.com/playlist?list=PLnPxF9V0hJaKMJ2iGrpt64M0PjZlqMuKl)
 
-## Acknowledgement
+
+If you use Requal in your work, please cite as: 
+
+> Hladík R, Škvrňák M, Fárová N, Hájek M (2023). Requal: Shiny Application for Computer-Assisted Qualitative Data Analysis. R package version no. [...]. \<https://github.com/RE-QDA/requal\>.
+
+## Acknowledgements
 
 The application development has been supported by:
 
@@ -35,11 +42,13 @@ The application development has been supported by:
 
 Requal is a proud member of the community of free and open source software for computer-assisted qualitative data analysis (FOSS CAQDAS). You can explore other similar projects:
 
-- [RQDA](https://rqda.r-forge.r-project.org/) - this deserves a special mention as our original source of motivation and inspiration for QDA in R.
-- [Taguette](https://www.taguette.org/) - straightforward and collaborative online qualitative coding.
-- [QualCoder](https://qualcoder.wordpress.com/) - feature-rich alternative to proprietary CAQDAS.
-- [OpenQDA](https://openqda.org/) - open-source collaborative CAQDAS in the cloud.
-- [QCoder](https://github.com/ropenscilabs/qcoder) - lightweight tool for coding text and its further analysis with R.
-- [ROCK](https://r-packages.gitlab.io/rock/) - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility.
-- [Iramuteq](http://www.iramuteq.org/) - graphical user interface for geometrical text analyses in R.
-- [CATMA](https://catma.de/) - annotation and query software tuned for literary and historical documents.
+- [RQDA](https://rqda.r-forge.r-project.org/) - this deserves a special mention as our original source of motivation and inspiration for conducting QDA in R environment
+- [Taguette](https://www.taguette.org/) - straightforward and collaborative online or offline qualitative coding application
+- [LibreQDA](https://www.libreqda.org/) - a Taguette fork with some nice additional features such as code coloring and overlay or academic identity logon
+- [QualCoder](https://qualcoder.wordpress.com/) - a feature-rich alternative to proprietary CAQDAS, including processing of audiovisual data
+- [OpenQDA](https://openqda.org/) - open-source collaborative CAQDAS in the cloud
+- [QCoder](https://github.com/ropenscilabs/qcoder) - lightweight tool for coding text and its further analysis with R
+- [ROCK](https://r-packages.gitlab.io/rock/) - R implementation of quantitative ethnography approach to QDA with a focus on reproducibility
+- [Iramuteq](http://www.iramuteq.org/) - graphical user interface for geometrical text analyses in R
+- [CATMA](https://catma.de/) - annotation and query software tuned for literary and historical documents
+- [Sonal](http://www.sonal-info.com/) - a free Windows application particularly well-suited for qualitative analysis of audio interviews and their transcriptions

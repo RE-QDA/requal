@@ -4,7 +4,24 @@ title: "Getting started"
 
 Requal provides basic functionality for annotating documents in plain text with user-defined codes. The annotated text segments can be filtered and exported. Modules to enhance reproducibility help users in making their analysis more transparent and reflexive.
 
-## Installation
+You can try the demo version of Requal on the server of [Charles University](https://iss.fsv.cuni.cz/):
+
+:::{.center}
+
+[https://requal.fsv.cuni.cz/demo](https://requal.fsv.cuni.cz/demo)
+
+```
+user: demo
+password: requal123
+```
+:::
+
+You have multiple options to install and use Requal, depending on your preferences and resources:
+
+- [Server option](#server-version) - You can self-host Requal on a server and collaborate with others through a Shiny-server; the data is stored in a remote PostgreSQL database.
+- [Desktop option](#desktop-version) - You can run Requal locally on your machine in the R environment from a release (stable) version; the data is stored in a local SQLite database.
+- [Development option](#development-version) - Requal is under active development, and for both server and desktop usage, you might prefer installing the development version to access the latest features, though you may also encounter some unresolved bugs.
+- [Standalone option](/posts/try-macOS-install/index.qmd) - The standalone option for desktop usage is packaged using Electron and does not require prior installation of R on your machine. Currently, this is experimental and available only for macOS. The macOS-built version may lag slightly behind the development version in terms of features.
 
 ::: {.callout-tip}
 ## Tip for adventurous macOS users
@@ -12,22 +29,15 @@ Requal provides basic functionality for annotating documents in plain text with 
 Try directly installing the standalone [macOS version of the Requal app](/posts/try-macOS-install/index.qmd) (experimental).
 :::
 
-### Server version
+## Installation
 
-To use the server version, you need to install Requal on a server or ask your organization's IT staff to install it for you. The server version is intended for online teamwork or teaching. You can try the demo version on the server of Charles University:
+This section provides instructions for different options to install Requal.
 
-:::{.center}
+### Server version {#server-version}
 
-[https://requal.fsv.cuni.cz/demo](https://requal.fsv.cuni.cz/demo)
+The server version is intended for online teamwork or teaching. To use the server version, you need to install Requal on a server or ask your organization's IT staff to install it for you. [Requal Wiki](https://github.com/RE-QDA/requal/wiki/) contains a basic guide for a [server setup](https://github.com/RE-QDA/requal/wiki/Server-setup). 
 
-
-```
-user: demo
-pswd: requal123
-```
-:::
-
-### Desktop version
+### Desktop version {#desktop-version}
 
 To use Requal, you need to have the R language installed and running on your machine. You can download and install R from [here](https://cloud.r-project.org). You will also need a web browser with JavaScript support (i.e. any of the standard issue browsers like Firefox, Chrome, or Safari).
 
@@ -37,7 +47,7 @@ You can install Requal from GitHub by following these steps (assuming you have R
 2. Open the R console and install the `remotes` package by running `install.packages("remotes")` command.
 3. Install the `requal` package by running `remotes::install_local(file.choose())` command and selecting the downloaded release file on your hard drive.
 
-## Usage (desktop)
+#### Usage (desktop)
 
 After installation, the Requal app can be launched from the R console with the following command:
 
@@ -48,14 +58,15 @@ requal::run_app()
 ![Requal start screen](https://user-images.githubusercontent.com/101122661/198824139-56f614af-90e5-46c0-a265-db3d89a54741.png)
 
 
-### Development version (desktop)
+### Development version {#development-version}
 
 The development version contains the latest features, but might be less stable than a released version.
 
 You can install the development version of Requal from GitHub by running this code in R:
 
 ```
-install.packages("devtools")
-devtools::install_github("RE-QDA/requal")
+install.packages("remotes")
+remotes::install_github("RE-QDA/requal")
 ```
 
+Usage is the same as in the server and desktop versions.
