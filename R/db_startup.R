@@ -1,384 +1,773 @@
 utils::globalVariables(c("sql", "is_new_quickcode"))
 
-db_call <- c(
-  "attributes" = "
-CREATE TABLE if not exists attributes (
-    attribute_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   attribute_name TEXT
-,   attribute_object TEXT
-,   attribute_type TEXT
-,   project_id INTEGER
-,   user_id INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
-",
+# ============================================================================
+# Database Schema Definition (DBML-inspired)
+# ============================================================================
 
-  "attributes_users_map" = "
-CREATE TABLE if not exists attributes_users_map (
-    user_id INTEGER
-,   attribute_id INTEGER
-,   attribute_value_id INTEGER 
-,   project_id INTEGER
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
-,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
-",
+schema <- list(
+  # Base tables (no dependencies - level auto-calculated)
+  projects = list(
+    columns = list(
+      project_id = list(type = "serial_pk"),
+      project_name = list(type = "text"),
+      project_description = list(type = "text"),
+      created_at = list(type = "timestamp", default = "CURRENT_TIMESTAMP")
+    )
+  ),
 
-  "attributes_documents_map" = "
-  CREATE TABLE if not exists attributes_documents_map (
-      doc_id INTEGER
-  ,   attribute_id INTEGER
-  ,   attribute_value_id INTEGER 
-  ,   project_id INTEGER
-  ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-  );
-  ",
+  users = list(
+    columns = list(
+      user_id = list(type = "integer_pk"),
+      user_login = list(type = "text", unique = TRUE),
+      user_name = list(type = "text"),
+      user_mail = list(type = "text"),
+      created_at = list(type = "timestamp", default = "CURRENT_TIMESTAMP")
+    )
+  ),
 
-  "attributes_cases_map" = "
-  CREATE TABLE if not exists attributes_cases_map (
-      case_id INTEGER
-  ,   attribute_id INTEGER
-  ,   attribute_value_id INTEGER 
-  ,   project_id INTEGER
-  ,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(attribute_value_id) REFERENCES attribute_values(attribute_value_id) ON DELETE CASCADE
-  ,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-  );
-  ",
+  # Tables with dependencies (levels auto-calculated from foreign keys)
+  documents = list(
+    columns = list(
+      doc_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer"),
+      doc_name = list(type = "text"),
+      doc_description = list(type = "text"),
+      doc_text = list(type = "text"),
+      created_at = list(type = "timestamp", default = "CURRENT_TIMESTAMP")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "attribute_values" = "
-CREATE TABLE if not exists attribute_values (
-    attribute_value_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   attribute_id INTEGER
-,   value TEXT
-,   FOREIGN KEY(attribute_id) REFERENCES attributes(attribute_id) ON DELETE CASCADE
-);
-",
+  codes = list(
+    columns = list(
+      code_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer"),
+      code_name = list(type = "text"),
+      code_description = list(type = "text"),
+      code_color = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "cases" = "
-CREATE TABLE if not exists cases (
-    project_id INTEGER
-,   case_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   case_name TEXT
-,   case_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
-",
+  categories = list(
+    columns = list(
+      category_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer"),
+      category_name = list(type = "text"),
+      category_description = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "cases_documents_map" = "
-CREATE TABLE if not exists cases_documents_map (
-    project_id INTEGER
-,   case_id INTEGER
-,   doc_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(case_id) REFERENCES cases(case_id) ON DELETE CASCADE
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
-);
-",
+  cases = list(
+    columns = list(
+      case_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      case_name = list(type = "text"),
+      case_description = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "categories" = "
-CREATE TABLE if not exists categories (
-    project_id INTEGER
-,   category_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   user_id INTEGER
-,   category_name TEXT
-,   category_description TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  attributes = list(
+    columns = list(
+      attribute_id = list(type = "serial_pk"),
+      attribute_name = list(type = "text"),
+      attribute_object = list(type = "text"),
+      attribute_type = list(type = "text"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "categories_codes_map" = "
-CREATE TABLE if not exists categories_codes_map (
-    project_id INTEGER
-,   category_id INTEGER
-,   code_id INTEGER
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(category_id) REFERENCES categories(category_id) ON DELETE CASCADE
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
-);
-",
+  memos = list(
+    columns = list(
+      memo_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer"),
+      text = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "codes" = "
-CREATE TABLE if not exists codes (
-    project_id INTEGER
-,   code_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   user_id INTEGER
-,   code_name TEXT
-,   code_description TEXT
-,   code_color TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  requal_logs = list(
+    columns = list(
+      user_id = list(type = "integer"),
+      project_id = list(type = "integer"),
+      action = list(type = "text"),
+      payload = list(type = "json"),
+      created_at = list(type = "timestamp", default = "CURRENT_TIMESTAMP")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "documents" = "
-CREATE TABLE if not exists documents (
-    doc_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   project_id INTEGER
-,   user_id INTEGER
-,   doc_name TEXT
-,   doc_description TEXT
-,   doc_text TEXT
-,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  requal_version = list(
+    columns = list(
+      project_id = list(type = "integer"),
+      version = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "logs" = "
-CREATE TABLE if not exists logs
-(   user_id INTEGER
-,   project_id INTEGER
-,   action TEXT
-,   payload JSON
-,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  user_permissions = list(
+    columns = list(
+      user_id = list(type = "integer"),
+      project_id = list(type = "integer"),
+      data_modify = list(type = "integer"),
+      data_other_modify = list(type = "integer"),
+      data_other_view = list(type = "integer"),
+      attributes_modify = list(type = "integer"),
+      attributes_other_modify = list(type = "integer"),
+      attributes_other_view = list(type = "integer"),
+      codebook_modify = list(type = "integer"),
+      codebook_other_modify = list(type = "integer"),
+      codebook_other_view = list(type = "integer"),
+      annotation_modify = list(type = "integer"),
+      annotation_other_modify = list(type = "integer"),
+      annotation_other_view = list(type = "integer"),
+      analysis_other_view = list(type = "integer"),
+      report_other_view = list(type = "integer"),
+      permissions_modify = list(type = "integer"),
+      memo_modify = list(type = "integer"),
+      memo_other_modify = list(type = "integer"),
+      memo_other_view = list(type = "integer"),
+      project_owner = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "memos" = "
-CREATE TABLE if not exists memos (
-    project_id INTEGER
-,   memo_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   user_id INTEGER
-,   text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  # Level 2 tables
+  attribute_values = list(
+    columns = list(
+      attribute_value_id = list(type = "serial_pk"),
+      attribute_id = list(type = "integer"),
+      value = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "attribute_id",
+        ref_table = "attributes",
+        ref_column = "attribute_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "memos_codes_map" = "
-CREATE TABLE if not exists memos_codes_map (
-    memo_id INTEGER
-    ,   code_id INTEGER
-    ,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
-);
-",
+  segments = list(
+    columns = list(
+      segment_id = list(type = "serial_pk"),
+      project_id = list(type = "integer"),
+      user_id = list(type = "integer"),
+      doc_id = list(type = "integer"),
+      code_id = list(type = "integer"),
+      segment_start = list(type = "integer"),
+      segment_end = list(type = "integer"),
+      segment_text = list(type = "text")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "doc_id",
+        ref_table = "documents",
+        ref_column = "doc_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "code_id",
+        ref_table = "codes",
+        ref_column = "code_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "memos_documents_map" = "
-CREATE TABLE if not exists memos_documents_map (
-    memo_id INTEGER
-    ,   doc_id INTEGER
-    ,   memo_start INTEGER
-    ,   memo_end INTEGER
-    ,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
-);
-",
+  categories_codes_map = list(
+    columns = list(
+      project_id = list(type = "integer"),
+      category_id = list(type = "integer"),
+      code_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "category_id",
+        ref_table = "categories",
+        ref_column = "category_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "code_id",
+        ref_table = "codes",
+        ref_column = "code_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "memos_segments_map" = "
-CREATE TABLE if not exists memos_segments_map (
-    memo_id INTEGER
-    ,   segment_id INTEGER
-    ,   FOREIGN KEY(segment_id) REFERENCES segments(segment_id) ON DELETE CASCADE
-    ,   FOREIGN KEY(memo_id) REFERENCES memos(memo_id) ON DELETE CASCADE
-);
-",
+  cases_documents_map = list(
+    columns = list(
+      project_id = list(type = "integer"),
+      case_id = list(type = "integer"),
+      doc_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "case_id",
+        ref_table = "cases",
+        ref_column = "case_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "doc_id",
+        ref_table = "documents",
+        ref_column = "doc_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "projects" = "
-CREATE TABLE projects (
-     project_id INTEGER PRIMARY KEY AUTOINCREMENT
-,    project_name TEXT
-,    project_description TEXT
-,    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-",
+  memos_codes_map = list(
+    columns = list(
+      memo_id = list(type = "integer"),
+      code_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "code_id",
+        ref_table = "codes",
+        ref_column = "code_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "memo_id",
+        ref_table = "memos",
+        ref_column = "memo_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "requal_version" = "
-CREATE TABLE if not exists requal_version (
-    project_id INTEGER
-,   version TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
-",
+  memos_documents_map = list(
+    columns = list(
+      memo_id = list(type = "integer"),
+      doc_id = list(type = "integer"),
+      memo_start = list(type = "integer"),
+      memo_end = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "doc_id",
+        ref_table = "documents",
+        ref_column = "doc_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "memo_id",
+        ref_table = "memos",
+        ref_column = "memo_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "segments" = "
-CREATE TABLE if not exists segments (
-    project_id INTEGER
-,   user_id INTEGER
-,   doc_id INTEGER
-,   code_id INTEGER
-,   segment_id INTEGER PRIMARY KEY AUTOINCREMENT
-,   segment_start INTEGER
-,   segment_end INTEGER
-,   segment_text TEXT
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id)ON DELETE CASCADE
-,   FOREIGN KEY(doc_id) REFERENCES documents(doc_id) ON DELETE CASCADE
-,   FOREIGN KEY(code_id) REFERENCES codes(code_id) ON DELETE CASCADE
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-",
+  memos_segments_map = list(
+    columns = list(
+      memo_id = list(type = "integer"),
+      segment_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "segment_id",
+        ref_table = "segments",
+        ref_column = "segment_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "memo_id",
+        ref_table = "memos",
+        ref_column = "memo_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "users" = "
-CREATE TABLE if not exists users (
-    user_id INTEGER PRIMARY KEY
-,   user_login TEXT UNIQUE
-,   user_name TEXT
-,   user_mail TEXT
-,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-",
+  attributes_users_map = list(
+    columns = list(
+      user_id = list(type = "integer"),
+      attribute_id = list(type = "integer"),
+      attribute_value_id = list(type = "integer"),
+      project_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "user_id",
+        ref_table = "users",
+        ref_column = "user_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_id",
+        ref_table = "attributes",
+        ref_column = "attribute_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_value_id",
+        ref_table = "attribute_values",
+        ref_column = "attribute_value_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-  "user_permissions" = "
-CREATE TABLE if not exists user_permissions (
-    user_id INTEGER
-,   project_id INTEGER
-,   data_modify INTEGER            
-,   data_other_modify INTEGER     
-,   data_other_view INTEGER       
-,   attributes_modify INTEGER      
-,   attributes_other_modify INTEGER
-,   attributes_other_view INTEGER  
-,   codebook_modify INTEGER        
-,   codebook_other_modify INTEGER  
-,   codebook_other_view INTEGER    
-,   annotation_modify INTEGER     
-,   annotation_other_modify INTEGER
-,   annotation_other_view INTEGER
-,   analysis_other_view INTEGER    
-,   report_other_view INTEGER      
-,   permissions_modify INTEGER
-,   memo_modify INTEGER
-,   memo_other_modify INTEGER
-,   memo_other_view INTEGER
-,   project_owner INTEGER     
-,   FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-,   FOREIGN KEY(project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
-"
-)
+  attributes_documents_map = list(
+    columns = list(
+      doc_id = list(type = "integer"),
+      attribute_id = list(type = "integer"),
+      attribute_value_id = list(type = "integer"),
+      project_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "doc_id",
+        ref_table = "documents",
+        ref_column = "doc_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_id",
+        ref_table = "attributes",
+        ref_column = "attribute_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_value_id",
+        ref_table = "attribute_values",
+        ref_column = "attribute_value_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
+  ),
 
-db_call_df_unordered <- tibble::tibble(
-  table = names(db_call),
-  sql = db_call
-)
-
-# Arrange by priority as required by postgres
-db_call_df_ordered <- tibble::tibble(
-  table = c(
-    "projects",
-    "requal_version",
-    "users",
-    "user_permissions",
-    "logs",
-    "documents",
-    "codes",
-    "categories",
-    "categories_codes_map",
-    "cases",
-    "cases_documents_map",
-    "segments",
-    "memos",
-    "attributes",
-    "attribute_values",
-    "memos_segments_map"
+  attributes_cases_map = list(
+    columns = list(
+      case_id = list(type = "integer"),
+      attribute_id = list(type = "integer"),
+      attribute_value_id = list(type = "integer"),
+      project_id = list(type = "integer")
+    ),
+    foreign_keys = list(
+      list(
+        column = "case_id",
+        ref_table = "cases",
+        ref_column = "case_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_id",
+        ref_table = "attributes",
+        ref_column = "attribute_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "attribute_value_id",
+        ref_table = "attribute_values",
+        ref_column = "attribute_value_id",
+        on_delete = "CASCADE"
+      ),
+      list(
+        column = "project_id",
+        ref_table = "projects",
+        ref_column = "project_id",
+        on_delete = "CASCADE"
+      )
+    )
   )
 )
 
-db_call_df <- dplyr::full_join(
-  db_call_df_ordered,
-  db_call_df_unordered,
-  by = "table"
+# ============================================================================
+# Type Mappings (DBML-inspired)
+# ============================================================================
+
+type_map <- list(
+  sqlite = list(
+    serial_pk = "INTEGER PRIMARY KEY AUTOINCREMENT",
+    integer_pk = "INTEGER PRIMARY KEY",
+    integer = "INTEGER",
+    text = "TEXT",
+    timestamp = "TEXT",
+    json = "TEXT"
+  ),
+  postgres = list(
+    serial_pk = "SERIAL PRIMARY KEY",
+    integer_pk = "INTEGER PRIMARY KEY",
+    integer = "INTEGER",
+    text = "TEXT",
+    timestamp = "TIMESTAMP",
+    json = "JSON" # Throws warnings
+  )
 )
 
-db_call_df_unordered <- tibble::tibble(
-  table = names(db_call),
-  sql = db_call
-)
+# ============================================================================
+# Core Functions
+# ============================================================================
 
+# Auto-calculate dependency levels from foreign keys
+calculate_dependency_levels <- function(schema) {
+  all_tables <- names(schema)
+  levels <- setNames(rep(NA_integer_, length(all_tables)), all_tables)
 
+  # Iteratively assign levels
+  max_iterations <- length(all_tables) + 1
+  for (iteration in 1:max_iterations) {
+    changed <- FALSE
+
+    for (tbl in all_tables) {
+      if (!is.na(levels[tbl])) {
+        next
+      }
+
+      fks <- schema[[tbl]]$foreign_keys
+
+      # No foreign keys = level 0
+      if (is.null(fks) || length(fks) == 0) {
+        levels[tbl] <- 0
+        changed <- TRUE
+        next
+      }
+
+      # Get all referenced tables
+      ref_tables <- purrr::map_chr(fks, ~ .x$ref_table)
+      ref_levels <- levels[ref_tables]
+
+      # Can only assign level if all dependencies are resolved
+      if (all(!is.na(ref_levels))) {
+        levels[tbl] <- max(ref_levels) + 1
+        changed <- TRUE
+      }
+    }
+
+    if (!changed) break
+  }
+
+  # Check for unresolved (circular dependencies or missing tables)
+  if (any(is.na(levels))) {
+    unresolved <- names(levels)[is.na(levels)]
+    stop(
+      "Cannot resolve dependency order for tables: ",
+      paste(unresolved, collapse = ", ")
+    )
+  }
+
+  levels
+}
+
+# Get tables in correct dependency order
+get_ordered_tables <- function(schema) {
+  levels <- calculate_dependency_levels(schema)
+
+  tibble::tibble(
+    table = names(levels),
+    level = levels
+  ) %>%
+    dplyr::arrange(level, table) %>%
+    dplyr::pull(table)
+}
+
+# Build column definition SQL
+build_column_sql <- function(col_name, col_def, db_type, type_map) {
+  base_type <- type_map[[db_type]][[col_def$type]]
+
+  parts <- c(col_name, base_type)
+
+  # Add constraints
+  if (!is.null(col_def$unique) && col_def$unique) {
+    parts <- c(parts, "UNIQUE")
+  }
+
+  if (!is.null(col_def$default)) {
+    parts <- c(parts, paste0("DEFAULT ", col_def$default))
+  }
+
+  paste(parts, collapse = " ")
+}
+
+# Build foreign key constraint SQL
+build_fk_sql <- function(fk) {
+  sprintf(
+    "FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE %s",
+    fk$column,
+    fk$ref_table,
+    fk$ref_column,
+    fk$on_delete
+  )
+}
+
+# Build CREATE TABLE statement
+build_create_table_sql <- function(table_name, table_def, db_type, type_map) {
+  # Build column definitions
+  col_sqls <- purrr::imap_chr(
+    table_def$columns,
+    ~ build_column_sql(.y, .x, db_type, type_map)
+  )
+
+  # Build foreign key constraints
+  fk_sqls <- if (!is.null(table_def$foreign_keys)) {
+    purrr::map_chr(table_def$foreign_keys, build_fk_sql)
+  } else {
+    character(0)
+  }
+
+  # Combine all SQL parts
+  all_parts <- c(col_sqls, fk_sqls)
+
+  sprintf(
+    "CREATE TABLE IF NOT EXISTS %s (\n    %s\n);",
+    table_name,
+    paste(all_parts, collapse = "\n,   ")
+  )
+}
+
+# Detect database type from pool
+get_db_type <- function(pool) {
+  if (pool::dbGetInfo(pool)$pooledObjectClass == "SQLiteConnection") {
+    "sqlite"
+  } else {
+    "postgres"
+  }
+}
+
+# Get existing columns for a table
+get_existing_columns <- function(pool, table_name) {
+  tryCatch(
+    {
+      # Use dplyr::tbl to get table structure
+      result <- dplyr::tbl(pool, table_name) %>%
+        utils::head(0) %>%
+        dplyr::collect()
+      names(result)
+    },
+    error = function(e) {
+      character(0) # Table doesn't exist
+    }
+  )
+}
+
+# Add a column to existing table
+add_column_sql <- function(table_name, col_name, col_def, db_type, type_map) {
+  col_sql <- build_column_sql(col_name, col_def, db_type, type_map)
+  sprintf("ALTER TABLE %s ADD COLUMN %s;", table_name, col_sql)
+}
+
+# ============================================================================
+# Main Functions
+# ============================================================================
+
+# Create entire database schema
 create_db_schema <- function(pool) {
-  db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
-  if (db_postgres) {
-    psql <- db_call_df %>%
-      dplyr::mutate(
-        psql = stringr::str_replace(
-          sql,
-          "INTEGER PRIMARY KEY AUTOINCREMENT",
-          "SERIAL PRIMARY KEY"
-        )
-      ) %>%
-      dplyr::pull(psql)
+  db_type <- get_db_type(pool)
+  ordered_tables <- get_ordered_tables(schema)
 
-    purrr::walk(psql, ~ DBI::dbExecute(pool, .x))
-  } else {
-    purrr::walk(db_call_df$sql, ~ DBI::dbExecute(pool, .x))
-  }
+  purrr::walk(ordered_tables, function(tbl) {
+    sql <- build_create_table_sql(tbl, schema[[tbl]], db_type, type_map)
+    DBI::dbExecute(pool, sql)
+  })
+
+  message("Created database schema with ", length(ordered_tables), " tables.")
 }
 
+# Update database schema (add missing tables and columns)
 update_db_schema <- function(pool) {
+  db_type <- get_db_type(pool)
+  ordered_tables <- get_ordered_tables(schema)
   existing_tables <- pool::dbListTables(pool)
-  existing_tables_no_sqlite <- existing_tables[
-    !grepl("sqlite", existing_tables)
-  ]
-  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
-  if (length(missing_tables) > 0) {
-    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
-    if (db_postgres) {
-      to_create_tables <- db_call_df %>%
-        dplyr::filter(table %in% missing_tables) %>%
-        dplyr::mutate(
-          psql = stringr::str_replace(
-            sql,
-            "INTEGER PRIMARY KEY AUTOINCREMENT",
-            "SERIAL PRIMARY KEY"
-          )
-        )
-      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
-    } else {
-      to_create_tables <- db_call_df %>%
-        dplyr::filter(table %in% missing_tables)
+  existing_tables <- existing_tables[!grepl("sqlite", existing_tables)]
 
-      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
+  tables_created <- 0
+  columns_added <- 0
+
+  purrr::walk(ordered_tables, function(tbl) {
+    if (!tbl %in% existing_tables) {
+      sql <- build_create_table_sql(tbl, schema[[tbl]], db_type, type_map)
+      DBI::dbExecute(pool, sql)
+      tables_created <<- tables_created + 1
+    } else {
+      existing_cols <- get_existing_columns(pool, tbl)
+      schema_cols <- names(schema[[tbl]]$columns)
+      missing_cols <- setdiff(schema_cols, existing_cols)
+
+      if (length(missing_cols) > 0) {
+        purrr::walk(missing_cols, function(col) {
+          sql <- add_column_sql(
+            tbl,
+            col,
+            schema[[tbl]]$columns[[col]],
+            db_type,
+            type_map
+          )
+          DBI::dbExecute(pool, sql)
+          columns_added <<- columns_added + 1
+        })
+      }
     }
-    message("Updated requal schema.")
+  })
+
+  if (tables_created > 0 || columns_added > 0) {
+    message(sprintf(
+      "Updated schema: %d tables created, %d columns added.",
+      tables_created,
+      columns_added
+    ))
   } else {
-    NULL
+    message("Schema is up to date.")
   }
 }
 
-update_db_schema <- function(pool) {
-  existing_tables <- pool::dbListTables(pool)
-  existing_tables_no_sqlite <- existing_tables[
-    !grepl("sqlite", existing_tables)
-  ]
-  missing_tables <- setdiff(db_call_df$table, existing_tables_no_sqlite)
-  if (length(missing_tables) > 0) {
-    db_postgres <- pool::dbGetInfo(pool)$pooledObjectClass != "SQLiteConnection"
-    if (db_postgres) {
-      to_create_tables <- db_call_df %>%
-        dplyr::filter(table %in% missing_tables) %>%
-        dplyr::mutate(
-          psql = stringr::str_replace(
-            sql,
-            "INTEGER PRIMARY KEY AUTOINCREMENT",
-            "SERIAL PRIMARY KEY"
-          )
-        )
-      purrr::walk(to_create_tables$psql, ~ DBI::dbExecute(pool, .x))
-    } else {
-      to_create_tables <- db_call_df %>%
-        dplyr::filter(table %in% missing_tables)
 
-      purrr::walk(to_create_tables$sql, ~ DBI::dbExecute(pool, .x))
-    }
-    message("Updated requal schema.")
-  } else {
-    NULL
-  }
-}
-
-# Database functions ####
+# Database functions -----------------
 
 create_default_user <- function(pool, project_id, user_id) {
   default_user_permission_df <- tibble::tibble(
