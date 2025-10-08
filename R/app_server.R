@@ -36,17 +36,8 @@ app_server <- function(input, output, session) {
     shinyjs::show(selector = "div.tab-content")
     glob$users_observer <- 0
     glob$segments_observer <- 0
-    # Launch user-project-specific RequalAPI
-    mod_extensions_server(
-      "extensions_ui_1",
-      api = RequalAPI$new(
-        con = req(glob$pool),
-        user_id = req(glob$user$user_id),
-        project_id = req(glob$active_project)
-      )
-    )
+    session$sendCustomMessage(type = "reset", message = NULL)
   })
-
   # Project  ----
   mod_project_server("mod_project_ui_1", glob)
   # Manage users ----
@@ -88,6 +79,15 @@ app_server <- function(input, output, session) {
   mod_memo_server("memo_ui_1", glob)
   ## free memo
   mod_memo_free_server("free_memo_ui_1", glob)
+
+  mod_extensions_server(
+    "extensions_ui_1",
+    api = RequalAPI$new(
+      con = req(glob$pool),
+      user_id = req(glob$user$user_id),
+      project_id = req(glob$active_project)
+    )
+  )
 
   # show admin interface
   observeEvent(glob$user$is_admin, {

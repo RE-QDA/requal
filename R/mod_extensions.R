@@ -69,7 +69,7 @@ mod_extensions_ui <- function(id) {
 #' extensions Server Functions
 #'
 #' @noRd
-mod_extensions_server <- function(id, api) {
+mod_extensions_server <- function(id, glob, api) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     observe(print(api))
