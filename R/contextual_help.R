@@ -21,7 +21,7 @@ with_help <- function(tag = NULL, help_item = NULL, visible = FALSE) {
       if (visible) "visible;" else "hidden;"
     ),
     onclick = paste0(
-      "Shiny.setInputValue('show_help', {item: '",
+      "event.stopPropagation(); event.preventDefault(); Shiny.setInputValue('show_help', {item: '",
       help_item,
       "'}, {priority: 'event'});"
     ),
@@ -60,7 +60,7 @@ with_help <- function(tag = NULL, help_item = NULL, visible = FALSE) {
           color: gray;
         ",
         onclick = paste0(
-          "Shiny.setInputValue('hide_help', {item: '",
+          "event.stopPropagation(); event.preventDefault(); Shiny.setInputValue('hide_help', {item: '",
           help_item,
           "'}, {priority: 'event'});"
         ),

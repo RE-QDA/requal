@@ -10,31 +10,59 @@
 mod_codebook_import_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    fileInput(
-      ns("file"),
-      "Choose CSV File",
-      accept = c(
-        "text/csv",
-        "text/comma-separated-values,text/plain",
-        ".csv",
-        "text/tab-separated-values",
-        ".tsv"
-      )
+    selectInput(
+      ns("file_type"),
+      "Select import format",
+      choices = c("CSV" = "csv", "REFI-QDA" = "refi-qda"),
+      selected = "refi-qda"
     ),
     tags$hr(),
-    checkboxInput(
-      ns("header"),
-      "Header (the file includes column names)",
-      TRUE
+
+    # CSV input
+    conditionalPanel(
+      condition = "input.file_type == 'csv'",
+      ns = ns,
+      fileInput(
+        ns("file"),
+        with_help(
+          "Choose CSV File",
+          help_item = "codebook_csv_import",
+          visible = TRUE
+        ),
+        accept = c(
+          "text/csv",
+          "text/comma-separated-values,text/plain",
+          ".csv",
+          "text/tab-separated-values",
+          ".tsv"
+        )
+      ),
+      tags$hr(),
+      checkboxInput(
+        ns("header"),
+        "Header (the file includes column names)",
+        TRUE
+      ),
+      radioButtons(
+        ns("sep"),
+        "Separator",
+        choices = c(Comma = ",", Semicolon = ";", Tab = "\t"),
+        selected = ","
+      ),
+      actionButton(ns("import"), "Import")
     ),
-    "",
-    radioButtons(
-      ns("sep"),
-      "Separator",
-      choices = c(Comma = ",", Semicolon = ";", Tab = "\t"),
-      selected = ","
-    ),
-    actionButton(ns("import"), "Import")
+
+    # REFI-QDA input
+    conditionalPanel(
+      condition = "input.file_type == 'refi-qda'",
+      ns = ns,
+      fileInput(
+        ns("qdc_file"),
+        "Choose QDC File",
+        accept = c(".qdc")
+      ),
+      actionButton(ns("import_qdc"), "Import")
+    )
   )
 }
 
@@ -222,8 +250,12 @@ convert_to_rgb <- function(color) {
     return(paste0("rgb(", paste(color, collapse = ", "), ")"))
   }
 
-  if(color %in% grDevices::colors()){
-    return(paste0("rgb(", paste0(grDevices::col2rgb(color)[, 1], collapse = ", "), ")"))
+  if (color %in% grDevices::colors()) {
+    return(paste0(
+      "rgb(",
+      paste0(grDevices::col2rgb(color)[, 1], collapse = ", "),
+      ")"
+    ))
   }
 
   # Ensure color is a character string for regex operations
