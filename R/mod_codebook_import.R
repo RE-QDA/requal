@@ -13,7 +13,7 @@ mod_codebook_import_ui <- function(id) {
     selectInput(
       ns("file_type"),
       "Select import format",
-      choices = c("CSV" = "csv", "REFI-QDA" = "refi-qda"),
+      choices = c("REFI-QDA" = "refi-qda", "CSV" = "csv"),
       selected = "refi-qda"
     ),
     tags$hr(),

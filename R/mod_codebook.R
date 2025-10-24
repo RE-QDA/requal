@@ -176,7 +176,25 @@ mod_codebook_server <- function(id, glob) {
         mod_rql_button_server(
           id = "code_export_ui",
           custom_title = "Export codebook",
-          custom_tagList = downloadButton(ns("export_codebook"), label = "CSV"),
+          custom_tagList = tagList(
+            selectInput(
+              ns("file_type"),
+              "Select export format",
+              choices = c("REFI-QDA" = "refi-qda", "CSV" = "csv"),
+              selected = "refi-qda"
+            ),
+            tags$hr(),
+            conditionalPanel(
+              condition = "input.file_type == 'csv'",
+              ns = ns,
+              downloadButton(ns("export_codebook"), label = "CSV")
+            ),
+            conditionalPanel(
+              condition = "input.file_type == 'refi-qda'",
+              ns = ns,
+              downloadButton(ns("export_codebook_qdc"), label = "QDC")
+            )
+          ),
           glob,
           permission = TRUE
         )
@@ -367,7 +385,8 @@ mod_codebook_server <- function(id, glob) {
 
     #---Import codebook-----------------------------------------------------
     mod_codebook_import_server("codebook_import_1", glob = glob)
-
+    #---Export codebook-----------------------------------------------------
+    # CSV export
     output$export_codebook <- downloadHandler(
       filename = function() {
         "requal_codebook.csv"
@@ -377,7 +396,24 @@ mod_codebook_server <- function(id, glob) {
         utils::write.csv(codebook, file, fileEncoding = "UTF-8")
       }
     )
+    # QDC export
+    output$export_codebook_qdc <- downloadHandler(
+      filename = function() {
+        "requal_codebook.csv"
+      },
+      content = function(file) {
+        # browser()
+        # passing a whole glob is a bit too intense?
+        codebook <- get_codebook_export_table(glob)
+        #TODO Michal
+        # not to forget categories as sets
+        # let's use xml2 and uuid packages
+        # Convert codebook data to refi-qdaXML
+        # Write xml text to file
+      }
+    )
 
+    #---Toggle codes visibility-----------------------------------------------------
     observeEvent(input$toggle_all_codes, {
       if (input$toggle_all_codes %% 2 == 1) {
         expand_codes(session = session)
