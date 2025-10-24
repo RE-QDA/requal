@@ -392,8 +392,19 @@ mod_codebook_server <- function(id, glob) {
         "requal_codebook.csv"
       },
       content = function(file) {
-        codebook <- get_codebook_export_table(glob)
-        utils::write.csv(codebook, file, fileEncoding = "UTF-8")
+        tryCatch(
+          {
+            codebook <- get_codebook_export_table(glob)
+            utils::write.csv(codebook, file, fileEncoding = "UTF-8")
+          },
+          error = function(e) {
+            showNotification(
+              paste("Error exporting codebook:", e$message),
+              type = "error",
+              duration = NULL
+            )
+          }
+        )
       }
     )
     # QDC export
