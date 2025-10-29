@@ -38,9 +38,9 @@ function getCaretCharacterOffsetWithin(element) {
 
 function updateSelection() {
   var sel = window.getSelection();
-    // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
-    
-    if(sel.rangeCount > 0){
+  // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
+  
+  if(sel.rangeCount > 0){
       var range = sel.getRangeAt(0);
       var el = document.getElementById("document_code_ui_1-focal_text")
     
@@ -63,16 +63,46 @@ function updateSelection() {
       } 
       
       var tag_position_value = startOffset.toString() + '-' + endOffset.toString();
-        console.log("tag_position" + tag_position_value)
+      // console.log("tag_position" + tag_position_value)
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
-    }
+  }
 }
 
-// Function to send calculated positions to Shiny
+// Attach selection listeners to the focal text element
 $( document ).ready(function() {
-  document.addEventListener('mouseup', updateSelection);
-  document.addEventListener('keyup', updateSelection);
-  document.addEventListener('touchend', updateSelection);
+  function attachSelectionListeners(el) {
+    if (!el) return;
+
+    // If element is contenteditable, ensure it can receive keyboard focus
+    if (el.isContentEditable && !el.hasAttribute('tabindex')) {
+      el.setAttribute('tabindex', '0');
+    }
+
+    // Element-level events
+    el.addEventListener('mouseup', updateSelection, false);
+    el.addEventListener('touchend', updateSelection, false);
+    // el.addEventListener('input', updateSelection, false); // catches edits in contenteditable
+    el.addEventListener('keyup', updateSelection, false);
+
+    // Document-level selectionchange: only act when selection is inside the target element
+    document.addEventListener('selectionchange', function() {
+      var sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return;
+      var node = sel.anchorNode;
+      // climb from text nodes to element nodes
+      while (node && node.nodeType !== 1) {
+        node = node.parentNode;
+      }
+      if (node && el.contains(node)) {
+        updateSelection();
+      }
+    }, false);
+  }
+
+  var el = document.getElementById('document_code_ui_1-focal_text');
+  if (el) {
+    attachSelectionListeners(el);
+  }
 })
 
 // Obtain information from iframe and send to Shiny
@@ -177,7 +207,6 @@ function findScrollElement(targetId) {
   let matchingElements = document.querySelectorAll(`.${className}`);
 
   if (matchingElements.length > 0) {
-    return matchingElements;
     return matchingElements;
   } else {
     console.log("No matching segment found.");
