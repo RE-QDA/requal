@@ -512,3 +512,12 @@ entitle_memo <- function(memo_text) {
 button_is_on <- function(button_input) {
   return(button_input %% 2 == 1)
 }
+
+get_project_version <- function(glob){
+  dplyr::tbl(glob$pool, "requal_version") %>%
+    dplyr::filter(
+      .data$project_id == local(as.numeric(glob$active_project))
+    ) %>%
+    dplyr::pull(version)
+}
+

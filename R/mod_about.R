@@ -107,11 +107,7 @@ mod_about_server <- function(id, glob) {
     output$version_project <- renderText({
       paste0(
         "The current project was created with requal version ",
-        dplyr::tbl(glob$pool, "requal_version") %>%
-          dplyr::filter(
-            .data$project_id == local(as.numeric(glob$active_project))
-          ) %>%
-          dplyr::pull(version),
+        get_project_version(glob), 
         "."
       )
     })

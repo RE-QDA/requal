@@ -412,17 +412,23 @@ mod_codebook_server <- function(id, glob) {
     # QDC export
     output$export_codebook_qdc <- downloadHandler(
       filename = function() {
-        "requal_codebook.csv"
+        "requal_codebook.qdc"
       },
       content = function(file) {
-        # browser()
-        # passing a whole glob is a bit too intense?
-        codebook <- get_codebook_export_table(glob)
-        #TODO Michal
-        # not to forget categories as sets
-        # let's use xml2 and uuid packages
-        # Convert codebook data to refi-qdaXML
-        # Write xml text to file
+        tryCatch(
+          {
+            # passing a whole glob is a bit too intense?
+            codebook_xml <- export_codebook_xml(glob)
+            xml2::write_xml(codebook_xml, file)
+          },
+          error = function(e) {
+            showNotification(
+              paste("Error exporting codebook:", e$message),
+              type = "error",
+              duration = NULL
+            )
+          }
+        )
       }
     )
 
