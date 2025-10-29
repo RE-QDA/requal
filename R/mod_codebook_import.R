@@ -18,7 +18,7 @@ mod_codebook_import_ui <- function(id) {
     ),
     tags$hr(),
 
-    # CSV input
+    # CSV input ----
     conditionalPanel(
       condition = "input.file_type == 'csv'",
       ns = ns,
@@ -52,7 +52,7 @@ mod_codebook_import_ui <- function(id) {
       actionButton(ns("import"), "Import")
     ),
 
-    # REFI-QDA input
+    # REFI-QDA input ----
     conditionalPanel(
       condition = "input.file_type == 'refi-qda'",
       ns = ns,
@@ -207,7 +207,7 @@ mod_codebook_import_server <- function(id, glob) {
       datatable
     })
 
-    ### Import execute -----
+    ### Import CSV execute -----
     observeEvent(input$confirm, {
       removeModal()
 
@@ -245,8 +245,9 @@ mod_codebook_import_server <- function(id, glob) {
 
     ## QDC Import -----
     observeEvent(input$import_qdc, {
-      req(input$file_qdc)
-      loc$input_df <- read_qdc(input$file_qdc$datapath)
+      req(input$qdc_file)
+      loc$qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
+      print(loc$qdc_codebook_df)
     })
   })
 }
@@ -436,7 +437,133 @@ import_codes_to_database <- function(imported_df, pool, project_id, user_id) {
 }
 
 ## QDC helpers ----
-read_qdc <- function(filepath) {
-  browser()
-  readxl::read_excel(filepath, skip = 1)
+parse_qdc <- function(qdc_filepath) {
+  converting_msg <- showNotification(
+    "Converting REFI-QDA codebook...",
+    duration = NULL,
+    closeButton = FALSE
+  )
+  on.exit(removeNotification(converting_msg), add = TRUE)
+  qdc_file <- xml2::read_xml(qdc_filepath)
+  qdc_ns <- c(qdc = xml2::xml_attr(qdc_file, "xmlns")[1])
+  qdc_schema <- xml2::read_xml(system.file('qdc.xsd', package = 'requal'))
+  #TODO check if we could validate against qdpx schema
+  # check file against validation schema
+  validatition_res <- xml2::xml_validate(qdc_file, qdc_schema)
+  if (as.logical(validatition_res)) {
+    rql_message("Validation of QDC file format: Success!")
+  } else {
+    errors <- paste(attributes(validatition_res)$errors, collapse = ", ")
+    rql_message(paste("Validation of QDC file format: Error!", errors))
+  }
+  imported_codebook <- get_qdc_codebook(qdc_file, qdc_ns)
+  imported_codebook
+}
+
+get_qdc_codebook <- function(qdc_file, qdc_ns) {
+  codes <- xml2::xml_find_all(
+    qdc_file,
+    "//qdc:CodeBook/qdc:Codes//qdc:Code",
+    ns = qdc_ns
+  )
+  parent_guids <- purrr::map_df(codes, .f = function(x) {
+    tibble::tibble(
+      guid = xml2::xml_attr(x, "guid"),
+      parent_guid = xml2::xml_parent(x) |>
+        xml2::xml_attr("guid")
+    )
+  })
+
+  codes_df <- xml2::xml_attrs(codes) |> dplyr::bind_rows()
+
+  # join code relationships to codes dataframe and reassign names
+  codes_df_joined <- codes_df |>
+    dplyr::left_join(parent_guids, by = "guid")
+  codes_df_renamed <- codes_df_joined |>
+    dplyr::mutate(
+      name = purrr::map2_chr(parent_guid, name, .f = function(x, y) {
+        code_name <- y
+        while (!is.na(x)) {
+          df <- codes_df_joined |>
+            dplyr::filter(guid == x)
+          # get code name
+          code_name <- paste(
+            df |> dplyr::pull(name),
+            code_name,
+            sep = " > "
+          )
+          # update x
+          # (the while-loop continues until parent_guid is NA)
+          x <- df |>
+            dplyr::pull(parent_guid)
+        }
+        code_name
+      })
+    )
+
+  # get codes descriptions
+  descriptions <- purrr::map_chr(codes, .f = function(code_node) {
+    desc <- xml2::xml_find_first(code_node, ".//qdc:Description", ns = qdc_ns)
+    if (is.na(desc)) {
+      return("")
+    } else {
+      return(xml2::xml_text(desc))
+    }
+  })
+
+  # TODO add import info from qdc header to descriptions
+
+  # add descriptions
+  codes_df_renamed <- codes_df_renamed |>
+    dplyr::mutate(description = descriptions)
+  # add default color
+  if (!"color" %in% names(codes_df_renamed)) {
+    codes_df_renamed <- codes_df_renamed |>
+      dplyr::mutate(color = "#FFFF00")
+  } else {
+    if (any(is.na(codes_df_renamed$color))) {
+      missing_colors <- which(is.na(codes_df_renamed$color))
+      codes_df_renamed$color[missing_colors] <- "#FFFF00"
+      # TODO add a check for non-hex colors
+    }
+  }
+
+  # Warning for non-codable codes
+  if (any(!isTRUE(stringr::str_detect(isCodable, "[Tt]rue")))) {
+    rql_message(
+      "Non-codable codes found in QDC file. Only codable codes will be imported."
+    )
+  }
+
+  # clean up result
+  codes_converted <- codes_df_renamed |>
+    dplyr::mutate(description = descriptions) |>
+    dplyr::mutate(
+      code_color = purrr::map_chr(color, .f = function(input_color) {
+        rgb_colours <- grDevices::col2rgb(input_color)
+        paste0(
+          "rgb(",
+          rgb_colours[1],
+          ",",
+          rgb_colours[2],
+          ",",
+          rgb_colours[3],
+          ")"
+        )
+      })
+    ) |>
+    dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) |>
+    # so far no support for non-codable codes in requal
+    # either we remove them or enforce codability for all codes
+    dplyr::filter(isCodable) |>
+    dplyr::select(
+      code_name = name,
+      code_description = description,
+      code_color,
+      guid,
+      parent_guid
+    )
+  #TODO unique code names check and paste
+
+  return(codes_converted)
 }

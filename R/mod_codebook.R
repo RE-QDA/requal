@@ -342,6 +342,7 @@ mod_codebook_server <- function(id, glob) {
       req(input$code_to_del)
 
       # delete edges - must precede deleting of codes
+      # but we should check if cascading delete od edges is possible
       edge <- list()
       edge$code_id <- input$code_to_del
       delete_category_code_record(
@@ -352,6 +353,7 @@ mod_codebook_server <- function(id, glob) {
       )
 
       # if a code gets deleted, the corresponding segments should be deleted too
+      # but we should check if cascading delete od edges is possible
       delete_codes_segment_db(
         pool = glob$pool,
         active_project = glob$active_project,

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="urn:QDA-XML:codebook:1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:QDA-XML:codebook:1.0" elementFormDefault="qualified"
+            attributeFormDefault="unqualified" version="1.0">
+    <!-- ===== Element Declarations ===== -->
+    <xsd:element name="CodeBook" type="CodeBookType">
+        <xsd:annotation>
+            <xsd:documentation>This element MUST be conveyed as the root element in any instance
+                document based on this Schema expression
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <!-- ===== Type Definitions ===== -->
+    <xsd:complexType name="CodeBookType">
+        <xsd:sequence>
+            <xsd:element name="Codes" type="CodesType"/>
+            <xsd:element name="Sets" type="SetsType" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="origin" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:complexType name="CodesType">
+        <xsd:sequence>
+            <xsd:element name="Code" type="CodeType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="SetsType">
+        <xsd:sequence>
+            <xsd:element name="Set" type="SetType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="CodeType">
+        <xsd:sequence>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Code" type="CodeType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="guid" type="GUIDType" use="required"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="isCodable" type="xsd:boolean" use="required"/>
+        <xsd:attribute name="color" type="RGBType"/>
+    </xsd:complexType>
+    <xsd:complexType name="SetType">
+        <xsd:sequence>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MemberCode" type="MemberCodeType" minOccurs="0"
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="guid" type="GUIDType" use="required"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="MemberCodeType">
+        <xsd:attribute name="guid" type="GUIDType" use="required"/>
+    </xsd:complexType>
+    <xsd:simpleType name="GUIDType">
+        <xsd:restriction base="xsd:token">
+            <xsd:pattern value="([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\})"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="RGBType">
+        <xsd:restriction base="xsd:token">
+            <xsd:pattern value="#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>
