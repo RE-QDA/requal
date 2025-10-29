@@ -38,7 +38,7 @@ function getCaretCharacterOffsetWithin(element) {
 
 function updateSelection() {
   var sel = window.getSelection();
-    // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
+    if(window.getSelection().anchorNode.parentNode.closest('article') == null) return;
     
     if(sel.rangeCount > 0){
       var range = sel.getRangeAt(0);

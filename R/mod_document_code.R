@@ -67,6 +67,7 @@ mod_document_code_ui <- function(id) {
               tags$article(
                 id = "article",
                 class = "scrollable80",
+                tabindex = 0,
                 .noWS = "outside"
               ),
               .noWS = "outside"
