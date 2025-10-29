@@ -70,9 +70,10 @@ function updateSelection() {
 
 // Function to send calculated positions to Shiny
 $( document ).ready(function() {
-  document.addEventListener('mouseup', updateSelection);
-  document.addEventListener('keyup', updateSelection);
-  document.addEventListener('touchend', updateSelection);
+  var el = document.getElementById("document_code_ui_1-focal_text")
+  el.addEventListener('mouseup', updateSelection);
+  el.addEventListener('keyup', updateSelection);
+  el.addEventListener('touchend', updateSelection);
 })
 
 // Obtain information from iframe and send to Shiny
