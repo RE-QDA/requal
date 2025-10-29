@@ -74,7 +74,74 @@ mod_codebook_import_server <- function(id, glob) {
     ns <- session$ns
     loc <- reactiveValues()
 
-    # Load import file
+    # Internal module helper functions ----
+    # (scope includes input, session, loc, or ns)
+    .get_column_choices_for <- function(field) {
+      exclude_cols <- switch(
+        field,
+        "code_name" = c(input$code_description, input$code_color),
+        "code_description" = c(input$code_name, input$code_color),
+        "code_color" = c(input$code_name, input$code_description)
+      )
+      get_column_choices_excluding(colnames(loc$input_df), exclude_cols)
+    }
+
+    .show_import_wizard <- function() {
+      showModal(modalDialog(
+        title = "Specify imported codes",
+        .create_column_selectors(),
+        "Preview",
+        DT::dataTableOutput(ns("preview")),
+        footer = tagList(
+          modalButton("Cancel"),
+          shinyjs::disabled(actionButton(ns("confirm"), "Confirm"))
+        )
+      ))
+    }
+
+    .create_column_selectors <- function() {
+      tagList(
+        selectInput(
+          ns("code_name"),
+          "Select column for code name",
+          choices = .get_column_choices_for("code_name"),
+          selected = ""
+        ) %>%
+          tagAppendAttributes(class = "required"),
+
+        selectInput(
+          ns("code_description"),
+          "Select column for code description",
+          choices = .get_column_choices_for("code_description"),
+          selected = ""
+        ),
+
+        selectInput(
+          ns("code_color"),
+          "Select column for code color",
+          choices = .get_column_choices_for("code_color"),
+          selected = ""
+        )
+      )
+    }
+
+    .update_all_selectors <- function() {
+      selectors <- c("code_name", "code_description", "code_color")
+
+      purrr::walk(selectors, function(selector) {
+        updateSelectInput(
+          session,
+          selector,
+          selected = input[[selector]],
+          choices = .get_column_choices_for(selector)
+        )
+      })
+    }
+
+    # Server business logic ----
+
+    ## CSV Import -----
+    ### Load import file -----
     observeEvent(input$import, {
       req(input$file)
       loc$input_df <- read.csv(
@@ -82,20 +149,20 @@ mod_codebook_import_server <- function(id, glob) {
         header = input$header,
         sep = input$sep
       )
-      show_import_wizard()
+      .show_import_wizard()
     })
 
-    # Update column choices when selections change
+    ### Update column choices when selections change ----
     observeEvent(c(input$code_name, input$code_description, input$code_color), {
       if (isTruthy(input$code_name)) {
         shinyjs::enable("confirm")
       } else {
         shinyjs::disable("confirm")
       }
-      update_all_selectors()
+      .update_all_selectors()
     })
 
-    # Process imported dataframe
+    ### Process imported dataframe -----
     observeEvent(c(input$code_name, input$code_description, input$code_color), {
       req(input$code_name)
 
@@ -116,7 +183,7 @@ mod_codebook_import_server <- function(id, glob) {
         )
     })
 
-    # Render the datatable
+    ### Render the preview datatable ----
     output$preview <- DT::renderDT({
       req(input$code_name)
 
@@ -140,7 +207,7 @@ mod_codebook_import_server <- function(id, glob) {
       datatable
     })
 
-    # Import execute
+    ### Import execute -----
     observeEvent(input$confirm, {
       removeModal()
 
@@ -176,72 +243,16 @@ mod_codebook_import_server <- function(id, glob) {
       }
     })
 
-    # Internal helper functions (need access to input, session, loc, or ns) ----
-    get_column_choices_for <- function(field) {
-      exclude_cols <- switch(
-        field,
-        "code_name" = c(input$code_description, input$code_color),
-        "code_description" = c(input$code_name, input$code_color),
-        "code_color" = c(input$code_name, input$code_description)
-      )
-      get_column_choices_excluding(colnames(loc$input_df), exclude_cols)
-    }
-
-    show_import_wizard <- function() {
-      showModal(modalDialog(
-        title = "Specify imported codes",
-        create_column_selectors(),
-        "Preview",
-        DT::dataTableOutput(ns("preview")),
-        footer = tagList(
-          modalButton("Cancel"),
-          shinyjs::disabled(actionButton(ns("confirm"), "Confirm"))
-        )
-      ))
-    }
-
-    create_column_selectors <- function() {
-      tagList(
-        selectInput(
-          ns("code_name"),
-          "Select column for code name",
-          choices = get_column_choices_for("code_name"),
-          selected = ""
-        ) %>%
-          tagAppendAttributes(class = "required"),
-
-        selectInput(
-          ns("code_description"),
-          "Select column for code description",
-          choices = get_column_choices_for("code_description"),
-          selected = ""
-        ),
-
-        selectInput(
-          ns("code_color"),
-          "Select column for code color",
-          choices = get_column_choices_for("code_color"),
-          selected = ""
-        )
-      )
-    }
-
-    update_all_selectors <- function() {
-      selectors <- c("code_name", "code_description", "code_color")
-
-      purrr::walk(selectors, function(selector) {
-        updateSelectInput(
-          session,
-          selector,
-          selected = input[[selector]],
-          choices = get_column_choices_for(selector)
-        )
-      })
-    }
+    ## QDC Import -----
+    observeEvent(input$import_qdc, {
+      req(input$file_qdc)
+      loc$input_df <- read_qdc(input$file_qdc$datapath)
+    })
   })
 }
 
-# Helper function for this module -----
+# Helper functions for this module -----
+## CSV helpers ----
 convert_to_rgb <- function(color) {
   # Check if the color is a vector of three numeric values first
   if (
@@ -422,4 +433,10 @@ import_codes_to_database <- function(imported_df, pool, project_id, user_id) {
         user_id = user_id
       )
     })
+}
+
+## QDC helpers ----
+read_qdc <- function(filepath) {
+  browser()
+  readxl::read_excel(filepath, skip = 1)
 }
