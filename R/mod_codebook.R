@@ -419,7 +419,12 @@ mod_codebook_server <- function(id, glob) {
           {
             # passing a whole glob is a bit too intense?
             codebook_xml <- export_codebook_xml(glob)
-            xml2::write_xml(codebook_xml, file)
+            xml2::write_xml(
+              codebook_xml,
+              file,
+              encoding = "utf-8",
+              declaration = TRUE
+            )
           },
           error = function(e) {
             showNotification(

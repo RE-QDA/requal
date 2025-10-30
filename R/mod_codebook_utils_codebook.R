@@ -329,34 +329,6 @@ convert_colour_to_hex <- function(color) {
     )
 }
 
-# prepare data.frame with codes and categories to export
-get_codebook_export_table <- function(glob) {
-    categories <- dplyr::tbl(glob$pool, "categories") %>%
-        dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
-        dplyr::select(category_id, category_name, category_description) %>%
-        dplyr::collect() %>%
-        dplyr::mutate(
-            category_title = dplyr::if_else(
-                !is.na(category_description) & category_description != "",
-                paste0(category_name, " (", category_description, ")"),
-                category_name
-            )
-        ) %>%
-        dplyr::select(-c(category_name, category_description))
-
-    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
-        dplyr::collect() %>%
-        dplyr::inner_join(categories, by = "category_id")
-
-    dplyr::left_join(glob$codebook, categories_map, by = "code_id") %>%
-        dplyr::group_by(code_id, code_name, code_description, code_color) %>%
-        dplyr::summarise(
-            categories = paste0(category_title, collapse = " | ")
-        ) %>%
-        dplyr::mutate(
-            code_color = purrr::map_chr(code_color, convert_colour_to_hex)
-        )
-}
 
 # Edit codes ------
 
