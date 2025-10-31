@@ -396,7 +396,7 @@ mod_codebook_server <- function(id, glob) {
       content = function(file) {
         tryCatch(
           {
-            codebook <- get_codebook_export_table(glob)
+            codebook <- export_codebook_csv(glob)
             utils::write.csv(codebook, file, fileEncoding = "UTF-8")
           },
           error = function(e) {

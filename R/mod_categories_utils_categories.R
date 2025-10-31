@@ -131,6 +131,7 @@ read_db_categories <- function(pool, active_project, user) {
         dplyr::select(
             category_id,
             category_name,
+            category_description, 
             user_id
         ) %>%
         dplyr::collect()
@@ -144,8 +145,12 @@ read_db_categories <- function(pool, active_project, user) {
             dplyr::filter(user_id == !!user$user_id)
     }
 
-    project_categories <- project_categories_df$category_id
-    names(project_categories) <- project_categories_df$category_name
+    return(project_categories_df)
+}
+
+create_categories_list <- function(categories_df){
+    project_categories <- categories_df$category_id
+    names(project_categories) <- categories_df$category_name
 
     return(project_categories)
 }
@@ -202,7 +207,7 @@ delete_category_UI <- function(ns, pool, active_project, user) {
         pool,
         active_project = active_project,
         user = user
-    )
+    ) %>% create_categories_list()
     tags$div(
         selectizeInput(
             ns("categories_to_del"),

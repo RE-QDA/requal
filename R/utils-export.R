@@ -1,10 +1,6 @@
 # prepare data.frame with codes and categories to export
-get_codebook_export_table <- function(glob) {
-  # REVIEW: Does not handle permission to view others codes
-  categories <- dplyr::tbl(glob$pool, "categories") %>%
-    dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
-    dplyr::select(category_id, category_name, category_description) %>%
-    dplyr::collect() %>%
+export_codebook_csv <- function(glob) {
+  categories <- read_db_categories(glob$pool, glob$active_project, glob$user) %>%
     dplyr::mutate(
       category_title = dplyr::if_else(
         !is.na(category_description) & category_description != "",
@@ -30,22 +26,19 @@ get_codebook_export_table <- function(glob) {
 
 # create xml
 export_codebook_xml <- function(glob) {
-  codebook <- dplyr::tbl(glob$pool, "codes") %>%
-    # REVIEW: Use glob$codebook or need to add filter for user and permissions?
-    dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
-    dplyr::collect() %>%
+  codebook <- glob$codebook %>%
     dplyr::mutate(
       guid = uuid::UUIDgenerate(n = dplyr::n()),
       code_color = purrr::map_chr(code_color, convert_colour_to_hex)
     )
 
-  categories <- dplyr::tbl(glob$pool, "categories") %>%
-    dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
-    dplyr::collect() %>%
+  categories <- read_db_categories(glob$pool, glob$active_project, glob$user) %>%
     dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
 
-  categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
+  if(nrow(categories)){
+    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
     dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
+    dplyr::filter(category_id %in% categories$category_id) %>%
     dplyr::collect() %>%
     dplyr::left_join(
       codebook %>% dplyr::select(code_id, membercode_guid = guid),
@@ -55,6 +48,7 @@ export_codebook_xml <- function(glob) {
       categories %>% dplyr::select(category_id, guid),
       by = "category_id"
     )
+  }
 
   validator_file <- "qdc.xsd"
   validator_schema <- xml2::read_xml(system.file(
@@ -77,7 +71,7 @@ export_codebook_xml <- function(glob) {
 
   codes <- xml2::xml_add_child(codebook_xml, "Codes")
   # TODO? does not handle nesting of codes
-  for (i in 1:nrow(codebook)) {
+  for (i in seq_len(nrow(codebook))) {
     code <- xml2::xml_add_child(codes, "Code")
     xml2::xml_attr(code, "guid") <- codebook$guid[i]
     xml2::xml_attr(code, "name") <- codebook$code_name[i]
@@ -95,7 +89,7 @@ export_codebook_xml <- function(glob) {
   }
 
   sets <- xml2::xml_add_child(codebook_xml, "Sets")
-  for (i in 1:nrow(categories)) {
+  for (i in seq_len(nrow(categories))) {
     set <- xml2::xml_add_child(sets, "Set")
     xml2::xml_attr(set, "guid") <- categories$guid[i]
     xml2::xml_attr(set, "name") <- categories$category_name[i]

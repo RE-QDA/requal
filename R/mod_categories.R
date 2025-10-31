@@ -97,7 +97,7 @@ mod_categories_server <- function(id, glob) {
           pool = glob$pool,
           active_project = glob$active_project,
           user = NULL
-        )
+        ) %>% create_categories_list()
       }
     )
 
@@ -170,7 +170,7 @@ mod_categories_server <- function(id, glob) {
           pool = glob$pool,
           active_project = glob$active_project,
           user = glob$user
-        )
+        ) %>% create_categories_list()
       } else {
         warn_user("Category name must be unique.")
       }
@@ -211,7 +211,7 @@ mod_categories_server <- function(id, glob) {
         pool = glob$pool,
         active_project = glob$active_project,
         user = glob$user
-      )
+      ) %>% create_categories_list()
     })
 
     # Create edge -----------------------------------------
