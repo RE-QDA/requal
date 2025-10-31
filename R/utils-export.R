@@ -1,6 +1,6 @@
 # prepare data.frame with codes and categories to export
 export_codebook_csv <- function(glob) {
-  categories <- read_db_categories(glob$pool, glob$active_project, glob$user) %>%
+  categories <- read_db_categories(glob$pool, glob$active_project, glob$user, modify = FALSE) %>%
     dplyr::mutate(
       category_title = dplyr::if_else(
         !is.na(category_description) & category_description != "",
