@@ -24,6 +24,7 @@
   - foreign keys now enforced in SQLite
   - default document encoding is now processed explicitly
   - other minor fixes
+  - selecting segments on smartphones/tablets and by combination of mouse and keyboard now works
 
 # requal 1.1.3 Rieppeleon
 
