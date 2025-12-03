@@ -246,8 +246,24 @@ mod_codebook_import_server <- function(id, glob) {
     ## QDC Import -----
     observeEvent(input$import_qdc, {
       req(input$qdc_file)
-      loc$qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
-      print(loc$qdc_codebook_df)
+
+      qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
+
+      import_codes_to_database(
+        qdc_codebook_df %>%
+          dplyr::select(code_name, code_description, code_color),
+        glob$pool,
+        glob$active_project,
+        glob$user$user_id
+      )
+
+      # Update global state
+      glob$codebook <- list_db_codes(
+        glob$pool,
+        glob$active_project,
+        glob$user
+      )
+      glob$codebook_observer <- glob$codebook_observer + 1
     })
   })
 }
@@ -476,7 +492,7 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
 
   codes_df <- xml2::xml_attrs(codes) |> dplyr::bind_rows()
 
-  # join code relationships to codes dataframe and reassign names
+  # join code relationships to codes dataframe and reassign hierarchical names
   codes_df_joined <- codes_df |>
     dplyr::left_join(parent_guids, by = "guid")
   codes_df_renamed <- codes_df_joined |>
@@ -529,7 +545,9 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
   }
 
   # Warning for non-codable codes
-  if (any(!isTRUE(stringr::str_detect(isCodable, "[Tt]rue")))) {
+  if (
+    any(!isTRUE(stringr::str_detect(codes_df_renamed$isCodable, "[Tt]rue")))
+  ) {
     rql_message(
       "Non-codable codes found in QDC file. Only codable codes will be imported."
     )
