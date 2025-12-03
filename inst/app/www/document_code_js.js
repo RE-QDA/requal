@@ -36,11 +36,9 @@ function getCaretCharacterOffsetWithin(element) {
   return caretOffset;
 }
 
-// Function to send calculated positions to Shiny
-$( document ).ready(function() {
-document.addEventListener('mouseup', function () {
-    var sel = window.getSelection();
-    // if(window.getSelection().baseNode.parentNode.id != "document_code_ui_1-focal_text") return;
+function updateSelection() {
+  var sel = window.getSelection();
+    if(window.getSelection().anchorNode.parentNode.closest('article') == null) return;
     
     if(sel.rangeCount > 0){
       var range = sel.getRangeAt(0);
@@ -68,8 +66,16 @@ document.addEventListener('mouseup', function () {
         console.log("tag_position" + tag_position_value)
       Shiny.setInputValue('document_code_ui_1-tag_position', tag_position_value);
     }
-}, false);
+}
+
+// Function to send calculated positions to Shiny
+$( document ).ready(function() {
+  var el = document.getElementById("document_code_ui_1-focal_text")
+  el.addEventListener('mouseup', updateSelection);
+  el.addEventListener('keyup', updateSelection);
+  el.addEventListener('touchend', updateSelection);
 })
+
 // Obtain information from iframe and send to Shiny
 $(document).ready(function() {
   var iframe = document.getElementsByTagName('iframe')[0];
