@@ -2,6 +2,9 @@
 
 - Codebook import
   - code names, descriptions, and colors can be imported via a CSV file
+  - code names, descriptions, and colors can be imported via a QDC file
+- Codebook export
+  - codebook can be exported into the REFI-QDA QDC file
 - Segment memos
   - memos can be added to any transcript segment
 - Backlight 
