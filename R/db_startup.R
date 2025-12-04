@@ -540,13 +540,6 @@ add_cases_record <- function(pool, project_id, case_df, user_id) {
 }
 
 add_codes_record <- function(pool, project_id, codes_df, user_id) {
-  if (!"project_id" %in% colnames(codes_df)) {
-    codes_df$project_id <- as.integer(project_id)
-  }
-  if (!"user_id" %in% colnames(codes_df)) {
-    codes_df$user_id <- as.integer(user_id)
-  }
-
   res <- DBI::dbWriteTable(
     pool,
     "codes",

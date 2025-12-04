@@ -248,10 +248,14 @@ mod_codebook_import_server <- function(id, glob) {
       req(input$qdc_file)
 
       qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
+      # We add the info for current project and user to the imported dataframe
+      qdc_codebook_df_full <- qdc_codebook_df %>%
+        dplyr::select(code_name, code_description, code_color) %>%
+        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+        dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
       import_codes_to_database(
-        qdc_codebook_df %>%
-          dplyr::select(code_name, code_description, code_color),
+        qdc_codebook_df_full,
         glob$pool,
         glob$active_project,
         glob$user$user_id
