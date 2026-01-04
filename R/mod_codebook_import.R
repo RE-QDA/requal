@@ -246,8 +246,28 @@ mod_codebook_import_server <- function(id, glob) {
     ## QDC Import -----
     observeEvent(input$import_qdc, {
       req(input$qdc_file)
-      loc$qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
-      print(loc$qdc_codebook_df)
+
+      qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
+      # We add the info for current project and user to the imported dataframe
+      qdc_codebook_df_full <- qdc_codebook_df %>%
+        dplyr::select(code_name, code_description, code_color) %>%
+        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+        dplyr::mutate(user_id = as.integer(glob$user$user_id))
+
+      import_codes_to_database(
+        qdc_codebook_df_full,
+        glob$pool,
+        glob$active_project,
+        glob$user$user_id
+      )
+
+      # Update global state
+      glob$codebook <- list_db_codes(
+        glob$pool,
+        glob$active_project,
+        glob$user
+      )
+      glob$codebook_observer <- glob$codebook_observer + 1
     })
   })
 }
@@ -469,32 +489,32 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
   parent_guids <- purrr::map_df(codes, .f = function(x) {
     tibble::tibble(
       guid = xml2::xml_attr(x, "guid"),
-      parent_guid = xml2::xml_parent(x) |>
+      parent_guid = xml2::xml_parent(x) %>%
         xml2::xml_attr("guid")
     )
   })
 
-  codes_df <- xml2::xml_attrs(codes) |> dplyr::bind_rows()
+  codes_df <- xml2::xml_attrs(codes) %>% dplyr::bind_rows()
 
-  # join code relationships to codes dataframe and reassign names
-  codes_df_joined <- codes_df |>
+  # join code relationships to codes dataframe and reassign hierarchical names
+  codes_df_joined <- codes_df %>%
     dplyr::left_join(parent_guids, by = "guid")
-  codes_df_renamed <- codes_df_joined |>
+  codes_df_renamed <- codes_df_joined %>%
     dplyr::mutate(
       name = purrr::map2_chr(parent_guid, name, .f = function(x, y) {
         code_name <- y
         while (!is.na(x)) {
-          df <- codes_df_joined |>
+          df <- codes_df_joined %>%
             dplyr::filter(guid == x)
           # get code name
           code_name <- paste(
-            df |> dplyr::pull(name),
+            df %>% dplyr::pull(name),
             code_name,
             sep = " > "
           )
           # update x
           # (the while-loop continues until parent_guid is NA)
-          x <- df |>
+          x <- df %>%
             dplyr::pull(parent_guid)
         }
         code_name
@@ -514,11 +534,11 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
   # TODO add import info from qdc header to descriptions
 
   # add descriptions
-  codes_df_renamed <- codes_df_renamed |>
+  codes_df_renamed <- codes_df_renamed %>%
     dplyr::mutate(description = descriptions)
   # add default color
   if (!"color" %in% names(codes_df_renamed)) {
-    codes_df_renamed <- codes_df_renamed |>
+    codes_df_renamed <- codes_df_renamed %>%
       dplyr::mutate(color = "#FFFF00")
   } else {
     if (any(is.na(codes_df_renamed$color))) {
@@ -529,15 +549,17 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
   }
 
   # Warning for non-codable codes
-  if (any(!isTRUE(stringr::str_detect(isCodable, "[Tt]rue")))) {
+  if (
+    any(!isTRUE(stringr::str_detect(codes_df_renamed$isCodable, "[Tt]rue")))
+  ) {
     rql_message(
       "Non-codable codes found in QDC file. Only codable codes will be imported."
     )
   }
 
   # clean up result
-  codes_converted <- codes_df_renamed |>
-    dplyr::mutate(description = descriptions) |>
+  codes_converted <- codes_df_renamed %>%
+    dplyr::mutate(description = descriptions) %>%
     dplyr::mutate(
       code_color = purrr::map_chr(color, .f = function(input_color) {
         rgb_colours <- grDevices::col2rgb(input_color)
@@ -551,11 +573,11 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
           ")"
         )
       })
-    ) |>
-    dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) |>
+    ) %>%
+    dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) %>%
     # so far no support for non-codable codes in requal
     # either we remove them or enforce codability for all codes
-    dplyr::filter(isCodable) |>
+    dplyr::filter(isCodable) %>%
     dplyr::select(
       code_name = name,
       code_description = description,

@@ -2,6 +2,9 @@
 
 - Codebook import
   - code names, descriptions, and colors can be imported via a CSV file
+  - code names, descriptions, and colors can be imported via a QDC file
+- Codebook export
+  - codebook can be exported into the REFI-QDA QDC file
 - Segment memos
   - memos can be added to any transcript segment
 - Backlight 
@@ -24,6 +27,7 @@
   - foreign keys now enforced in SQLite
   - default document encoding is now processed explicitly
   - other minor fixes
+  - selecting segments on smartphones/tablets and by combination of mouse and keyboard now works
 
 # requal 1.1.3 Rieppeleon
 

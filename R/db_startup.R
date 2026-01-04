@@ -547,12 +547,13 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
     append = TRUE,
     row.names = FALSE
   )
+
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(
-        .data$code_name == !!codes_df$code_name,
-        .data$project_id == !!as.integer(project_id),
-        .data$user_id == !!user_id
+        .data$code_name == codes_df$code_name,
+        .data$project_id == codes_df$project_id,
+        .data$user_id == codes_df$user_id
       ) %>%
       dplyr::pull(code_id)
 
