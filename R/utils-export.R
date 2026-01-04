@@ -1,6 +1,11 @@
 # prepare data.frame with codes and categories to export
 export_codebook_csv <- function(glob) {
-  categories <- read_db_categories(glob$pool, glob$active_project, glob$user, modify = FALSE) %>%
+  categories <- read_db_categories(
+    glob$pool,
+    glob$active_project,
+    glob$user,
+    modify = FALSE
+  ) %>%
     dplyr::mutate(
       category_title = dplyr::if_else(
         !is.na(category_description) & category_description != "",
@@ -32,22 +37,26 @@ export_codebook_xml <- function(glob) {
       code_color = purrr::map_chr(code_color, convert_colour_to_hex)
     )
 
-  categories <- read_db_categories(glob$pool, glob$active_project, glob$user) %>%
+  categories <- read_db_categories(
+    glob$pool,
+    glob$active_project,
+    glob$user
+  ) %>%
     dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
 
-  if(nrow(categories)){
+  if (nrow(categories)) {
     categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
-    dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
-    dplyr::filter(category_id %in% categories$category_id) %>%
-    dplyr::collect() %>%
-    dplyr::left_join(
-      codebook %>% dplyr::select(code_id, membercode_guid = guid),
-      by = "code_id"
-    ) %>%
-    dplyr::left_join(
-      categories %>% dplyr::select(category_id, guid),
-      by = "category_id"
-    )
+      dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
+      dplyr::filter(category_id %in% categories$category_id) %>%
+      dplyr::collect() %>%
+      dplyr::left_join(
+        codebook %>% dplyr::select(code_id, membercode_guid = guid),
+        by = "code_id"
+      ) %>%
+      dplyr::left_join(
+        categories %>% dplyr::select(category_id, guid),
+        by = "category_id"
+      )
   }
 
   validator_file <- "qdc.xsd"
@@ -87,28 +96,29 @@ export_codebook_xml <- function(glob) {
       )
     }
   }
-
-  sets <- xml2::xml_add_child(codebook_xml, "Sets")
-  for (i in seq_len(nrow(categories))) {
-    set <- xml2::xml_add_child(sets, "Set")
-    xml2::xml_attr(set, "guid") <- categories$guid[i]
-    xml2::xml_attr(set, "name") <- categories$category_name[i]
-    if (
-      categories$category_description[i] != "" &&
-        !is.na(categories$category_description[i])
-    ) {
-      description <- xml2::xml_add_child(
-        set,
-        "Description",
-        categories$category_description[i]
-      )
-    }
-    if (categories$guid[i] %in% categories_map$guid) {
-      tmp <- categories_map %>%
-        dplyr::filter(guid == categories$guid[i])
-      for (j in 1:nrow(tmp)) {
-        membercode <- xml2::xml_add_child(set, "MemberCode")
-        xml2::xml_attr(membercode, "guid") <- tmp$membercode_guid[j]
+  if (nrow(categories)) {
+    sets <- xml2::xml_add_child(codebook_xml, "Sets")
+    for (i in seq_len(nrow(categories))) {
+      set <- xml2::xml_add_child(sets, "Set")
+      xml2::xml_attr(set, "guid") <- categories$guid[i]
+      xml2::xml_attr(set, "name") <- categories$category_name[i]
+      if (
+        categories$category_description[i] != "" &&
+          !is.na(categories$category_description[i])
+      ) {
+        description <- xml2::xml_add_child(
+          set,
+          "Description",
+          categories$category_description[i]
+        )
+      }
+      if (categories$guid[i] %in% categories_map$guid) {
+        tmp <- categories_map %>%
+          dplyr::filter(guid == categories$guid[i])
+        for (j in 1:nrow(tmp)) {
+          membercode <- xml2::xml_add_child(set, "MemberCode")
+          xml2::xml_attr(membercode, "guid") <- tmp$membercode_guid[j]
+        }
       }
     }
   }
