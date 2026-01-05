@@ -226,7 +226,7 @@ mod_codebook_import_server <- function(id, glob) {
           glob$user$user_id
         )
 
-        import_codes_to_database(
+        db_import_codes(
           imported_df,
           glob$pool,
           glob$active_project,
@@ -247,20 +247,56 @@ mod_codebook_import_server <- function(id, glob) {
     observeEvent(input$import_qdc, {
       req(input$qdc_file)
 
-      qdc_codebook_df <- parse_qdc(input$qdc_file$datapath)
+      qdc_codebook_src <- parse_qdc(input$qdc_file$datapath)
+
+      qdc_codebook_df <- qdc_codebook_src$codebook
+      qdc_categories_df <- qdc_codebook_src$categories
       # We add the info for current project and user to the imported dataframe
       qdc_codebook_df_full <- qdc_codebook_df %>%
-        dplyr::select(code_name, code_description, code_color) %>%
         dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
         dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
-      import_codes_to_database(
-        qdc_codebook_df_full,
-        glob$pool,
-        glob$active_project,
-        glob$user$user_id
-      )
+      qdc_categories_df_full <- qdc_categories_df %>%
+        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+        dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
+      ### Import QDC execute ----
+      if (nrow(qdc_codebook_df_full)) {
+        imported_code_ids <- db_import_codes(
+          qdc_codebook_df_full,
+          glob$pool,
+          glob$active_project,
+          glob$user$user_id
+        )
+      }
+
+      if (nrow(qdc_categories_df_full)) {
+        imported_category_ids <- db_import_categories(
+          qdc_categories_df_full,
+          glob$pool,
+          glob$active_project,
+          glob$user$user_id
+        )
+      }
+
+      if ("category_guids" %in% colnames(qdc_codebook_df_full)) {
+        qdc_code_category_map <- qdc_codebook_df_full %>%
+          dplyr::select(code_guid, category_guids) %>%
+          tidyr::unnest(category_guids, keep_empty = FALSE) %>%
+          dplyr::rename(category_guid = category_guids) %>%
+          dplyr::left_join(imported_code_ids, by = "code_guid") %>%
+          dplyr::left_join(imported_category_ids, by = "category_guid") %>%
+          dplyr::select(code_id, category_id)
+
+        if (nrow(qdc_code_category_map)) {
+          db_import_code_category_map(
+            qdc_code_category_map,
+            glob$pool,
+            glob$active_project,
+            glob$user$user_id
+          )
+        }
+      }
       # Update global state
       glob$codebook <- list_db_codes(
         glob$pool,
@@ -444,16 +480,71 @@ prepare_import_dataframe <- function(output_df, project_id, user_id) {
   )
 }
 
-import_codes_to_database <- function(imported_df, pool, project_id, user_id) {
-  split(imported_df, seq(nrow(imported_df))) %>%
-    purrr::walk(function(row_df) {
-      add_codes_record(
-        pool = pool,
-        project_id = project_id,
-        codes_df = row_df,
-        user_id = user_id
-      )
-    })
+db_import_codes <- function(imported_df, pool, project_id, user_id) {
+  # Create a list to store mappings
+  mappings <- purrr::map_df(seq(nrow(imported_df)), function(i) {
+    row_df <- imported_df[i, ]
+    current_guid <- row_df$code_guid
+
+    # Add the code and get the new ID
+    new_code_id <- add_codes_record(
+      pool = pool,
+      project_id = project_id,
+      codes_df = row_df %>%
+        dplyr::select(
+          project_id,
+          user_id,
+          code_name,
+          code_description,
+          code_color #TODO, code_parent_id
+        ),
+      user_id = user_id
+    )
+
+    # Return the mapping as a tibble
+    tibble::tibble(
+      code_guid = current_guid,
+      code_id = new_code_id
+    )
+  })
+
+  return(mappings)
+}
+
+db_import_categories <- function(imported_df, pool, project_id, user_id) {
+  mappings <- purrr::map_df(seq(nrow(imported_df)), function(i) {
+    row_df <- imported_df[i, ]
+    current_guid <- row_df$category_guid
+
+    new_category_id <- add_category_record(
+      pool = pool,
+      project_id = project_id,
+      categories_df = row_df %>%
+        dplyr::select(project_id, user_id, category_name, category_description),
+      user_id = user_id
+    )
+
+    tibble::tibble(
+      category_guid = current_guid,
+      category_id = new_category_id
+    )
+  })
+
+  return(mappings)
+}
+
+db_import_code_category_map <- function(
+  imported_df,
+  pool,
+  project_id,
+  user_id
+) {
+  add_category_code_record(
+    pool = pool,
+    active_project = project_id,
+    user_id = user_id,
+    edge = imported_df
+  )
 }
 
 ## QDC helpers ----
@@ -464,6 +555,7 @@ parse_qdc <- function(qdc_filepath) {
     closeButton = FALSE
   )
   on.exit(removeNotification(converting_msg), add = TRUE)
+
   qdc_file <- xml2::read_xml(qdc_filepath)
   qdc_ns <- c(qdc = xml2::xml_attr(qdc_file, "xmlns")[1])
   qdc_schema <- xml2::read_xml(system.file('qdc.xsd', package = 'requal'))
@@ -476,8 +568,9 @@ parse_qdc <- function(qdc_filepath) {
     errors <- paste(attributes(validatition_res)$errors, collapse = ", ")
     rql_message(paste("Validation of QDC file format: Error!", errors))
   }
-  imported_codebook <- get_qdc_codebook(qdc_file, qdc_ns)
-  imported_codebook
+  imported_codes <- get_qdc_codebook(qdc_file, qdc_ns)
+  imported_categories <- get_qdc_categories(qdc_file, qdc_ns)
+  list(codebook = imported_codes, categories = imported_categories)
 }
 
 get_qdc_codebook <- function(qdc_file, qdc_ns) {
@@ -486,6 +579,7 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
     "//qdc:CodeBook/qdc:Codes//qdc:Code",
     ns = qdc_ns
   )
+
   parent_guids <- purrr::map_df(codes, .f = function(x) {
     tibble::tibble(
       guid = xml2::xml_attr(x, "guid"),
@@ -582,10 +676,92 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
       code_name = name,
       code_description = description,
       code_color,
-      guid,
+      guid = guid,
       parent_guid
     )
   #TODO unique code names check and paste
 
-  return(codes_converted)
+  # Get all sets with their member codes
+  sets <- xml2::xml_find_all(
+    qdc_file,
+    "//qdc:CodeBook/qdc:Sets/qdc:Set",
+    ns = qdc_ns
+  )
+  if (length(sets) > 0) {
+    # Create a mapping of code GUID to set GUIDs
+    # (a code can belong to multiple sets)
+    code_to_sets <- purrr::map_df(sets, .f = function(set) {
+      set_guid <- xml2::xml_attr(set, "guid")
+      member_codes <- xml2::xml_find_all(set, ".//qdc:MemberCode", ns = qdc_ns)
+
+      if (length(member_codes) > 0) {
+        purrr::map_df(member_codes, .f = function(member) {
+          tibble::tibble(
+            guid = xml2::xml_attr(member, "guid"),
+            set_guid = set_guid
+          )
+        })
+      } else {
+        tibble::tibble(guid = character(), set_guid = character())
+      }
+    })
+
+    # Aggregate set GUIDs into a list column
+    code_sets <- code_to_sets %>%
+      dplyr::group_by(guid) %>%
+      dplyr::summarise(category_guids = list(set_guid), .groups = "drop")
+
+    # Join codes with their sets
+    codes_converted <- codes_converted %>%
+      dplyr::left_join(code_sets, by = "guid")
+  }
+  return(
+    codes_converted %>%
+      # to be explicit about which guid is which later on
+      dplyr::rename(code_guid = guid)
+  )
+}
+
+get_qdc_categories <- function(qdc_file, qdc_ns) {
+  sets <- xml2::xml_find_all(
+    qdc_file,
+    "//qdc:CodeBook/qdc:Sets/qdc:Set",
+    ns = qdc_ns
+  )
+
+  # If no sets found, return empty tibble
+  if (length(sets) == 0) {
+    return(tibble::tibble(
+      category_name = character(),
+      category_description = character(),
+      category_guid = character(),
+      member_code_guids = list()
+    ))
+  }
+
+  # Get set attributes (guid and name)
+  sets_df <- xml2::xml_attrs(sets) %>% dplyr::bind_rows()
+
+  # Get set descriptions
+  descriptions <- purrr::map_chr(sets, .f = function(set_node) {
+    desc <- xml2::xml_find_first(set_node, ".//qdc:Description", ns = qdc_ns)
+    if (is.na(desc)) {
+      return("")
+    } else {
+      return(xml2::xml_text(desc))
+    }
+  })
+
+  # Build categories dataframe
+  categories_converted <- sets_df %>%
+    dplyr::mutate(
+      category_description = descriptions
+    ) %>%
+    dplyr::select(
+      category_name = name,
+      category_description,
+      category_guid = guid
+    )
+
+  return(categories_converted)
 }

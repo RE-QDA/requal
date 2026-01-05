@@ -547,7 +547,7 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
     append = TRUE,
     row.names = FALSE
   )
-
+  written_code_id <- NULL
   if (res) {
     written_code_id <- dplyr::tbl(pool, "codes") %>%
       dplyr::filter(
@@ -570,6 +570,7 @@ add_codes_record <- function(pool, project_id, codes_df, user_id) {
   } else {
     warning("code not added")
   }
+  return(written_code_id)
 }
 
 add_quickcode_record <- function(pool, project_id, codes_df, user_id) {

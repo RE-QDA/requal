@@ -131,23 +131,25 @@ read_db_categories <- function(pool, active_project, user, modify = TRUE) {
         dplyr::select(
             category_id,
             category_name,
-            category_description, 
+            category_description,
             user_id
         ) %>%
         dplyr::collect()
 
-    if (modify &&
-        !is.null(user) &&
+    if (
+        modify &&
+            !is.null(user) &&
             !is.null(user$data) &&
             user$data$codebook_other_modify == 0
     ) {
         project_categories_df <- project_categories_df %>%
             dplyr::filter(user_id == !!user$user_id)
-    }else if(
-        !modify && 
-        !is.null(user) &&
+    } else if (
+        !modify &&
+            !is.null(user) &&
             !is.null(user$data) &&
-            user$data$codebook_other_view == 0){
+            user$data$codebook_other_view == 0
+    ) {
         project_categories_df <- project_categories_df %>%
             dplyr::filter(user_id == !!user$user_id)
     }
@@ -155,7 +157,7 @@ read_db_categories <- function(pool, active_project, user, modify = TRUE) {
     return(project_categories_df)
 }
 
-create_categories_list <- function(categories_df){
+create_categories_list <- function(categories_df) {
     project_categories <- categories_df$category_id
     names(project_categories) <- categories_df$category_name
 
@@ -214,7 +216,8 @@ delete_category_UI <- function(ns, pool, active_project, user) {
         pool,
         active_project = active_project,
         user = user
-    ) %>% create_categories_list()
+    ) %>%
+        create_categories_list()
     tags$div(
         selectizeInput(
             ns("categories_to_del"),
@@ -261,7 +264,7 @@ add_category_record <- function(pool, project_id, user_id, categories_df) {
         append = TRUE,
         row.names = FALSE
     )
-
+    written_category_id <- NULL
     if (res) {
         written_category_id <- dplyr::tbl(pool, "categories") %>%
             dplyr::filter(
@@ -278,6 +281,7 @@ add_category_record <- function(pool, project_id, user_id, categories_df) {
     } else {
         warning("category not added")
     }
+    return(written_category_id)
 }
 
 # add code to category -----
