@@ -258,7 +258,8 @@ mod_document_code_server <- function(id, glob) {
         glob$pool,
         glob$active_project,
         user = glob$user
-      )
+      ) %>%
+        dplyr::arrange(code_name)
 
       code_labels <- purrr::pmap(
         list(
