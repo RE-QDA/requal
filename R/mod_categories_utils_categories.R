@@ -271,6 +271,7 @@ add_category_record <- function(pool, project_id, user_id, categories_df) {
                 .data$category_name == !!categories_df$category_name
             ) %>%
             dplyr::pull(.data$category_id)
+        written_category_id <- max(written_category_id)
         log_add_category_record(
             pool,
             project_id,

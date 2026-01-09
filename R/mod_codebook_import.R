@@ -234,12 +234,11 @@ mod_codebook_import_server <- function(id, glob) {
         )
 
         # Update global state
-        glob$codebook <- list_db_codes(
-          glob$pool,
-          glob$active_project,
-          glob$user
+        glob$codebook_observer <- ifelse(
+          !isTruthy(glob$codebook_observer),
+          1,
+          (glob$codebook_observer + 1)
         )
-        glob$codebook_observer <- glob$codebook_observer + 1
       }
     })
 
@@ -298,12 +297,11 @@ mod_codebook_import_server <- function(id, glob) {
         }
       }
       # Update global state
-      glob$codebook <- list_db_codes(
-        glob$pool,
-        glob$active_project,
-        glob$user
+      glob$codebook_observer <- ifelse(
+        !isTruthy(glob$codebook_observer),
+        1,
+        (glob$codebook_observer + 1)
       )
-      glob$codebook_observer <- glob$codebook_observer + 1
     })
   })
 }
