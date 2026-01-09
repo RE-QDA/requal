@@ -34,7 +34,7 @@ merge_code_UI <- function(ns, pool, project, user) {
         project_id = project,
         user = user
     ) %>%
-        dplyr::arrange(code_name)
+        dplyr::arrange(tolower(code_name))
 
     if (user$data$codebook_other_modify == 0) {
         codes <- codes %>%
@@ -69,7 +69,7 @@ edit_code_UI <- function(ns, pool, project, user) {
         project_id = project,
         user = user
     ) %>%
-        dplyr::arrange(code_name)
+        dplyr::arrange(tolower(code_name))
 
     if (user$data$codebook_other_modify == 0) {
         codes <- codes %>%
@@ -115,7 +115,7 @@ delete_code_UI <- function(ns, pool, project, user) {
         project_id = project,
         user = user
     ) %>%
-        dplyr::arrange(code_name)
+        dplyr::arrange(tolower(code_name))
 
     if (user$data$codebook_other_modify == 0) {
         codes <- codes %>%
@@ -271,7 +271,7 @@ render_codes <- function(pool, active_project, user) {
             project_id = active_project,
             user = user
         ) %>%
-            dplyr::arrange(code_name)
+            dplyr::arrange(tolower(code_name))
 
         if (nrow(project_codes) == 0) {
             "No codes have been created."

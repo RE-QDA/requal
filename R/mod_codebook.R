@@ -205,7 +205,7 @@ mod_codebook_server <- function(id, glob) {
           glob$active_project,
           glob$user
         ) %>%
-          dplyr::arrange(code_name)
+          dplyr::arrange(tolower(code_name))
 
         print(glob$codebook)
         output$codes_ui <- renderUI({

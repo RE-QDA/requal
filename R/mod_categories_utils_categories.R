@@ -94,7 +94,7 @@ render_categories <- function(id, pool, active_project, user) {
             pool,
             project_id = active_project
         ) %>%
-            dplyr::arrange(category_name)
+            dplyr::arrange(tolower(category_name))
 
         if (!is.null(user) && user$data$codebook_other_view == 0) {
             project_categories <- project_categories %>%
@@ -218,7 +218,7 @@ delete_category_UI <- function(ns, pool, active_project, user) {
         active_project = active_project,
         user = user
     ) %>%
-        dplyr::arrange(category_name) %>%
+        dplyr::arrange(tolower(category_name)) %>%
         create_categories_list()
     tags$div(
         selectizeInput(
