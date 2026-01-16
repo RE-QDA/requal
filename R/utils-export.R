@@ -1,3 +1,5 @@
+utils::globalVariables(c("guid"))
+
 # prepare data.frame with codes and categories to export
 export_codebook_csv <- function(glob) {
   categories <- read_db_categories(

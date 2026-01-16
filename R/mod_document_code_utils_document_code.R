@@ -1,3 +1,5 @@
+utils::globalVariables(c("span_id", "par_id"))
+
 read_doc_db <- function(pool, active_project) {
   doc_name <- NULL
   if (isTruthy(active_project)) {
@@ -307,7 +309,7 @@ dplyr::summarise(
     memo_id = format_class_id(memo_id, "memo"),
     .by = span_id
 ) %>% 
-dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "")) %>% 
+dplyr::mutate(dplyr::across(dplyr::ends_with("id"), dplyr::na_if, "")) %>% 
 dplyr::left_join(
     dplyr::select(paragraphs, par_id, segment_start), by = "segment_start"
 ) %>% 
@@ -564,7 +566,7 @@ make_span  <- function(segment_start, segment_end, span_id = NULL, segment_id = 
             id = span_id,
             title = if (code_assigned) code_name else NULL,
             class = span_class,
-            style = if (code_assigned) paste("--code-color:", na.omit(code_color)) else NULL,
+            style = if (code_assigned) paste("--code-color:", stats::na.omit(code_color)) else NULL,
             `data-startend` = paste(segment_start, segment_end),
             .noWS = "outside"
         )

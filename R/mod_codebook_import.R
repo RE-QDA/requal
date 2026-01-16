@@ -1,3 +1,10 @@
+utils::globalVariables(c(
+  "parent_guid", "guid", "color", 
+  "isCodable", "description", "set_guid", 
+  "code_guid", "category_guids")
+)
+
+
 #' codebook_import UI Function
 #'
 #' @description A shiny Module.
@@ -144,7 +151,7 @@ mod_codebook_import_server <- function(id, glob) {
     ### Load import file -----
     observeEvent(input$import, {
       req(input$file)
-      loc$input_df <- read.csv(
+      loc$input_df <- utils::read.csv(
         input$file$datapath,
         header = input$header,
         sep = input$sep
@@ -173,7 +180,7 @@ mod_codebook_import_server <- function(id, glob) {
       )
 
       loc$output_df <- loc$input_df %>%
-        dplyr::select(all_of(selected_columns)) %>%
+        dplyr::select(dplyr::all_of(selected_columns)) %>%
         process_description_column(input$code_description) %>%
         process_color_column(input$code_color) %>%
         rename_columns_to_standard(
@@ -188,7 +195,7 @@ mod_codebook_import_server <- function(id, glob) {
       req(input$code_name)
 
       datatable <- DT::datatable(
-        head(loc$output_df),
+        utils::head(loc$output_df),
         escape = FALSE,
         options = list(dom = 't', ordering = FALSE)
       )

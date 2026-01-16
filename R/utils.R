@@ -482,7 +482,7 @@ db_update_value <- function(pool, table, col_val, by_col_val) {
 # format class HTML
 
 format_class_id <- function(x, class_name = NULL) {
-  class_string <- purrr::map_chr(unique(na.omit(x)), function(y) {
+  class_string <- purrr::map_chr(unique(stats::na.omit(x)), function(y) {
     paste0(class_name, "_id_", y)
   })
   if (length(class_string) > 0) {

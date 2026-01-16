@@ -1,4 +1,4 @@
-utils::globalVariables(c("memo_title"))
+utils::globalVariables(c("memo_title", "memo_type", "memo_text"))
 
 # list existing memos ------
 list_memo_records <- function(pool, project) {
@@ -68,7 +68,7 @@ add_memo_record <- function(pool, project, text, user_id) {
             dplyr::pull(memo_id)
         log_add_memo_record(
             pool,
-            project = memo_df$project_id,
+            project_id = memo_df$project_id,
             user_id = user_id,
             df = memo_df %>%
                 dplyr::mutate(memo_id = max(memo_id))

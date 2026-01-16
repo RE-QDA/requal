@@ -1,3 +1,5 @@
+utils::globalVariables(c("end"))
+
 #' document_code UI Function
 #'
 #' @description A shiny Module.
