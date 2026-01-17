@@ -320,9 +320,9 @@ warn_user <- function(warning) {
 }
 
 # send message to interactive or Shiny session
-rql_message <- function(msg) {
+rql_message <- function(msg, type = "default") {
   if (shiny::isRunning()) {
-    showNotification(msg)
+    showNotification(msg, type = type)
   } else {
     message(msg)
   }

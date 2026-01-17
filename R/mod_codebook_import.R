@@ -257,26 +257,13 @@ mod_codebook_import_server <- function(id, glob) {
 
       qdc_codebook_df <- qdc_codebook_src$codebook
       qdc_categories_df <- qdc_codebook_src$categories
-      # We add the info for current project and user to the imported dataframe
-      qdc_codebook_df_full <- qdc_codebook_df %>%
-        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
-        dplyr::mutate(user_id = as.integer(glob$user$user_id))
-
-      qdc_categories_df_full <- qdc_categories_df %>%
-        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
-        dplyr::mutate(user_id = as.integer(glob$user$user_id))
-
+      
       ### Import QDC execute ----
-      if (nrow(qdc_codebook_df_full)) {
-        imported_code_ids <- db_import_codes(
-          qdc_codebook_df_full,
-          glob$pool,
-          glob$active_project,
-          glob$user$user_id
-        )
-      }
+      if (nrow(qdc_categories_df)) {
+        qdc_categories_df_full <- qdc_categories_df %>%
+          dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+          dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
-      if (nrow(qdc_categories_df_full)) {
         imported_category_ids <- db_import_categories(
           qdc_categories_df_full,
           glob$pool,
@@ -285,24 +272,40 @@ mod_codebook_import_server <- function(id, glob) {
         )
       }
 
-      if ("category_guids" %in% colnames(qdc_codebook_df_full)) {
-        qdc_code_category_map <- qdc_codebook_df_full %>%
-          dplyr::select(code_guid, category_guids) %>%
-          tidyr::unnest(category_guids, keep_empty = FALSE) %>%
-          dplyr::rename(category_guid = category_guids) %>%
-          dplyr::left_join(imported_code_ids, by = "code_guid") %>%
-          dplyr::left_join(imported_category_ids, by = "category_guid") %>%
-          dplyr::select(code_id, category_id)
+      if (nrow(qdc_codebook_df)) {
+        # We add the info for current project and user to the imported dataframe
+        qdc_codebook_df_full <- qdc_codebook_df %>%
+        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+        dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
-        if (nrow(qdc_code_category_map)) {
-          db_import_code_category_map(
-            qdc_code_category_map,
-            glob$pool,
-            glob$active_project,
-            glob$user$user_id
-          )
+        imported_code_ids <- db_import_codes(
+          qdc_codebook_df_full,
+          glob$pool,
+          glob$active_project,
+          glob$user$user_id
+        )
+
+        if ("category_guids" %in% colnames(qdc_codebook_df_full)) {
+          qdc_code_category_map <- qdc_codebook_df_full %>%
+            dplyr::select(code_guid, category_guids) %>%
+            tidyr::unnest(category_guids, keep_empty = FALSE) %>%
+            dplyr::rename(category_guid = category_guids) %>%
+            dplyr::left_join(imported_code_ids, by = "code_guid") %>%
+            dplyr::left_join(imported_category_ids, by = "category_guid") %>%
+            dplyr::select(code_id, category_id)
+
+          if (nrow(qdc_code_category_map)) {
+            db_import_code_category_map(
+              qdc_code_category_map,
+              glob$pool,
+              glob$active_project,
+              glob$user$user_id
+            )
+          }
         }
       }
+
+      
       # Update global state
       glob$codebook_observer <- ifelse(
         !isTruthy(glob$codebook_observer),
@@ -561,21 +564,29 @@ parse_qdc <- function(qdc_filepath) {
   )
   on.exit(removeNotification(converting_msg), add = TRUE)
 
-  qdc_file <- xml2::read_xml(qdc_filepath)
-  qdc_ns <- c(qdc = xml2::xml_attr(qdc_file, "xmlns")[1])
-  qdc_schema <- xml2::read_xml(system.file('qdc.xsd', package = 'requal'))
-  #TODO check if we could validate against qdpx schema
-  # check file against validation schema
-  validatition_res <- xml2::xml_validate(qdc_file, qdc_schema)
-  if (as.logical(validatition_res)) {
-    rql_message("Validation of QDC file format: Success!")
-  } else {
-    errors <- paste(attributes(validatition_res)$errors, collapse = ", ")
-    rql_message(paste("Validation of QDC file format: Error!", errors))
-  }
-  imported_codes <- get_qdc_codebook(qdc_file, qdc_ns)
-  imported_categories <- get_qdc_categories(qdc_file, qdc_ns)
-  list(codebook = imported_codes, categories = imported_categories)
+  tryCatch(
+    {
+      qdc_file <- xml2::read_xml(qdc_filepath)
+      qdc_ns <- c(qdc = xml2::xml_attr(qdc_file, "xmlns")[1])
+      qdc_schema <- xml2::read_xml(system.file('qdc.xsd', package = 'requal'))
+      #TODO check if we could validate against qdpx schema
+      # check file against validation schema
+      validatition_res <- xml2::xml_validate(qdc_file, qdc_schema)
+      if (as.logical(validatition_res)) {
+        rql_message("Validation of QDC file format: Success!")
+      } else {
+        errors <- paste(attributes(validatition_res)$errors, collapse = ", ")
+        rql_message(paste("Validation of QDC file format: Error!", errors))
+      }
+      imported_codes <- get_qdc_codebook(qdc_file, qdc_ns)
+      imported_categories <- get_qdc_categories(qdc_file, qdc_ns)
+      list(codebook = imported_codes, categories = imported_categories)
+    },
+    error = function(e) {
+      rql_message(paste("Error parsing QDC file:", e$message, "\nCodebook not imported."), type = "error")
+      list(codebook = data.frame(), categories = data.frame())
+    }
+  )
 }
 
 get_qdc_codebook <- function(qdc_file, qdc_ns) {
