@@ -1,8 +1,13 @@
 utils::globalVariables(c(
-  "parent_guid", "guid", "color", 
-  "isCodable", "description", "set_guid", 
-  "code_guid", "category_guids")
-)
+  "parent_guid",
+  "guid",
+  "color",
+  "isCodable",
+  "description",
+  "set_guid",
+  "code_guid",
+  "category_guids"
+))
 
 
 #' codebook_import UI Function
@@ -255,9 +260,13 @@ mod_codebook_import_server <- function(id, glob) {
 
       qdc_codebook_src <- parse_qdc(input$qdc_file$datapath)
 
+      if (!is.null(qdc_codebook_src$message)) {
+        print(qdc_codebook_src$message)
+        rql_message(qdc_codebook_src$message)
+      }
       qdc_codebook_df <- qdc_codebook_src$codebook
       qdc_categories_df <- qdc_codebook_src$categories
-      
+
       ### Import QDC execute ----
       if (nrow(qdc_categories_df)) {
         qdc_categories_df_full <- qdc_categories_df %>%
@@ -275,8 +284,8 @@ mod_codebook_import_server <- function(id, glob) {
       if (nrow(qdc_codebook_df)) {
         # We add the info for current project and user to the imported dataframe
         qdc_codebook_df_full <- qdc_codebook_df %>%
-        dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
-        dplyr::mutate(user_id = as.integer(glob$user$user_id))
+          dplyr::mutate(project_id = as.integer(glob$active_project)) %>%
+          dplyr::mutate(user_id = as.integer(glob$user$user_id))
 
         imported_code_ids <- db_import_codes(
           qdc_codebook_df_full,
@@ -305,7 +314,6 @@ mod_codebook_import_server <- function(id, glob) {
         }
       }
 
-      
       # Update global state
       glob$codebook_observer <- ifelse(
         !isTruthy(glob$codebook_observer),
@@ -557,12 +565,13 @@ db_import_code_category_map <- function(
 
 ## QDC helpers ----
 parse_qdc <- function(qdc_filepath) {
-  converting_msg <- showNotification(
-    "Converting REFI-QDA codebook...",
-    duration = NULL,
-    closeButton = FALSE
-  )
-  on.exit(removeNotification(converting_msg), add = TRUE)
+  # converting_msg <- showNotification(
+  #   "Converting REFI-QDA codebook...",
+  #   duration = NULL,
+  #   closeButton = FALSE
+  # )
+  # on.exit(removeNotification(converting_msg), add = TRUE)
+  message <- NULL
 
   tryCatch(
     {
@@ -572,24 +581,42 @@ parse_qdc <- function(qdc_filepath) {
       #TODO check if we could validate against qdpx schema
       # check file against validation schema
       validatition_res <- xml2::xml_validate(qdc_file, qdc_schema)
-      if (as.logical(validatition_res)) {
-        rql_message("Validation of QDC file format: Success!")
-      } else {
+      if (!as.logical(validatition_res)) {
         errors <- paste(attributes(validatition_res)$errors, collapse = ", ")
-        rql_message(paste("Validation of QDC file format: Error!", errors))
+        message <- paste("Validation of QDC file format: Error!", errors)
       }
       imported_codes <- get_qdc_codebook(qdc_file, qdc_ns)
       imported_categories <- get_qdc_categories(qdc_file, qdc_ns)
-      list(codebook = imported_codes, categories = imported_categories)
+
+      codes <- imported_codes$codes
+      message <- c(message, imported_codes$message)
+      if (!is.null(message)) {
+        message <- paste(message, collapse = "\n")
+      }
+
+      list(
+        codebook = codes,
+        categories = imported_categories,
+        message = message
+      )
     },
     error = function(e) {
-      rql_message(paste("Error parsing QDC file:", e$message, "\nCodebook not imported."), type = "error")
-      list(codebook = data.frame(), categories = data.frame())
+      list(
+        codebook = data.frame(),
+        categories = data.frame(),
+        message = paste(
+          "Error parsing QDC file:",
+          e$message,
+          "\nCodebook not imported."
+        )
+      )
     }
   )
 }
 
 get_qdc_codebook <- function(qdc_file, qdc_ns) {
+  message <- NULL
+
   codes <- xml2::xml_find_all(
     qdc_file,
     "//qdc:CodeBook/qdc:Codes//qdc:Code",
@@ -662,9 +689,8 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
   if (
     any(!isTRUE(stringr::str_detect(codes_df_renamed$isCodable, "[Tt]rue")))
   ) {
-    rql_message(
+    message <-
       "Non-codable codes found in QDC file. Only codable codes will be imported."
-    )
   }
 
   # clean up result
@@ -732,9 +758,12 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
       dplyr::left_join(code_sets, by = "guid")
   }
   return(
-    codes_converted %>%
-      # to be explicit about which guid is which later on
-      dplyr::rename(code_guid = guid)
+    list(
+      codes = codes_converted %>%
+        # to be explicit about which guid is which later on
+        dplyr::rename(code_guid = guid),
+      message = message
+    )
   )
 }
 
