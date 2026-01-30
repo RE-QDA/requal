@@ -193,11 +193,46 @@ get_volume_paths <- function() {
     names(volumes_checked) <- volumes_checked
     volumes_checked
   } else if (tolower(sysinfo["sysname"]) == "windows") {
-    volumes_string <- system("wmic logicaldisk get caption", intern = TRUE)
-    volumes <- unlist(stringr::str_extract_all(volumes_string, "[A-Z]\\:"))
-    volumes_checked <- volumes[fs::file_access(volumes)]
-    names(volumes_checked) <- volumes_checked
-    volumes_checked
+    # First try PowerShell
+    tryCatch(
+      {
+        volumes_string <- system(
+          "powershell -Command \"Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty Name\"",
+          intern = TRUE
+        )
+        volumes <- paste0(volumes_string[nzchar(volumes_string)], ":")
+        volumes_checked <- volumes[fs::file_access(volumes)]
+        names(volumes_checked) <- volumes_checked
+        volumes_checked
+      },
+      error = function(e) {
+        # Fallback: try wmic
+        tryCatch(
+          {
+            volumes_string <- system(
+              "wmic logicaldisk get caption",
+              intern = TRUE
+            )
+            volumes <- unlist(stringr::str_extract_all(
+              volumes_string,
+              "[A-Z]\\:"
+            ))
+            volumes_checked <- volumes[fs::file_access(volumes)]
+            names(volumes_checked) <- volumes_checked
+            volumes_checked
+          },
+          error = function(e2) {
+            # Last resort: check common drive letters
+            potential_volumes <- paste0(LETTERS[3:26], ":") # C: through Z:
+            volumes_checked <- potential_volumes[fs::file_access(
+              potential_volumes
+            )]
+            names(volumes_checked) <- volumes_checked
+            volumes_checked
+          }
+        )
+      }
+    )
   } else {
     c(Volumes = fs::path_home())
   }
