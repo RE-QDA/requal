@@ -193,7 +193,7 @@ get_volume_paths <- function() {
     names(volumes_checked) <- volumes_checked
     volumes_checked
   } else if (tolower(sysinfo["sysname"]) == "windows") {
-    # First try PowerShell
+    # For Windows 11, first try PowerShell
     tryCatch(
       {
         volumes_string <- system(
