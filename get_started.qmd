@@ -69,10 +69,11 @@ requal::run_app()
 
 The development version contains the latest features, but might be less stable than a released version.
 
-To access the latest features, you can install the development version of Requal from the developer's [R-Universe](https://hlageek.r-universe.dev/requal) repository by running this code in R:
+To access the latest features and receive the most recent bug fixes, you can install the development version of Requal by running this code in R:
 
 ```{.r .copy}
-install.packages("requal", repos = c("https://hlageek.r-universe.dev", "https://cloud.r-project.org"))
+install.packages("remotes")
+remotes::install_github("RE-QDA/requal", dependencies = TRUE)
 ```
 
-Usage is the same as in the server and desktop versions.
+Usage of the development version is identical with the server and desktop versions.
