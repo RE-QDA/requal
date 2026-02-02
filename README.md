@@ -52,10 +52,11 @@ The development version contains the latest features, but might be less
 stable than a [released
 version](https://github.com/RE-QDA/requal/releases).
 
-You can install the development version of `requal` by running this code
-in R:
+You can install the development version of `requal` from GitHub by
+running this code in R:
 
-    install.packages("requal", repos = c("https://hlageek.r-universe.dev", "https://cloud.r-project.org"))
+    install.packages("remotes") 
+    remotes::install_github("RE-QDA/requal", dependencies = TRUE)
 
 ## Usage
 
