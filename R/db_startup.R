@@ -222,7 +222,7 @@ CREATE TABLE if not exists segments (
   "users" = "
 CREATE TABLE if not exists users (
     user_id INTEGER PRIMARY KEY
-,   user_login TEXT UNIQUE
+,   user_login TEXT UNIQUE NOT NULL
 ,   user_name TEXT
 ,   user_mail TEXT
 ,   created_at TEXT DEFAULT CURRENT_TIMESTAMP
