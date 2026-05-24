@@ -103,12 +103,12 @@ mod_memo_server <- function(id, glob) {
             rownames = FALSE,
             width = "100%",
             colnames = c(
-              "ID" = "memo_id",
+              # "ID" = "memo_id",
               "Title" = "memo_title",
               "Type" = "memo_type",
               "Document" = "doc_name",
-              "Creator" = "user_name",
-              "Creator ID" = "user_id"
+              "Creator" = "user_name"
+              # "Creator ID" = "user_id"
             ),
             filter = "top",
             escape = FALSE,

@@ -417,11 +417,11 @@ dt_memo_options <- function() {
     scrollX = TRUE,
     columnDefs = list(
       # Visibility settings
-      list(visible = TRUE, targets = c(0, 1, 2, 3)), # Show these columns
-      list(visible = FALSE, targets = c(4, 5)), # Hide these columns
+      list(visible = TRUE, targets = c(1, 2, 3)), # Show these columns
+      list(visible = FALSE, targets = c(0, 4, 5, 7)), # Hide these columns
 
       # Width settings
-      list(width = '50px', targets = 0),
+      # list(width = '50px', targets = 0),
       list(width = '20vh', targets = 1),
       list(width = '20vh', targets = 2),
       list(width = '20vh', targets = 3)

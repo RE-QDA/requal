@@ -20,4 +20,6 @@ tests/test.requal
 test-iframe.R
 wip.R
 
+.vscode/
+
 /.quarto/
