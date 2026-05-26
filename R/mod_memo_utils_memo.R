@@ -12,7 +12,20 @@ list_memo_records <- function(pool, project) {
     dplyr::collect() %>%
     dplyr::mutate(
       memo_name = entitle_memo(memo_text)
-    )
+    ) %>%
+    dplyr::group_by(
+      memo_name
+    ) |>
+    dplyr::mutate(n = dplyr::row_number()) %>%
+    dplyr::mutate(
+      memo_name = dplyr::if_else(
+        n > 1,
+        paste0(memo_name, " (", n, ")"),
+        memo_name
+      )
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(-n)
 }
 
 read_memo_by_id <- function(pool, project, memo_id) {
