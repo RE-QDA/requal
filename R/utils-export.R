@@ -154,3 +154,193 @@ export_codebook_xml <- function(glob) {
     return(NULL)
   }
 }
+
+read_projects_db <- function(pool) {
+  dplyr::tbl(pool, "projects") %>%
+    dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
+    dplyr::collect()
+}
+
+parse_date <- function(x) {
+  format(as.POSIXct(x), "%Y-%m-%dT%H:%M:%OS6")
+}
+
+export_project_xml <- function(glob) {
+  users <- get_users_in_project(glob$pool, glob$active_project) %>%
+    dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
+
+  project <- read_projects_db(glob$pool)
+
+  validator_file <- "refi.xsd"
+  validator_schema <- xml2::read_xml(system.file(
+    validator_file,
+    package = "requal"
+  ))
+  validator_ns <- xml2::xml_attr(validator_schema, "targetNamespace")
+
+  log <- load_logs_for_reporting(glob$pool, glob$active_project)
+
+  created_user_id <- log %>%
+    dplyr::filter(action == "Create project") %>%
+    dplyr::left_join(users, by = c("user" = "user_name")) %>%
+    dplyr::pull(user_id)
+
+  created_user_guid <- users %>%
+    dplyr::filter(user_id == created_user_id) %>%
+    dplyr::pull(guid)
+
+  last_mod <- log %>%
+    tail(1)
+
+  modified_user_id <- last_mod %>%
+    dplyr::left_join(users, by = c("user" = "user_name")) %>%
+    dplyr::pull(user_id)
+
+  modified_user_guid <- users %>%
+    dplyr::filter(user_id == modified_user_id) %>%
+    dplyr::pull(guid)
+
+  project_xml <- xml2::xml_new_root(
+    "Project",
+    "xmlns" = validator_ns,
+    "xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance",
+    "xsi:schemaLocation" = paste(validator_ns, validator_file),
+    "origin" = paste0(
+      "requal (version: ",
+      get_project_version(glob),
+      ")"
+    ),
+    "creatingUserGUID" = created_user_guid,
+    "modifiedDateTime" = parse_date(last_mod$created_at),
+    "creationDateTime" = parse_date(project$created_at),
+    "basePath" = NA,
+    "modifyingUserGUID" = modified_user_guid,
+    "name" = project$project_name
+  )
+
+  # Users
+  users_xml <- xml2::xml_add_child(project_xml, "Users")
+  for (i in seq_len(nrow(users))) {
+    user <- xml2::xml_add_child(users_xml, "User")
+    xml2::xml_attr(user, "guid") <- users$guid[i]
+    xml2::xml_attr(user, "name") <- users$user_name[i]
+  }
+
+  # Codebook
+  codebook <- list_db_codes(
+    glob$pool,
+    glob$active_project,
+    glob$user
+  ) %>%
+    dplyr::arrange(tolower(code_name)) %>%
+    dplyr::mutate(
+      guid = uuid::UUIDgenerate(n = dplyr::n()),
+      code_color = purrr::map_chr(code_color, convert_colour_to_hex)
+    )
+
+  codebook_xml <- xml2::xml_add_child(project_xml, "CodeBook")
+  codes <- xml2::xml_add_child(codebook_xml, "Codes")
+  # TODO? does not handle nesting of codes
+  for (i in seq_len(nrow(codebook))) {
+    code <- xml2::xml_add_child(codes, "Code")
+    xml2::xml_attr(code, "guid") <- codebook$guid[i]
+    xml2::xml_attr(code, "name") <- codebook$code_name[i]
+    xml2::xml_attr(code, "color") <- codebook$code_color[i]
+    xml2::xml_attr(code, "isCodable") <- "true"
+    if (
+      codebook$code_description[i] != "" && !is.na(codebook$code_description[i])
+    ) {
+      description <- xml2::xml_add_child(
+        code,
+        "Description",
+        codebook$code_description[i]
+      )
+    }
+  }
+
+  # Sources
+
+  # Notes
+  # Links
+  # Sets
+  categories <- read_db_categories(
+    glob$pool,
+    glob$active_project,
+    glob$user
+  ) %>%
+    dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
+
+  if (nrow(categories)) {
+    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
+      dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
+      dplyr::filter(category_id %in% categories$category_id) %>%
+      dplyr::collect() %>%
+      dplyr::left_join(
+        codebook %>% dplyr::select(code_id, membercode_guid = guid),
+        by = "code_id"
+      ) %>%
+      dplyr::left_join(
+        categories %>% dplyr::select(category_id, guid),
+        by = "category_id"
+      )
+  }
+  if (nrow(categories)) {
+    sets <- xml2::xml_add_child(project_xml, "Sets")
+    for (i in seq_len(nrow(categories))) {
+      set <- xml2::xml_add_child(sets, "Set")
+      xml2::xml_attr(set, "guid") <- categories$guid[i]
+      xml2::xml_attr(set, "name") <- categories$category_name[i]
+      if (
+        categories$category_description[i] != "" &&
+          !is.na(categories$category_description[i])
+      ) {
+        description <- xml2::xml_add_child(
+          set,
+          "Description",
+          categories$category_description[i]
+        )
+      }
+      if (categories$guid[i] %in% categories_map$guid) {
+        tmp <- categories_map %>%
+          dplyr::filter(guid == categories$guid[i])
+        for (j in 1:nrow(tmp)) {
+          membercode <- xml2::xml_add_child(set, "MemberCode")
+          xml2::xml_attr(membercode, "targetGUID") <- tmp$membercode_guid[j]
+        }
+      }
+    }
+  }
+
+  # Graphs
+
+  tmp_qdefile <- tempfile(fileext = ".qde")
+  xml2::write_xml(
+    project_xml,
+    tmp_qdefile,
+    encoding = "utf-8",
+    declaration = TRUE
+  )
+  validation_res <- xml2::xml_validate(
+    xml2::read_xml(tmp_qdefile), # use codebook_xml instead when checking for errors
+    validator_schema
+  )
+  if (validation_res) {
+    showNotification(
+      "Project successfully exported.",
+      type = "message"
+    )
+    return(project_xml)
+  } else {
+    showNotification(
+      div(
+        p("Error exporting project:"),
+        p(paste(attr(validation_res, "errors"), collapse = ", "))
+      ),
+      type = "error",
+      duration = NULL
+    )
+    return(NULL)
+  }
+
+  #
+}
