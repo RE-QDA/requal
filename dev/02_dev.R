@@ -40,6 +40,7 @@ usethis::use_package("pool")
 ## Create a module infrastructure in R/
 golem::add_module(name = "launchpad_loader") # Name of the module
 golem::add_module(name = "launchpad_creator") # Name of the module
+golem::add_module(name = "launchpad_import") # Name of the module
 
 # Project menu
 golem::add_module(name = "project") # Name of the module
@@ -70,19 +71,19 @@ golem::add_module(name = "download_handler") # Name of the module
 golem::add_module(name = "download_html") # Name of the module
 
 
-golem::add_module( name = "reporting" ) # Name of the module
-golem::add_module( name = "settings" ) # Name of the module
-golem::add_module( name = "about" ) # Name of the module
-golem::add_module( name = "user" ) # Name of the module
-golem::add_module( name = "memo" ) # Name of the module
-golem::add_module( name = "agreement" )
-golem::add_module( name = "browser" )
-golem::add_module( name = "text_stats")
-golem::add_module( name = "summary" )
-golem::add_module( name = "rql_button" )
-golem::add_module( name = "rql_hidden_ui" )
-golem::add_module( name = "memo_segment" )
-golem::add_module( name = "memo_editor")
+golem::add_module(name = "reporting") # Name of the module
+golem::add_module(name = "settings") # Name of the module
+golem::add_module(name = "about") # Name of the module
+golem::add_module(name = "user") # Name of the module
+golem::add_module(name = "memo") # Name of the module
+golem::add_module(name = "agreement")
+golem::add_module(name = "browser")
+golem::add_module(name = "text_stats")
+golem::add_module(name = "summary")
+golem::add_module(name = "rql_button")
+golem::add_module(name = "rql_hidden_ui")
+golem::add_module(name = "memo_segment")
+golem::add_module(name = "memo_editor")
 golem::add_module(name = "codebook_import")
 
 
@@ -106,12 +107,12 @@ golem::add_utils("user_manager", module = "user_manager")
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
-golem::add_js_file( "document_code_js" )
-golem::add_js_file( "check_categories" )
-golem::add_js_handler( "handlers" )
-golem::add_css_file( "custom" )
-golem::add_css_file( "memo_editor" )
-golem::add_js_file( "memo_editor" )
+golem::add_js_file("document_code_js")
+golem::add_js_file("check_categories")
+golem::add_js_handler("handlers")
+golem::add_css_file("custom")
+golem::add_css_file("memo_editor")
+golem::add_js_file("memo_editor")
 
 
 ## Add internal datasets ----

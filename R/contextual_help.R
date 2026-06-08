@@ -134,6 +134,12 @@ help_items <- function(help_item) {
           )
         )
       )
+    ),
+    "qdpx_import" = list(
+      title = "Importing QDPX projects",
+      content = div(
+        "QDPX file extensions refers to REFI-QDA format for qualitative project exchange."
+      )
     )
   )
 }

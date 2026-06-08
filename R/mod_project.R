@@ -30,12 +30,13 @@ mod_project_ui <- function(id) {
               label = "Delete project",
               icon = "trash",
               inputId = ns("project_delete_menu")
+            ),
+            mod_rql_button_ui(
+              ns("project_export_tool"),
+              label = "Export project",
+              icon = "file-export",
+              inputId = ns("project_export_menu")
             )
-            #mod_rql_button_ui(ns("project_import_tool"),
-            #  label = "Import project",
-            #  icon = "file-import",
-            #  inputId = ns("project_import_menu")
-            #)
           ),
           fluidRow(
             class = "module_content",
@@ -167,6 +168,25 @@ mod_project_server <- function(id, glob) {
         asis = TRUE
       )
       showNotification("Changes to project were saved.")
+    })
+
+    # Project export UI ----
+
+    mod_rql_button_server(
+      id = "project_export_tool",
+      custom_title = "Export project",
+      custom_tagList = tagList(
+        actionButton(ns("project_export"), "Export")
+      ),
+      glob,
+      permission = "project_owner"
+    )
+
+    observeEvent(input$project_export, {
+      showModal(modalDialog(
+        title = "Project export",
+        "REFI-QDA export not yet implemented."
+      ))
     })
 
     # Project delete UI ----

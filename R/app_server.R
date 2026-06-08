@@ -30,6 +30,8 @@ app_server <- function(input, output, session) {
 
   mod_launchpad_creator_server("launchpad_creator_ui_1", glob)
 
+  mod_launchpad_import_server("launchpad_import_1", glob)
+
   observeEvent(glob$active_project, {
     updateControlbar("control_bar")
     shinyjs::show(id = "btn-free_memo")

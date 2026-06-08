@@ -138,6 +138,12 @@ set_controlbar <- function() {
         title = "Create",
         icon = icon("plus"),
         mod_launchpad_creator_ui("launchpad_creator_ui_1")
+      ),
+      shinydashboardPlus::controlbarItem(
+        id = "importer",
+        title = "Import",
+        icon = icon("file-import"),
+        mod_launchpad_import_ui("launchpad_import_1")
       )
     )
   )
@@ -513,11 +519,10 @@ button_is_on <- function(button_input) {
   return(button_input %% 2 == 1)
 }
 
-get_project_version <- function(glob){
+get_project_version <- function(glob) {
   dplyr::tbl(glob$pool, "requal_version") %>%
     dplyr::filter(
       .data$project_id == local(as.numeric(glob$active_project))
     ) %>%
     dplyr::pull(version)
 }
-
