@@ -41,6 +41,7 @@ usethis::use_package("pool")
 golem::add_module(name = "launchpad_loader") # Name of the module
 golem::add_module(name = "launchpad_creator") # Name of the module
 golem::add_module(name = "launchpad_import") # Name of the module
+golem::add_fct(name = "launchpad_import", module = "launchpad_import")
 
 # Project menu
 golem::add_module(name = "project") # Name of the module
