@@ -258,10 +258,12 @@ export_project_xml <- function(glob) {
     }
   }
 
-  # Sources
+  # TODO: Sources
 
-  # Notes
+  # TODO: Notes
+
   # Links
+
   # Sets
   categories <- read_db_categories(
     glob$pool,
@@ -342,5 +344,6 @@ export_project_xml <- function(glob) {
     return(NULL)
   }
 
-  #
+  # TODO: export sources to .txt files
+  # TODO: zip .qde + sources
 }

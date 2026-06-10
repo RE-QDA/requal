@@ -66,7 +66,6 @@ Imports:
     uuid
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
 Suggests:
     rmarkdown,
     knitr,
@@ -82,3 +81,4 @@ Config/testthat/edition: 3
 Language: en-US
 URL: https://github.com/RE-QDA/requal
 BugReports: https://github.com/RE-QDA/requal/issues
+Config/roxygen2/version: 8.0.0
