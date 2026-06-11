@@ -405,7 +405,8 @@ create_default_user <- function(pool, project_id, user_id) {
 
   if (golem::get_golem_options("mode") %in% c("local", "local_test")) {
     user_df <- tibble::tibble(
-      user_name = Sys.info()["user"]
+      user_name = Sys.info()["user"],
+      user_login = Sys.info()["user"]
     )
     DBI::dbWriteTable(pool, "users", user_df, append = TRUE, row.names = FALSE)
 
