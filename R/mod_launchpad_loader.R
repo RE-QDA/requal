@@ -133,14 +133,6 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
         }
       }
     )
-    # observeEvent(glob$pool, {
-    #   updateSelectInput(session,
-    #                     "project_selector_load",
-    #                     choices = read_project_db(glob$pool,
-    #                                               project_id = NULL
-    #                     )
-    #   )
-    # })
 
     observeEvent(glob$user$user_id, {
       if (isTruthy(glob$user$user_id)) {
@@ -154,6 +146,18 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             session,
             "project_selector_load",
             choices = projects
+          )
+        }
+
+        if (
+          golem::get_golem_options("mode") %in%
+            c("server", "local_test") &
+            nrow(permitted_projects) == 0
+        ) {
+          shinydashboardPlus::updateControlbarMenu(
+            "launchpad",
+            selected = "Create",
+            session = session$rootScope()
           )
         }
       }
