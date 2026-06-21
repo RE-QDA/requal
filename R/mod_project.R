@@ -176,18 +176,34 @@ mod_project_server <- function(id, glob) {
       id = "project_export_tool",
       custom_title = "Export project",
       custom_tagList = tagList(
-        actionButton(ns("project_export"), "Export")
+        downloadButton(ns("project_export"), "Export")
       ),
       glob,
       permission = "project_owner"
     )
 
-    observeEvent(input$project_export, {
-      showModal(modalDialog(
-        title = "Project export",
-        "REFI-QDA export not yet implemented."
-      ))
-    })
+    output$project_export <- downloadHandler(
+      filename = function() {
+        project_name <- names(glob$active_project)
+        paste0(project_name, ".qdpx")
+      },
+      content = function(file) {
+        tryCatch(
+          {
+            # passing a whole glob is a bit too intense?
+            project_xml <- export_project_xml(glob)
+            export_project_qdpx(project_xml, file)
+          },
+          error = function(e) {
+            showNotification(
+              paste("Error exporting project:", e$message),
+              type = "error",
+              duration = NULL
+            )
+          }
+        )
+      }
+    )
 
     # Project delete UI ----
     mod_rql_button_server(

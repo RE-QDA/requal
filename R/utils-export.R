@@ -31,7 +31,7 @@ export_codebook_csv <- function(glob) {
     )
 }
 
-# create xml
+# export codebook to .qdc file
 export_codebook_xml <- function(glob) {
   codebook <- glob$codebook %>%
     dplyr::mutate(
@@ -155,11 +155,83 @@ export_codebook_xml <- function(glob) {
   }
 }
 
+# write project XML to a .qdpx file (a zip archive containing project.qde)
+export_project_qdpx <- function(project_xml, file) {
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir)
+  on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+
+  qde_path <- file.path(tmp_dir, "project.qde")
+  xml2::write_xml(
+    project_xml,
+    qde_path,
+    encoding = "utf-8",
+    declaration = TRUE
+  )
+
+  # zip from within tmp_dir so paths in the archive are not absolute
+  old_wd <- setwd(tmp_dir)
+  on.exit(setwd(old_wd), add = TRUE)
+  utils::zip(
+    zipfile = file,
+    files = "project.qde",
+    flags = "-r9Xq"
+  )
+
+  invisible(file)
+}
+
 read_projects_db <- function(pool) {
   dplyr::tbl(pool, "projects") %>%
     dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
     dplyr::collect()
 }
+
+read_documents_db <- function(pool, active_project, user) {
+  other_docs_permission <- user$data$data_other_view
+
+  docs <- dplyr::tbl(pool, "documents") %>%
+    dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+    dplyr::collect()
+
+  if (!other_docs_permission) {
+    docs <- docs |>
+      dplyr::filter(user_id == user$user_id)
+  }
+
+  docs
+}
+
+read_segments_db <- function(pool, active_project, user) {
+  other_segments_permission <- user$data$annotation_other_view
+
+  segments <- dplyr::tbl(pool, "segments") %>%
+    dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+    dplyr::collect()
+
+  if (!other_segments_permission) {
+    segments <- segments |>
+      dplyr::filter(user_id == user$user_id)
+  }
+
+  segments
+}
+
+read_memos_db <- function(pool, active_project, user) {
+  other_memos_permission <- user$data$memo_other_view
+
+  memos <- dplyr::tbl(pool, "memos") %>%
+    dplyr::filter(.data$project_id == as.integer(active_project)) %>%
+    dplyr::collect()
+
+  if (!other_memos_permission) {
+    memos <- memos |>
+      dplyr::filter(user_id == user$user_id)
+  }
+
+  memos
+}
+
 
 parse_date <- function(x) {
   format(as.POSIXct(x), "%Y-%m-%dT%H:%M:%OS6")
@@ -231,15 +303,20 @@ export_project_xml <- function(glob) {
     glob$pool,
     glob$active_project,
     glob$user
-  ) %>%
-    dplyr::arrange(tolower(code_name)) %>%
-    dplyr::mutate(
-      guid = uuid::UUIDgenerate(n = dplyr::n()),
-      code_color = purrr::map_chr(code_color, convert_colour_to_hex)
-    )
+  )
 
-  codebook_xml <- xml2::xml_add_child(project_xml, "CodeBook")
-  codes <- xml2::xml_add_child(codebook_xml, "Codes")
+  if (nrow(codebook)) {
+    codebook_xml <- xml2::xml_add_child(project_xml, "CodeBook")
+    codes <- xml2::xml_add_child(codebook_xml, "Codes")
+
+    codebook <- codebook |>
+      dplyr::arrange(tolower(code_name)) %>%
+      dplyr::mutate(
+        guid = uuid::UUIDgenerate(n = dplyr::n()),
+        code_color = purrr::map_chr(code_color, convert_colour_to_hex)
+      )
+  }
+
   # TODO? does not handle nesting of codes
   for (i in seq_len(nrow(codebook))) {
     code <- xml2::xml_add_child(codes, "Code")
@@ -258,9 +335,109 @@ export_project_xml <- function(glob) {
     }
   }
 
-  # TODO: Sources
+  # Sources
+  docs <- read_documents_db(
+    glob$pool,
+    glob$active_project,
+    glob$user
+  )
 
-  # TODO: Notes
+  if (nrow(docs)) {
+    sources <- xml2::xml_add_child(project_xml, "Sources")
+
+    docs <- docs |>
+      dplyr::mutate(
+        guid = uuid::UUIDgenerate(n = dplyr::n())
+      )
+  }
+
+  segments <- read_segments_db(glob$pool, glob$active_project, glob$user)
+
+  if (nrow(segments)) {
+    segments <- segments |>
+      dplyr::mutate(
+        guid = uuid::UUIDgenerate(n = dplyr::n())
+      )
+  }
+
+  memos <- read_memos_db(glob$pool, glob$active_project, glob$user)
+
+  if (nrow(memos)) {
+    memos <- memos |>
+      dplyr::mutate(
+        guid = uuid::UUIDgenerate(n = dplyr::n())
+      )
+  }
+
+  for (i in seq_len(nrow(docs))) {
+    src <- xml2::xml_add_child(sources, "TextSource")
+    xml2::xml_attr(src, "guid") <- docs$guid[i]
+    xml2::xml_attr(src, "name") <- docs$doc_name[i]
+    xml2::xml_attr(src, "creatingUser") <- users$guid[
+      users$user_id == docs$user_id[i]
+    ]
+    xml2::xml_attr(src, "creationDateTime") <- parse_date(docs$created_at[i])
+
+    if (
+      docs$doc_description[i] != "" &&
+        !is.na(docs$doc_description[i])
+    ) {
+      description <- xml2::xml_add_child(
+        src,
+        "Description",
+        docs$doc_description[i]
+      )
+    }
+
+    doc_content <- xml2::xml_add_child(src, "PlainTextContent")
+    xml2::xml_text(doc_content) <- docs$doc_text[i]
+
+    # Segments
+    doc_segments <- segments |>
+      dplyr::filter(doc_id == docs$doc_id[i])
+    for (i in seq_len(nrow(doc_segments))) {
+      sel <- xml2::xml_add_child(src, "PlainTextSelection")
+      xml2::xml_attr(sel, "guid") <- doc_segments$guid[i]
+      xml2::xml_attr(sel, "startPosition") <- doc_segments$segment_start[i] - 1
+      xml2::xml_attr(sel, "endPosition") <- doc_segments$segment_end[i]
+
+      if (!is.na(doc_segments$code_id[i])) {
+        coding <- xml2::xml_add_child(sel, "Coding")
+        xml2::xml_attr(coding, "guid") <- uuid::UUIDgenerate()
+        xml2::xml_attr(coding, "creatingUser") <- users$guid[
+          users$user_id == doc_segments$user_id[i]
+        ]
+        code_ref <- xml2::xml_add_child(coding, "CodeRef")
+        xml2::xml_attr(code_ref, "targetGUID") <- codebook$guid[
+          codebook$code_id == doc_segments$code_id[i]
+        ]
+      } else {
+        sg_memo_map <- dplyr::tbl(glob$pool, "memos_segments_map") %>%
+          dplyr::filter(segment_id == !!doc_segments$segment_id[i]) %>%
+          dplyr::collect()
+        segment_memo <- xml2::xml_add_child(sel, "NoteRef")
+        xml2::xml_attr(segment_memo, "targetGUID") <- memos$guid[
+          memos$memo_id == sg_memo_map$memo_id
+        ]
+      }
+    }
+    # TODO: memos_documents_map => NoteRef (if memos_documents_map will be implemented)
+  }
+
+  # Notes
+  if (nrow(memos)) {
+    notes <- xml2::xml_add_child(project_xml, "Notes")
+
+    for (i in seq_len(nrow(memos))) {
+      note <- xml2::xml_add_child(notes, "Note")
+      xml2::xml_attr(note, "guid") <- memos$guid[i]
+      xml2::xml_attr(note, "creatingUser") <- users$guid[
+        users$user_id == memos$user_id[i]
+      ]
+      text <- xml2::xml_add_child(note, "PlainTextContent")
+      xml2::xml_text(text) <- memos$text[i]
+    }
+  }
 
   # Links
 
@@ -269,10 +446,12 @@ export_project_xml <- function(glob) {
     glob$pool,
     glob$active_project,
     glob$user
-  ) %>%
-    dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
+  )
 
   if (nrow(categories)) {
+    categories <- categories |>
+      dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
+
     categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
       dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
       dplyr::filter(category_id %in% categories$category_id) %>%
@@ -343,7 +522,4 @@ export_project_xml <- function(glob) {
     )
     return(NULL)
   }
-
-  # TODO: export sources to .txt files
-  # TODO: zip .qde + sources
 }
