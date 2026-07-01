@@ -409,7 +409,6 @@ create_default_user <- function(pool, project_id, user_id) {
       user_login = unname(Sys.info()["user"])
     )
 
-    browser()
     DBI::dbWriteTable(pool, "users", user_df, append = TRUE, row.names = FALSE)
 
     user_df_stored <- dplyr::tbl(pool, "users") %>%
