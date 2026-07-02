@@ -1,9 +1,11 @@
-create_project_db <- function(pool,
-                              project_name,
-                              project_description,
-                              user_id) {
- 
-  project_df <- tibble::tibble(project_name,
+create_project_db <- function(
+  pool,
+  project_name,
+  project_description,
+  user_id
+) {
+  project_df <- tibble::tibble(
+    project_name,
     project_description,
     created_at = as.character(Sys.time())
   )
@@ -22,17 +24,16 @@ create_project_db <- function(pool,
 
   project <- stats::setNames(
     active_project_df %>%
-    dplyr::pull(project_id),
+      dplyr::pull(project_id),
     active_project_df %>%
-    dplyr::pull(project_name)
+      dplyr::pull(project_name)
   )
 
   return(project)
 }
 
 
-read_project_db_util <- function(pool,
-                                 table = "projects") {
+read_project_db_util <- function(pool, table = "projects") {
   active_project_df <- dplyr::tbl(pool, table) %>%
     dplyr::select(project_id, project_name) %>%
     dplyr::collect()
@@ -48,7 +49,8 @@ read_project_db_util <- function(pool,
 
 read_project_db <- function(pool, project_id) {
   if (!is.null(pool)) {
-    if (!is.null(project_id)) { # filter by id
+    if (!is.null(project_id)) {
+      # filter by id
 
       project_id <- as.integer(project_id)
 
@@ -56,8 +58,9 @@ read_project_db <- function(pool, project_id) {
       active_project <- active_project[active_project == project_id]
 
       return(active_project)
-    } else { # no filter
-      
+    } else {
+      # no filter
+
       active_project <- read_project_db_util(pool)
 
       return(active_project)
@@ -86,8 +89,8 @@ list_db_documents <- function(pool, active_project, user) {
     dplyr::collect() %>%
     dplyr::mutate(doc_name = ifelse(is.na(doc_name), "", doc_name))
 
-  if(!is.null(user$data) && user$data$data_other_modify == 0){
-    project_documents <- project_documents %>% 
+  if (!is.null(user$data) && user$data$data_other_modify == 0) {
+    project_documents <- project_documents %>%
       dplyr::filter(user_id == user$user_id)
   }
 
@@ -98,26 +101,31 @@ list_db_documents <- function(pool, active_project, user) {
 }
 
 list_db_document_table <- function(pool, active_project, user) {
-  active_project <- as.integer(active_project)
-  
+  active_project <- as.integer(unname(active_project))
+
   documents_table <- dplyr::tbl(pool, "documents") %>%
     dplyr::filter(.data$project_id == .env$active_project) %>%
-    dplyr::left_join(., dplyr::tbl(pool, "users") %>% 
-                       dplyr::select(user_id, user_name), 
-                     by = "user_id") %>% 
+    dplyr::left_join(
+      .,
+      dplyr::tbl(pool, "users") %>%
+        dplyr::select(user_id, user_name),
+      by = "user_id"
+    ) %>%
     dplyr::collect()
-  
-  if(!is.null(user$data) && user$data$data_other_view == 0){
-    documents_table <- documents_table %>% 
+
+  if (!is.null(user$data) && user$data$data_other_view == 0) {
+    documents_table <- documents_table %>%
       dplyr::filter(user_id == user$user_id)
   }
 
-  documents_table %>% dplyr::select( # "ID" = doc_id,
-    "Name" = doc_name,
-    "Description" = doc_description,
-    "Date added" = created_at, 
-    "Created by" = user_name,
-  )
+  documents_table %>%
+    dplyr::select(
+      # "ID" = doc_id,
+      "Name" = doc_name,
+      "Description" = doc_description,
+      "Date added" = created_at,
+      "Created by" = user_name,
+    )
 }
 
 make_doc_table <- function(glob, doc_list) {
