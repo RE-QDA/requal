@@ -78,7 +78,7 @@ load_doc <- function(pool, project_id, doc_id) {
 
 load_segments_db <- function(pool, active_project, user, doc_selector) {
     code_id <- segment_start <- segment_end <- NULL
-    active_project <- as.integer(unname(project_id))
+    active_project <- as.integer(unname(active_project))
     document_id <- as.integer(unname(doc_id))
 
     if (isTruthy(active_project)) {
