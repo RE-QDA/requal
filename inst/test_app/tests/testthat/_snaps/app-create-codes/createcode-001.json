@@ -5,9 +5,9 @@
       "deps": [
         {
           "name": "font-awesome",
-          "version": "6.4.2",
+          "version": "6.5.2",
           "src": {
-            "href": "font-awesome-6.4.2"
+            "href": "font-awesome-6.5.2"
           },
           "meta": null,
           "script": null,

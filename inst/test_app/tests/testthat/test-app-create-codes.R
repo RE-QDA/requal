@@ -31,7 +31,14 @@ test_that("{shinytest2} testing create codebook", {
     app$click("categories_ui_1-category_create-rql_button_id")
     
     app$expect_values(output = "categories_ui_1-categories_ui")
-    
+
+    # Open the export dropdown so the download link becomes active.
+    # Shiny keeps download links inside hidden containers disabled (no href)
+    # until the container is shown.
+    app$set_inputs(`codebook_ui_1-codebook_tabset` = "codebook_tabset")
+    app$click("codebook_ui_1-code_export_ui-rql_button_id")
+    app$wait_for_idle()
+
     app$expect_download("codebook_ui_1-export_codebook")
     
     

@@ -3,24 +3,22 @@ library(shinytest2)
 
 test_that("{shinytest2} test", {
     app <- AppDriver$new(name = "requaltest", seed = 123, height = 789, width = 1139)
-    
+
     app$click("launchpad_loader_ui_1-project_load")
-    
+
     app$wait_for_idle()
-    
-    app$click(selector = ".fa-note-sticky")
-    
+
+    # Open the Memos tab
+    app$set_inputs(tab_menu = "Memos")
     app$wait_for_idle()
-    
-    app$click("memo_ui_1-new_memo")
-    app$set_inputs(`memo_ui_1-memo_text` = "Memo")
-    app$click("memo_ui_1-save_close")
-    
-    app$click(selector = ".fa-note-sticky")
-    
+
+    # Compose and create a new free memo
+    app$set_inputs(`memo_ui_1-memo_main_editor-memo_text_input` = "Memo")
+    app$click("memo_ui_1-memo_main_editor-create_new")
+
     app$wait_for_idle()
-    
+
     vals <- app$get_values()
-    
+
     expect_equal(vals$input$`memo_ui_1-memo_rows_all`, 1)
 })
