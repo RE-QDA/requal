@@ -79,7 +79,7 @@ load_doc <- function(pool, project_id, doc_id) {
 load_segments_db <- function(pool, active_project, user, doc_selector) {
     code_id <- segment_start <- segment_end <- NULL
     active_project <- as.integer(unname(active_project))
-    document_id <- as.integer(unname(doc_id))
+    document_id <- as.integer(unname(doc_selector))
 
     if (isTruthy(active_project)) {
         segments <- dplyr::tbl(pool, "segments") %>%
@@ -391,7 +391,7 @@ calculate_code_overlap <- function(segments, paragraphs) {
             memo_id = format_class_id(memo_id, "memo"),
             .by = span_id
         ) %>%
-        dplyr::mutate(dplyr::across(ends_with("id"), dplyr::na_if, "")) %>%
+        dplyr::mutate(across(ends_with("id"), ~ dplyr::na_if(.x, ""))) %>%
         dplyr::left_join(
             dplyr::select(paragraphs, par_id, segment_start),
             by = "segment_start"
