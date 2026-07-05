@@ -122,12 +122,6 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
           glob$user$user_id <- as.integer(1)
         }
 
-        updateSelectInput(
-          session,
-          "project_selector_load",
-          choices = existing_projects # global variable obtained on app start
-        )
-
         # create glob$pool if it was not launched previously
         if (!isTruthy(glob$active_project)) {
           glob$pool <- pool
@@ -137,77 +131,80 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
 
           update_db_schema(glob$pool)
         }
-
-        # observeEvent(glob$pool, {
-        #   updateSelectInput(session,
-        #                     "project_selector_load",
-        #                     choices = read_project_db(glob$pool,
-        #                                               project_id = NULL
-        #                     )
-        #   )
-        # })
-
-        observeEvent(glob$user$user_id, {
-          if (isTruthy(glob$user$user_id)) {
-            projects <- read_project_db(glob$pool, project_id = NULL)
-            permitted_projects <- dplyr::tbl(glob$pool, "user_permissions") %>%
-              dplyr::filter(user_id == !!glob$user$user_id) %>%
-              dplyr::collect()
-            if (!is.null(permitted_projects)) {
-              projects <- projects[projects %in% permitted_projects$project_id]
-              updateSelectInput(
-                session,
-                "project_selector_load",
-                choices = projects
-              )
-            }
-          }
-        })
-
-        observeEvent(input$project_load, {
-          if (!isTruthy(input$project_selector_load)) {
-            warn_user("No project to load.")
-          }
-
-          req(input$project_selector_load)
-
-          # user control
-          if (golem::get_golem_options(which = "mode") %in% c("server")) {
-            existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
-              dplyr::pull(user_id)
-
-            if (!(glob$user$user_id %in% existing_user_id)) {
-              # create user in db if an uknown user logs in
-              users_df <- data.frame(
-                user_id = glob$user$user_id,
-                user_name = glob$user$name,
-                user_mail = glob$user$mail
-              )
-              DBI::dbWriteTable(
-                glob$pool,
-                "users",
-                users_df,
-                append = TRUE,
-                row.names = FALSE
-              )
-
-              create_default_user(
-                glob$pool,
-                input$project_selector_load,
-                glob$user$user_id
-              )
-            }
-          }
-
-          loc$active_project <- isolate(
-            read_project_db(
-              pool = glob$pool,
-              project_id = input$project_selector_load
-            )
-          )
-        })
       }
     )
+
+    observeEvent(glob$user$user_id, {
+      if (isTruthy(glob$user$user_id)) {
+        projects <- read_project_db(glob$pool, project_id = NULL)
+        permitted_projects <- dplyr::tbl(glob$pool, "user_permissions") %>%
+          dplyr::filter(user_id == !!glob$user$user_id) %>%
+          dplyr::collect()
+        if (!is.null(permitted_projects)) {
+          projects <- projects[projects %in% permitted_projects$project_id]
+          updateSelectInput(
+            session,
+            "project_selector_load",
+            choices = projects
+          )
+        }
+
+        if (
+          golem::get_golem_options("mode") %in%
+            c("server", "local_test") &
+            nrow(permitted_projects) == 0
+        ) {
+          shinydashboardPlus::updateControlbarMenu(
+            "launchpad",
+            selected = "Create",
+            session = session$rootScope()
+          )
+        }
+      }
+    })
+
+    observeEvent(input$project_load, {
+      if (!isTruthy(input$project_selector_load)) {
+        warn_user("No project to load.")
+      }
+
+      req(input$project_selector_load)
+
+      # user control
+      if (golem::get_golem_options(which = "mode") %in% c("server")) {
+        existing_user_id <- dplyr::tbl(glob$pool, "users") %>%
+          dplyr::pull(user_id)
+
+        if (!(glob$user$user_id %in% existing_user_id)) {
+          # create user in db if an uknown user logs in
+          users_df <- data.frame(
+            user_id = glob$user$user_id,
+            user_name = glob$user$name,
+            user_mail = glob$user$mail
+          )
+          DBI::dbWriteTable(
+            glob$pool,
+            "users",
+            users_df,
+            append = TRUE,
+            row.names = FALSE
+          )
+
+          create_default_user(
+            glob$pool,
+            input$project_selector_load,
+            glob$user$user_id
+          )
+        }
+      }
+
+      loc$active_project <- isolate(
+        read_project_db(
+          pool = glob$pool,
+          project_id = input$project_selector_load
+        )
+      )
+    })
 
     # observe newly created projects
     observeEvent(glob$active_project, {
