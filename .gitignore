@@ -21,3 +21,4 @@ test-iframe.R
 wip.R
 
 /.quarto/
+.vscode/*

@@ -111,7 +111,7 @@ mod_launchpad_creator_server <- function(id, glob, setup) {
           project_description = input$project_description,
           user_id = glob$user$user_id
         )
-        names(loc$active_project) <- input$project_name
+        # names(loc$active_project) <- input$project_name
       })
     })
 
