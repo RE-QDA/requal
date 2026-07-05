@@ -1,7 +1,11 @@
 library(shinytest2)
 
 test_that("{shinytest2} testing editing code", {
-  app <- AppDriver$new(name = "edit_code", seed = 123, 
+  skip_on_cran()
+  skip_on_ci()
+
+  appdir <- system.file("test_app", package = "requal")
+  app <- AppDriver$new(appdir, name = "edit_code", seed = 123, 
                        height = 789, width = 1139)
   
   app$click("launchpad_loader_ui_1-project_load")

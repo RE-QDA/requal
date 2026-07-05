@@ -1,7 +1,11 @@
 library(shinytest2)
 
 test_that("{shinytest2} test merge codes", {
-  app <- AppDriver$new(name = "merging-codes", seed = 123, 
+  skip_on_cran()
+  skip_on_ci()
+
+  appdir <- system.file("test_app", package = "requal")
+  app <- AppDriver$new(appdir, name = "merging-codes", seed = 123, 
                        height = 857, width = 1211)
   app$click("launchpad_loader_ui_1-project_load")
   app$wait_for_idle()

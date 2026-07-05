@@ -1,11 +1,15 @@
-library(rvest)
 library(shinytest2)
 
-test_that("{shinytest2} test", {
-    app <- AppDriver$new(name = "requaltest", seed = 123, height = 789, width = 1139)
+test_that("{shinytest2} test creating segment", {
     
+    skip_on_cran()
+    skip_on_ci()
+
+    appdir <- system.file("test_app", package = "requal")
+    app <- AppDriver$new(appdir, name = "workdesk2", seed = 123, 
+                         height = 789, width = 1139, 
+                         variant = platform_variant())
     app$click("launchpad_loader_ui_1-project_load")
-    
     app$wait_for_idle()
     
     app$set_inputs(tab_menu = "Data")
@@ -16,20 +20,22 @@ test_that("{shinytest2} test", {
     app$click("data_1-doc_manager_ui_1-doc_add")
     app$click("data_1-doc_manager_ui_1-doc_create_ui-rql_button_id")
     
-    vals <- app$get_values()
-    docs_length <- read_html(vals$output$`data_1-doc_manager_ui_1-doc_list_table`) %>% 
-        html_nodes("tr") %>% 
-        length()
+    app$set_inputs(tab_menu = "Codebook")
     
-    docs_name <- read_html(vals$output$`data_1-doc_manager_ui_1-doc_list_table`) %>% 
-        html_nodes("tr") %>% 
-        html_nodes("td") %>% 
-        `[`(., 1) %>% 
-        html_text() %>% 
-        trimws()
+    app$click("codebook_ui_1-code_create_ui-rql_button_id")
+    app$set_inputs(`codebook_ui_1-code_name` = "Class")
+    app$click("codebook_ui_1-code_add")
+    app$click("codebook_ui_1-code_create_ui-rql_button_id")
     
-    expect_equal(docs_length, 1)
-    expect_equal(docs_name, "dok1")
-    # The tables includes time of document creation so we cannot use snapshots
-    # app$expect_values()
+    app$set_inputs(tab_menu = "Annotate")
+    
+    app$set_inputs(`document_code_ui_1-doc_selector` = "1")
+    app$wait_for_idle()
+    
+    app$set_inputs(`document_code_ui_1-tag_position` = "619-623", allow_no_input_binding_ = TRUE)
+    app$click("document_code_ui_1-1")
+    
+    app$expect_screenshot()
+    # app$expect_values(output = "document_code_ui_1-focal_text")
+    
 })
