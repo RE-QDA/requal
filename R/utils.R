@@ -393,7 +393,17 @@ dt_options <- function() {
     autoWidth = TRUE,
     ordering = TRUE,
     dom = "lfrtpBi",
-    buttons = c("csv")
+    buttons = list(
+      list(
+        extend = 'csv',
+        filename = DT::JS(
+          "function(){ 
+          var d = new Date();
+          var p = function(n){ return ('0' + n).slice(-2); };
+          return 'requal_log_' + d.toISOString().slice(0,10) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }"
+        )
+      )
+    )
   )
 }
 
@@ -409,6 +419,12 @@ dt_memo_options <- function() {
     buttons = list(
       list(
         extend = 'csv',
+        filename = DT::JS(
+          "function(){ 
+          var d = new Date();
+          var p = function(n){ return ('0' + n).slice(-2); };
+          return 'requal_memos_' + d.toISOString().slice(0,10) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()); }"
+        ),
         exportOptions = list(
           columns = c(0, 1, 2, 3, 4, 5) # Specify indices of columns to include in the export
         )
