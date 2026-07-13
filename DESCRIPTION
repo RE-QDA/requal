@@ -49,7 +49,7 @@ Imports:
     rlang,
     RPostgreSQL,
     RSQLite,
-    shiny (>= 1.6.0),
+    shiny (>= 1.8.1),
     shinydashboard,
     shinydashboardPlus,
     shinyFiles,
