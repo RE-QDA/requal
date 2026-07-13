@@ -35,7 +35,7 @@ Imports:
     DBI,
     dbplyr,
     dplyr (>= 1.1.4),
-    DT,
+    DT (>= 0.32.1),
     fs,
     ggplot2,
     glue,

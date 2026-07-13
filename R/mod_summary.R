@@ -204,7 +204,7 @@ mod_summary_server <- function(id, glob) {
             ),
             extensions = c("Buttons", "FixedColumns"),
             options = list(
-              dom = "Brt",
+              dom = "rtB",
               buttons = list(
                 list(
                   extend = "csv",
