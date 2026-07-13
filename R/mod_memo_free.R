@@ -16,7 +16,7 @@ mod_memo_free_ui <- function(id) {
       mod_memo_editor_ui(ns("memo_free_editor"))
     )),
     hr(),
-    DT::dataTableOutput(ns("memo"))
+    DT::DTOutput(ns("memo"))
   )
 }
 

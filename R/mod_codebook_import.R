@@ -164,7 +164,7 @@ mod_codebook_import_server <- function(id, glob) {
         title = "Specify imported codes",
         create_column_selectors(),
         "Preview",
-        DT::dataTableOutput(ns("preview")),
+        DT::DTOutput(ns("preview")),
         footer = tagList(
           modalButton("Cancel"),
           shinyjs::disabled(actionButton(ns("confirm"), "Confirm"))
@@ -222,8 +222,12 @@ convert_to_rgb <- function(color) {
     return(paste0("rgb(", paste(color, collapse = ", "), ")"))
   }
 
-  if(color %in% grDevices::colors()){
-    return(paste0("rgb(", paste0(grDevices::col2rgb(color)[, 1], collapse = ", "), ")"))
+  if (color %in% grDevices::colors()) {
+    return(paste0(
+      "rgb(",
+      paste0(grDevices::col2rgb(color)[, 1], collapse = ", "),
+      ")"
+    ))
   }
 
   # Ensure color is a character string for regex operations

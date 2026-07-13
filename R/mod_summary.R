@@ -50,7 +50,7 @@ mod_summary_ui <- function(id) {
     actionButton(ns("calculate"), "Calculate"),
     h2("Codes-documents frequency"),
     textOutput(ns("summary_message")),
-    dataTableOutput(ns("summary_table"))
+    DT::DTOutput(ns("summary_table"))
   )
 }
 

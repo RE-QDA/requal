@@ -41,7 +41,7 @@ mod_memo_ui <- function(id) {
     hr(),
     fluidRow(
       style = "margin-left: 30px;",
-      div(style = "width: 60vw;", DT::dataTableOutput(ns("memo")))
+      div(style = "width: 60vw;", DT::DTOutput(ns("memo")))
     )
   )
 }

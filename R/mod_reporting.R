@@ -42,7 +42,7 @@ mod_reporting_ui <- function(id) {
         value = "logs",
         actionButton(ns("logs_refresh"), label = "", icon = icon("sync")) %>%
           tagAppendAttributes(style = "float:right;"),
-        DT::dataTableOutput(ns("report_logs"))
+        DT::DTOutput(ns("report_logs"))
       )
     )
   )
