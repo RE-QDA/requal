@@ -80,3 +80,4 @@ Language: en-US
 URL: https://github.com/RE-QDA/requal
 BugReports: https://github.com/RE-QDA/requal/issues
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.2
