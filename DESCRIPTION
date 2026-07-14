@@ -1,6 +1,6 @@
 Package: requal
 Title: Shiny Application for Computer-Assisted Qualitative Data Analysis
-Version: 1.2.4.9008
+Version: 1.2.4.9009
 Authors@R:
     c(
      person(given = "Radim",
@@ -35,7 +35,7 @@ Imports:
     DBI,
     dbplyr,
     dplyr (>= 1.1.4),
-    DT,
+    DT (>= 0.32.1),
     fs,
     ggplot2,
     glue,
@@ -49,7 +49,7 @@ Imports:
     rlang,
     RPostgreSQL,
     RSQLite,
-    shiny (>= 1.6.0),
+    shiny (>= 1.8.1),
     shinydashboard,
     shinydashboardPlus,
     shinyFiles,
@@ -80,3 +80,4 @@ Language: en-US
 URL: https://github.com/RE-QDA/requal
 BugReports: https://github.com/RE-QDA/requal/issues
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.2

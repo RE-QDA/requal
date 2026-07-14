@@ -42,7 +42,11 @@ mod_download_csv_server <- function(id, glob) {
 
     observeEvent(glob$segments_df, {
       output$download_analysis <- handle_download(
-        paste0("requal_export-", format(Sys.time(), "%Y-%m-%d-%H%M%S"), ".csv"),
+        paste0(
+          "requal_segments-",
+          format(Sys.time(), "%Y-%m-%d-%H%M%S"),
+          ".csv"
+        ),
         glob$segments_df
       )
     })

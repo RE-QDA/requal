@@ -17,14 +17,12 @@ golem::document_and_reload()
   credentials_path = "requal_users.sqlite",
   credentials_pass = "test",
   options = list("launch.browser")
- ))
-
+))
 
 # (run_app(
 #  mode = "local",
 #  options = list("launch.browser")
 # ))
-
 
 # (run_app(
 #   mode = "local_test",
