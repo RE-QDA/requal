@@ -181,9 +181,10 @@ export_project_qdpx <- function(project_xml, file) {
   invisible(file)
 }
 
-read_projects_db <- function(pool) {
+read_projects_db <- function(pool, active_project = NULL) {
+  active_project <- as.integer(unname(active_project))
   dplyr::tbl(pool, "projects") %>%
-    dplyr::filter(project_id == !!as.integer(glob$active_project)) %>%
+    dplyr::filter(project_id == active_project) %>%
     dplyr::collect()
 }
 
@@ -241,7 +242,7 @@ export_project_xml <- function(glob) {
   users <- get_users_in_project(glob$pool, glob$active_project) %>%
     dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
 
-  project <- read_projects_db(glob$pool)
+  project <- read_projects_db(glob$pool, glob$active_project)
 
   validator_file <- "refi.xsd"
   validator_schema <- xml2::read_xml(system.file(
