@@ -126,9 +126,10 @@ render_categories <- function(id, pool, active_project, user) {
 # Read categories--------------------------------------------------------
 read_db_categories <- function(pool, active_project, user, modify = TRUE) {
   category_id <- category_description <- category_name <- NULL
+  active_project <- as.integer(unname(active_project))
 
   project_categories_df <- dplyr::tbl(pool, "categories") %>%
-    dplyr::filter(.data$project_id == as.integer(.env$active_project)) %>%
+    dplyr::filter(.data$project_id == active_project) %>%
     dplyr::select(
       category_id,
       category_name,
