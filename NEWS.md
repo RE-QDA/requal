@@ -23,6 +23,8 @@
   - more metadata included in displayed transcripts
 - Contextual help
   - functionality to display contextual help
+- Codes-Documents summary
+  - improved table with export option
 - Fixed bugs
   - foreign keys now enforced in SQLite
   - default document encoding is now processed explicitly

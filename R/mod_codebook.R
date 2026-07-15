@@ -393,7 +393,11 @@ mod_codebook_server <- function(id, glob) {
     # CSV export
     output$export_codebook <- downloadHandler(
       filename = function() {
-        "requal_codebook.csv"
+        paste0(
+          "requal_codebook-",
+          format(Sys.time(), "%Y-%m-%d-%H%M%S"),
+          ".csv"
+        )
       },
       content = function(file) {
         tryCatch(

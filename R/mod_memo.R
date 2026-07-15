@@ -41,7 +41,7 @@ mod_memo_ui <- function(id) {
     hr(),
     fluidRow(
       style = "margin-left: 30px;",
-      div(style = "width: 60vw;", DT::dataTableOutput(ns("memo")))
+      div(style = "width: 60vw;", DT::DTOutput(ns("memo")))
     )
   )
 }
@@ -84,7 +84,7 @@ mod_memo_server <- function(id, glob) {
         input$reload_memo_table
       ),
       {
-        output$memo <- DT::renderDataTable({
+        output$memo <- DT::renderDT({
           req(glob$active_project)
           memo_table <- list_memo_records(glob$pool, glob$active_project)
           if (glob$user$data$memo_other_view == 0) {

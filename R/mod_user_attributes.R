@@ -28,7 +28,7 @@ mod_user_attributes_ui <- function(id) {
     fluidRow(
       class = "module_content",
       textOutput(ns("user_message")),
-      DT::dataTableOutput(ns("user_attributes_table")),
+      DT::DTOutput(ns("user_attributes_table")),
       actionButton(
         ns("show_graph"),
         label = "Show distribution",

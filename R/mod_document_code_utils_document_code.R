@@ -8,7 +8,11 @@ read_doc_db <- function(pool, active_project) {
       dplyr::select(doc_name, doc_id) %>%
       dplyr::collect() %>%
       dplyr::mutate(
-        doc_name = ifelse(is.na(doc_name), as.character(doc_id), doc_name)
+        doc_name = ifelse(
+          is.na(doc_name),
+          as.character(doc_id),
+          doc_name
+        )
       )
 
     named_ids <- db_docs_df %>%
@@ -61,11 +65,13 @@ load_doc_db <- function(pool, active_project, doc_id) {
 
 load_doc <- function(pool, project_id, doc_id) {
   doc_text <- NULL
+  active_project <- as.integer(unname(project_id))
+  document_id <- as.integer(unname(doc_id))
 
   dplyr::tbl(pool, "documents") %>%
     dplyr::filter(
-      .data$project_id == as.integer(.env$project_id),
-      .data$doc_id == as.integer(.env$doc_id)
+      .data$project_id == active_project,
+      .data$doc_id == document_id
     ) %>%
     dplyr::pull(doc_text)
 }
@@ -74,11 +80,14 @@ load_doc <- function(pool, project_id, doc_id) {
 
 load_segments_db <- function(pool, active_project, user, doc_selector) {
   code_id <- segment_start <- segment_end <- NULL
+  active_project <- as.integer(unname(active_project))
+  document_id <- as.integer(unname(doc_selector))
+
   if (isTruthy(active_project)) {
     segments <- dplyr::tbl(pool, "segments") %>%
       dplyr::filter(
-        .data$project_id == as.integer(active_project),
-        .data$doc_id == as.integer(.env$doc_selector)
+        .data$project_id == active_project,
+        .data$doc_id == document_id
       ) %>%
       dplyr::select(
         segment_id,
@@ -153,11 +162,13 @@ write_segment_db <- function(
   startOff,
   endOff
 ) {
+  active_project <- unname(as.integer(active_project))
+
   # Check overlap
   # - return segments with the same document ID and code ID from the DB
   coded_segments <- dplyr::tbl(pool, "segments") %>%
     dplyr::filter(
-      .data$project_id == as.integer(active_project),
+      .data$project_id == active_project,
       .data$user_id == as.integer(.env$user_id),
       .data$doc_id == as.integer(.env$doc_id),
       .data$code_id == as.integer(.env$code_id)
@@ -354,12 +365,16 @@ calculate_code_overlap <- function(segments, paragraphs) {
 
   long_codes <- segments %>%
     dplyr::mutate(
-      span_id = purrr::map2(segment_start, segment_end, .f = function(x, y) {
-        intersect(
-          names(named_starts[named_starts >= x]),
-          names(named_ends[named_ends <= y])
-        )
-      })
+      span_id = purrr::map2(
+        segment_start,
+        segment_end,
+        .f = function(x, y) {
+          intersect(
+            names(named_starts[named_starts >= x]),
+            names(named_ends[named_ends <= y])
+          )
+        }
+      )
     ) %>%
     tidyr::unnest(cols = c(span_id)) %>%
     dplyr::select(-segment_end, -segment_start)
@@ -378,10 +393,7 @@ calculate_code_overlap <- function(segments, paragraphs) {
       memo_id = format_class_id(memo_id, "memo"),
       .by = span_id
     ) %>%
-    dplyr::mutate(dplyr::across(
-      dplyr::ends_with("id"),
-      ~ dplyr::na_if(.x, "")
-    )) %>%
+    dplyr::mutate(across(ends_with("id"), ~ dplyr::na_if(.x, ""))) %>%
     dplyr::left_join(
       dplyr::select(paragraphs, par_id, segment_start),
       by = "segment_start"
@@ -479,6 +491,9 @@ load_segment_codes_db <- function(
   active_doc,
   marked_codes
 ) {
+  active_project <- unname(as.integer(active_project))
+  active_doc <- unname(as.integer(active_doc))
+
   segment_codes_df <- dplyr::tbl(pool, "segments") %>%
     dplyr::inner_join(
       dplyr::tbl(pool, "codes") %>%
@@ -487,8 +502,8 @@ load_segment_codes_db <- function(
       suffix = c(".x", ".y")
     ) %>%
     dplyr::filter(
-      .data$project_id == as.integer(active_project),
-      .data$doc_id == as.integer(active_doc)
+      .data$project_id == active_project,
+      .data$doc_id == active_doc
     ) %>%
     dplyr::filter(dplyr::between(
       marked_codes,
@@ -518,7 +533,6 @@ parse_tag_pos <- function(tag_postion, which_part) {
     "both" = c(startOff, endOff)
   )
 }
-
 
 # Remove codes from a document ----------------
 
@@ -676,7 +690,7 @@ make_span <- function(
     title = if (code_assigned) code_name else NULL,
     class = span_class,
     style = if (code_assigned) {
-      paste("--code-color:", stats::na.omit(code_color))
+      paste("--code-color:", na.omit(code_color))
     } else {
       NULL
     },

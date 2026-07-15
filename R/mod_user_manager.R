@@ -91,7 +91,7 @@ mod_user_manager_server <- function(id, glob) {
     })
 
     # render project members =======================================================
-    output$assigned_users <- DT::renderDataTable(server = FALSE, {
+    output$assigned_users <- DT::renderDT(server = FALSE, {
       req(golem::get_golem_options("mode") == "server")
 
       loc$users_display <- loc$users_permissions_df %>%
