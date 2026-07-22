@@ -354,6 +354,55 @@ creator_UI_server <- function(ns) {
   )
 }
 
+# import UI
+
+import_UI_local <- function(ns) {
+  tagList(
+    h3("Import QDPX file"),
+    fileInput(
+      ns("import_file"),
+      label = NULL,
+      accept = ".qdpx"
+    ),
+    h3("Destination folder"),
+    div(
+      span(
+        textOutput(
+          ns("project_path")
+        ),
+        class = "form-control"
+      ),
+      class = "form-group shiny-input-container"
+    ),
+    shinyFiles::shinyDirButton(
+      ns("sel_directory"),
+      "Folder select",
+      "Please select a destination folder for the new .requal project file"
+    ),
+    actionButton(
+      ns("project_import"),
+      label = "Import project",
+      class = "btn-success"
+    )
+  )
+}
+
+import_UI_server <- function(ns) {
+  tagList(
+    h3("Import QDPX file"),
+    fileInput(
+      ns("import_file"),
+      label = NULL,
+      accept = ".qdpx"
+    ),
+    actionButton(
+      ns("project_import"),
+      label = "Import project",
+      class = "btn-success"
+    )
+  )
+}
+
 # warnings ------
 
 warn_user <- function(warning) {

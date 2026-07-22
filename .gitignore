@@ -11,6 +11,11 @@ requal.yml
 requal_users.sqlite
 # {shinytest2}: Ignore new debug snapshots for `$expect_values()`
 *_.new.png
+
+# Test screenshots and artifacts
+tests/testthat/*.png
+tests/testthat/_snaps/
+
 # gh-pages
 .quarto
 wiki/

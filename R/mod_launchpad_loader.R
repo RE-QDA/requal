@@ -35,6 +35,13 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
     loc$doc_list <- NULL
     loc$project <- ""
 
+    # Initialize glob$project_imported if not set (must be in observe)
+    observeEvent(TRUE, {
+      if (is.null(glob$project_imported)) {
+        glob$project_imported <- 0
+      }
+    }, once = TRUE)
+
     ##################
     # Local setup ####
     ##################
@@ -160,6 +167,24 @@ mod_launchpad_loader_server <- function(id, glob, setup) {
             session = session$rootScope()
           )
         }
+      }
+    })
+
+    # Refresh project selector when a new project is imported
+    observeEvent(glob$project_imported, {
+      req(isTruthy(glob$user$user_id))
+
+      projects <- read_project_db(glob$pool, project_id = NULL)
+      permitted_projects <- dplyr::tbl(glob$pool, "user_permissions") %>%
+        dplyr::filter(user_id == !!glob$user$user_id) %>%
+        dplyr::collect()
+      if (!is.null(permitted_projects)) {
+        projects <- projects[projects %in% permitted_projects$project_id]
+        updateSelectInput(
+          session,
+          "project_selector_load",
+          choices = projects
+        )
       }
     })
 

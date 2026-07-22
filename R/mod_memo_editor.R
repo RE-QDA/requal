@@ -106,11 +106,16 @@ mod_memo_editor_server <- function(id, glob, type = NULL) {
 
     # Monitor difference between saved and input text, adjust UI
     observeEvent(c(input$memo_text_editor, loc$save_observer), {
-      if (input$memo_text_editor != loc$editing_data$memo_text &&
-        loc$editor_ui$editor_state == "editor") {
+      current_text <- as.character(input$memo_text_editor)
+      saved_text <- as.character(loc$editing_data$memo_text)
+
+      if (!is.null(saved_text) && !is.na(saved_text) &&
+          current_text != saved_text &&
+          loc$editor_ui$editor_state == "editor") {
         shinyjs::show("save", animType = "fade")
-      } else if (input$memo_text_editor == loc$editing_data$memo_text &&
-        loc$editor_ui$editor_state == "editor") {
+      } else if (!is.null(saved_text) && !is.na(saved_text) &&
+                 current_text == saved_text &&
+                 loc$editor_ui$editor_state == "editor") {
         shinyjs::hide("save")
       }
     })
