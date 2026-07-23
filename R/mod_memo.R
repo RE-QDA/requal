@@ -58,9 +58,8 @@ mod_memo_server <- function(id, glob) {
 
     observeEvent(glob$active_project, {
       loc$memo_observer <- loc$memo_observer + 1
-      # Reset memo editor when project changes - target nested module inputs directly
-      updateTextAreaInput(session = session, id = paste0(ns("memo_main_editor"), "-memo_text_input"), value = "")
-      updateTextInput(session = session, id = paste0(ns("memo_main_editor"), "-memo_id"), value = NULL)
+      # Reset memo editor when project changes
+      shinyjs::reset("memo_main_editor")
     })
 
     observeEvent(input$text_memo_click, {
