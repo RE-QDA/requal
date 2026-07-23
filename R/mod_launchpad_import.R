@@ -66,21 +66,25 @@ mod_launchpad_import_server <- function(id, glob) {
         # Store project name for download handler
         glob$active_project_name <- parsed$project$project_name
 
-        # Create temporary SQLite connection for import (does not affect glob$pool)
-        import_con <- DBI::dbConnect(RSQLite::SQLite(), loc$db_path)
-        on.exit(DBI::dbDisconnect(import_con), add = TRUE)
+        # Create temporary SQLite pool for import (does not affect glob$pool)
+        import_pool <- pool::dbPool(
+          drv = RSQLite::SQLite(),
+          dbname = loc$db_path,
+          onCreate = function(con) {
+            DBI::dbExecute(con, "PRAGMA foreign_keys = ON;")
+          }
+        )
+        on.exit(pool::poolClose(import_pool), add = TRUE)
 
-        # Enable foreign keys
-        DBI::dbExecute(import_con, "PRAGMA foreign_keys = ON;")
-
-        glob$user$user_id <- as.integer(1)
+        # Use a local user_id for import (do not set glob$user$user_id to avoid triggering loader observers)
+        local_user_id <- as.integer(1)
 
         # create project and import
         loc$active_project <- create_project_db(
-          pool = import_con,
+          pool = import_pool,
           project_name = parsed$project$project_name,
           project_description = parsed$project$project_description,
-          user_id = glob$user$user_id
+          user_id = local_user_id
         )
 
         # import content
@@ -88,9 +92,9 @@ mod_launchpad_import_server <- function(id, glob) {
           {
             import_project(
               content = parsed,
-              user_id = glob$user$user_id,
+              user_id = local_user_id,
               active_project = isolate(loc$active_project),
-              pool = import_con
+              pool = import_pool
             )
             TRUE
           },
