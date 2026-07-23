@@ -64,14 +64,14 @@ add_memo_record <- function(pool, project, text, user_id) {
         .data$project_id == !!memo_df$project_id,
         .data$text == !!memo_df$text
       ) %>%
-      dplyr::filter(memo_id == max(memo_id)) %>%
+      dplyr::filter(memo_id == max(memo_id, na.rm = TRUE)) %>%
       dplyr::pull(memo_id)
     log_add_memo_record(
       pool,
       project = memo_df$project_id,
       user_id = user_id,
       df = memo_df %>%
-        dplyr::mutate(memo_id = max(memo_id))
+        dplyr::mutate(memo_id = max(memo_id, na.rm = TRUE))
     )
   }
   return(memo_id)
