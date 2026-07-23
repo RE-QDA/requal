@@ -262,6 +262,13 @@ export_project_xml <- function(glob) {
     dplyr::filter(user_id == created_user_id) %>%
     dplyr::pull(guid)
 
+  # Handle case where no user found - use first available user or empty string
+  if (length(created_user_guid) == 0 || is.na(created_user_guid[1])) {
+    created_user_guid <- if (nrow(users) > 0) users$guid[1] else ""
+  } else {
+    created_user_guid <- created_user_guid[1]
+  }
+
   last_mod <- log %>%
     tail(1)
 
@@ -272,6 +279,13 @@ export_project_xml <- function(glob) {
   modified_user_guid <- users %>%
     dplyr::filter(user_id == modified_user_id) %>%
     dplyr::pull(guid)
+
+  # Handle case where no user found - use first available user or empty string
+  if (length(modified_user_guid) == 0 || is.na(modified_user_guid[1])) {
+    modified_user_guid <- if (nrow(users) > 0) users$guid[1] else ""
+  } else {
+    modified_user_guid <- modified_user_guid[1]
+  }
 
   project_xml <- xml2::xml_new_root(
     "Project",
@@ -453,18 +467,45 @@ export_project_xml <- function(glob) {
     categories <- categories |>
       dplyr::mutate(guid = uuid::UUIDgenerate(n = dplyr::n()))
 
-    categories_map <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
-      dplyr::filter(project_id == as.numeric(!!glob$active_project)) %>%
+    # Materialize categories_codes_map first
+    active_project_id <- as.integer(unname(glob$active_project))
+    categories_codes_map_raw <- dplyr::tbl(glob$pool, "categories_codes_map") %>%
+      dplyr::filter(project_id == active_project_id) %>%
       dplyr::filter(category_id %in% categories$category_id) %>%
-      dplyr::collect() %>%
+      dplyr::collect()
+
+    # Ensure codebook is materialized for the join
+    if (inherits(codebook, "tbl")) {
+      codebook_df <- dplyr::collect(codebook)
+    } else {
+      codebook_df <- codebook
+    }
+
+    # Now do all joins in memory
+    categories_map <- categories_codes_map_raw %>%
       dplyr::left_join(
-        codebook %>% dplyr::select(code_id, membercode_guid = guid),
+        codebook_df %>% dplyr::select(code_id, membercode_guid = guid),
         by = "code_id"
       ) %>%
       dplyr::left_join(
         categories %>% dplyr::select(category_id, guid),
         by = "category_id"
       )
+
+    # Ensure final result is materialized
+    if (inherits(categories_map, "tbl")) {
+      categories_map <- dplyr::collect(categories_map)
+    }
+
+    # Handle case where no category-code mappings exist
+    if (is.null(categories_map) || nrow(categories_map) == 0) {
+      categories_map <- tibble::tibble(
+        category_id = integer(),
+        code_id = integer(),
+        membercode_guid = character(),
+        guid = character()
+      )
+    }
   }
   if (nrow(categories)) {
     sets <- xml2::xml_add_child(project_xml, "Sets")
@@ -472,19 +513,25 @@ export_project_xml <- function(glob) {
       set <- xml2::xml_add_child(sets, "Set")
       xml2::xml_attr(set, "guid") <- categories$guid[i]
       xml2::xml_attr(set, "name") <- categories$category_name[i]
-      if (
+      # Always add Description element (empty string if no description)
+      desc_value <- if (
         categories$category_description[i] != "" &&
           !is.na(categories$category_description[i])
       ) {
-        description <- xml2::xml_add_child(
-          set,
-          "Description",
-          categories$category_description[i]
-        )
+        categories$category_description[i]
+      } else {
+        ""
       }
-      if (categories$guid[i] %in% categories_map$guid) {
+      description <- xml2::xml_add_child(
+        set,
+        "Description",
+        desc_value
+      )
+      # Only add MemberCode if categories_map exists and has entries for this category
+      if (!is.null(categories_map) && nrow(categories_map) > 0 && categories$guid[i] %in% categories_map$guid) {
         tmp <- categories_map %>%
-          dplyr::filter(guid == categories$guid[i])
+          dplyr::filter(guid == categories$guid[i]) %>%
+          dplyr::collect()
         for (j in 1:nrow(tmp)) {
           membercode <- xml2::xml_add_child(set, "MemberCode")
           xml2::xml_attr(membercode, "targetGUID") <- tmp$membercode_guid[j]

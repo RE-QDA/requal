@@ -145,7 +145,8 @@ read_db_categories <- function(pool, active_project, user, modify = TRUE) {
       user$data$codebook_other_modify == 0
   ) {
     project_categories_df <- project_categories_df %>%
-      dplyr::filter(user_id == !!user$user_id)
+      dplyr::filter(user_id == !!user$user_id) %>%
+      dplyr::collect()
   } else if (
     !modify &&
       !is.null(user) &&
@@ -153,7 +154,13 @@ read_db_categories <- function(pool, active_project, user, modify = TRUE) {
       user$data$codebook_other_view == 0
   ) {
     project_categories_df <- project_categories_df %>%
-      dplyr::filter(user_id == !!user$user_id)
+      dplyr::filter(user_id == !!user$user_id) %>%
+      dplyr::collect()
+  }
+
+  # Ensure result is always a data frame
+  if (inherits(project_categories_df, "tbl")) {
+    project_categories_df <- dplyr::collect(project_categories_df)
   }
 
   return(project_categories_df)

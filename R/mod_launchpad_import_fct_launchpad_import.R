@@ -418,8 +418,8 @@ parse_qdpx <- function(path) {
   sets_df <- purrr::map_df(sets_nodes, .f = function(set_node) {
     set_guid <- xml2::xml_attr(set_node, "guid") %||% ""
     set_name <- xml2::xml_attr(set_node, "name") %||% ""
-    set_description <- xml2::xml_find_first(set_node, ".//qda:Description", ns = refi_ns) |>
-      xml2::xml_text()
+    desc_node <- xml2::xml_find_first(set_node, ".//qda:Description", ns = refi_ns)
+    set_description <- if (xml2::xml_length(desc_node) == 0) "" else xml2::xml_text(desc_node)
 
     # Get member code GUIDs
     member_codes <- xml2::xml_find_all(set_node, ".//qda:MemberCode", ns = refi_ns)
