@@ -364,21 +364,7 @@ import_UI_local <- function(ns) {
       label = NULL,
       accept = ".qdpx"
     ),
-    h3("Destination folder"),
-    div(
-      span(
-        textOutput(
-          ns("project_path")
-        ),
-        class = "form-control"
-      ),
-      class = "form-group shiny-input-container"
-    ),
-    shinyFiles::shinyDirButton(
-      ns("sel_directory"),
-      "Folder select",
-      "Please select a destination folder for the new .requal project file"
-    ),
+    p("The imported project will be available for download. Choose a location to save it after import."),
     actionButton(
       ns("project_import"),
       label = "Import project",

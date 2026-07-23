@@ -58,6 +58,7 @@ mod_memo_server <- function(id, glob) {
 
     observeEvent(glob$active_project, {
       loc$memo_observer <- loc$memo_observer + 1
+      shinyjs::reset("memo_main_editor")
     })
 
     observeEvent(input$text_memo_click, {

@@ -46,7 +46,10 @@ parse_qdpx <- function(path) {
     refi_ns = refi_ns,
     import_dir = import_dir
   )
-  #imp_project$sets <- .xml2df(xml_file, "//qda:Project/qda:Sets/qda:Set")
+  imp_project$sets <- .refi_get_sets(
+    xml_file,
+    refi_ns = refi_ns
+  )
   #xml2::xml_find_all(xml_file, "//qda:Project/qda:Links", ns = refi_ns)
   return(imp_project)
 }
@@ -159,16 +162,25 @@ parse_qdpx <- function(path) {
     dplyr::mutate(description = descriptions) |>
     dplyr::mutate(
       code_color = purrr::map_chr(color, .f = function(input_color) {
-        rgb_colours <- grDevices::col2rgb(input_color)
-        paste0(
-          "rgb(",
-          rgb_colours[1],
-          ",",
-          rgb_colours[2],
-          ",",
-          rgb_colours[3],
-          ")"
-        )
+        # Use default yellow if color is NA, empty, or invalid
+        if (is.na(input_color) || input_color == "" || !nzchar(trimws(input_color))) {
+          return("rgb(255,255,0)")  # Default yellow
+        }
+        tryCatch({
+          rgb_colours <- grDevices::col2rgb(input_color)
+          paste0(
+            "rgb(",
+            rgb_colours[1],
+            ",",
+            rgb_colours[2],
+            ",",
+            rgb_colours[3],
+            ")"
+          )
+        }, error = function(e) {
+          # If color conversion fails, return default yellow
+          "rgb(255,255,0)"
+        })
       })
     ) |>
     dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) |>
@@ -294,14 +306,18 @@ parse_qdpx <- function(path) {
   return(txt_df)
 }
 
-# Parse selections (coded segments) ----
-# Returns a tidy tibble of coded selections. Each row is one code applied to one
-# plain-text selection. Documents and codes are referenced by GUID and matched to
-# their new database ids at import time (see .import_segments()).
+# Parse selections (coded segments and memo segments) ----
+# Returns a tidy tibble of selections. Each row is either:
+# - A coded segment (has code_guid, no note_guid)
+# - A memo segment (has note_guid, no code_guid) - selection with only NoteRef
+# - Split rows if both code and note exist (one row per code, one row for note)
+# Documents, codes, and notes are referenced by GUID and matched to their
+# new database ids at import time (see .import_segments()).
 .refi_get_selections <- function(xml_file, refi_ns) {
   empty_selections <- tibble::tibble(
     source_guid = character(),
     code_guid = character(),
+    note_guid = character(),
     startPosition = integer(),
     endPosition = integer()
   )
@@ -323,24 +339,101 @@ parse_qdpx <- function(path) {
       return(empty_selections)
     }
     purrr::map_df(sels, .f = function(sel) {
+      # Get all code refs in this selection
       code_refs <- xml2::xml_find_all(
         sel,
         ".//qda:Coding/qda:CodeRef",
         ns = refi_ns
       )
-      if (length(code_refs) == 0) {
+      code_guids <- xml2::xml_attr(code_refs, "targetGUID")
+
+      # Get all note refs in this selection
+      note_refs <- xml2::xml_find_all(
+        sel,
+        ".//qda:NoteRef",
+        ns = refi_ns
+      )
+      note_guids <- xml2::xml_attr(note_refs, "targetGUID")
+
+      start_pos <- as.integer(xml2::xml_attr(sel, "startPosition"))
+      end_pos <- as.integer(xml2::xml_attr(sel, "endPosition"))
+
+      # If no codes and no notes, skip this selection
+      if (length(code_guids) == 0 && length(note_guids) == 0) {
         return(empty_selections)
       }
-      tibble::tibble(
-        source_guid = source_guid,
-        code_guid = xml2::xml_attr(code_refs, "targetGUID"),
-        startPosition = as.integer(xml2::xml_attr(sel, "startPosition")),
-        endPosition = as.integer(xml2::xml_attr(sel, "endPosition"))
-      )
+
+      # Create rows: one for each code, plus one for notes (if no codes)
+      result_rows <- list()
+
+      # Add rows for each code
+      if (length(code_guids) > 0) {
+        for (cg in code_guids) {
+          result_rows[[length(result_rows) + 1]] <- tibble::tibble(
+            source_guid = source_guid,
+            code_guid = cg,
+            note_guid = NA_character_,
+            startPosition = start_pos,
+            endPosition = end_pos
+          )
+        }
+      }
+
+      # Add row for notes if there are notes and NO codes
+      # (if codes exist, we already created rows; if no codes but notes exist, create memo segment)
+      if (length(note_guids) > 0 && length(code_guids) == 0) {
+        for (ng in note_guids) {
+          result_rows[[length(result_rows) + 1]] <- tibble::tibble(
+            source_guid = source_guid,
+            code_guid = NA_character_,
+            note_guid = ng,
+            startPosition = start_pos,
+            endPosition = end_pos
+          )
+        }
+      }
+
+      do.call(rbind, result_rows)
     })
   })
 
   return(selections)
+}
+
+# Parse sets (categories) ----
+.refi_get_sets <- function(xml_file, refi_ns) {
+  empty_sets <- tibble::tibble(
+    set_guid = character(),
+    set_name = character(),
+    set_description = character(),
+    member_code_guids = list()
+  )
+
+  sets_nodes <- xml2::xml_find_all(xml_file, "//qda:Project/qda:Sets/qda:Set", ns = refi_ns)
+
+  if (length(sets_nodes) == 0) {
+    return(empty_sets)
+  }
+
+  sets_df <- purrr::map_df(sets_nodes, .f = function(set_node) {
+    set_guid <- xml2::xml_attr(set_node, "guid") %||% ""
+    set_name <- xml2::xml_attr(set_node, "name") %||% ""
+    set_description <- xml2::xml_find_first(set_node, ".//qda:Description", ns = refi_ns) |>
+      xml2::xml_text()
+
+    # Get member code GUIDs
+    member_codes <- xml2::xml_find_all(set_node, ".//qda:MemberCode", ns = refi_ns)
+    member_code_guids <- xml2::xml_attr(member_codes, "targetGUID")
+
+    tibble::tibble(
+      set_guid = set_guid,
+      set_name = set_name,
+      set_description = set_description,
+      member_code_guids = list(member_code_guids[!is.na(member_code_guids)])
+    )
+  })
+
+  return(sets_df)
 }
 
 # Parse notes ----
@@ -349,6 +442,7 @@ parse_qdpx <- function(path) {
     note_guid = character(),
     creating_user = character(),
     note_name = character(),
+    note_description = character(),
     text = character()
   )
 
@@ -364,7 +458,13 @@ parse_qdpx <- function(path) {
       note_guid <- xml2::xml_attr(note, "guid") %||% ""
       creating_user <- xml2::xml_attr(note, "creatingUser") %||% ""
       note_name <- xml2::xml_attr(note, "name") %||% ""
+
+      # Get description from Description element
+      desc_node <- xml2::xml_find_first(note, ".//qda:Description", ns = refi_ns)
+      note_description <- if (length(desc_node) > 0) xml2::xml_text(desc_node) else ""
+
       plain_text_path <- xml2::xml_attr(note, "plainTextPath")
+      rich_text_path <- xml2::xml_attr(note, "richTextPath")
 
       # Try to get text from PlainTextContent element first
       text_node <- xml2::xml_find_first(note, ".//qda:PlainTextContent", ns = refi_ns)
@@ -372,35 +472,19 @@ parse_qdpx <- function(path) {
 
       # If no embedded content and plainTextPath exists, try to read from file
       if (text == "" && !is.na(plain_text_path) && plain_text_path != "") {
-        # Handle internal:// paths - these are typically stored in the sources folder
-        if (grepl("^internal://", plain_text_path)) {
-          # Extract the filename from the internal path
-          file_id <- sub("^internal://", "", plain_text_path)
-          # Try common locations for the file
-          possible_paths <- c(
-            paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, file_id),
-            paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, basename(file_id)),
-            paste0(import_dir, .Platform$file.sep, file_id)
-          )
-          for (path in possible_paths) {
-            if (file.exists(path)) {
-              text <- paste0(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-              break
-            }
-          }
-        } else {
-          # Regular file path
-          path_to_file <- paste0(import_dir, .Platform$file.sep, plain_text_path)
-          if (file.exists(path_to_file)) {
-            text <- paste0(readLines(path_to_file, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-          }
-        }
+        text <- .read_note_text_file(plain_text_path, import_dir)
+      }
+
+      # If still no content and richTextPath exists, try that (as fallback)
+      if (text == "" && !is.na(rich_text_path) && rich_text_path != "") {
+        text <- .read_note_text_file(rich_text_path, import_dir)
       }
 
       tibble::tibble(
         note_guid = note_guid,
         creating_user = creating_user,
         note_name = note_name,
+        note_description = note_description,
         text = text
       )
     }, error = function(e) {
@@ -409,12 +493,54 @@ parse_qdpx <- function(path) {
         note_guid = "",
         creating_user = "",
         note_name = "",
+        note_description = "",
         text = ""
       )
     })
   })
 
   return(notes_df)
+}
+
+# Helper function to read note text from file
+.read_note_text_file <- function(plain_text_path, import_dir) {
+  if (is.na(plain_text_path) || plain_text_path == "") {
+    return("")
+  }
+
+  # Handle internal:// paths
+  if (grepl("^internal://", plain_text_path)) {
+    file_id <- sub("^internal://", "", plain_text_path)
+    # Try common locations for the file
+    possible_paths <- c(
+      paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, file_id),
+      paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, basename(file_id)),
+      paste0(import_dir, .Platform$file.sep, file_id)
+    )
+    for (path in possible_paths) {
+      if (file.exists(path)) {
+        # Check if it's a .txt file
+        if (grepl("\\.txt$", path, ignore.case = TRUE)) {
+          return(paste0(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n"))
+        }
+        # For other files (like .docx), we can't extract text without additional packages
+        # Return a placeholder message
+        return(paste0("[Content from ", basename(path), " - text extraction not supported]"))
+      }
+    }
+  } else {
+    # Regular file path
+    path_to_file <- paste0(import_dir, .Platform$file.sep, plain_text_path)
+    if (file.exists(path_to_file)) {
+      if (grepl("\\.txt$", path_to_file, ignore.case = TRUE)) {
+        return(paste0(readLines(path_to_file, encoding = "UTF-8", warn = FALSE), collapse = "\n"))
+      } else {
+        return(paste0("[Content from ", basename(path_to_file), " - text extraction not supported]"))
+      }
+    }
+  }
+
+  return("")
 }
 
 # 1.2 Parsing utils ----
@@ -519,8 +645,9 @@ import_project <- function(content, user_id, active_project, pool) {
 
   rql_message(paste0("Codebook: ", nrow(content$codebook), " codes"))
   rql_message(paste0("Sources: ", nrow(content$sources), " documents"))
-  rql_message(paste0("Selections: ", nrow(content$selections), " coded segments"))
+  rql_message(paste0("Selections: ", nrow(content$selections), " segment(s)"))
   rql_message(paste0("Notes: ", nrow(content$notes), " notes"))
+  rql_message(paste0("Sets/Categories: ", nrow(content$sets), " categories"))
 
   # Import codebook
   rql_message("Importing codebook...")
@@ -554,10 +681,10 @@ import_project <- function(content, user_id, active_project, pool) {
     stop(e)
   })
 
-  # Import segments
+  # Import segments (coded and memo segments)
   rql_message("Importing segments...")
-  tryCatch({
-    .import_segments(
+  segment_result <- tryCatch({
+    result <- .import_segments(
       selections = content$selections,
       code_map = code_map,
       doc_map = doc_map,
@@ -566,24 +693,42 @@ import_project <- function(content, user_id, active_project, pool) {
       pool
     )
     rql_message("Segments import successful.")
+    result
   }, error = function(e) {
     rql_message(paste("Error importing segments:", e$message))
     stop(e)
   })
 
-  # Import notes as memos
+  # Import notes as memos (and create memos_segments_map if memo segments exist)
   rql_message("Importing notes...")
   tryCatch({
     .import_notes(
       notes = content$notes,
       user_id,
       active_project,
-      pool
+      pool,
+      memo_mappings = segment_result$memo_mappings
     )
     rql_message("Notes import successful.")
   }, error = function(e) {
     rql_message(paste("Error importing notes:", e$message))
     # Don't stop import for notes errors
+  })
+
+  # Import sets as categories
+  rql_message("Importing categories...")
+  tryCatch({
+    .import_categories(
+      sets = content$sets,
+      code_map = code_map,
+      user_id,
+      active_project,
+      pool
+    )
+    rql_message("Categories import successful.")
+  }, error = function(e) {
+    rql_message(paste("Error importing categories:", e$message))
+    # Don't stop import for category errors
   })
 
   rql_message("Project import complete.")
@@ -803,7 +948,10 @@ import_project <- function(content, user_id, active_project, pool) {
   return(doc_map)
 }
 
-# Import coded segments ----
+# Import coded segments and memo segments ----
+# Creates segments with code_id for coded selections, and segments without code_id
+# (memo segments) for selections with only NoteRef. Returns note-to-segment mappings
+# for creating memos_segments_map entries.
 .import_segments <- function(selections, code_map, doc_map, user_id, active_project, pool) {
   # Ensure selections is a regular data frame (not a lazy table)
   if (inherits(selections, "tbl")) {
@@ -811,8 +959,8 @@ import_project <- function(content, user_id, active_project, pool) {
   }
 
   if (nrow(selections) == 0) {
-    rql_message("No coded segments found in QDPX file.")
-    return(invisible(NULL))
+    rql_message("No selections found in QDPX file.")
+    return(invisible(list(coded = NULL, memo_mappings = NULL)))
   }
 
   # Convert maps to tibbles for joining
@@ -830,36 +978,23 @@ import_project <- function(content, user_id, active_project, pool) {
     dplyr::left_join(doc_map_tbl, by = "source_guid") |>
     dplyr::left_join(code_map_tbl, by = "code_guid")
 
-  # Drop unmatched rows (orphaned selections) and count them
-  matched <- segments_to_import |>
+  # Separate coded segments (have code_id) from memo segments (have note_guid, no code_id)
+  coded_segments <- segments_to_import |>
     dplyr::filter(!is.na(doc_id), !is.na(code_id))
-  dropped <- nrow(segments_to_import) - nrow(matched)
+
+  memo_segments <- segments_to_import |>
+    dplyr::filter(!is.na(doc_id), is.na(code_id), !is.na(note_guid))
+
+  # Count dropped orphaned selections
+  dropped <- nrow(segments_to_import) - nrow(coded_segments) - nrow(memo_segments)
   if (dropped > 0) {
     rql_message(paste0(
-      "Dropped ", dropped, " orphaned segment(s) with missing source or code."
+      "Dropped ", dropped, " orphaned segment(s) with missing source."
     ))
   }
 
-  if (nrow(matched) == 0) {
-    rql_message("No valid segments to import.")
-    return(invisible(NULL))
-  }
-
-  rql_message(paste0("Importing ", nrow(matched), " coded segment(s)."))
-
-  # Build segments dataframe with correct offset conversion:
-  # REFI startPosition = segment_start - 1  =>  segment_start = startPosition + 1
-  segments_df <- matched |>
-    dplyr::mutate(
-      project_id = as.integer(active_project),
-      user_id = as.integer(user_id),
-      segment_start = startPosition + 1L,
-      segment_end = endPosition
-    ) |>
-    as.data.frame()
-
   # First, load all document texts into memory to avoid pool checkout issues during segment text extraction
-  unique_doc_ids <- unique(segments_df$doc_id)
+  unique_doc_ids <- unique(coded_segments$doc_id, memo_segments$doc_id)
   doc_texts_list <- list()
   for (did in unique_doc_ids) {
     doc_text <- DBI::dbGetQuery(
@@ -872,36 +1007,111 @@ import_project <- function(content, user_id, active_project, pool) {
     doc_texts_list[[as.character(did)]] <- doc_text$doc_text[1]
   }
 
-  # Extract segment text using pre-loaded document texts
-  segment_texts <- mapply(function(doc_id_val, start, end) {
+  # Function to extract segment text
+  extract_segment_text <- function(doc_id_val, start, end) {
     full_text <- doc_texts_list[[as.character(doc_id_val)]]
     if (is.null(full_text) || is.na(full_text)) {
       return("")
     }
     substr(full_text, start, end)
-  }, segments_df$doc_id, segments_df$segment_start, segments_df$segment_end, USE.NAMES = FALSE)
+  }
 
-  segments_df$segment_text <- segment_texts
+  # Import coded segments
+  if (nrow(coded_segments) > 0) {
+    rql_message(paste0("Importing ", nrow(coded_segments), " coded segment(s)."))
 
-  # Reorder columns to match expected schema
-  segments_df <- segments_df |>
-    dplyr::select(project_id, user_id, doc_id, code_id, segment_start, segment_end, segment_text)
+    coded_df <- coded_segments |>
+      dplyr::mutate(
+        project_id = as.integer(active_project),
+        user_id = as.integer(user_id),
+        segment_start = startPosition + 1L,
+        segment_end = endPosition
+      )
 
-  # Write segments to DB
-  DBI::dbWriteTable(
-    pool,
-    "segments",
-    segments_df,
-    append = TRUE,
-    row.names = FALSE
-  )
+    # Extract segment text for coded segments
+    coded_df$segment_text <- mapply(
+      extract_segment_text,
+      coded_df$doc_id,
+      coded_df$segment_start,
+      coded_df$segment_end,
+      USE.NAMES = FALSE
+    )
+
+    # Reorder columns to match expected schema
+    coded_df <- coded_df |>
+      dplyr::select(project_id, user_id, doc_id, code_id, segment_start, segment_end, segment_text)
+
+    # Write coded segments to DB
+    DBI::dbWriteTable(
+      pool,
+      "segments",
+      as.data.frame(coded_df),
+      append = TRUE,
+      row.names = FALSE
+    )
+  } else {
+    rql_message("No coded segments to import.")
+  }
+
+  # Import memo segments (segments without code_id, linked to notes)
+  memo_mappings <- NULL
+  if (nrow(memo_segments) > 0) {
+    rql_message(paste0("Importing ", nrow(memo_segments), " memo segment(s)."))
+
+    memo_df <- memo_segments |>
+      dplyr::mutate(
+        project_id = as.integer(active_project),
+        user_id = as.integer(user_id),
+        code_id = NA_integer_,  # Explicitly set to NA for memo segments
+        segment_start = startPosition + 1L,
+        segment_end = endPosition
+      )
+
+    # Extract segment text for memo segments
+    memo_df$segment_text <- mapply(
+      extract_segment_text,
+      memo_df$doc_id,
+      memo_df$segment_start,
+      memo_df$segment_end,
+      USE.NAMES = FALSE
+    )
+
+    # Keep note_guid for mapping to memos later
+    memo_df_with_note <- memo_df |>
+      dplyr::select(doc_id, note_guid, segment_start, segment_end)
+
+    # Reorder columns to match expected schema (without note_guid for DB write)
+    memo_df_db <- memo_df |>
+      dplyr::select(project_id, user_id, doc_id, code_id, segment_start, segment_end, segment_text)
+
+    # Write memo segments to DB
+    DBI::dbWriteTable(
+      pool,
+      "segments",
+      as.data.frame(memo_df_db),
+      append = TRUE,
+      row.names = FALSE
+    )
+
+    # Return mapping info for memos_segments_map creation
+    # We need to match memo segments to newly created memos by note_guid
+    memo_mappings <- memo_df_with_note
+  } else {
+    rql_message("No memo segments to import.")
+  }
 
   rql_message("Segment import complete.")
-  invisible(NULL)
+  # Ensure memo_mappings is NULL (not empty data frame) when no memo segments exist
+  if (is.null(memo_mappings) || nrow(memo_mappings) == 0) {
+    memo_mappings <- NULL
+  }
+  invisible(list(coded = coded_segments, memo_mappings = memo_mappings))
 }
 
 # Import notes as memos ----
-.import_notes <- function(notes, user_id, active_project, pool) {
+# If memo_mappings is provided, creates memos_segments_map entries to link
+# memo segments (segments without code_id) to their corresponding memos.
+.import_notes <- function(notes, user_id, active_project, pool, memo_mappings = NULL) {
   if (nrow(notes) == 0) {
     rql_message("No notes to import.")
     return(invisible(NULL))
@@ -909,16 +1119,25 @@ import_project <- function(content, user_id, active_project, pool) {
 
   rql_message(paste0("Importing ", nrow(notes), " note(s)..."))
 
+  # Keep note_guid for mapping to memos later
+  notes_with_guid <- notes |>
+    dplyr::mutate(note_guid = note_guid)
+
   # Convert notes to memos format
-  # If note has a name, prepend it as the first line of the memo text
-  memos_df <- notes |>
+  # Memo text structure: Name (if present) + Description (if present) + Content
+  memos_df <- notes_with_guid |>
     dplyr::mutate(
       project_id = as.integer(active_project),
       user_id = as.integer(user_id),
-      text = ifelse(
-        note_name != "" & !is.na(note_name),
-        paste0(note_name, "\n\n", text),
-        text
+      text = purrr::pmap_chr(
+        list(note_name, note_description, text),
+        function(name, desc, content) {
+          parts <- c()
+          if (!is.na(name) && !is.null(name) && nzchar(trimws(name))) parts <- c(parts, name)
+          if (!is.na(desc) && !is.null(desc) && nzchar(trimws(desc))) parts <- c(parts, desc)
+          if (!is.na(content) && !is.null(content) && nzchar(trimws(content))) parts <- c(parts, content)
+          paste(parts, collapse = "\n\n")
+        }
       )
     ) |>
     dplyr::select(project_id, user_id, text) |>
@@ -936,7 +1155,170 @@ import_project <- function(content, user_id, active_project, pool) {
     row.names = FALSE
   )
 
-  rql_message(paste0("Imported ", nrow(memos_df), " memo(s)."))
+  # Read back the newly created memo IDs
+  new_memos_query <- glue::glue_sql(
+    "SELECT memo_id FROM memos WHERE project_id = {active_project} AND memo_id > {max_memo_id_before} ORDER BY memo_id",
+    .con = pool
+  )
+  new_memos <- DBI::dbGetQuery(pool, new_memos_query)
+
+  rql_message(paste0("Imported ", nrow(new_memos), " memo(s)."))
+
+  # Create memos_segments_map entries if memo_mappings provided
+  if (!is.null(memo_mappings) && nrow(memo_mappings) > 0) {
+    rql_message("Creating memo-segment relationships...")
+
+    # Build a mapping from note_guid to memo_id
+    # Since notes and new_memos are in the same order, we can create this directly
+    note_guid_to_memo_id <- setNames(new_memos$memo_id, notes_with_guid$note_guid)
+
+    # For each memo segment, find the corresponding segment_id and memo_id
+    map_entries <- data.frame()
+    for (i in seq_len(nrow(memo_mappings))) {
+      row <- memo_mappings[i, ]
+      note_guid <- row$note_guid
+
+      # Find memo_id for this note_guid
+      memo_id <- note_guid_to_memo_id[note_guid]
+      if (is.na(memo_id)) {
+        next  # Skip if no matching memo found
+      }
+
+      # Find segment_id for this memo segment
+      seg_query <- glue::glue_sql(
+        "SELECT segment_id FROM segments
+         WHERE project_id = {active_project}
+         AND doc_id = {row$doc_id}
+         AND code_id IS NULL
+         AND segment_start = {row$segment_start}
+         AND segment_end = {row$segment_end}
+         LIMIT 1",
+        .con = pool
+      )
+      seg_result <- DBI::dbGetQuery(pool, seg_query)
+
+      if (nrow(seg_result) > 0) {
+        segment_id <- seg_result$segment_id[1]
+        map_entries <- rbind(map_entries, data.frame(
+          memo_id = memo_id,
+          segment_id = segment_id
+        ))
+      }
+    }
+
+    # Write memos_segments_map entries
+    if (nrow(map_entries) > 0) {
+      DBI::dbWriteTable(
+        pool,
+        "memos_segments_map",
+        map_entries,
+        append = TRUE,
+        row.names = FALSE
+      )
+      rql_message(paste0("Created ", nrow(map_entries), " memo-segment relationship(s)."))
+    } else {
+      rql_message("No memo-segment relationships could be created.")
+    }
+  }
+
+  invisible(NULL)
+}
+
+# Import sets as categories ----
+# Only imports sets that have at least one member code (after mapping).
+# Empty sets are skipped since requal doesn't support categories without members.
+.import_categories <- function(sets, code_map, user_id, active_project, pool) {
+  if (nrow(sets) == 0) {
+    rql_message("No categories to import.")
+    return(invisible(NULL))
+  }
+
+  # Filter sets to only those with at least one valid member code
+  sets_with_codes <- sets |>
+    dplyr::filter(purrr::map_int(member_code_guids, ~ sum(!is.na(code_map[.x]))) > 0)
+
+  if (nrow(sets_with_codes) == 0) {
+    rql_message("No categories with valid codes to import.")
+    return(invisible(NULL))
+  }
+
+  # Count how many sets were skipped
+  skipped <- nrow(sets) - nrow(sets_with_codes)
+  if (skipped > 0) {
+    rql_message(paste0("Skipped ", skipped, " empty category(ies) with no valid codes."))
+  }
+
+  rql_message(paste0("Importing ", nrow(sets_with_codes), " category(ies)..."))
+
+  # Get the current max category_id before insert
+  max_cat_id_before <- DBI::dbGetQuery(pool, "SELECT COALESCE(MAX(category_id), 0) as max_id FROM categories")$max_id[1]
+
+  # Insert categories
+  categories_df <- sets_with_codes |>
+    dplyr::mutate(
+      project_id = as.integer(active_project),
+      user_id = as.integer(user_id)
+    ) |>
+    dplyr::select(project_id, user_id, category_name = set_name, category_description = set_description) |>
+    as.data.frame()
+
+  DBI::dbWriteTable(
+    pool,
+    "categories",
+    categories_df,
+    append = TRUE,
+    row.names = FALSE
+  )
+
+  # Read back the newly inserted category IDs
+  new_cats_query <- glue::glue_sql(
+    "SELECT category_id, category_name FROM categories
+     WHERE project_id = {active_project} AND category_id > {max_cat_id_before}
+     ORDER BY category_id",
+    .con = pool
+  )
+  new_cats <- DBI::dbGetQuery(pool, new_cats_query)
+
+  # Build category to code mapping
+  # sets_with_codes$member_code_guids contains lists of GUIDs for each category
+  cat_code_mappings <- list()
+  for (i in seq_len(nrow(new_cats))) {
+    cat_name <- new_cats$category_name[i]
+    # Find the original set by name (there might be duplicates, so find by order)
+    set_idx <- which(new_cats$category_name[i] == sets_with_codes$set_name)[1]
+    if (length(set_idx) > 0) {
+      member_guids <- sets_with_codes$member_code_guids[[set_idx]]
+      if (length(member_guids) > 0) {
+        # Map GUIDs to code_ids using code_map
+        code_ids <- unname(code_map[member_guids])
+        # Remove NA values (codes that weren't imported)
+        code_ids <- code_ids[!is.na(code_ids)]
+        if (length(code_ids) > 0) {
+          cat_code_mappings[[i]] <- tibble::tibble(
+            category_id = new_cats$category_id[i],
+            code_id = code_ids
+          )
+        }
+      }
+    }
+  }
+
+  # Combine all mappings and insert into categories_codes_map
+  if (length(cat_code_mappings) > 0) {
+    cat_code_df <- do.call(rbind, cat_code_mappings)
+    if (!is.null(cat_code_df) && nrow(cat_code_df) > 0) {
+      DBI::dbWriteTable(
+        pool,
+        "categories_codes_map",
+        as.data.frame(cat_code_df),
+        append = TRUE,
+        row.names = FALSE
+      )
+      rql_message(paste0("Mapped ", nrow(cat_code_df), " code(s) to categories."))
+    }
+  }
+
+  rql_message(paste0("Imported ", nrow(new_cats), " category(ies)."))
   invisible(NULL)
 }
 

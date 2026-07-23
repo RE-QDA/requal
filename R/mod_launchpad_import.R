@@ -37,38 +37,9 @@ mod_launchpad_import_server <- function(id, glob) {
     ##################
 
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
-      # file system prep -----
-      volumes <- c(Home = fs::path_home(), get_volume_paths())
-
-      shinyFiles::shinyDirChoose(
-        input,
-        "sel_directory",
-        roots = volumes,
-        defaultRoot = "Home",
-        session = session,
-        restrictions = system.file(package = "base"),
-        allowDirCreate = TRUE
-      )
-
-      output$project_path <- renderText({
-        if (is.integer(input$sel_directory)) {
-          "No destination directory has been selected."
-        } else {
-          loc$project_directory
-        }
-      })
-
-      observeEvent(input$sel_directory, {
-        loc$project_directory <- normalizePath(shinyFiles::parseDirPath(
-          volumes,
-          input$sel_directory
-        ))
-      })
-
       # handle import button ----
       observeEvent(input$project_import, {
         req(input$import_file)
-        req(loc$project_directory)
 
         # parse QDPX first to get project name
         parsed <- tryCatch(
@@ -80,43 +51,33 @@ mod_launchpad_import_server <- function(id, glob) {
         )
         req(!is.null(parsed))
 
-        # build db path from parsed project name
+        # create temp db path for import
         proj_name_clean <- gsub(
           "[^a-zA-Z0-9]+",
           "",
           iconv(parsed$project$project_name, to = "ASCII//TRANSLIT")
         )
         loc$db_path <- paste0(
-          loc$project_directory,
+          tempdir(),
           .Platform$file.sep,
-          paste0(proj_name_clean, ".requal")
+          paste0(proj_name_clean, "_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".requal")
         )
 
-        # check for existing file
-        if (file.exists(loc$db_path)) {
-          warn_user(
-            paste(
-              "Project file already exists at:",
-              loc$db_path,
-              "Choose a different folder or delete the existing file."
-            )
-          )
-          return(NULL)
-        }
+        # Store project name for download handler
+        glob$active_project_name <- parsed$project$project_name
 
-        # create new SQLite pool
-        glob$pool <- pool::dbPool(
-          drv = RSQLite::SQLite(),
-          dbname = loc$db_path,
-          onCreate = function(con) {
-            DBI::dbExecute(con, "PRAGMA foreign_keys = ON;")
-          }
-        )
+        # Create temporary SQLite connection for import (does not affect glob$pool)
+        import_con <- DBI::dbConnect(RSQLite::SQLite(), loc$db_path)
+        on.exit(DBI::dbDisconnect(import_con), add = TRUE)
+
+        # Enable foreign keys
+        DBI::dbExecute(import_con, "PRAGMA foreign_keys = ON;")
+
         glob$user$user_id <- as.integer(1)
 
         # create project and import
         loc$active_project <- create_project_db(
-          pool = glob$pool,
+          pool = import_con,
           project_name = parsed$project$project_name,
           project_description = parsed$project$project_description,
           user_id = glob$user$user_id
@@ -129,7 +90,7 @@ mod_launchpad_import_server <- function(id, glob) {
               content = parsed,
               user_id = glob$user$user_id,
               active_project = isolate(loc$active_project),
-              pool = glob$pool
+              pool = import_con
             )
             TRUE
           },
@@ -140,6 +101,9 @@ mod_launchpad_import_server <- function(id, glob) {
         )
 
         if (isTRUE(import_result)) {
+          # Clear the file input using shinyjs::reset()
+          shinyjs::reset("import_file")
+
           # Signal that a project was imported (triggers selector update in loader)
           glob$project_imported <- glob$project_imported + 1
 
@@ -153,12 +117,13 @@ mod_launchpad_import_server <- function(id, glob) {
               ),
               p(
                 strong("Important:"),
-                "To permanently save this project, download the .requal file to your desired location."
+                "Download the .requal file to save it to your desired location."
               ),
               downloadButton(
                 ns("download_project"),
                 label = "Download .requal File",
-                class = "btn-primary"
+                class = "btn-primary",
+                onclick = sprintf("Shiny.setInputValue('%s_closed', 1, {priority: 'event'});", ns("download"))
               ),
               footer = tagList(
                 actionButton(
@@ -169,14 +134,24 @@ mod_launchpad_import_server <- function(id, glob) {
               )
             )
           )
+
+          # Close modal when download button is clicked
+          observeEvent(input[[paste0(ns("download"), "_closed")]], {
+            removeModal()
+          }, ignoreInit = TRUE)
         }
       })
 
       # Download .requal file for local mode ----
       output$download_project <- downloadHandler(
         filename = function() {
-          if (!is.null(loc$db_path)) {
-            basename(loc$db_path)
+          if (!is.null(glob$active_project_name)) {
+            proj_name_clean <- gsub(
+              "[^a-zA-Z0-9]+",
+              "",
+              iconv(glob$active_project_name, to = "ASCII//TRANSLIT")
+            )
+            paste0(proj_name_clean, ".requal")
           } else {
             "project.requal"
           }
@@ -262,6 +237,9 @@ mod_launchpad_import_server <- function(id, glob) {
           )
 
           if (isTRUE(import_result)) {
+            # Clear the file input using shinyjs::reset()
+            shinyjs::reset("import_file")
+
             # Signal that a project was imported (triggers selector update in loader)
             glob$project_imported <- glob$project_imported + 1
 

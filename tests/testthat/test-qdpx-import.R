@@ -42,6 +42,10 @@ create_test_qdpx <- function(base_name = "test_project") {
           <CodeRef targetGUID="code-002-aaaa-bbbb-cccc-ddddeeeeffff"/>
         </Coding>
       </PlainTextSelection>
+      <!-- Memo segment: selection with only NoteRef, no Coding -->
+      <PlainTextSelection guid="sel-003-aaaa-bbbb-cccc-ddddeeeeffff" startPosition="65" endPosition="83">
+        <NoteRef targetGUID="note-001-aaaa-bbbb-cccc-ddddeeeeffff"/>
+      </PlainTextSelection>
     </TextSource>
   </Sources>
   <Notes>
@@ -52,6 +56,13 @@ create_test_qdpx <- function(base_name = "test_project") {
       <PlainTextContent>Another test note with more content.</PlainTextContent>
     </Note>
   </Notes>
+  <Sets>
+    <Set guid="set-001-aaaa-bbbb-cccc-ddddeeeeffff" name="Test Category">
+      <Description>A test category for grouping codes</Description>
+      <MemberCode targetGUID="code-001-aaaa-bbbb-cccc-ddddeeeeffff"/>
+      <MemberCode targetGUID="code-002-aaaa-bbbb-cccc-ddddeeeeffff"/>
+    </Set>
+  </Sets>
   <Links/>
 </Project>'
   writeLines(project_xml, file.path(tmp_dir, "project.qde"))
@@ -77,7 +88,7 @@ test_that("parse_qdpx returns expected structure", {
   result <- parse_qdpx(valid_qdpx_path)
 
   expect_type(result, "list")
-  expect_named(result, c("project", "users", "codebook", "sources", "selections", "notes"))
+  expect_named(result, c("project", "users", "codebook", "sources", "selections", "notes", "sets"))
 
   # Check project
   expect_s3_class(result$project, "data.frame")
@@ -101,12 +112,22 @@ test_that("parse_qdpx returns expected structure", {
 
   # Check selections
   expect_s3_class(result$selections, "data.frame")
-  expect_equal(nrow(result$selections), 2)
-  expect_true(all(c("source_guid", "code_guid", "startPosition", "endPosition") %in% names(result$selections)))
+  # Now includes 2 coded segments + 1 memo segment (selection with only NoteRef)
+  expect_equal(nrow(result$selections), 3)
+  expect_true(all(c("source_guid", "code_guid", "note_guid", "startPosition", "endPosition") %in% names(result$selections)))
+
+  # Check that memo segment has note_guid but no code_guid
+  memo_sel <- result$selections[is.na(result$selections$code_guid), ]
+  expect_equal(nrow(memo_sel), 1)
+  expect_equal(memo_sel$note_guid[1], "note-001-aaaa-bbbb-cccc-ddddeeeeffff")
 
   # Check notes
   expect_s3_class(result$notes, "data.frame")
-  expect_true(all(c("note_guid", "creating_user", "text") %in% names(result$notes)))
+  expect_true(all(c("note_guid", "creating_user", "note_name", "text") %in% names(result$notes)))
+
+  # Check sets (categories)
+  expect_s3_class(result$sets, "data.frame")
+  expect_true(all(c("set_guid", "set_name", "set_description", "member_code_guids") %in% names(result$sets)))
 })
 
 test_that("segment offsets are correctly converted on import", {
@@ -164,11 +185,12 @@ test_that("segment offsets are correctly converted on import", {
   )
 
   # Verify segments were imported with correct offsets
+  # Now includes 2 coded segments + 1 memo segment
   segments <- dplyr::tbl(test_pool, "segments") %>%
     dplyr::filter(project_id == !!active_project) %>%
     dplyr::collect()
 
-  expect_equal(nrow(segments), 2)
+  expect_equal(nrow(segments), 3)
 
   # First selection: startPosition=0, endPosition=31
   # Should become: segment_start = 0 + 1 = 1, segment_end = 31
@@ -181,6 +203,99 @@ test_that("segment offsets are correctly converted on import", {
   seg2 <- segments %>%
     dplyr::filter(segment_start == 33, segment_end == 55)
   expect_equal(nrow(seg2), 1)
+
+  pool::poolClose(test_pool)
+})
+
+test_that("memo segments (selections with only NoteRef) are imported correctly", {
+  # Create an in-memory SQLite database for testing
+  test_pool <- pool::dbPool(drv = RSQLite::SQLite(), dbname = ":memory:")
+  DBI::dbExecute(test_pool, "PRAGMA foreign_keys = ON;")
+  create_db_schema(test_pool)
+
+  # Create project
+  project_df <- tibble::tibble(
+    project_name = "Test Memo Segments",
+    project_description = "Testing memo segment import",
+    created_at = as.character(Sys.time())
+  )
+  DBI::dbWriteTable(test_pool, "projects", project_df, append = TRUE, row.names = FALSE)
+  active_project <- dplyr::tbl(test_pool, "projects") %>%
+    dplyr::filter(project_name == "Test Memo Segments") %>%
+    dplyr::pull(project_id)
+
+  # Create user
+  user_df <- tibble::tibble(
+    user_id = 1L,
+    user_login = "test_user",
+    user_name = "Test User"
+  )
+  DBI::dbWriteTable(test_pool, "users", user_df, append = TRUE, row.names = FALSE)
+
+  # Re-parse to get fresh result
+  result <- parse_qdpx(valid_qdpx_path)
+
+  # Import codebook
+  code_map <- .import_codebook(
+    codebook = result$codebook,
+    user_id = 1L,
+    active_project = active_project,
+    pool = test_pool
+  )
+
+  # Import sources
+  doc_map <- .import_sources(
+    sources = result$sources,
+    user_id = 1L,
+    active_project = active_project,
+    pool = test_pool
+  )
+
+  # Import segments (including memo segments)
+  segment_result <- .import_segments(
+    selections = result$selections,
+    code_map = code_map,
+    doc_map = doc_map,
+    user_id = 1L,
+    active_project = active_project,
+    pool = test_pool
+  )
+
+  # Verify coded segments were imported
+  coded_segments <- dplyr::tbl(test_pool, "segments") %>%
+    dplyr::filter(project_id == !!active_project, !is.na(code_id)) %>%
+    dplyr::collect()
+  expect_equal(nrow(coded_segments), 2)
+
+  # Verify memo segment was imported (code_id IS NULL)
+  memo_segments <- dplyr::tbl(test_pool, "segments") %>%
+    dplyr::filter(project_id == !!active_project, is.na(code_id)) %>%
+    dplyr::collect()
+  expect_equal(nrow(memo_segments), 1)
+
+  # Verify memo segment has correct position
+  expect_equal(nrow(memo_segments), 1)
+  expect_equal(memo_segments$segment_start[1], 66)  # startPosition 65 + 1
+  expect_equal(memo_segments$segment_end[1], 83)
+  expect_equal(memo_segments$segment_text[1], "that will be coded")
+
+  # Import notes (with memo_mappings to create memos_segments_map)
+  .import_notes(
+    notes = result$notes,
+    user_id = 1L,
+    active_project = active_project,
+    pool = test_pool,
+    memo_mappings = segment_result$memo_mappings
+  )
+
+  # Verify memos_segments_map entry was created
+  memo_segments_map <- dplyr::tbl(test_pool, "memos_segments_map") %>%
+    dplyr::collect()
+  expect_equal(nrow(memo_segments_map), 1)
+
+  # Verify the mapping is correct
+  expect_true(memo_segments_map$memo_id[1] > 0)
+  expect_true(memo_segments_map$segment_id[1] > 0)
 
   pool::poolClose(test_pool)
 })
