@@ -658,21 +658,38 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
       })
     )
 
-  # get codes descriptions
+  # get codes descriptions - ensure length matches to avoid subscript errors
   descriptions <- purrr::map_chr(codes, .f = function(code_node) {
-    desc <- xml2::xml_find_first(code_node, ".//qdc:Description", ns = qdc_ns)
-    if (is.na(desc)) {
+    tryCatch({
+      desc <- xml2::xml_find_first(code_node, ".//qdc:Description", ns = qdc_ns)
+      if (is.na(desc)) {
+        return("")
+      } else {
+        desc_text <- xml2::xml_text(desc)
+        if (is.na(desc_text) || !nzchar(trimws(desc_text))) {
+          return("")
+        }
+        return(desc_text)
+      }
+    }, error = function(e) {
       return("")
-    } else {
-      return(xml2::xml_text(desc))
-    }
+    })
   })
 
   # TODO add import info from qdc header to descriptions
 
-  # add descriptions
-  codes_df_renamed <- codes_df_renamed %>%
-    dplyr::mutate(description = descriptions)
+  # add descriptions (ensure length matches to avoid subscript errors)
+  if (length(descriptions) == nrow(codes_df_renamed)) {
+    codes_df_renamed <- codes_df_renamed %>%
+      dplyr::mutate(description = descriptions)
+  } else {
+    # Fallback: use empty descriptions if lengths don't match
+    rql_message(paste("Warning: Description count", length(descriptions),
+                      "does not match code count", nrow(codes_df_renamed),
+                      "- using empty descriptions"))
+    codes_df_renamed <- codes_df_renamed %>%
+      dplyr::mutate(description = "")
+  }
   # add default color
   if (!"color" %in% names(codes_df_renamed)) {
     codes_df_renamed <- codes_df_renamed %>%
@@ -682,6 +699,11 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
       missing_colors <- which(is.na(codes_df_renamed$color))
       codes_df_renamed$color[missing_colors] <- "#FFFF00"
       # TODO add a check for non-hex colors
+    }
+    # Replace empty strings with default color
+    empty_colors <- which(codes_df_renamed$color == "" | codes_df_renamed$color == "NA")
+    if (length(empty_colors) > 0) {
+      codes_df_renamed$color[empty_colors] <- "#FFFF00"
     }
   }
 
@@ -695,19 +717,27 @@ get_qdc_codebook <- function(qdc_file, qdc_ns) {
 
   # clean up result
   codes_converted <- codes_df_renamed %>%
-    dplyr::mutate(description = descriptions) %>%
     dplyr::mutate(
       code_color = purrr::map_chr(color, .f = function(input_color) {
-        rgb_colours <- grDevices::col2rgb(input_color)
-        paste0(
-          "rgb(",
-          rgb_colours[1],
-          ",",
-          rgb_colours[2],
-          ",",
-          rgb_colours[3],
-          ")"
-        )
+        # Use default yellow if color is NA, empty, or invalid
+        if (is.na(input_color) || input_color == "" || !nzchar(trimws(input_color))) {
+          return("rgb(255,255,0)")  # Default yellow
+        }
+        tryCatch({
+          rgb_colours <- grDevices::col2rgb(input_color)
+          paste0(
+            "rgb(",
+            rgb_colours[1],
+            ",",
+            rgb_colours[2],
+            ",",
+            rgb_colours[3],
+            ")"
+          )
+        }, error = function(e) {
+          # If color conversion fails, return default yellow
+          "rgb(255,255,0)"
+        })
       })
     ) %>%
     dplyr::mutate(isCodable = stringr::str_detect(isCodable, "[Tt]rue")) %>%
@@ -787,15 +817,31 @@ get_qdc_categories <- function(qdc_file, qdc_ns) {
   # Get set attributes (guid and name)
   sets_df <- xml2::xml_attrs(sets) %>% dplyr::bind_rows()
 
-  # Get set descriptions
+  # Get set descriptions - ensure length matches to avoid subscript errors
   descriptions <- purrr::map_chr(sets, .f = function(set_node) {
-    desc <- xml2::xml_find_first(set_node, ".//qdc:Description", ns = qdc_ns)
-    if (is.na(desc)) {
+    tryCatch({
+      desc <- xml2::xml_find_first(set_node, ".//qdc:Description", ns = qdc_ns)
+      if (is.na(desc)) {
+        return("")
+      } else {
+        desc_text <- xml2::xml_text(desc)
+        if (is.na(desc_text) || !nzchar(trimws(desc_text))) {
+          return("")
+        }
+        return(desc_text)
+      }
+    }, error = function(e) {
       return("")
-    } else {
-      return(xml2::xml_text(desc))
-    }
+    })
   })
+
+  # Validate description count matches set count
+  if (length(descriptions) != nrow(sets_df)) {
+    rql_message(paste("Warning: Category description count", length(descriptions),
+                      "does not match category count", nrow(sets_df),
+                      "- using empty descriptions"))
+    descriptions <- rep("", nrow(sets_df))
+  }
 
   # Build categories dataframe
   categories_converted <- sets_df %>%

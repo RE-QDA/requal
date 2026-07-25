@@ -196,15 +196,31 @@ parse_qdpx <- function(path) {
       })
     )
 
-  # get codes descriptions
+  # get codes descriptions - ensure length matches to avoid subscript errors
   descriptions <- purrr::map_chr(codes, .f = function(code_node) {
-    desc <- xml2::xml_find_first(code_node, ".//qda:Description", ns = refi_ns)
-    if (is.na(desc)) {
+    tryCatch({
+      desc <- xml2::xml_find_first(code_node, ".//qda:Description", ns = refi_ns)
+      if (is.na(desc)) {
+        return("")
+      } else {
+        desc_text <- xml2::xml_text(desc)
+        if (is.na(desc_text) || !nzchar(trimws(desc_text))) {
+          return("")
+        }
+        return(desc_text)
+      }
+    }, error = function(e) {
       return("")
-    } else {
-      return(xml2::xml_text(desc))
-    }
+    })
   })
+
+  # Validate description count matches code count
+  if (length(descriptions) != nrow(codes_df_joined)) {
+    rql_message(paste("Warning: Code description count", length(descriptions),
+                      "does not match code count", nrow(codes_df_joined),
+                      "- using empty descriptions"))
+    descriptions <- rep("", nrow(codes_df_joined))
+  }
 
   # clean up result
   codes_converted <- codes_df_renamed |>
@@ -386,11 +402,13 @@ parse_qdpx <- function(path) {
   if (length(txt_nodes) > 0) {
     txt_Description <- .get_xml_el_txt(txt_nodes, "Description")
     txt_PlainTextContent <- .get_xml_el_txt(txt_nodes, "PlainTextContent")
+    txt_modifiedDateTime <- .get_xml_el_txt(txt_nodes, "modifiedDateTime")
     txt_df <- xml2::xml_attrs(txt_nodes) |>
       dplyr::bind_rows() |>
       dplyr::mutate(
         doc_description = txt_Description,
-        PlainTextContent = txt_PlainTextContent
+        PlainTextContent = txt_PlainTextContent,
+        modifiedDateTime = txt_modifiedDateTime
       )
 
     # Handle doc_text: use PlainTextContent if embedded, otherwise read from file
@@ -411,13 +429,7 @@ parse_qdpx <- function(path) {
         dplyr::mutate(doc_text = PlainTextContent)
     }
 
-    # Preserve source guid for segment mapping
-    txt_df <- txt_df |>
-      dplyr::rename(source_guid = guid) |>
-      dplyr::select(source_guid, name, doc_description, doc_text, modifiedDateTime)
-
-    # Add modifiedDateTime if missing
-    txt_modifiedDateTime <- .get_xml_el_txt(txt_nodes, "modifiedDateTime")
+    # Ensure modifiedDateTime has default value if missing or empty
     txt_df <- txt_df |>
       dplyr::mutate(
         modifiedDateTime = ifelse(
@@ -426,6 +438,11 @@ parse_qdpx <- function(path) {
           modifiedDateTime
         )
       )
+
+    # Preserve source guid for segment mapping
+    txt_df <- txt_df |>
+      dplyr::rename(source_guid = guid) |>
+      dplyr::select(source_guid, name, doc_description, doc_text, modifiedDateTime)
   }
 
   # Combine PDF and text sources
