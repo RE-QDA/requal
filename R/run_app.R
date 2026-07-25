@@ -10,6 +10,7 @@
 #' @param dbpassword Password to DB (for server use only)
 #' @param credentials_path Path to credentials DB (for server use only)
 #' @param credentials_pass Password to credentials DB (for server use only)
+#' @param max_upload_size Maximum file upload size in bytes (default: 500 MB)
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
@@ -23,8 +24,12 @@ run_app <- function(mode = "local",
                     dbpassword = NULL,
                     credentials_path = NULL,
                     credentials_pass = NULL,
+                    max_upload_size = 500 * 1024^2,  # 500 MB default
                     uiPattern = "/",
                     ...) {
+  # Set maximum upload size for file inputs
+  options(shiny.maxRequestSize = max_upload_size)
+
   with_golem_options(
     app = shinyApp(
       ui = switch(mode,
@@ -36,7 +41,7 @@ run_app <- function(mode = "local",
                                    enable_admin = TRUE,
                                    fab_position = "bottom-left"
           ),
-          local = app_ui, 
+          local = app_ui,
           local_test = app_ui
           ),
       server = app_server,
@@ -45,7 +50,7 @@ run_app <- function(mode = "local",
     ),
     golem_opts = list(mode = mode,
                       dbhost = dbhost,
-                      dbport = dbport, 
+                      dbport = dbport,
                       dbname = dbname,
                       dbusername = dbusername,
                       dbpassword = dbpassword,

@@ -36,20 +36,61 @@ mod_launchpad_import_server <- function(id, glob) {
     # Local setup ####
     ##################
 
+    # Render progress UI
+    output$import_progress_ui <- renderUI({
+      if (isTRUE(loc$importing)) {
+        tagList(
+          br(),
+          div(class = "progress", style = "height: 20px;",
+            div(id = ns("import_progress_bar"), class = "progress-bar progress-bar-striped active",
+              role = "progressbar", style = "width: 0%; height: 100%;",
+              `aria-valuenow` = "0", `aria-valuemin` = "0", `aria-valuemax` = "100"
+            )
+          ),
+          p(id = ns("import_progress_text"), "Preparing import...")
+        )
+      } else {
+        NULL
+      }
+    })
+
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
       # handle import button ----
       observeEvent(input$project_import, {
         req(input$import_file)
 
+        # Set importing flag to show progress UI
+        loc$importing <- TRUE
+        on.exit(loc$importing <- FALSE, add = TRUE)
+
+        # Show progress modal
+        showModal(modalDialog(
+          title = "Importing Project",
+          div(
+            class = "progress", style = "height: 30px; margin-bottom: 15px;",
+            div(id = ns("modal_progress_bar"), class = "progress-bar progress-bar-striped active",
+              role = "progressbar", style = "width: 0%; height: 100%;",
+              `aria-valuenow` = "0", `aria-valuemin` = "0", `aria-valuemax` = "100"
+            )
+          ),
+          p(id = ns("modal_progress_text"), "Preparing..."),
+          size = "m",
+          easyClose = FALSE,
+          footer = NULL
+        ))
+
         # parse QDPX first to get project name
         parsed <- tryCatch(
           parse_qdpx(input$import_file$datapath),
           error = function(e) {
-            warn_user(paste("Error parsing QDPX file:", e$message))
+            removeModal()
+            warn_user(paste("Error parsing QDPX file:", conditionMessage(e)))
+            warn_user(paste("Error class:", class(e)[1]))
             NULL
           }
         )
         req(!is.null(parsed))
+        removeModal()
 
         # create temp db path for import
         proj_name_clean <- gsub(
@@ -193,6 +234,26 @@ mod_launchpad_import_server <- function(id, glob) {
             req(glob$user$project_admin)
           }
 
+          # Set importing flag to show progress UI
+          loc$importing <- TRUE
+          on.exit(loc$importing <- FALSE, add = TRUE)
+
+          # Show progress modal
+          showModal(modalDialog(
+            title = "Importing Project",
+            div(
+              class = "progress", style = "height: 30px; margin-bottom: 15px;",
+              div(id = ns("server_modal_progress_bar"), class = "progress-bar progress-bar-striped active",
+                role = "progressbar", style = "width: 0%; height: 100%;",
+                `aria-valuenow` = "0", `aria-valuemin` = "0", `aria-valuemax` = "100"
+              )
+            ),
+            p(id = ns("server_modal_progress_text"), "Preparing..."),
+            size = "m",
+            easyClose = FALSE,
+            footer = NULL
+          ))
+
           # reuse global pool
           if (!isTruthy(glob$pool)) {
             glob$pool <- pool
@@ -202,11 +263,13 @@ mod_launchpad_import_server <- function(id, glob) {
           parsed <- tryCatch(
             parse_qdpx(input$import_file$datapath),
             error = function(e) {
+              removeModal()
               warn_user(paste("Error parsing QDPX file:", e$message))
               NULL
             }
           )
           req(!is.null(parsed))
+          removeModal()
 
           # create project in postgres
           loc$active_project <- tryCatch(

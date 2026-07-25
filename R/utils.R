@@ -369,7 +369,9 @@ import_UI_local <- function(ns) {
       ns("project_import"),
       label = "Import project",
       class = "btn-success"
-    )
+    ),
+    # Progress UI for large file imports
+    uiOutput(ns("import_progress_ui"))
   )
 }
 
@@ -385,7 +387,9 @@ import_UI_server <- function(ns) {
       ns("project_import"),
       label = "Import project",
       class = "btn-success"
-    )
+    ),
+    # Progress UI for large file imports
+    uiOutput(ns("import_progress_ui"))
   )
 }
 

@@ -13,6 +13,7 @@ run_app(
   dbpassword = NULL,
   credentials_path = NULL,
   credentials_pass = NULL,
+  max_upload_size = 500 * 1024^2,
   uiPattern = "/",
   ...
 )
@@ -33,6 +34,8 @@ run_app(
 \item{credentials_path}{Path to credentials DB (for server use only)}
 
 \item{credentials_pass}{Password to credentials DB (for server use only)}
+
+\item{max_upload_size}{Maximum file upload size in bytes (default: 500 MB)}
 
 \item{uiPattern}{A regular expression that will be applied to each \code{GET}
 request to determine whether the \code{ui} should be used to handle the

@@ -9,7 +9,7 @@ golem::detach_all_attached()
 golem::document_and_reload()
 
 (run_app(
-  mode = "server",
+  mode = "local",
   dbname = "requal",
   dbhost = "localhost",
   dbusername = "requal_admin",

@@ -19,6 +19,7 @@ parse_qdpx <- function(path) {
     .Platform$file.sep,
     "project.qde"
   ))
+
   xml_schema <- xml2::read_xml(system.file('refi.xsd', package = 'requal'))
 
   # check file against validation schema
@@ -29,6 +30,7 @@ parse_qdpx <- function(path) {
   }
   # extract data from file
   imp_project <- list()
+
   imp_project$project <- .refi_get_project(xml_file, refi_ns = refi_ns)
   imp_project$users <- .refi_get_users(xml_file, refi_ns = refi_ns)
   imp_project$codebook <- .refi_get_codebook(xml_file, refi_ns = refi_ns)
@@ -50,7 +52,6 @@ parse_qdpx <- function(path) {
     xml_file,
     refi_ns = refi_ns
   )
-  #xml2::xml_find_all(xml_file, "//qda:Project/qda:Links", ns = refi_ns)
   return(imp_project)
 }
 
@@ -58,6 +59,15 @@ parse_qdpx <- function(path) {
 # Parse project information ----
 .refi_get_project <- function(xml_file, refi_ns) {
   project_node <- xml2::xml_find_all(xml_file, "//qda:Project", ns = refi_ns)
+
+  if (length(project_node) == 0) {
+    rql_message("No Project element found in QDPX file.")
+    return(tibble::tibble(
+      project_name = character(),
+      project_description = character()
+    ))
+  }
+
   description <- xml2::xml_find_first(
     project_node,
     ".//qda:Description",
@@ -93,6 +103,16 @@ parse_qdpx <- function(path) {
     "//qda:Users/qda:User",
     ns = refi_ns
   )
+
+  if (length(users_node) == 0) {
+    rql_message("No Users found in QDPX file.")
+    return(tibble::tibble(
+      user_login = character(),
+      user_name = character(),
+      user_guid = character()
+    ))
+  }
+
   user_names <- users_node |> xml2::xml_attr("name")
   user_ids <- users_node |> xml2::xml_attr("id")
   user_ids[is.na(user_ids)] <- user_names[is.na(user_ids)]
@@ -108,11 +128,40 @@ parse_qdpx <- function(path) {
 
 # Parse codebook information ----
 .refi_get_codebook <- function(xml_file, refi_ns) {
+  # Check if CodeBook element exists
+  codebook_node <- xml2::xml_find_all(xml_file, "//qda:Project/qda:CodeBook", ns = refi_ns)
+
+  if (length(codebook_node) == 0) {
+    rql_message("No CodeBook element found in QDPX file.")
+    return(tibble::tibble(
+      code_id = integer(),
+      code_name = character(),
+      code_description = character(),
+      code_color = character(),
+      guid = character(),
+      code_parent_id = integer()
+    ))
+  }
+
   codes <- xml2::xml_find_all(
     xml_file,
     "//qda:Project/qda:CodeBook/qda:Codes//qda:Code",
     ns = refi_ns
   )
+
+  # Handle case with no codes
+  if (length(codes) == 0) {
+    rql_message("No codes found in QDPX file.")
+    return(tibble::tibble(
+      code_id = integer(),
+      code_name = character(),
+      code_description = character(),
+      code_color = character(),
+      guid = character(),
+      code_parent_id = integer()
+    ))
+  }
+
   parent_guids <- purrr::map_df(codes, .f = function(x) {
     tibble::tibble(
       guid = xml2::xml_attr(x, "guid"),
@@ -222,88 +271,167 @@ parse_qdpx <- function(path) {
     ns = refi_ns
   )
   img_df <- .refi_get_src_type(sources, src_type = "PictureSource")
-  pdf_df <- .refi_get_src_type(sources, src_type = "PDFSource")
   audio_df <- .refi_get_src_type(sources, src_type = "AudioSource")
   video_df <- .refi_get_src_type(sources, src_type = "VideoSource")
 
   # TODO when support for sources implemented
   purrr::walk2(
-    list(img_df, pdf_df, audio_df, video_df),
-    list("Picture", "PDF", "Audio", "Video"),
+    list(img_df, audio_df, video_df),
+    list("Picture", "Audio", "Video"),
     .f = function(x, y) {
       msg <- paste0("Ignoring ", nrow(x), " sources of type '", y, "'.")
       rql_message(msg)
     }
   )
-  txt_nodes <- xml2::xml_find_all(sources, ".//qda:TextSource", ns = refi_ns)
-  rql_message(paste0(
-    "Importing ",
-    length(txt_nodes),
-    " sources of type 'Text'."
-  ))
 
-  # Handle case with no text sources
-  if (length(txt_nodes) == 0) {
-    rql_message("No text sources found in QDPX file.")
-    return(tibble::tibble(
-      source_guid = character(),
-      name = character(),
-      doc_description = character(),
-      doc_text = character(),
-      modifiedDateTime = character()
-    ))
+  # Handle PDF sources with plaintext representations
+  pdf_source_nodes <- xml2::xml_find_all(sources, ".//qda:PDFSource", ns = refi_ns)
+  rql_message(paste0("Found ", length(pdf_source_nodes), " PDF source(s)."))
+
+  pdf_df <- tibble::tibble(
+    source_guid = character(),
+    name = character(),
+    doc_description = character(),
+    doc_text = character(),
+    modifiedDateTime = character()
+  )
+
+  if (length(pdf_source_nodes) > 0) {
+    rql_message(paste0("Processing ", length(pdf_source_nodes), " PDF sources..."))
+    # Process each PDF source to extract text from Representation's plainTextPath
+    pdf_data <- purrr::map(seq_along(pdf_source_nodes), function(i) {
+      tryCatch({
+        pdf_node <- pdf_source_nodes[[i]]
+
+        # Get PDF attributes
+        pdf_guid <- xml2::xml_attr(pdf_node, "guid") %||% ""
+        pdf_name <- xml2::xml_attr(pdf_node, "name") %||% ""
+        pdf_modified <- xml2::xml_attr(pdf_node, "modifiedDateTime") %||% ""
+
+        # Get description from Description child element
+        desc_node <- xml2::xml_find_first(pdf_node, ".//qda:Description", ns = refi_ns)
+        pdf_desc <- if (xml2::xml_length(desc_node) > 0) xml2::xml_text(desc_node) else ""
+
+        # Try to find Representation child with plainTextPath attribute
+        # Note: ATLAS.ti uses default namespace, so we need to find children by name directly
+        # since XPath with namespace prefix doesn't work reliably with default namespaces
+        all_children <- xml2::xml_children(pdf_node)
+        rep_idx <- which(xml2::xml_name(all_children) == "Representation")
+
+        pdf_text <- ""
+        if (length(rep_idx) > 0) {
+          rep_node <- all_children[[rep_idx[1]]]
+          plain_text_path <- xml2::xml_attr(rep_node, "plainTextPath")
+
+          if (!is.na(plain_text_path) && plain_text_path != "") {
+            # Found a plaintext representation path, try to read it
+            pdf_text <- .read_plaintext_path(plain_text_path, import_dir)
+          }
+        }
+
+        list(
+          source_guid = pdf_guid,
+          name = pdf_name,
+          doc_description = pdf_desc,
+          doc_text = pdf_text,
+          modifiedDateTime = pdf_modified
+        )
+      }, error = function(e) {
+        rql_message(paste0("Error processing PDF ", i, ": ", conditionMessage(e)))
+        # Return empty entry for this PDF
+        list(
+          source_guid = "",
+          name = paste0("[Error] PDF ", i),
+          doc_description = "",
+          doc_text = "",
+          modifiedDateTime = ""
+        )
+      })
+    })
+
+    # Convert to tibble and filter out PDFs without valid content
+    pdf_df <- do.call(rbind, lapply(pdf_data, function(x) {
+      tibble::tibble(
+        source_guid = x$source_guid,
+        name = x$name,
+        doc_description = x$doc_description,
+        doc_text = x$doc_text,
+        modifiedDateTime = x$modifiedDateTime
+      )
+    }))
+
+    # Filter to only include PDFs that have actual text content (have Representation with plainTextPath)
+    pdf_with_content <- pdf_df[pdf_df$source_guid != "" & nzchar(trimws(pdf_df$doc_text)), ]
+    pdf_without_content <- pdf_df[pdf_df$source_guid == "" | !nzchar(trimws(pdf_df$doc_text)), ]
+
+    if (nrow(pdf_without_content) > 0) {
+      rql_message(paste0("Skipping ", nrow(pdf_without_content), " PDF source(s) without plaintext representation."))
+    }
+
+    pdf_df <- pdf_with_content
+    rql_message(paste0("Importing ", nrow(pdf_df), " PDF source(s) with text content."))
   }
 
-  txt_Description <- .get_xml_el_txt(txt_nodes, "Description")
-  txt_PlainTextContent <- .get_xml_el_txt(txt_nodes, "PlainTextContent")
-  txt_NoteRef <- .get_xml_el_txt(txt_nodes, "NoteRef")
-  txt_VariableValue <- .get_xml_el_txt(txt_nodes, "VariableValue")
-  # xml2::xml_find_all(sources, ".//qda:PlainTextSelection", ns = refi_ns) |>
-  # xml2::xml_attrs() |> dplyr::bind_rows()
-  txt_df <- xml2::xml_attrs(txt_nodes) |>
-    dplyr::bind_rows() |>
-    dplyr::mutate(
-      doc_description = txt_Description,
-      PlainTextContent = txt_PlainTextContent
-    )
+  # Handle TextSource elements
+  txt_nodes <- xml2::xml_find_all(sources, ".//qda:TextSource", ns = refi_ns)
 
-  # Handle doc_text: use PlainTextContent if embedded, otherwise read from file
-  has_embedded_content <- any(nzchar(trimws(txt_df$PlainTextContent)))
-  rql_message(paste0("PlainTextContent check: has_embedded_content = ", has_embedded_content))
+  txt_df <- tibble::tibble(
+    source_guid = character(),
+    name = character(),
+    doc_description = character(),
+    doc_text = character(),
+    modifiedDateTime = character()
+  )
 
-  if (!has_embedded_content) {
-    # No embedded content, read from plainTextPath files
-    rql_message("No embedded PlainTextContent found, attempting to read from files...")
+  if (length(txt_nodes) > 0) {
+    txt_Description <- .get_xml_el_txt(txt_nodes, "Description")
+    txt_PlainTextContent <- .get_xml_el_txt(txt_nodes, "PlainTextContent")
+    txt_df <- xml2::xml_attrs(txt_nodes) |>
+      dplyr::bind_rows() |>
+      dplyr::mutate(
+        doc_description = txt_Description,
+        PlainTextContent = txt_PlainTextContent
+      )
+
+    # Handle doc_text: use PlainTextContent if embedded, otherwise read from file
+    has_embedded_content <- any(nzchar(trimws(txt_df$PlainTextContent)))
+
+    if (!has_embedded_content) {
+      # No embedded content, read from plainTextPath files
+      txt_df <- txt_df |>
+        dplyr::mutate(
+          doc_text = purrr::map_chr(
+            plainTextPath,
+            ~ .read_plaintext_path(.x, import_dir)
+          )
+        )
+    } else {
+      # Use embedded PlainTextContent
+      txt_df <- txt_df |>
+        dplyr::mutate(doc_text = PlainTextContent)
+    }
+
+    # Preserve source guid for segment mapping
+    txt_df <- txt_df |>
+      dplyr::rename(source_guid = guid) |>
+      dplyr::select(source_guid, name, doc_description, doc_text, modifiedDateTime)
+
+    # Add modifiedDateTime if missing
+    txt_modifiedDateTime <- .get_xml_el_txt(txt_nodes, "modifiedDateTime")
     txt_df <- txt_df |>
       dplyr::mutate(
-        doc_text = purrr::map_chr(
-          plainTextPath,
-          ~ .read_plaintext_path(.x, import_dir)
+        modifiedDateTime = ifelse(
+          is.na(modifiedDateTime) | modifiedDateTime == "",
+          format(Sys.time(), "%Y-%m-%dT%H:%M:%S"),
+          modifiedDateTime
         )
       )
-  } else {
-    # Use embedded PlainTextContent
-    rql_message("Using embedded PlainTextContent for documents.")
-    txt_df <- txt_df |>
-      dplyr::mutate(doc_text = PlainTextContent)
   }
 
-  # Preserve source guid for segment mapping
-  txt_df <- txt_df |>
-    dplyr::rename(source_guid = guid)
+  # Combine PDF and text sources
+  all_sources <- dplyr::bind_rows(pdf_df, txt_df)
 
-  # Add modifiedDateTime from the TextSource nodes if available
-  txt_modifiedDateTime <- .get_xml_el_txt(txt_nodes, "modifiedDateTime")
-  txt_df <- txt_df |>
-    dplyr::mutate(
-      modifiedDateTime = ifelse(
-        txt_modifiedDateTime == "",
-        format(Sys.time(), "%Y-%m-%dT%H:%M:%S"),
-        txt_modifiedDateTime
-      )
-    )
-
-  return(txt_df)
+  return(all_sources)
 }
 
 # Parse selections (coded segments and memo segments) ----
@@ -593,7 +721,34 @@ parse_qdpx <- function(path) {
 }
 
 .read_plaintext_path <- function(file, import_dir) {
-  # Try multiple possible paths for the plaintext file
+  # Handle internal:// paths (used by ATLAS.ti/QDAX for embedded resources)
+  if (grepl("^internal://", file)) {
+    file_id <- sub("^internal://", "", file)
+
+    # Try common locations for the file in the unzipped archive
+    possible_paths <- c(
+      paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, file_id),
+      paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, basename(file_id)),
+      paste0(import_dir, .Platform$file.sep, file_id),
+      paste0(import_dir, .Platform$file.sep, basename(file_id))
+    )
+
+    for (path_to_file in possible_paths) {
+      if (file.exists(path_to_file)) {
+        plain_text <- paste0(
+          readLines(path_to_file, encoding = "UTF-8", warn = FALSE),
+          collapse = "\n"
+        )
+        return(plain_text)
+      }
+    }
+
+    # File not found - return empty string and log warning
+    rql_message(paste("Warning: Could not find internal plaintext file:", file))
+    return("")
+  }
+
+  # Handle regular relative file paths
   possible_paths <- c(
     paste0(import_dir, .Platform$file.sep, "sources", .Platform$file.sep, basename(file)),
     paste0(import_dir, .Platform$file.sep, basename(file)),
@@ -754,6 +909,12 @@ import_project <- function(content, user_id, active_project, pool) {
 .import_codebook <- function(codebook, user_id, active_project, pool) {
   rql_message(paste0("Importing ", nrow(codebook), " code(s)..."))
 
+  # Handle empty codebook
+  if (nrow(codebook) == 0) {
+    rql_message("No codes to import.")
+    return(setNames(integer(), character()))
+  }
+
   # Keep guid for mapping
   codebook_with_guid <- codebook |>
     dplyr::select(
@@ -870,7 +1031,7 @@ import_project <- function(content, user_id, active_project, pool) {
   # Check if sources is empty
   if (nrow(sources) == 0) {
     rql_message("No sources to import.")
-    return(named(character()))
+    return(setNames(character(), character()))
   }
 
   rql_message(paste0("Importing ", nrow(sources), " document(s)..."))
