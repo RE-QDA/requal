@@ -356,13 +356,19 @@ creator_UI_server <- function(ns) {
 
 # import UI
 
-import_UI_local <- function(ns) {
+import_UI_local <- function(id) {
+  ns <- NS(id)
+  # Get max upload size from golem options for JavaScript validation
+  max_upload_size <- golem::get_golem_options("max_upload_size") %||% (5 * 1024^2)
+  max_upload_mb <- round(max_upload_size / (1024^2), 0)
+
   tagList(
     h3("Import QDPX file"),
     fileInput(
       ns("import_file"),
       label = NULL,
-      accept = ".qdpx"
+      accept = ".qdpx",
+      width = "100%"
     ),
     p("The imported project will be available for download. Choose a location to save it after import."),
     actionButton(
@@ -371,17 +377,51 @@ import_UI_local <- function(ns) {
       class = "btn-success"
     ),
     # Progress UI for large file imports
-    uiOutput(ns("import_progress_ui"))
+    uiOutput(ns("import_progress_ui")),
+    # JavaScript to check file size and send custom input to Shiny
+    # Note: setInputValue uses un-namespaced name - Shiny scopes it to the module automatically
+    tags$script(HTML(sprintf('
+      document.addEventListener("DOMContentLoaded", function() {
+        var maxBytes = %d;
+        var maxMb = %d;
+        var moduleId = "%s";
+        // Find the file input by its name attribute
+        var input = document.querySelector("#" + moduleId + "-import_file");
+        if (input) {
+          input.addEventListener("change", function(event) {
+            var files = event.target.files;
+            if (files && files.length > 0) {
+              var fileSize = files[0].size;
+              if (fileSize > maxBytes) {
+                var sizeMb = (fileSize / (1024*1024)).toFixed(2);
+                // Send custom input to Shiny - un-namespaced, Shiny scopes it to module
+                Shiny.setInputValue(moduleId + "-file_too_large", {
+                  sizeMb: sizeMb,
+                  maxMb: maxMb
+                }, {priority: "event"});
+                event.target.value = "";
+              }
+            }
+          });
+        }
+      });
+    ', max_upload_size, max_upload_mb, id)))
   )
 }
 
-import_UI_server <- function(ns) {
+import_UI_server <- function(id) {
+  ns <- NS(id)
+  # Get max upload size from golem options for JavaScript validation
+  max_upload_size <- golem::get_golem_options("max_upload_size") %||% (5 * 1024^2)
+  max_upload_mb <- round(max_upload_size / (1024^2), 0)
+
   tagList(
     h3("Import QDPX file"),
     fileInput(
       ns("import_file"),
       label = NULL,
-      accept = ".qdpx"
+      accept = ".qdpx",
+      width = "100%"
     ),
     actionButton(
       ns("project_import"),
@@ -389,7 +429,33 @@ import_UI_server <- function(ns) {
       class = "btn-success"
     ),
     # Progress UI for large file imports
-    uiOutput(ns("import_progress_ui"))
+    uiOutput(ns("import_progress_ui")),
+    # JavaScript to check file size and send custom input to Shiny
+    tags$script(HTML(sprintf('
+      document.addEventListener("DOMContentLoaded", function() {
+        var maxBytes = %d;
+        var maxMb = %d;
+        var moduleId = "%s";
+        // Find the file input by its name attribute
+        var input = document.querySelector("#" + moduleId + "-import_file");
+        if (input) {
+          input.addEventListener("change", function(event) {
+            var files = event.target.files;
+            if (files && files.length > 0) {
+              var fileSize = files[0].size;
+              if (fileSize > maxBytes) {
+                var sizeMb = (fileSize / (1024*1024)).toFixed(2);
+                Shiny.setInputValue(moduleId + "-file_too_large", {
+                  sizeMb: sizeMb,
+                  maxMb: maxMb
+                }, {priority: "event"});
+                event.target.value = "";
+              }
+            }
+          });
+        }
+      });
+    ', max_upload_size, max_upload_mb, id)))
   )
 }
 
@@ -397,6 +463,79 @@ import_UI_server <- function(ns) {
 
 warn_user <- function(warning) {
   showModal(modalDialog(title = "Warning", warning))
+}
+
+# check file size against limit and show error modal if exceeded ----
+# Returns TRUE if file is OK, FALSE if too large or error
+# Shows modal for errors
+check_file_size <- function(file_input, max_size_bytes, max_size_mb = NULL, session = NULL) {
+  # Calculate max size in MB if not specified
+  if (is.null(max_size_mb)) {
+    max_size_mb <- max_size_bytes / (1024^2)
+  }
+
+  # Check if file input is NULL - this can happen when:
+  # 1. No file has been uploaded yet
+  # 2. File was rejected by Shiny due to exceeding maxRequestSize
+  if (is.null(file_input)) {
+    # Only show error if we have a session (i.e., user clicked import button)
+    # In reactive context, req() will handle the NULL case silently
+    if (!is.null(session)) {
+      showModal(
+        modalDialog(
+          title = "No file selected",
+          p("Please select a file to import."),
+          footer = modalButton("Close"),
+          easyClose = TRUE,
+          size = "s"
+        )
+      )
+    }
+    return(FALSE)
+  }
+
+  # Get file size in bytes
+  file_size <- file.info(file_input$datapath)$size
+
+  if (is.na(file_size) || file_size == 0) {
+    if (!is.null(session)) {
+      showModal(
+        modalDialog(
+          title = "Invalid file",
+          p("The selected file appears to be empty or invalid."),
+          footer = modalButton("Close"),
+          easyClose = TRUE,
+          size = "s"
+        )
+      )
+    }
+    return(FALSE)
+  }
+
+  if (file_size > max_size_bytes) {
+    showModal(
+      modalDialog(
+        title = "File too large",
+        div(
+          p(paste("The selected file is too large.")),
+          p(paste0(
+            "File size: ",
+            round(file_size / (1024^2), 2), " MB"
+          )),
+          p(paste0(
+            "Maximum allowed size: ",
+            round(max_size_mb, 0), " MB"
+          )),
+          p("Please select a smaller file or contact your administrator to increase the upload limit.")
+        ),
+        footer = modalButton("Close"),
+        easyClose = TRUE,
+        size = "m"
+      )
+    )
+    return(FALSE)
+  }
+  return(TRUE)
 }
 
 # send message to interactive or Shiny session

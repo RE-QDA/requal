@@ -21,6 +21,11 @@ utils::globalVariables(c(
 #' @importFrom shiny NS tagList
 mod_codebook_import_ui <- function(id) {
   ns <- NS(id)
+
+  # Get max upload size from golem options for JavaScript validation
+  max_upload_size <- golem::get_golem_options("max_upload_size") %||% (5 * 1024^2)
+  max_upload_mb <- round(max_upload_size / (1024^2), 0)
+
   tagList(
     selectInput(
       ns("file_type"),
@@ -74,7 +79,54 @@ mod_codebook_import_ui <- function(id) {
         accept = c(".qdc")
       ),
       actionButton(ns("import_qdc"), "Import")
-    )
+    ),
+
+    # JavaScript to check file size and send custom input to Shiny
+    tags$script(HTML(sprintf('
+      document.addEventListener("DOMContentLoaded", function() {
+        var maxBytes = %d;
+        var maxMb = %d;
+        var moduleId = "%s";
+
+        // Check CSV file input - Shiny fileInput has id like "moduleId-file"
+        var csvInput = document.querySelector("#" + moduleId + "-file");
+        if (csvInput) {
+          csvInput.addEventListener("change", function(event) {
+            var files = event.target.files;
+            if (files && files.length > 0) {
+              var fileSize = files[0].size;
+              if (fileSize > maxBytes) {
+                var sizeMb = (fileSize / (1024*1024)).toFixed(2);
+                Shiny.setInputValue("file_too_large", {
+                  sizeMb: sizeMb,
+                  maxMb: maxMb
+                }, {priority: "event"});
+                event.target.value = "";
+              }
+            }
+          });
+        }
+
+        // Check QDC file input
+        var qdcInput = document.querySelector("#" + moduleId + "-qdc_file");
+        if (qdcInput) {
+          qdcInput.addEventListener("change", function(event) {
+            var files = event.target.files;
+            if (files && files.length > 0) {
+              var fileSize = files[0].size;
+              if (fileSize > maxBytes) {
+                var sizeMb = (fileSize / (1024*1024)).toFixed(2);
+                Shiny.setInputValue("file_too_large", {
+                  sizeMb: sizeMb,
+                  maxMb: maxMb
+                }, {priority: "event"});
+                event.target.value = "";
+              }
+            }
+          });
+        }
+      });
+    ', max_upload_size, max_upload_mb, id)))
   )
 }
 
@@ -85,6 +137,10 @@ mod_codebook_import_server <- function(id, glob) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     loc <- reactiveValues()
+    # Stored file paths - maintained by file observers, checked by button handlers
+    loc$file_input <- NULL   # CSV file path
+    loc$qdc_file_input <- NULL  # QDC file path
+
 
     # Internal module helper functions ----
     # (scope includes input, session, loc, or ns)
@@ -152,12 +208,75 @@ mod_codebook_import_server <- function(id, glob) {
 
     # Server business logic ----
 
+    # Observer: Maintain loc$file_input based on CSV file input state
+    observeEvent(input$file, {
+      if (isTruthy(input$file)) {
+        loc$file_input <- input$file$datapath
+      } else {
+        loc$file_input <- NULL
+      }
+    })
+
+    # Observer: Maintain loc$qdc_file_input based on QDC file input state
+    observeEvent(input$qdc_file, {
+      if (isTruthy(input$qdc_file)) {
+        loc$qdc_file_input <- input$qdc_file$datapath
+      } else {
+        loc$qdc_file_input <- NULL
+      }
+    })
+
+    # Observer to handle file size violation from JavaScript
+    observeEvent(input$file_too_large, {
+      req(input$file_too_large)
+      info <- input$file_too_large
+      showModal(
+        modalDialog(
+          title = "File too large",
+          div(
+            p(paste("The selected file is too large.")),
+            p(paste0("File size: ", info$sizeMb, " MB")),
+            p(paste0("Maximum allowed size: ", info$maxMb, " MB")),
+            p("Please select a smaller file.")
+          ),
+          footer = modalButton("Close"),
+          easyClose = TRUE,
+          size = "m"
+        )
+      )
+      # Reset both file input UIs
+      shinyjs::reset("file")
+      shinyjs::reset("qdc_file")
+      # Clear our stored file paths
+      loc$file_input <- NULL
+      loc$qdc_file_input <- NULL
+      # Clear the custom input so it can be triggered again
+      golem::invoke_js("Shiny.setInputValue", list(name = "file_too_large", value = NULL, priority = "event"))
+    })
+
     ## CSV Import -----
     ### Load import file -----
     observeEvent(input$import, {
-      req(input$file)
+      # Check: is there a file in our stored state?
+      if (!isTruthy(loc$file_input)) {
+        showModal(
+          modalDialog(
+            title = "No file selected",
+            p("Please select a CSV file to import before clicking the Import button."),
+            footer = modalButton("Close"),
+            easyClose = TRUE
+          )
+        )
+        return()
+      }
+
+      # File exists - capture path and clear state BEFORE processing
+      file_path <- loc$file_input
+      loc$file_input <- NULL
+      shinyjs::reset("file")
+
       loc$input_df <- utils::read.csv(
-        input$file$datapath,
+        file_path,
         header = input$header,
         sep = input$sep
       )
@@ -245,6 +364,7 @@ mod_codebook_import_server <- function(id, glob) {
           glob$user$user_id
         )
 
+        # Reset file input after successful import
         # Update global state
         glob$codebook_observer <- ifelse(
           !isTruthy(glob$codebook_observer),
@@ -256,9 +376,25 @@ mod_codebook_import_server <- function(id, glob) {
 
     ## QDC Import -----
     observeEvent(input$import_qdc, {
-      req(input$qdc_file)
+      # Check: is there a file in our stored state?
+      if (!isTruthy(loc$qdc_file_input)) {
+        showModal(
+          modalDialog(
+            title = "No file selected",
+            p("Please select a QDC file to import before clicking the Import button."),
+            footer = modalButton("Close"),
+            easyClose = TRUE
+          )
+        )
+        return()
+      }
 
-      qdc_codebook_src <- parse_qdc(input$qdc_file$datapath)
+      # File exists - capture path and clear state BEFORE processing
+      file_path <- loc$qdc_file_input
+      loc$qdc_file_input <- NULL
+      shinyjs::reset("qdc_file")
+
+      qdc_codebook_src <- parse_qdc(file_path)
 
       if (!is.null(qdc_codebook_src$message)) {
         print(qdc_codebook_src$message)

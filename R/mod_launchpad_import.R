@@ -11,11 +11,11 @@ mod_launchpad_import_ui <- function(id) {
   ns <- NS(id)
 
   if (golem::get_golem_options(which = "mode") == "local") {
-    import_UI_local(ns)
+    import_UI_local(id)
   } else if (
     golem::get_golem_options(which = "mode") %in% c("server", "local_test")
   ) {
-    import_UI_server(ns)
+    import_UI_server(id)
   }
 }
 
@@ -31,6 +31,8 @@ mod_launchpad_import_server <- function(id, glob) {
     loc$db_path <- NULL
     loc$active_project <- NULL
     loc$project_directory <- NULL
+    # Single source of truth for file state - maintained by file observer
+    loc$file_input <- NULL  # NULL or file path; button checks this directly
 
     ##################
     # Local setup ####
@@ -54,10 +56,65 @@ mod_launchpad_import_server <- function(id, glob) {
       }
     })
 
+    # Observer: Maintain loc$file_input based on actual file input state
+    # This is the single source of truth for the button handler
+    observeEvent(input$import_file, {
+      if (isTruthy(input$import_file)) {
+        # File selected - store the path
+        loc$file_input <- input$import_file$datapath
+      } else {
+        # File cleared (reset or JS rejection) - clear our stored value
+        loc$file_input <- NULL
+      }
+    })
+
+    # Observer to handle file size violation from JavaScript
+    # When JS rejects a file, reset the UI and clear our stored file path
+    observeEvent(input$file_too_large, {
+      req(input$file_too_large)
+      info <- input$file_too_large
+      showModal(
+        modalDialog(
+          title = "File too large",
+          div(
+            p(paste("The selected file is too large.")),
+            p(paste0("File size: ", info$sizeMb, " MB")),
+            p(paste0("Maximum allowed size: ", info$maxMb, " MB")),
+            p("Please select a smaller file.")
+          ),
+          footer = modalButton("Close"),
+          easyClose = TRUE,
+          size = "m"
+        )
+      )
+      # Reset the file input UI
+      shinyjs::reset("import_file")
+      # Clear our stored file path (file observer will also fire but input is already NULL)
+      loc$file_input <- NULL
+      # Clear the custom input so it can be triggered again
+      golem::invoke_js("Shiny.setInputValue", list(name = "file_too_large", value = NULL, priority = "event"))
+    })
+
     observeEvent(req(golem::get_golem_options(which = "mode") == "local"), {
       # handle import button ----
       observeEvent(input$project_import, {
-        req(input$import_file)
+        # Check: is there a file in our stored state?
+        if (!isTruthy(loc$file_input)) {
+          showModal(
+            modalDialog(
+              title = "No file selected",
+              p("Please select a file to import before clicking the Import button."),
+              footer = modalButton("Close"),
+              easyClose = TRUE
+            )
+          )
+          return()
+        }
+
+        # File exists - capture path and clear state BEFORE processing
+        file_path <- loc$file_input
+        loc$file_input <- NULL  # Clear so next click requires new selection
+        shinyjs::reset("import_file")  # Reset UI
 
         # Set importing flag to show progress UI
         loc$importing <- TRUE
@@ -79,9 +136,9 @@ mod_launchpad_import_server <- function(id, glob) {
           footer = NULL
         ))
 
-        # parse QDPX first to get project name
+        # parse QDPX first to get project name (use captured file_path)
         parsed <- tryCatch(
-          parse_qdpx(input$import_file$datapath),
+          parse_qdpx(file_path),
           error = function(e) {
             removeModal()
             warn_user(paste("Error parsing QDPX file:", conditionMessage(e)))
@@ -146,9 +203,6 @@ mod_launchpad_import_server <- function(id, glob) {
         )
 
         if (isTRUE(import_result)) {
-          # Clear the file input using shinyjs::reset()
-          shinyjs::reset("import_file")
-
           # Signal that a project was imported (triggers selector update in loader)
           glob$project_imported <- glob$project_imported + 1
 
@@ -224,7 +278,23 @@ mod_launchpad_import_server <- function(id, glob) {
       ),
       {
         observeEvent(input$project_import, {
-          req(input$import_file)
+          # Check: is there a file in our stored state?
+          if (!isTruthy(loc$file_input)) {
+            showModal(
+              modalDialog(
+                title = "No file selected",
+                p("Please select a file to import before clicking the Import button."),
+                footer = modalButton("Close"),
+                easyClose = TRUE
+              )
+            )
+            return()
+          }
+
+          # File exists - capture path and clear state BEFORE processing
+          file_path <- loc$file_input
+          loc$file_input <- NULL
+          shinyjs::reset("import_file")
 
           # require project admin privileges
           if (!isTruthy(glob$user$project_admin)) {
@@ -259,9 +329,9 @@ mod_launchpad_import_server <- function(id, glob) {
             glob$pool <- pool
           }
 
-          # parse QDPX
+          # parse QDPX (use captured file_path)
           parsed <- tryCatch(
-            parse_qdpx(input$import_file$datapath),
+            parse_qdpx(file_path),
             error = function(e) {
               removeModal()
               warn_user(paste("Error parsing QDPX file:", e$message))
@@ -304,9 +374,6 @@ mod_launchpad_import_server <- function(id, glob) {
           )
 
           if (isTRUE(import_result)) {
-            # Clear the file input using shinyjs::reset()
-            shinyjs::reset("import_file")
-
             # Signal that a project was imported (triggers selector update in loader)
             glob$project_imported <- glob$project_imported + 1
 

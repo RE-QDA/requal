@@ -10,7 +10,7 @@
 #' @param dbpassword Password to DB (for server use only)
 #' @param credentials_path Path to credentials DB (for server use only)
 #' @param credentials_pass Password to credentials DB (for server use only)
-#' @param max_upload_size Maximum file upload size in bytes (default: 500 MB)
+#' @param max_upload_size Maximum file upload size in bytes (default: 5 MB)
 #' @inheritParams shiny::shinyApp
 #'
 #' @export
@@ -24,7 +24,7 @@ run_app <- function(mode = "local",
                     dbpassword = NULL,
                     credentials_path = NULL,
                     credentials_pass = NULL,
-                    max_upload_size = 500 * 1024^2,  # 500 MB default
+                    max_upload_size = 5 * 1024^2,  # 5 MB default
                     uiPattern = "/",
                     ...) {
   # Set maximum upload size for file inputs
@@ -55,7 +55,8 @@ run_app <- function(mode = "local",
                       dbusername = dbusername,
                       dbpassword = dbpassword,
                       credentials_path = credentials_path,
-                      credentials_pass = credentials_pass)
+                      credentials_pass = credentials_pass,
+                      max_upload_size = max_upload_size)
   )
 }
 
